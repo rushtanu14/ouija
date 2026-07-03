@@ -377,6 +377,40 @@ export interface TrackEvidence {
   pipeline: ReasoningTraceStep[];
 }
 
+export interface ProgressPortfolioSnapshot {
+  id: string;
+  title: string;
+  subject: string;
+  savedAt: string;
+  score: number;
+  readiness: TrackEvidence["readiness"];
+  issueCount: number;
+}
+
+export interface ProgressPortfolioMetric {
+  id: "saved-runs" | "score-trend" | "subject-breadth" | "best-readiness";
+  label: string;
+  value: string;
+  status: "strong" | "watch" | "needs_action";
+  detail: string;
+}
+
+export interface ProgressPortfolioMilestone {
+  id: "first-saved-run" | "strongest-run" | "latest-next-step";
+  label: string;
+  title: string;
+  detail: string;
+}
+
+export interface ProgressPortfolio {
+  status: "empty" | "building" | "evidence_ready";
+  summary: string;
+  metrics: ProgressPortfolioMetric[];
+  milestones: ProgressPortfolioMilestone[];
+  nextAction: string;
+  judgeTakeaway: string;
+}
+
 export type RubricStatus = "strong" | "ready" | "review";
 
 export interface RubricCriterionFit {

@@ -54,9 +54,9 @@ Click Projectile Motion, Pendulum, Ohm's Law, Enzyme Activity, Density Layers, a
 
 Type an unsupported plant-light lab. Show that Ouija labels it as a low-confidence closest supported match instead of pretending full coverage, then scroll to Custom Lab Triage: inferred focus, suggested columns, source searches, clarifying questions, and teacher-confirmation boundary.
 
-## 4:50-4:55 - Saved Lab Snapshot
+## 4:50-4:55 - Saved Lab Snapshot And Progress Portfolio
 
-Save the current run and show the Saved Labs section so judges see the workflow continues after one analysis.
+Save the current run and show Saved Labs plus Progress Portfolio so judges see the workflow continues after one analysis and can measure saved-run trend, subject breadth, and the next portfolio action.
 
 ## 4:55-4:58 - Evaluation Bench
 
@@ -64,7 +64,7 @@ Show Evaluation Bench with 100/100 and 8/8 live checks: projectile, pendulum per
 
 ## 4:58-5:00 - Judge Brief
 
-Show Judge Brief so evaluators see Track 1 fit, Judge Demo Path, live app, hosted deck/video links, official rubric fit, learning impact, learning exit ticket, grounding audit, AI evaluation harness, data-handling ethics, pattern evidence, model strategy, AI pipeline, evaluation, tests, and integrity constraints in one place.
+Show Judge Brief so evaluators see Track 1 fit, Judge Demo Path, live app, hosted deck/video links, official rubric fit, learning impact, learning exit ticket, progress portfolio, grounding audit, AI evaluation harness, data-handling ethics, pattern evidence, model strategy, AI pipeline, evaluation, tests, and integrity constraints in one place.
 
 ## Closing Line
 

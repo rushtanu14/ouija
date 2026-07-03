@@ -136,6 +136,7 @@ a {
 .next-trial-panel,
 .evidence-packet,
 .saved-labs-panel,
+.progress-portfolio-panel,
 .evaluation-panel,
 .judge-brief-panel,
 .settings-panel,
@@ -2334,7 +2335,7 @@ td input {
 
 .lower-workspace {
   display: grid;
-  grid-template-columns: repeat(5, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: 18px;
   width: min(1500px, calc(100vw - 40px));
   margin: 0 auto;
@@ -2342,6 +2343,7 @@ td input {
 }
 
 .saved-labs-panel,
+.progress-portfolio-panel,
 .evaluation-panel,
 .model-card-panel,
 .judge-brief-panel,
@@ -2661,6 +2663,120 @@ td input {
   width: 36px;
   padding: 0;
   color: #8a1f12;
+}
+
+.progress-portfolio-panel {
+  align-content: start;
+}
+
+.progress-summary {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  border-radius: 8px;
+  padding: 12px;
+  color: #173b74;
+  background: #eef5ff;
+}
+
+.progress-summary strong {
+  display: block;
+  color: #173b74;
+  line-height: 1.2;
+}
+
+.progress-summary > span {
+  min-width: 0;
+  color: #526276;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.progress-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.progress-metric {
+  display: grid;
+  gap: 5px;
+  border: 1px solid #d9e5f2;
+  border-radius: 8px;
+  padding: 11px;
+  background: #fbfdff;
+}
+
+.progress-metric-strong {
+  border-color: #ccebd8;
+  background: #f3fbf6;
+}
+
+.progress-metric-watch {
+  border-color: #f2dfae;
+  background: #fffaf0;
+}
+
+.progress-metric-needs_action {
+  border-color: #f3c8be;
+  background: #fff5f2;
+}
+
+.progress-metric strong {
+  color: #172439;
+  font-size: 18px;
+}
+
+.progress-metric span {
+  color: #607087;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.progress-milestones {
+  display: grid;
+  gap: 9px;
+}
+
+.progress-milestones > article {
+  display: grid;
+  gap: 4px;
+  border-left: 3px solid #2368ff;
+  padding-left: 10px;
+}
+
+.progress-milestones span {
+  color: #607087;
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.progress-milestones strong {
+  color: #172439;
+  font-size: 14px;
+  line-height: 1.25;
+}
+
+.progress-milestones small,
+.progress-next-action span {
+  color: #607087;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.progress-next-action {
+  display: grid;
+  gap: 7px;
+  border-radius: 8px;
+  padding: 12px;
+  color: #1f4c38;
+  background: #eefaf2;
+}
+
+.progress-next-action strong {
+  color: #173b33;
+  line-height: 1.35;
 }
 
 .settings-grid {

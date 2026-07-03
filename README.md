@@ -27,8 +27,9 @@ Ouija is a student-facing AI experiment interpreter for middle and high school s
 12. Copy the Evidence Packet as a student-owned reasoning handoff with judge demo path, Custom Lab Triage, AIYES rubric fit, learning impact, Learning Exit Ticket, guided flow, Grounding Audit, AI Evaluation Harness, Data Handling Ledger, sources, checks, safety notes, concept vocabulary, pattern evidence, repeat reliability, data table, next-trial plan, blanks, and next question.
 13. Open Evaluation Bench to see eight live checks: seven supported lab demos plus the unsupported-lab boundary.
 14. Save lab snapshots locally so a student can return to a checked run without sending data to an account system.
-15. Open AI Model Card for the architecture, grounding, evaluation, privacy, and guardrail summary.
-16. Open Judge Brief for a compact Track 1 proof surface: live app, hosted deck/video, judge demo path, official rubric fit, learning impact, AI pipeline, model strategy, evaluation, data-handling ethics, tests, and integrity constraints.
+15. Use Progress Portfolio to show saved-run count, score trend, subject breadth, strongest run, and next portfolio action.
+16. Open AI Model Card for the architecture, grounding, evaluation, privacy, and guardrail summary.
+17. Open Judge Brief for a compact Track 1 proof surface: live app, hosted deck/video, judge demo path, official rubric fit, learning impact, progress portfolio, AI pipeline, model strategy, evaluation, data-handling ethics, tests, and integrity constraints.
 
 Guided Lab Flow gives students one current next action and six stable stages so the interface feels like a lab workflow rather than separate AI outputs.
 
@@ -75,6 +76,8 @@ Learning Exit Ticket turns AI feedback into three student reflection prompts for
 Spreadsheet paste import turns copied lab-table rows into graph/check inputs without requiring students to retype every cell, and the expected overlay updates with the edited table.
 
 Saved Labs stores up to six browser-local lab snapshots with the experiment, table rows, readiness score, and data flags.
+
+Progress Portfolio turns those saved labs into repeated learning evidence: saved-run count, score trend, subject breadth, strongest run, milestones, and the next portfolio action.
 
 ## Run
 

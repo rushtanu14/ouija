@@ -23,6 +23,8 @@ describe("AIYES submission assets", () => {
     expect(copy).toContain("Project Title");
     expect(copy).toContain("Ouija");
     expect(copy).toContain("Built With");
+    expect(copy).toContain("Progress Portfolio");
+    expect(assets).toContain("Progress Portfolio");
     expect(assets).toContain("npm run capture:submission");
     expect(assets).toContain("npm run record:walkthrough");
     expect(assets).toContain("npm run sync:public-submission");

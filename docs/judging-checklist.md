@@ -9,6 +9,7 @@
 - AIYES Rubric Fit gives judges concrete problem/relevance evidence for each analyzed run.
 - Learning Impact Loop measures whether a run leaves the student ready to reason, watching flags, or needing fixes.
 - Learning Exit Ticket asks the student to explain variables, graph pattern, and next step in their own words before writing.
+- Progress Portfolio shows whether saved runs demonstrate learning trend, subject breadth, and a next portfolio action.
 - Judge Demo Path gives evaluators a direct route through problem fit, AI design, student workflow, evidence handoff, and submission proof.
 - Custom Lab Triage keeps unsupported student experiments useful without claiming full V1 coverage, because it gives students a concrete investigation planner instead of a fake expected result.
 
@@ -55,6 +56,7 @@
 - AIYES Rubric Fit visibly maps the run to the three official criteria: Problem Definition and Real-World Relevance, AI Technical Design and Model Strategy, and User Experience and Design.
 - Learning Impact Loop visibly scores outcome, data quality, concept learning, integrity, pattern evidence, repeat reliability, and next-trial readiness for every run.
 - Learning Exit Ticket visibly checks whether the student can explain variables, pattern evidence, and the next controlled step.
+- Progress Portfolio visibly turns Saved Labs into repeated learning evidence instead of only storage.
 - AI Model Card visibly summarizes architecture, grounding mode, evaluation method, privacy boundary, and risk controls.
 - Data Handling Ledger visibly summarizes privacy, retention, browser-local saves, and student controls.
 - Evaluation Bench exposes eight live checks through the app and `/api/evaluate`.
@@ -77,6 +79,7 @@
 - AIYES Rubric Fit appears in the app and Evidence Packet so judges can inspect the official UX/design fit during the live demo or exported handoff.
 - Learning Impact Loop appears in the app and Evidence Packet so the user's practical benefit is measurable inside the workflow.
 - Learning Exit Ticket appears in the app and Evidence Packet so judges can inspect student understanding prompts during the demo or exported handoff.
+- Progress Portfolio appears near Saved Labs so judges can inspect score trend, subject breadth, and strongest saved run.
 - Desktop and mobile E2E checks verify no horizontal overflow.
 
 ## Remaining Submission Work

@@ -17,6 +17,7 @@ import {
   ShieldCheck,
   SlidersHorizontal,
   Trash2,
+  TrendingUp,
   Trophy,
   Workflow
 } from "lucide-react";
@@ -36,6 +37,7 @@ import { requestAnalysis, requestEvaluation } from "./lib/api";
 import { refreshResultForRows } from "./lib/analysis";
 import { buildPasteExample, parsePastedTable } from "./lib/dataImport";
 import { buildEvidencePacket } from "./lib/evidencePacket";
+import { buildProgressPortfolio } from "./lib/progressPortfolio";
 import { SAMPLE_PROMPTS } from "./lib/samples";
 import type {
   AnalyzeResult,
@@ -56,6 +58,8 @@ import type {
   NextTrialPlan,
   OfficialRubricFit,
   PatternEvidence,
+  ProgressPortfolio,
+  ProgressPortfolioSnapshot,
   ReliabilityCoach,
   SafetyCoach,
   StudentDataRow
@@ -67,16 +71,9 @@ const liveDemoUrl = "https://ouija-olive.vercel.app";
 const slideDeckUrl = "https://ouija-olive.vercel.app/submission/slide-deck.html";
 const walkthroughVideoUrl = "https://ouija-olive.vercel.app/submission/assets/ouija-walkthrough.webm";
 
-interface SavedLab {
-  id: string;
-  title: string;
-  subject: string;
+interface SavedLab extends ProgressPortfolioSnapshot {
   description: string;
-  savedAt: string;
   rows: StudentDataRow[];
-  score: number;
-  readiness: AnalyzeResult["trackEvidence"]["readiness"];
-  issueCount: number;
 }
 
 export function App() {
@@ -162,6 +159,7 @@ export function App() {
       expectedY: comparisonByRow.get(row.id)?.expectedY ?? null
     }));
   }, [result, rows]);
+  const progressPortfolio = useMemo(() => buildProgressPortfolio(savedLabs), [savedLabs]);
 
   return (
     <main className="app-shell">
@@ -180,6 +178,7 @@ export function App() {
           <a href="#impact">Impact</a>
           <a href="#evaluation">Eval Bench</a>
           <a href="#saved">Saved Labs</a>
+          <a href="#progress">Progress</a>
           <a href="#model-card">Model Card</a>
           <a href="#judge">Judge Brief</a>
           <a href="#settings">Settings</a>
@@ -350,6 +349,7 @@ export function App() {
       </section>
       <section className="lower-workspace" aria-label="Saved labs and settings">
         <SavedLabsPanel savedLabs={savedLabs} onLoad={loadSavedLab} onDelete={deleteSavedLab} />
+        <ProgressPortfolioPanel portfolio={progressPortfolio} />
         <EvaluationBenchPanel report={evaluationReport} />
         <ModelCardPanel result={result} />
         <JudgeBriefPanel result={result} />
@@ -623,6 +623,7 @@ function JudgeBriefPanel({ result }: { result: AnalyzeResult | null }) {
     "Spreadsheet paste/import flows into data checks.",
     "Evidence Packet exports a student-owned reasoning handoff.",
     "Next Trial Planner gives adaptive measurement guidance.",
+    "Progress Portfolio shows learning over multiple saved runs.",
     "Evaluation Bench runs eight live cases.",
     "Custom Lab Triage keeps unsupported labs useful without pretending full coverage.",
     "Hosted deck and walkthrough are public.",
@@ -701,6 +702,7 @@ function ModelCardPanel({ result }: { result: AnalyzeResult | null }) {
     "Expected overlay gives students a visual comparison between their data and the expected pattern.",
     "Grounding Audit checks source agreement before students use the expected pattern.",
     "Data Handling Ledger makes student data flow, retention, and controls inspectable.",
+    "Progress Portfolio turns saved labs into repeated learning evidence for judges.",
     "Pattern Evidence Engine quantifies whether the dataset supports the expected science pattern.",
     "Reliability Coach checks repeated trials, averages, and spread before students trust a claim.",
     "Guided Lab Flow turns dense analysis into student next steps.",
@@ -802,6 +804,48 @@ function SavedLabsPanel({
       ) : (
         <p className="empty-copy">No saved lab snapshots yet.</p>
       )}
+    </section>
+  );
+}
+
+function ProgressPortfolioPanel({ portfolio }: { portfolio: ProgressPortfolio }) {
+  return (
+    <section className={`progress-portfolio-panel progress-portfolio-${portfolio.status}`} id="progress" aria-label="Progress Portfolio">
+      <div className="panel-title">
+        <TrendingUp size={18} />
+        <h3>Progress Portfolio</h3>
+      </div>
+      <div className="progress-summary">
+        <div>
+          <p className="section-label">Learning record</p>
+          <strong>{formatProgressPortfolioStatus(portfolio.status)}</strong>
+        </div>
+        <span>{portfolio.summary}</span>
+      </div>
+      <div className="progress-metrics">
+        {portfolio.metrics.map((metric) => (
+          <article className={`progress-metric progress-metric-${metric.status}`} key={metric.id}>
+            <p className="section-label">{metric.label}</p>
+            <strong>{metric.value}</strong>
+            <span>{metric.detail}</span>
+          </article>
+        ))}
+      </div>
+      <div className="progress-milestones">
+        <p className="section-label">Portfolio milestones</p>
+        {portfolio.milestones.map((milestone) => (
+          <article key={milestone.id}>
+            <span>{milestone.label}</span>
+            <strong>{milestone.title}</strong>
+            <small>{milestone.detail}</small>
+          </article>
+        ))}
+      </div>
+      <div className="progress-next-action">
+        <p className="section-label">Next portfolio action</p>
+        <strong>{portfolio.nextAction}</strong>
+        <span>{portfolio.judgeTakeaway}</span>
+      </div>
     </section>
   );
 }
@@ -1775,6 +1819,12 @@ function formatReadiness(readiness: AnalyzeResult["trackEvidence"]["readiness"])
   if (readiness === "competitive") return "Competitive";
   if (readiness === "submittable") return "Submittable";
   return "Needs work";
+}
+
+function formatProgressPortfolioStatus(status: ProgressPortfolio["status"]) {
+  if (status === "evidence_ready") return "Evidence ready";
+  if (status === "building") return "Portfolio building";
+  return "Start portfolio";
 }
 
 function formatRubricStatus(status: OfficialRubricFit["criteria"][number]["status"]) {

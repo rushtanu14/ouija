@@ -209,6 +209,31 @@ test("student can paste spreadsheet data into the active table", async ({ page }
   await expect(page.getByLabel("Reasoning trail").getByText("Expose model strategy")).toBeVisible();
 });
 
+test("saved labs build a visible progress portfolio for judges", async ({ page }) => {
+  await page.addInitScript(() => window.localStorage.clear());
+  await page.goto("/");
+
+  await page.getByLabel("Describe your experiment").fill("We grew bean seedlings under red, blue, and white light and measured plant height.");
+  await page.getByRole("button", { name: "Analyze" }).click();
+  await expect(page.getByRole("heading", { name: "Custom Lab Triage" })).toBeVisible();
+  await page.getByRole("button", { name: "Save current lab" }).click();
+  await page.getByRole("link", { name: "Saved Labs" }).click();
+  await expect(page.getByRole("heading", { name: "Progress Portfolio" })).toBeVisible();
+  await expect(page.getByLabel("Progress Portfolio").getByText("1 saved run")).toBeVisible();
+  await expect(page.getByLabel("Progress Portfolio").getByText("Portfolio building")).toBeVisible();
+
+  await page.getByRole("button", { name: "Water Filtration" }).click();
+  await expect(page.getByRole("heading", { name: "Water Filtration and Turbidity" })).toBeVisible();
+  await page.getByRole("button", { name: "Save current lab" }).click();
+  await page.getByRole("link", { name: "Saved Labs" }).click();
+
+  await expect(page.getByLabel("Progress Portfolio").getByText("2 saved runs")).toBeVisible();
+  await expect(page.locator(".progress-metric").filter({ hasText: "Score trend" }).getByText("+19", { exact: true })).toBeVisible();
+  await expect(page.locator(".progress-metric").filter({ hasText: "Subject breadth" }).getByText("2 subjects", { exact: true })).toBeVisible();
+  await expect(page.getByLabel("Progress Portfolio").getByText("repeated learning evidence")).toBeVisible();
+  await expect(page.getByLabel("Judge Brief").getByText("Progress Portfolio shows learning over multiple saved runs.")).toBeVisible();
+});
+
 test("sample chip analysis wins over a slower initial analysis", async ({ page }) => {
   let delayedInitial = false;
 
