@@ -1,0 +1,50 @@
+import { describe, expect, it } from "vitest";
+import { parsePastedTable } from "../src/lib/dataImport";
+import type { DataColumn } from "../src/lib/types";
+
+const reactionColumns: DataColumn[] = [
+  { key: "tempC", label: "Temperature", unit: "C", numeric: true },
+  { key: "reactionTimeS", label: "Reaction time", unit: "s", numeric: true },
+  { key: "ratePerS", label: "Rate", unit: "1/s", numeric: true }
+];
+
+describe("parsePastedTable", () => {
+  it("maps tab-separated spreadsheet rows by header labels", () => {
+    const parsed = parsePastedTable(
+      "Temperature (C)\tReaction time (s)\tRate (1/s)\n10\t118\t0.008\n22\t74\t0.014",
+      reactionColumns
+    );
+
+    expect(parsed.usedHeader).toBe(true);
+    expect(parsed.rows).toEqual([
+      { id: "import-1", tempC: "10", reactionTimeS: "118", ratePerS: "0.008" },
+      { id: "import-2", tempC: "22", reactionTimeS: "74", ratePerS: "0.014" }
+    ]);
+  });
+
+  it("maps rows positionally when headers are omitted", () => {
+    const parsed = parsePastedTable("10,118,0.008\n22,74,0.014", reactionColumns);
+
+    expect(parsed.usedHeader).toBe(false);
+    expect(parsed.rows[1].ratePerS).toBe("0.014");
+  });
+
+  it("keeps quoted comma cells together", () => {
+    const columns: DataColumn[] = [
+      { key: "liquid", label: "Liquid", numeric: false },
+      { key: "observation", label: "Observation", numeric: false }
+    ];
+
+    const parsed = parsePastedTable('Liquid,Observation\n"oil, vegetable","top layer"', columns);
+
+    expect(parsed.rows[0]).toEqual({ id: "import-1", liquid: "oil, vegetable", observation: "top layer" });
+  });
+
+  it("ignores blank pasted rows", () => {
+    const parsed = parsePastedTable("\n\nTemperature (C),Reaction time (s),Rate (1/s)\n\n", reactionColumns);
+
+    expect(parsed.usedHeader).toBe(true);
+    expect(parsed.rows).toEqual([]);
+    expect(parsed.ignoredRows).toBe(0);
+  });
+});

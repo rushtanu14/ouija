@@ -1,19 +1,250 @@
 import { expect, test } from "@playwright/test";
 
 test("student can analyze a sample experiment, edit table data, and see citations", async ({ page }) => {
+  await page.addInitScript(() => window.localStorage.clear());
   await page.goto("/");
 
   await page.getByRole("button", { name: "Reaction Rate" }).click();
   await expect(page.getByRole("heading", { name: "Reaction Rate vs Temperature" })).toBeVisible();
-  await expect(page.getByRole("link", { name: /Factors that affect reaction rates/i })).toBeVisible();
+  await expect(page.getByLabel("Sources and explanation").getByRole("link", { name: /Factors that affect reaction rates/i })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Grounding Audit" })).toBeVisible();
+  await expect(page.getByLabel("Grounding Audit").getByText("Source trust")).toBeVisible();
+  await expect(page.getByLabel("Grounding Audit").getByText("Student source task")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Guided Lab Flow" })).toBeVisible();
+  await expect(page.getByLabel("Guided Lab Flow").getByText("Get the teacher safety check before starting or extending the lab.")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Model Strategy" })).toBeVisible();
+  await expect(page.getByLabel("Model Strategy").getByText("Selected Reaction Rate vs Temperature")).toBeVisible();
+  await expect(page.getByLabel("Model Strategy").getByText("Top candidates")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "AI Evaluation Harness" })).toBeVisible();
+  await expect(page.getByLabel("AI Evaluation Harness").getByText("Model evidence")).toBeVisible();
+  await expect(page.getByLabel("AI Evaluation Harness").getByText("Coverage benchmark")).toBeVisible();
+  await expect(page.getByLabel("AI Evaluation Harness").getByText("Judge signal")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Data Handling Ledger" })).toBeVisible();
+  await expect(page.getByLabel("Data Handling Ledger").getByText("Student data", { exact: true })).toBeVisible();
+  await expect(page.getByLabel("Data Handling Ledger").getByText("Browser-local saved labs", { exact: true })).toBeVisible();
+  await expect(page.getByLabel("Data Handling Ledger").getByText("API key stays server-side")).toBeVisible();
+  await expect(page.getByLabel("Data Handling Ledger").getByText("Student control")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "AIYES Rubric Fit" })).toBeVisible();
+  await expect(page.getByLabel("AIYES Rubric Fit").getByText("Problem Definition and Real-World Relevance")).toBeVisible();
+  await expect(page.getByLabel("AIYES Rubric Fit").getByText("AI Technical Design and Model Strategy")).toBeVisible();
+  await expect(page.getByLabel("AIYES Rubric Fit").getByText("User Experience and Design")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Learning Impact Loop" })).toBeVisible();
+  await expect(page.getByLabel("Learning Impact Loop").getByText("Student outcome")).toBeVisible();
+  await expect(page.getByLabel("Learning Impact Loop").getByText("Data quality")).toBeVisible();
+  await expect(page.getByLabel("Learning Impact Loop").getByText("Pattern evidence", { exact: true })).toBeVisible();
+  await expect(page.getByLabel("Learning Impact Loop").getByText("Repeat reliability")).toBeVisible();
+  await expect(page.locator(".impact-metric").filter({ hasText: "Student outcome" }).getByText("Ready to reason", { exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Learning Exit Ticket" })).toBeVisible();
+  await expect(page.getByLabel("Learning Exit Ticket").getByText("Exit ticket prompts")).toBeVisible();
+  await expect(page.getByLabel("Learning Exit Ticket").getByText(/Which part of your setup was the independent variable/i)).toBeVisible();
+  await expect(page.getByLabel("Learning Exit Ticket").getByText("Teacher signal").first()).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Judge Demo Path" })).toBeVisible();
+  await expect(page.getByLabel("Judge Demo Path").getByText("Next best action")).toBeVisible();
+  await expect(page.getByLabel("Judge Demo Path").getByText("Problem fit", { exact: true })).toBeVisible();
+  await expect(page.getByLabel("Judge Demo Path").getByText("Submission proof", { exact: true })).toBeVisible();
   await expect(page.getByText("Student data table")).toBeVisible();
+  await expect(page.getByLabel("Expected overlay summary").getByText("Dashed expected overlay")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Method Audit" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Pattern Evidence Engine" })).toBeVisible();
+  await expect(page.getByLabel("Pattern Evidence Engine").getByText("Whole-pattern support")).toBeVisible();
+  await expect(page.getByLabel("Method Audit").getByText("Controlled variables", { exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Reliability Coach" })).toBeVisible();
+  await expect(page.getByLabel("Reliability Coach").getByText("Repeat groups")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Safety Coach" })).toBeVisible();
+  await expect(page.getByLabel("Safety Coach").getByText("Adult review", { exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Concept Coach" })).toBeVisible();
+  await expect(page.getByLabel("Concept Coach").getByText("Vocabulary")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Claim Coach" })).toBeVisible();
+  await expect(page.getByLabel("Claim Coach").getByText("I can claim that ___ because my graph shows ___")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Next Trial Planner" })).toBeVisible();
+  await expect(page.getByLabel("Next Trial Planner").getByText("Next measurement")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Evidence Packet" })).toBeVisible();
+  await expect(page.getByLabel("Student evidence packet")).toHaveValue(/Ouija Evidence Packet: Reaction Rate vs Temperature/);
+  await expect(page.getByLabel("Student evidence packet")).toHaveValue(/Model Strategy/);
+  await expect(page.getByLabel("Student evidence packet")).toHaveValue(/AI Evaluation Harness/);
+  await expect(page.getByLabel("Student evidence packet")).toHaveValue(/Data Handling Ledger/);
+  await expect(page.getByLabel("Student evidence packet")).toHaveValue(/Browser-local saved labs/);
+  await expect(page.getByLabel("Student evidence packet")).toHaveValue(/Judge Demo Path/);
+  await expect(page.getByLabel("Student evidence packet")).toHaveValue(/Next best action/);
+  await expect(page.getByLabel("Student evidence packet")).toHaveValue(/AIYES Rubric Fit/);
+  await expect(page.getByLabel("Student evidence packet")).toHaveValue(/Grounding Audit/);
+  await expect(page.getByLabel("Student evidence packet")).toHaveValue(/Expected Overlay/);
+  await expect(page.getByLabel("Student evidence packet")).toHaveValue(/Learning Impact Loop/);
+  await expect(page.getByLabel("Student evidence packet")).toHaveValue(/Learning Exit Ticket/);
+  await expect(page.getByLabel("Student evidence packet")).toHaveValue(/Exit ticket prompt:/);
+  await expect(page.getByLabel("Student evidence packet")).toHaveValue(/Pattern Evidence/);
+  await expect(page.getByLabel("Student evidence packet")).toHaveValue(/Guided Lab Flow/);
+  await expect(page.getByLabel("Student evidence packet")).toHaveValue(/Concept Coach/);
+  await expect(page.getByLabel("Student evidence packet")).toHaveValue(/Reliability Coach/);
+  await expect(page.getByLabel("Student evidence packet")).toHaveValue(/Safety Coach/);
+  await expect(page.getByLabel("Student evidence packet")).toHaveValue(/Next Trial Plan/);
+  await expect(page.getByLabel("Student evidence packet")).toHaveValue(/I can claim that ___/);
+  await expect(page.getByRole("heading", { name: "Reasoning trail" })).toBeVisible();
+  await expect(page.getByText("Track 1 evidence")).toBeVisible();
+  await expect(page.getByLabel("Reasoning trail").getByText("AI technical design", { exact: true })).toBeVisible();
+  await expect(page.getByLabel("Reasoning trail").getByText("Model strategy", { exact: true })).toBeVisible();
+  await expect(page.getByLabel("Reasoning trail").getByText("AI evaluation harness", { exact: true })).toBeVisible();
+  await expect(page.getByLabel("Reasoning trail").getByText("Run AI evaluation harness", { exact: true })).toBeVisible();
+  await expect(page.getByLabel("Reasoning trail").getByText("Judge demo path", { exact: true })).toBeVisible();
+  await expect(page.getByLabel("Reasoning trail").getByText("Guide judge demo", { exact: true })).toBeVisible();
+  await expect(page.getByLabel("Reasoning trail").getByText("Pattern evidence", { exact: true })).toBeVisible();
+  await expect(page.getByLabel("Reasoning trail").getByText("Score whole pattern", { exact: true })).toBeVisible();
+  await expect(page.getByLabel("Reasoning trail").getByText("Repeat reliability", { exact: true })).toBeVisible();
+  await expect(page.getByLabel("Reasoning trail").getByText("Audit data handling", { exact: true })).toBeVisible();
+  await expect(page.getByLabel("Reasoning trail").getByText("Data ethics", { exact: true })).toBeVisible();
+  await expect(page.getByLabel("Reasoning trail").getByText("Check learning exit ticket", { exact: true })).toBeVisible();
+  await expect(page.getByLabel("Reasoning trail").getByText("Learning exit ticket", { exact: true })).toBeVisible();
+  await page.getByRole("link", { name: "Eval Bench" }).click();
+  await expect(page.getByLabel("Evaluation Bench").getByText("100/100")).toBeVisible();
+  await expect(page.getByLabel("Evaluation Bench").getByText("8/8 passed")).toBeVisible();
+  await expect(page.getByLabel("Evaluation Bench").getByText("Pendulum coverage")).toBeVisible();
+  await expect(page.getByLabel("Evaluation Bench").getByText("Circuit coverage")).toBeVisible();
+  await expect(page.getByLabel("Evaluation Bench").getByText("Density coverage")).toBeVisible();
+  await expect(page.getByLabel("Evaluation Bench").getByText("Coverage boundary")).toBeVisible();
+  await page.getByRole("link", { name: "Model Card" }).click();
+  await expect(page.getByLabel("AI Model Card").getByText("Hybrid and inspectable")).toBeVisible();
+  await expect(page.getByLabel("AI Model Card").getByText("Trusted fallback")).toBeVisible();
+  await expect(page.getByLabel("AI Model Card").getByText("8 live cases")).toBeVisible();
+  await expect(page.getByLabel("AI Model Card").getByText("Server keeps API keys out of the browser.")).toBeVisible();
+  await expect(page.getByLabel("AI Model Card").getByText("Model Strategy exposes candidate ranking, signals, fallback behavior, and risk controls.")).toBeVisible();
+  await expect(page.getByLabel("AI Model Card").getByText("AI Evaluation Harness scores classifier confidence, coverage, grounding, validators, safety, and fallback boundaries.")).toBeVisible();
+  await expect(page.getByLabel("AI Model Card").getByText("Judge Demo Path reduces the live demo to problem fit, AI design, student workflow, evidence handoff, and submission proof.")).toBeVisible();
+  await expect(page.getByLabel("AI Model Card").getByText("Official Rubric Fit maps problem relevance, AI design, and UX to concrete app evidence.")).toBeVisible();
+  await expect(page.getByLabel("AI Model Card").getByText("Learning Impact Loop turns analysis into measurable student readiness and next-trial evidence.")).toBeVisible();
+  await expect(page.getByLabel("AI Model Card").getByText("Learning Exit Ticket converts the AI feedback into student reflection prompts judges can inspect.")).toBeVisible();
+  await expect(page.getByLabel("AI Model Card").getByText("Grounding Audit checks source agreement before students use the expected pattern.")).toBeVisible();
+  await expect(page.getByLabel("AI Model Card").getByText("Pattern Evidence Engine quantifies whether the dataset supports the expected science pattern.")).toBeVisible();
+  await expect(page.getByLabel("AI Model Card").getByText("Reliability Coach checks repeated trials, averages, and spread before students trust a claim.")).toBeVisible();
+  await expect(page.getByLabel("AI Model Card").getByText("Safety Coach forces adult-review language when a lab match is uncertain.")).toBeVisible();
+  await expect(page.getByLabel("AI Model Card").getByText("Evaluation Bench tests seven supported labs plus the unsupported boundary.")).toBeVisible();
+  await expect(page.getByLabel("AI Model Card").getByText("Data Handling Ledger makes student data flow, retention, and controls inspectable.")).toBeVisible();
+  await page.getByRole("button", { name: "Save current lab" }).click();
+  await page.getByRole("link", { name: "Saved Labs" }).click();
+  await expect(page.locator("#saved").getByText("Reaction Rate vs Temperature", { exact: true })).toBeVisible();
+  await expect(page.locator("#saved").getByText(/Competitive .* 94\/100/)).toBeVisible();
+  await page.getByRole("link", { name: "Settings" }).click();
+  await expect(page.getByLabel("Settings", { exact: true }).getByText("Local snapshots")).toBeVisible();
+  await expect(page.getByLabel("Settings", { exact: true }).getByText("1/6")).toBeVisible();
+  await page.getByRole("link", { name: "Judge Brief" }).click();
+  await expect(page.getByLabel("Judge Brief").getByText("AIYES Track 1")).toBeVisible();
+  await expect(page.locator(".judge-status-grid").getByText("Hosted")).toHaveCount(2);
+  await expect(page.getByLabel("Hosted submission links").getByRole("link", { name: /Slide deck/i })).toHaveAttribute(
+    "href",
+    "https://ouija-olive.vercel.app/submission/slide-deck.html"
+  );
+  await expect(page.getByLabel("Hosted submission links").getByRole("link", { name: /Video walkthrough/i })).toHaveAttribute(
+    "href",
+    "https://ouija-olive.vercel.app/submission/assets/ouija-walkthrough.webm"
+  );
+  await expect(page.getByLabel("Judge Brief").getByText("AI pipeline is visible in Reasoning Trail.")).toBeVisible();
+  await expect(page.getByLabel("Judge Brief").getByText("Judge Demo Path gives evaluators a five-step walkthrough.")).toBeVisible();
+  await expect(page.getByLabel("Judge Brief").getByText("Model Strategy shows candidate ranking and risk controls.")).toBeVisible();
+  await expect(page.getByLabel("Judge Brief").getByText("AI Evaluation Harness scores model behavior and safeguards.")).toBeVisible();
+  await expect(page.getByLabel("Judge Brief").getByText("Official Rubric Fit maps all three visible AIYES criteria.")).toBeVisible();
+  await expect(page.getByLabel("Judge Brief").getByText("Learning Impact Loop measures the student's outcome for each run.")).toBeVisible();
+  await expect(page.getByLabel("Judge Brief").getByText("Learning Exit Ticket proves students must explain variables, patterns, and next steps themselves.")).toBeVisible();
+  await expect(page.getByLabel("Judge Brief").getByText("Grounding Audit makes citation trust and mixed evidence visible.")).toBeVisible();
+  await expect(page.getByLabel("Judge Brief").getByText("Pattern Evidence Engine scores the whole graph against the expected pattern.")).toBeVisible();
+  await expect(page.getByLabel("Judge Brief").getByText("Reliability Coach checks repeats, averages, and spread.")).toBeVisible();
+  await expect(page.getByLabel("Judge Brief").getByText("Guided Lab Flow gives students a clear next action.")).toBeVisible();
+  await expect(page.getByLabel("Judge Brief").getByText("Concept Coach turns results into student learning scaffolds.")).toBeVisible();
+  await expect(page.getByLabel("Judge Brief").getByText("Safety Coach makes school-lab risk checks visible.")).toBeVisible();
+  await expect(page.getByLabel("Judge Brief").getByText("Evaluation Bench runs eight live cases.")).toBeVisible();
+  await expect(page.getByLabel("Judge Brief").getByText("Data Handling Ledger shows privacy, retention, and student controls.")).toBeVisible();
+  await expect(page.getByLabel("Judge Brief").getByText("Evidence Packet exports a student-owned reasoning handoff.")).toBeVisible();
+  await expect(page.getByLabel("Judge Brief").getByText("Next Trial Planner gives adaptive measurement guidance.")).toBeVisible();
+  await expect(page.getByLabel("Judge Brief").getByText("Hosted deck and walkthrough are public.")).toBeVisible();
+  await expect(page.getByLabel("Judge Brief").getByText("Low-confidence labs show a boundary warning.")).toBeVisible();
 
   const firstRate = page.getByLabel("Rate row c1");
   await firstRate.fill("0.09");
-  await expect(page.getByText("Rate trend does not match the expected temperature pattern")).toBeVisible();
+  await expect(page.getByLabel("Comparison insights").getByText("Rate trend does not match the expected temperature pattern")).toBeVisible();
+  await expect(page.getByLabel("Method Audit").getByText("Needs review")).toBeVisible();
+  await expect(page.getByLabel("Pattern Evidence Engine").getByText("Mixed evidence")).toBeVisible();
+  await expect(page.getByLabel("Learning Impact Loop").getByText("Review first")).toBeVisible();
+  await expect(page.getByLabel("Learning Exit Ticket").getByText("Review first", { exact: true })).toBeVisible();
+  await expect(page.getByLabel("Guided Lab Flow").getByText("Repeat or fix the flagged measurement before writing the claim.")).toBeVisible();
+  await expect(page.locator(".next-trial-summary > span").getByText("Fix warnings first", { exact: true })).toBeVisible();
+  await expect(page.getByLabel("Claim Coach").getByText(/warning to resolve/i)).toBeVisible();
 
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth);
   expect(overflow).toBe(false);
+});
+
+test("unsupported experiment descriptions show a low-confidence boundary", async ({ page }) => {
+  await page.goto("/");
+  await page.getByLabel("Describe your experiment").fill("We grew bean seedlings under red, blue, and white light and measured plant height.");
+  await page.getByRole("button", { name: "Analyze" }).click();
+
+  await expect(page.locator(".classification").getByText("Closest supported match", { exact: true })).toBeVisible();
+  await expect(page.locator(".classification-note").getByText("Low-confidence description", { exact: false })).toBeVisible();
+  await expect(page.getByLabel("Comparison insights").getByText("Closest supported experiment only")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Custom Lab Triage" })).toBeVisible();
+  await expect(page.locator(".triage-summary").getByText("plant growth light color", { exact: true })).toBeVisible();
+  await expect(page.getByLabel("Custom Lab Triage").getByText("Variable plan")).toBeVisible();
+  await expect(page.locator(".triage-variable-grid article").filter({ hasText: "Independent variable" }).getByText("Light color", { exact: true })).toBeVisible();
+  await expect(page.locator(".triage-variable-grid article").filter({ hasText: "Dependent variable" }).getByText("Plant height", { exact: true })).toBeVisible();
+  await expect(page.locator(".triage-starter-table").getByText("Red light", { exact: true })).toBeVisible();
+  await expect(page.locator(".triage-variable-grid article").filter({ hasText: "Repeat plan" }).getByText("Use at least 3 plants per light color")).toBeVisible();
+  await expect(page.getByLabel("Custom Lab Triage").getByText("What exact condition did you change on purpose?")).toBeVisible();
+  await expect(page.getByLabel("Model Strategy").getByText("Closest supported match is")).toBeVisible();
+  await expect(page.getByLabel("Guided Lab Flow").getByText("Confirm this is the right experiment before using the guidance.")).toBeVisible();
+  await expect(page.getByLabel("Safety Coach").getByText("Adult review needed because this description is only a closest supported match.")).toBeVisible();
+  await expect(page.getByLabel("Reasoning trail").getByText("Needs work")).toBeVisible();
+});
+
+test("student can paste spreadsheet data into the active table", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("button", { name: "Reaction Rate" }).click();
+
+  await page
+    .getByLabel("Paste data table")
+    .fill("Temperature (C)\tReaction time (s)\tRate (1/s)\n10\t50\t0.04\n40\t80\t0.01");
+  await page.getByRole("button", { name: "Import rows" }).click();
+
+  await expect(page.getByText("Imported 2 rows using headers.")).toBeVisible();
+  await expect(page.getByLabel("Rate row import-1")).toHaveValue("0.04");
+  await expect(page.getByLabel("Comparison insights").getByText("Rate trend does not match the expected temperature pattern")).toBeVisible();
+  await expect(page.getByLabel("Reasoning trail").getByText("Data handling", { exact: true })).toBeVisible();
+  await expect(page.getByLabel("Reasoning trail").getByText("Expose model strategy")).toBeVisible();
+});
+
+test("sample chip analysis wins over a slower initial analysis", async ({ page }) => {
+  let delayedInitial = false;
+
+  await page.route("**/api/analyze", async (route) => {
+    const body = JSON.parse(route.request().postData() ?? "{}") as { description?: string };
+    if (!delayedInitial && body.description?.includes("launch angle")) {
+      delayedInitial = true;
+      await new Promise((resolve) => setTimeout(resolve, 600));
+    }
+    await route.continue();
+  });
+
+  await page.goto("/");
+  await page.getByRole("button", { name: "Reaction Rate" }).click();
+  await expect(page.getByRole("heading", { name: "Reaction Rate vs Temperature" })).toBeVisible();
+  await page.waitForTimeout(800);
+  await expect(page.getByRole("heading", { name: "Reaction Rate vs Temperature" })).toBeVisible();
+});
+
+test("student can analyze an Ohm's law circuit lab", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("button", { name: "Ohm's Law" }).click();
+
+  await expect(page.getByRole("heading", { name: "Ohm's Law Circuits" })).toBeVisible();
+  await expect(page.getByLabel("Sources and explanation").getByRole("link", { name: /Ohm's law/i })).toBeVisible();
+  await expect(page.getByLabel("Student evidence packet")).toHaveValue(/Ouija Evidence Packet: Ohm's Law Circuits/);
+});
+
+test("student can analyze a pendulum period lab", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("button", { name: "Pendulum" }).click();
+
+  await expect(page.getByRole("heading", { name: "Pendulum Period vs Length" })).toBeVisible();
+  await expect(page.getByLabel("Sources and explanation").getByRole("link", { name: /Pendulum motion/i })).toBeVisible();
+  await expect(page.getByLabel("Concept Coach").getByText("small-angle swing")).toBeVisible();
+  await expect(page.getByLabel("Student evidence packet")).toHaveValue(/Ouija Evidence Packet: Pendulum Period vs Length/);
 });
 
 test("mobile layout has no horizontal overflow", async ({ page }) => {

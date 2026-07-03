@@ -1,0 +1,270 @@
+import { chromium } from "@playwright/test";
+import { mkdirSync, mkdtempSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { dirname, join, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+const assetDir = resolve(repoRoot, "docs", "assets");
+const baseUrl = process.env.OUIJA_URL ?? "https://ouija-olive.vercel.app";
+const recordingDir = mkdtempSync(join(tmpdir(), "ouija-walkthrough-"));
+const outputPath = resolve(assetDir, "ouija-walkthrough.webm");
+const captionDurationMs = Number(process.env.OUIJA_CAPTION_MS ?? 8500);
+let captionIndex = 0;
+const captionTotal = 29;
+
+mkdirSync(assetDir, { recursive: true });
+
+const browser = await chromium.launch();
+const context = await browser.newContext({
+  viewport: { width: 1440, height: 900 },
+  recordVideo: {
+    dir: recordingDir,
+    size: { width: 1440, height: 900 }
+  }
+});
+const page = await context.newPage();
+page.setDefaultTimeout(10000);
+
+await page.goto(baseUrl, { waitUntil: "networkidle" });
+await installCaptionOverlay(page);
+
+await caption(
+  page,
+  "Problem",
+  "Students need help connecting experiment setup, table data, sources, and their own conclusion without turning the lab into a chatbot-written report."
+);
+
+await page.getByRole("button", { name: "Reaction Rate" }).click();
+await page.getByRole("heading", { name: "Reaction Rate vs Temperature" }).waitFor();
+await caption(page, "Input and classification", "A normal student description becomes a classified science experiment with concepts, variables, and confidence.");
+
+await page.getByRole("heading", { name: "Judge Demo Path" }).scrollIntoViewIfNeeded();
+await caption(
+  page,
+  "Judge Demo Path",
+  "Ouija gives judges a five-step route through problem fit, AI design, student workflow, evidence handoff, and submission proof."
+);
+
+await page.getByRole("heading", { name: "Model Strategy" }).scrollIntoViewIfNeeded();
+await caption(page, "Model Strategy", "Ouija exposes candidate ranking, matched signals, fallback behavior, validation layers, pattern evidence, repeat reliability, safety layer, and risk controls.");
+
+await page.getByRole("heading", { name: "AI Evaluation Harness" }).scrollIntoViewIfNeeded();
+await caption(page, "AI Evaluation Harness", "Ouija scores classifier confidence, coverage, source grounding, pattern validation, row validators, safety, and fallback boundaries in the live run.");
+
+await page.getByRole("heading", { name: "Data Handling Ledger" }).scrollIntoViewIfNeeded();
+await caption(page, "Data Handling Ledger", "Ouija makes privacy, retention, browser-local saved labs, student controls, and the server-only API-key boundary visible for judges.");
+
+await page.getByRole("heading", { name: "AIYES Rubric Fit" }).scrollIntoViewIfNeeded();
+await caption(
+  page,
+  "AIYES Rubric Fit",
+  "Ouija maps the same run to the official criteria: problem relevance, AI technical design and model strategy, and user experience."
+);
+
+await page.getByRole("heading", { name: "Learning Impact Loop" }).scrollIntoViewIfNeeded();
+await caption(
+  page,
+  "Learning Impact Loop",
+  "Ouija measures whether the student is ready to reason, should review flags, or needs to fix the run before writing."
+);
+
+await page.getByRole("heading", { name: "Learning Exit Ticket" }).scrollIntoViewIfNeeded();
+await caption(
+  page,
+  "Learning Exit Ticket",
+  "Ouija turns AI feedback into student reflection prompts for variables, graph pattern, and next step, so judges can see learning rather than a generated answer."
+);
+
+await page.getByRole("heading", { name: "Guided Lab Flow" }).scrollIntoViewIfNeeded();
+await caption(page, "Guided Lab Flow", "Ouija gives the student one current next action across identify, prepare safely, understand, check data, plan, and claim stages.");
+
+await page.getByRole("heading", { name: "Grounding Audit" }).scrollIntoViewIfNeeded();
+await caption(page, "Grounding Audit", "Ouija scores citation visibility and source agreement, then gives the student a source task before using the expected pattern.");
+
+await caption(
+  page,
+  "How it is built",
+  "Ouija is a full-stack React, TypeScript, and Express app with deterministic science templates, server-side OpenAI web-search enrichment when available, and safe fallback behavior."
+);
+
+await page.getByRole("heading", { name: "Reasoning trail" }).scrollIntoViewIfNeeded();
+await caption(
+  page,
+  "AI pipeline",
+  "Reasoning Trail shows classification, model strategy, AI evaluation, judge demo guidance, variable mapping, source grounding audit, expected overlay, guided workflow, concept scaffolding, safety boundaries, table audit, pattern evidence, repeat reliability, next-trial planning, and claim coaching."
+);
+
+await page.getByRole("heading", { name: "Pattern Evidence Engine" }).scrollIntoViewIfNeeded();
+await caption(page, "Expected overlay and pattern evidence", "Ouija overlays expected graph values, then scores whether the whole graph supports the expected trend, peak, or ratio before the student writes a claim.");
+
+await page.getByRole("heading", { name: "Method Audit" }).scrollIntoViewIfNeeded();
+await caption(page, "Method Audit", "Ouija checks controls, assumptions, reproducibility, confounds, and interpretation limits.");
+
+await page.locator(".reliability-coach").scrollIntoViewIfNeeded();
+await caption(page, "Reliability Coach", "Ouija checks repeated-trial counts, averages, and spread so students know which condition to retest before trusting the graph.");
+
+await page.getByRole("heading", { name: "Safety Coach" }).scrollIntoViewIfNeeded();
+await caption(page, "Safety Coach", "Ouija names PPE, material limits, cleanup, stop conditions, and adult-review boundaries for school labs.");
+
+await page.getByRole("heading", { name: "Concept Coach" }).scrollIntoViewIfNeeded();
+await caption(page, "Concept Coach", "Ouija turns the result into vocabulary, explanation steps, source tasks, and misconception checks for students.");
+
+await page
+  .getByLabel("Paste data table")
+  .fill("Temperature (C)\tReaction time (s)\tRate (1/s)\n10\t50\t0.04\n40\t80\t0.01");
+await page.getByRole("button", { name: "Import rows" }).click();
+await page.getByText("Imported 2 rows using headers.").waitFor();
+await page.getByLabel("Comparison insights").getByText("Rate trend does not match the expected temperature pattern", { exact: true }).waitFor();
+await caption(
+  page,
+  "Spreadsheet data handling",
+  "A pasted table becomes graph data with an expected overlay, then warnings update in Guided Lab Flow, Comparison Insights, Pattern Evidence, Method Audit, Reliability Coach, Safety Coach, Learning Exit Ticket, Next Trial Planner, Claim Coach, and Reasoning Trail."
+);
+
+await page.getByRole("heading", { name: "Next Trial Planner" }).scrollIntoViewIfNeeded();
+await caption(page, "Next Trial Planner", "Ouija suggests whether to extend the pattern or repeat a flagged measurement before the student writes a claim.");
+
+await page.getByRole("heading", { name: "Claim Coach" }).scrollIntoViewIfNeeded();
+await caption(page, "Academic integrity", "Claim Coach leaves blanks and asks the next evidence question instead of writing the lab conclusion.");
+
+await page.getByRole("heading", { name: "Evidence Packet" }).scrollIntoViewIfNeeded();
+await caption(
+  page,
+  "Evidence Packet",
+  "The output is a source-backed reasoning handoff with blanks and questions, not a completed lab report."
+);
+
+for (const sample of ["Projectile Motion", "Pendulum", "Ohm's Law", "Enzyme Activity", "Density Layers", "Water Filtration"]) {
+  await page.getByRole("button", { name: sample }).click();
+  await page.waitForTimeout(650);
+}
+await caption(page, "Breadth", "The same workflow covers projectile motion, pendulums, circuits, reaction rates, enzymes, density layers, and water filtration.");
+
+await page.getByLabel("Describe your experiment").fill("We grew bean seedlings under red, blue, and white light and measured plant height.");
+await page.getByRole("button", { name: "Analyze" }).click();
+await page.locator(".classification").getByText("Closest supported match", { exact: true }).waitFor();
+await caption(page, "Honest coverage boundary", "Unsupported labs are marked as low confidence instead of being passed off as solved.");
+await page.getByRole("heading", { name: "Custom Lab Triage" }).scrollIntoViewIfNeeded();
+await caption(
+  page,
+  "Custom Lab Triage",
+  "Ouija still helps off-template labs with variable planning, repeat guidance, starter rows, source searches, clarifying questions, and teacher confirmation."
+);
+
+await page.getByRole("button", { name: "Water Filtration" }).click();
+await page.getByRole("heading", { name: "Water Filtration and Turbidity" }).waitFor();
+await page.getByRole("button", { name: "Save current lab" }).click();
+await page.locator("#saved").scrollIntoViewIfNeeded();
+await page.locator("#saved").getByText("Water Filtration and Turbidity", { exact: true }).waitFor();
+await caption(page, "Saved lab snapshot", "A student can save checked runs locally and return to the evidence trail later.");
+
+await page.locator("#evaluation").scrollIntoViewIfNeeded();
+await page.getByLabel("Evaluation Bench").getByText("100/100").waitFor();
+await caption(page, "Evaluation Bench", "The live app runs eight checks: seven supported labs plus custom triage for the unsupported-lab boundary.");
+
+await page.locator("#judge").scrollIntoViewIfNeeded();
+await page.getByLabel("Judge Brief").getByText("AIYES Track 1").waitFor();
+await caption(
+  page,
+  "Judge Brief",
+  "The live app includes Track 1 fit, judge demo path, hosted links, official rubric fit, learning impact, learning exit ticket, custom lab triage, grounding audit, AI evaluation harness, data handling, model strategy, evaluation, and integrity constraints."
+);
+
+await page.getByRole("heading", { name: "Reasoning trail" }).scrollIntoViewIfNeeded();
+await caption(page, "Submission point", "For AIYES Track 1, the live app demonstrates practical AI, official rubric fit, measured learning impact, UX, testing, constraints, and real-world student value.");
+
+const video = page.video();
+await page.close();
+await context.close();
+
+if (!video) {
+  await browser.close();
+  throw new Error("Playwright did not create a walkthrough video.");
+}
+
+await video.saveAs(outputPath);
+await browser.close();
+
+console.log(`Walkthrough video saved to ${outputPath}`);
+
+async function installCaptionOverlay(targetPage) {
+  await targetPage.addStyleTag({
+    content: `
+      #ouija-demo-caption {
+        position: fixed;
+        left: 24px;
+        bottom: 24px;
+        z-index: 10000;
+        width: min(560px, calc(100vw - 48px));
+        border: 1px solid rgba(20, 32, 51, 0.16);
+        border-radius: 8px;
+        padding: 16px 18px;
+        color: #142033;
+        background: rgba(255, 255, 255, 0.94);
+        box-shadow: 0 18px 48px rgba(22, 34, 51, 0.18);
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      #ouija-demo-caption strong {
+        display: block;
+        margin-bottom: 6px;
+        color: #2368ff;
+        font-size: 13px;
+        font-weight: 850;
+        text-transform: uppercase;
+        letter-spacing: 0;
+      }
+
+      #ouija-demo-caption span {
+        display: block;
+        font-size: 18px;
+        line-height: 1.35;
+        font-weight: 720;
+      }
+
+      #ouija-demo-caption small {
+        display: block;
+        margin-bottom: 8px;
+        color: #607087;
+        font-size: 12px;
+        font-weight: 820;
+        letter-spacing: 0;
+        text-transform: uppercase;
+      }
+    `
+  });
+  await targetPage.evaluate(() => {
+    const caption = document.createElement("div");
+    caption.id = "ouija-demo-caption";
+    caption.setAttribute("aria-hidden", "true");
+    caption.innerHTML = "<small>AIYES demo</small><strong>Ouija walkthrough</strong><span>Starting demo...</span>";
+    document.body.appendChild(caption);
+  });
+}
+
+async function caption(targetPage, title, body) {
+  captionIndex += 1;
+  await targetPage.evaluate(
+    ({ title, body, captionIndex, captionTotal }) => {
+      const caption = document.getElementById("ouija-demo-caption");
+      if (!caption) return;
+      caption.innerHTML = `<small>AIYES demo ${captionIndex}/${captionTotal}</small><strong>${escapeHtml(title)}</strong><span>${escapeHtml(body)}</span>`;
+
+      function escapeHtml(value) {
+        return value.replace(/[&<>"']/g, (character) => {
+          const map = {
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#039;"
+          };
+          return map[character];
+        });
+      }
+    },
+    { title, body, captionIndex, captionTotal }
+  );
+  await targetPage.waitForTimeout(captionDurationMs);
+}

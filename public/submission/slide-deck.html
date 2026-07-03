@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Ouija AIYES Slide Deck</title>
+    <style>
+      :root {
+        color: #132033;
+        background: #eef4f8;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background:
+          linear-gradient(135deg, rgba(35, 104, 255, 0.08), transparent 35%),
+          radial-gradient(circle at top right, rgba(48, 199, 142, 0.16), transparent 34%),
+          #eef4f8;
+      }
+
+      main {
+        display: grid;
+        gap: 24px;
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 32px;
+      }
+
+      section {
+        display: grid;
+        min-height: 640px;
+        grid-template-columns: 0.95fr 1.05fr;
+        gap: 28px;
+        align-items: center;
+        border: 1px solid rgba(20, 32, 51, 0.1);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.9);
+        box-shadow: 0 28px 70px rgba(22, 34, 51, 0.1);
+        padding: 44px;
+        page-break-after: always;
+      }
+
+      section.title {
+        grid-template-columns: 1fr;
+        align-content: center;
+      }
+
+      .eyebrow {
+        margin: 0 0 12px;
+        color: #2368ff;
+        font-size: 13px;
+        font-weight: 850;
+        letter-spacing: 0;
+        text-transform: uppercase;
+      }
+
+      h1,
+      h2 {
+        margin: 0;
+        letter-spacing: 0;
+        line-height: 0.98;
+      }
+
+      h1 {
+        font-size: 86px;
+      }
+
+      h2 {
+        font-size: 56px;
+      }
+
+      p,
+      li {
+        color: #42536a;
+        font-size: 20px;
+        line-height: 1.45;
+      }
+
+      ul {
+        display: grid;
+        gap: 12px;
+        margin: 18px 0 0;
+        padding-left: 24px;
+      }
+
+      .panel {
+        border: 1px solid #d9e5f2;
+        border-radius: 8px;
+        background: #fbfdff;
+        padding: 22px;
+      }
+
+      .metric-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      }
+
+      .metric {
+        border-radius: 8px;
+        background: #eef5ff;
+        padding: 18px;
+      }
+
+      .metric strong {
+        display: block;
+        color: #142033;
+        font-size: 34px;
+        line-height: 1;
+      }
+
+      .metric span {
+        display: block;
+        margin-top: 8px;
+        color: #536478;
+        font-weight: 750;
+      }
+
+      img {
+        width: 100%;
+        max-height: 500px;
+        object-fit: contain;
+        border: 1px solid #d9e5f2;
+        border-radius: 8px;
+        background: #ffffff;
+      }
+
+      code {
+        border-radius: 6px;
+        background: #edf3fb;
+        padding: 2px 6px;
+      }
+
+      @media print {
+        body {
+          background: #ffffff;
+        }
+
+        main {
+          padding: 0;
+        }
+
+        section {
+          min-height: 100vh;
+          border: 0;
+          box-shadow: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <section class="title">
+        <div>
+          <p class="eyebrow">Track 1 - AI Application Development</p>
+          <h1>Ouija</h1>
+          <p>A student-safe AI experiment interpreter for middle and high school science labs.</p>
+        </div>
+      </section>
+
+      <section>
+        <div>
+          <p class="eyebrow">Problem</p>
+          <h2>Labs leave students stuck between data and reasoning.</h2>
+        </div>
+        <div class="panel">
+          <ul>
+            <li>Students collect data but struggle to connect variables, graph patterns, and conclusions.</li>
+            <li>Generic chatbots can write too much and cross academic-integrity lines.</li>
+            <li>Static science references do not inspect the student's table or method.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section>
+        <div>
+          <p class="eyebrow">Solution</p>
+          <h2>An AI lab partner that checks evidence, not a report writer.</h2>
+        </div>
+        <div class="panel">
+          <ul>
+            <li>Classifies the experiment from a student description.</li>
+            <li>Shows Model Strategy with candidate ranking, matched signals, fallback logic, and risk controls.</li>
+            <li>Runs AI Evaluation Harness so model behavior and safeguards are visible per analysis.</li>
+            <li>Shows Data Handling Ledger with privacy score, retention, student controls, and server-only API-key boundary.</li>
+            <li>Maps the run to the three official AIYES criteria through AIYES Rubric Fit.</li>
+            <li>Scores student readiness through Learning Impact Loop.</li>
+            <li>Uses Learning Exit Ticket so students explain variables, graph pattern, and next step themselves.</li>
+            <li>Shows a Guided Lab Flow with the student's next action.</li>
+            <li>Shows expected results with visible citations.</li>
+            <li>Audits citation visibility, source agreement, and mixed-evidence boundaries before students use the expected pattern.</li>
+            <li>Imports pasted spreadsheet rows, overlays expected graph values, scores whole-pattern evidence, and detects issues.</li>
+            <li>Uses Custom Lab Triage for unsupported labs: inferred focus, planner variables, controls, repeat guidance, starter rows, source searches, clarifying questions, and teacher confirmation.</li>
+            <li>Uses Pattern Evidence Engine, Method Audit, Reliability Coach, Safety Coach, Concept Coach, Next Trial Planner, and Claim Coach to keep reasoning student-owned.</li>
+            <li>Runs Evaluation Bench so judges can inspect eight live checks.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section>
+        <div>
+          <p class="eyebrow">Demo Flow</p>
+          <h2>Describe, analyze, audit, reason.</h2>
+        </div>
+        <img src="assets/ouija-demo-desktop.png" alt="Ouija desktop demo screen" />
+      </section>
+
+      <section>
+        <div>
+          <p class="eyebrow">AI Architecture</p>
+          <h2>Hybrid grounding keeps the demo reliable.</h2>
+        </div>
+        <div class="panel">
+          <ul>
+            <li>Deterministic templates support seven school-lab demos without credentials.</li>
+            <li>Express server optionally enriches explanations with OpenAI Responses API <code>web_search</code>.</li>
+            <li>API key stays server-side; citations stay visible and clickable.</li>
+            <li>AI Evaluation Harness scores classifier confidence, coverage, grounding, validation, safety, and fallback boundaries.</li>
+            <li>Data Handling Ledger makes descriptions, table data, local snapshots, source use, retention, and student controls inspectable.</li>
+            <li>Grounding Audit makes citation trust and source agreement visible in fallback or web-enriched mode.</li>
+            <li>Custom Lab Triage turns low-confidence descriptions into a structured investigation planner.</li>
+            <li>Fallback mode keeps the app usable during live judging.</li>
+            <li>AIYES Rubric Fit turns classification, grounding, validators, and UX flow into official judging evidence.</li>
+            <li>Learning Impact Loop turns analysis into student-readiness metrics, including expected overlay, pattern evidence, and repeat reliability.</li>
+            <li>Learning Exit Ticket turns model feedback into inspectable student reflection prompts.</li>
+            <li><code>/api/evaluate</code> tests supported coverage and low-confidence boundary behavior.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section>
+        <div>
+          <p class="eyebrow">Technical Depth</p>
+          <h2>Safety and learning are inspectable.</h2>
+        </div>
+        <div class="metric-grid">
+          <div class="metric">
+            <strong>4</strong>
+            <span>Science areas</span>
+          </div>
+          <div class="metric">
+            <strong>100</strong>
+            <span>Reproducibility score</span>
+          </div>
+          <div class="metric">
+            <strong>Live</strong>
+            <span>Row recomputation</span>
+          </div>
+          <div class="metric">
+            <strong>0</strong>
+            <span>Report paragraphs generated</span>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div>
+          <p class="eyebrow">Academic Integrity</p>
+          <h2>Ouija leaves the final claim blank.</h2>
+        </div>
+        <div class="panel">
+          <ul>
+            <li>Concept Coach teaches vocabulary, explanation steps, and misconception checks.</li>
+            <li>Model Strategy and AI Evaluation Harness make the AI technical design visible instead of asking judges to trust a black box.</li>
+            <li>Data Handling Ledger makes the privacy and student-control story visible instead of buried in policy copy.</li>
+            <li>Judge Demo Path gives evaluators a five-step route through problem fit, AI design, student workflow, evidence handoff, and submission proof.</li>
+            <li>AIYES Rubric Fit shows problem relevance, AI design/model strategy, and UX/design in the live app and Evidence Packet.</li>
+            <li>Learning Impact Loop measures outcome, data quality, concept learning, integrity, pattern evidence, repeat reliability, and next-trial readiness.</li>
+            <li>Learning Exit Ticket asks the student to explain variables, graph pattern, and next step in their own words.</li>
+            <li>Expected overlay makes the student graph comparison visual before the claim prompt.</li>
+            <li>Pattern Evidence Engine checks whether the whole graph supports the expected trend, peak, or ratio before a claim.</li>
+            <li>Reliability Coach checks repeated-trial count, averages, spread, and which condition to retest.</li>
+            <li>Safety Coach names PPE, material limits, cleanup, stop conditions, and adult-review boundaries.</li>
+            <li>Custom Lab Triage keeps off-template experiments useful with planner rows and repeat guidance instead of pretending full coverage.</li>
+            <li>Next Trial Planner suggests what to measure, repeat, or control before a claim.</li>
+            <li>Claim Coach uses blanks, evidence checklists, and Socratic questions.</li>
+            <li>Integrity guard flags requests to write the report or conclusion.</li>
+            <li>Students get direction without losing ownership of the work.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section>
+        <div>
+          <p class="eyebrow">Breadth</p>
+          <h2>One workflow across core school sciences.</h2>
+        </div>
+        <div class="panel">
+          <ul>
+            <li>Physics: projectile motion, pendulum period vs length, and Ohm's law circuits.</li>
+            <li>Chemistry: reaction rate vs temperature and density layering.</li>
+            <li>Biology: enzyme activity vs temperature.</li>
+            <li>Earth science: water filtration and turbidity.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section>
+        <div>
+          <p class="eyebrow">Verification</p>
+          <h2>Tested like a real app.</h2>
+        </div>
+        <div class="panel">
+          <ul>
+            <li><code>npm run test</code>: unit and API coverage.</li>
+            <li><code>npm run build</code>: TypeScript and production build.</li>
+            <li><code>npm run test:e2e</code>: browser flow and mobile overflow.</li>
+            <li><code>/api/evaluate</code>: 8/8 live app evaluation bench.</li>
+            <li><code>npm audit --json</code>: dependency security check.</li>
+            <li><code>npm start</code>: production frontend and API smoke.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section>
+        <div>
+          <p class="eyebrow">Why It Can Win</p>
+          <h2>Practical, student-owned, and demoable.</h2>
+        </div>
+        <div class="panel">
+          <ul>
+            <li>Real student problem with a concrete user.</li>
+            <li>AI used for classification, grounding, and coaching instead of generic generation.</li>
+            <li>Strong UX with Judge Demo Path, Model Strategy, AI Evaluation Harness, Data Handling Ledger, AIYES Rubric Fit, Learning Impact Loop, Learning Exit Ticket, Guided Lab Flow, Grounding Audit, visible citations, expected overlay, data checks, Pattern Evidence Engine, Method Audit, Reliability Coach, Safety Coach, Concept Coach, Custom Lab Triage, Next Trial Planner, Reasoning Trail, Evaluation Bench, Claim Coach, and Evidence Packet.</li>
+            <li>Clear next step: submit the hosted live demo, deck, and walkthrough.</li>
+          </ul>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

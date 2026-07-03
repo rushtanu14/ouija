@@ -1,5 +1,5 @@
 import OpenAI from "openai";
-import type { AnalyzeResult, SourceCard } from "../src/lib/types";
+import type { AnalyzeResult, SourceCard } from "../src/lib/types.js";
 
 type Enrichment = Partial<Pick<AnalyzeResult, "expectedResult" | "sources" | "explanation" | "groundingStatus">>;
 

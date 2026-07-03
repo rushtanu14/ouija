@@ -1,4 +1,4 @@
-import type { ExperimentTemplate } from "./types";
+import type { ExperimentTemplate } from "./types.js";
 
 export const TRUSTED_SOURCES = {
   khanProjectile: {
@@ -16,6 +16,22 @@ export const TRUSTED_SOURCES = {
     publisher: "The Physics Classroom",
     confidence: "built-in" as const,
     note: "Middle/high school explanation of projectile paths and range."
+  },
+  physicsClassroomPendulum: {
+    id: "source-pendulum-physics-classroom",
+    title: "Pendulum motion",
+    url: "https://www.physicsclassroom.com/tutorial/vibrations-and-waves/vibrations/pendulum-motion",
+    publisher: "The Physics Classroom",
+    confidence: "built-in" as const,
+    note: "Middle/high school reference for pendulum period, length, mass, and arc-angle comparisons."
+  },
+  khanOhmsLaw: {
+    id: "source-ohms-law-khan",
+    title: "Ohm's law",
+    url: "https://www.khanacademy.org/science/physics/circuits-topic/circuits-resistance/a/ee-ohms-law",
+    publisher: "Khan Academy",
+    confidence: "built-in" as const,
+    note: "Explains the relationship among voltage, current, and resistance in simple circuits."
   },
   chemLibreRate: {
     id: "source-rate-libre",
@@ -40,6 +56,14 @@ export const TRUSTED_SOURCES = {
     publisher: "USGS Water Science School",
     confidence: "built-in" as const,
     note: "Explains turbidity as a water-quality measurement."
+  },
+  khanDensity: {
+    id: "source-density-khan",
+    title: "Density and pressure",
+    url: "https://www.khanacademy.org/science/physics/fluids/density-and-pressure/a/what-is-density",
+    publisher: "Khan Academy",
+    confidence: "built-in" as const,
+    note: "Explains density as mass per volume and why denser fluids settle below less dense fluids."
   }
 };
 
@@ -81,6 +105,81 @@ export const EXPERIMENT_TEMPLATES: ExperimentTemplate[] = [
       "Ignoring launch height when the landing point is not level."
     ],
     fallbackSources: [TRUSTED_SOURCES.khanProjectile, TRUSTED_SOURCES.physicsClassroomProjectile]
+  },
+  {
+    id: "pendulum-period-length",
+    subject: "Physics",
+    title: "Pendulum Period vs Length",
+    shortName: "Pendulum",
+    matcherKeywords: ["pendulum", "period", "swing", "string", "length", "bob", "oscillation", "cycles"],
+    concepts: ["period", "pendulum length", "gravity", "square root relationship"],
+    variables: ["length", "period", "release angle", "bob mass"],
+    columns: [
+      { key: "lengthM", label: "Length", unit: "m", numeric: true },
+      { key: "periodS", label: "Period", unit: "s", numeric: true },
+      { key: "trial", label: "Trial", numeric: false }
+    ],
+    sampleRows: [
+      { id: "q1", lengthM: 0.2, periodS: 0.9, trial: "short string" },
+      { id: "q2", lengthM: 0.4, periodS: 1.27, trial: "medium string" },
+      { id: "q3", lengthM: 0.6, periodS: 1.56, trial: "longer string" },
+      { id: "q4", lengthM: 0.8, periodS: 1.79, trial: "long string" }
+    ],
+    expectedResult: {
+      summary: "A longer pendulum usually has a longer period. The increase is not linear; period grows roughly with the square root of length for small swings.",
+      pattern: "Square-root relationship: longer string = longer period, while bob mass should have little effect if length and release angle stay controlled.",
+      graphTitle: "Pendulum length vs period",
+      xKey: "lengthM",
+      yKey: "periodS",
+      graphKind: "line",
+      mixedEvidence: false
+    },
+    explanation:
+      "For small swings, a simple pendulum's period depends mainly on its length and local gravity. Increasing the string length makes each swing take longer, but doubling length does not double the period.",
+    commonMistakes: [
+      "Timing one swing instead of averaging several cycles.",
+      "Measuring string length without including the bob's center of mass.",
+      "Changing release angle while testing length."
+    ],
+    fallbackSources: [TRUSTED_SOURCES.physicsClassroomPendulum]
+  },
+  {
+    id: "ohms-law-circuits",
+    subject: "Physics",
+    title: "Ohm's Law Circuits",
+    shortName: "Ohm's Law",
+    matcherKeywords: ["ohm", "ohm's law", "circuit", "voltage", "current", "resistance", "resistor", "amp", "electric"],
+    concepts: ["voltage", "current", "resistance", "linear relationship"],
+    variables: ["current", "voltage", "resistance"],
+    columns: [
+      { key: "currentA", label: "Current", unit: "A", numeric: true },
+      { key: "voltageV", label: "Voltage", unit: "V", numeric: true },
+      { key: "resistanceOhm", label: "Resistance", unit: "ohm", numeric: true },
+      { key: "trial", label: "Trial", numeric: false }
+    ],
+    sampleRows: [
+      { id: "o1", currentA: 0.1, voltageV: 1.0, resistanceOhm: 10, trial: "low current" },
+      { id: "o2", currentA: 0.2, voltageV: 2.0, resistanceOhm: 10, trial: "medium current" },
+      { id: "o3", currentA: 0.3, voltageV: 3.0, resistanceOhm: 10, trial: "higher current" },
+      { id: "o4", currentA: 0.4, voltageV: 4.0, resistanceOhm: 10, trial: "highest current" }
+    ],
+    expectedResult: {
+      summary: "For a fixed resistor at constant temperature, voltage should increase in direct proportion to current, and calculated resistance should stay nearly constant.",
+      pattern: "Linear relationship: as current increases, voltage increases at a steady rate; resistance stays about the same.",
+      graphTitle: "Current vs voltage",
+      xKey: "currentA",
+      yKey: "voltageV",
+      graphKind: "line",
+      mixedEvidence: false
+    },
+    explanation:
+      "Ohm's law connects voltage, current, and resistance. In a simple resistor circuit, the voltage across the resistor equals current multiplied by resistance, so a voltage-current graph should be close to a straight line.",
+    commonMistakes: [
+      "Recording current in milliamps but labeling it as amps.",
+      "Changing the resistor while testing current and voltage.",
+      "Letting the resistor heat up enough to change resistance."
+    ],
+    fallbackSources: [TRUSTED_SOURCES.khanOhmsLaw]
   },
   {
     id: "reaction-rate-temperature",
@@ -155,6 +254,44 @@ export const EXPERIMENT_TEMPLATES: ExperimentTemplate[] = [
       "Comparing different enzyme amounts between trials."
     ],
     fallbackSources: [TRUSTED_SOURCES.bioLibreEnzymes]
+  },
+  {
+    id: "density-layering",
+    subject: "Chemistry",
+    title: "Density Layering",
+    shortName: "Density Layers",
+    matcherKeywords: ["density", "layer", "layering", "corn syrup", "oil", "liquid column", "float", "sink", "graduated cylinder"],
+    concepts: ["density", "mass per volume", "liquid layers", "float and sink"],
+    variables: ["liquid type", "density", "layer order"],
+    columns: [
+      { key: "layerOrder", label: "Layer order", unit: "bottom=1", numeric: true },
+      { key: "liquid", label: "Liquid", numeric: false },
+      { key: "densityGml", label: "Density", unit: "g/mL", numeric: true },
+      { key: "observation", label: "Observation", numeric: false }
+    ],
+    sampleRows: [
+      { id: "d1", layerOrder: 1, liquid: "Corn syrup", densityGml: 1.33, observation: "bottom layer" },
+      { id: "d2", layerOrder: 2, liquid: "Salt water", densityGml: 1.05, observation: "below water" },
+      { id: "d3", layerOrder: 3, liquid: "Water", densityGml: 1.0, observation: "middle layer" },
+      { id: "d4", layerOrder: 4, liquid: "Vegetable oil", densityGml: 0.92, observation: "top layer" }
+    ],
+    expectedResult: {
+      summary: "In a stable density column, denser liquids settle below less dense liquids, so density should generally decrease from the bottom layer to the top layer.",
+      pattern: "Layer relationship: bottom layers should have higher density; top layers should have lower density.",
+      graphTitle: "Liquid layer vs density",
+      xKey: "liquid",
+      yKey: "densityGml",
+      graphKind: "stage",
+      mixedEvidence: true
+    },
+    explanation:
+      "Density compares mass to volume. When liquids do not mix, denser liquids sink below less dense liquids, creating visible layers in a classroom density column.",
+    commonMistakes: [
+      "Listing top-to-bottom order while labeling the column as bottom-to-top.",
+      "Assuming color determines density.",
+      "Using liquids that mix together and then expecting stable layers."
+    ],
+    fallbackSources: [TRUSTED_SOURCES.khanDensity]
   },
   {
     id: "water-filtration-turbidity",

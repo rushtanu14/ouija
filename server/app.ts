@@ -1,10 +1,16 @@
 import cors from "cors";
 import express from "express";
+import path from "node:path";
 import { analyzeExperiment, mergeEnrichment } from "../src/lib/analysis";
+import { runEvaluationSuite } from "../src/lib/evaluation";
 import type { AnalyzeRequest } from "../src/lib/types";
 import { enrichWithOpenAIWebSearch } from "./openaiGrounding";
 
-export function createApp() {
+interface AppOptions {
+  staticDir?: string;
+}
+
+export function createApp(options: AppOptions = {}) {
   const app = express();
 
   app.use(cors());
@@ -12,6 +18,10 @@ export function createApp() {
 
   app.get("/api/health", (_req, res) => {
     res.json({ ok: true, service: "ouija-api" });
+  });
+
+  app.get("/api/evaluate", (_req, res) => {
+    res.json(runEvaluationSuite());
   });
 
   app.post("/api/analyze", async (req, res) => {
@@ -43,6 +53,17 @@ export function createApp() {
       });
     }
   });
+
+  if (options.staticDir) {
+    app.use(express.static(options.staticDir));
+    app.get("*", (req, res, next) => {
+      if (req.path.startsWith("/api/")) {
+        return next();
+      }
+
+      return res.sendFile(path.join(options.staticDir as string, "index.html"));
+    });
+  }
 
   return app;
 }

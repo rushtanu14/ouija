@@ -8,6 +8,10 @@
     "dev:client": "vite --host 127.0.0.1",
     "dev:server": "tsx watch server/index.ts",
     "serve:api": "tsx server/index.ts",
+    "start": "tsx server/index.ts",
+    "capture:submission": "node scripts/capture-submission-assets.mjs",
+    "record:walkthrough": "node scripts/record-walkthrough.mjs",
+    "sync:public-submission": "node scripts/sync-public-submission-assets.mjs",
     "build": "tsc --noEmit && vite build",
     "test": "vitest run",
     "test:e2e": "playwright test"
