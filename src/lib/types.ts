@@ -372,6 +372,33 @@ export interface CustomLabTriage {
   studentNextAction: string;
 }
 
+export interface PreLabVariablePlan {
+  independentVariable: string;
+  dependentVariable: string;
+  controlVariables: string[];
+}
+
+export interface PreLabSetupCheck {
+  id: "variables" | "controls" | "repeats" | "table" | "safety" | "source-check";
+  label: string;
+  detail: string;
+  status: "ready" | "review" | "blocked";
+}
+
+export interface PreLabDesignCoach {
+  status: "ready_to_plan" | "needs_teacher_review" | "blocked";
+  summary: string;
+  variablePlan: PreLabVariablePlan;
+  repeatPlan: string;
+  tablePlan: DataColumn[];
+  hypothesisStarter: string;
+  setupChecks: PreLabSetupCheck[];
+  sourceTask: string;
+  safetyGate: string;
+  studentNextAction: string;
+  judgeTakeaway: string;
+}
+
 export interface NextTrialChecklistItem {
   id: string;
   label: string;
@@ -445,11 +472,12 @@ export type McpIntegrationActionId =
   | "google-docs-evidence-packet"
   | "google-sheets-data-log"
   | "google-drive-portfolio-archive"
+  | "google-classroom-prelab-checkpoint"
   | "notion-learning-record";
 
 export interface McpIntegrationAction {
   id: McpIntegrationActionId;
-  toolkit: "Google Docs" | "Google Sheets" | "Google Drive" | "Notion";
+  toolkit: "Google Docs" | "Google Sheets" | "Google Drive" | "Google Classroom" | "Notion";
   label: string;
   studentValue: string;
   composioCapability: string;
@@ -552,6 +580,7 @@ export interface AnalyzeResult {
   dataHandlingLedger: DataHandlingLedger;
   judgeDemoPath: JudgeDemoPath;
   customLabTriage: CustomLabTriage;
+  preLabDesignCoach: PreLabDesignCoach;
   nextTrialPlan: NextTrialPlan;
   impactSnapshot: LearningImpactSnapshot;
   learningExitTicket: LearningExitTicket;

@@ -61,6 +61,7 @@ import type {
   NextTrialPlan,
   OfficialRubricFit,
   PatternEvidence,
+  PreLabDesignCoach,
   ProgressPortfolio,
   ProgressPortfolioSnapshot,
   ReliabilityCoach,
@@ -291,6 +292,7 @@ export function App() {
 
               <JudgeDemoPathPanel path={result.judgeDemoPath} />
               {result.customLabTriage.status === "needs_student_details" ? <CustomLabTriagePanel triage={result.customLabTriage} /> : null}
+              <PreLabDesignCoachPanel coach={result.preLabDesignCoach} />
               <ModelStrategyPanel strategy={result.modelStrategy} />
               <AiEvaluationHarnessPanel harness={result.aiEvaluationHarness} />
               <DataHandlingLedgerPanel ledger={result.dataHandlingLedger} />
@@ -556,6 +558,81 @@ function CustomLabTriagePanel({ triage }: { triage: CustomLabTriage }) {
   );
 }
 
+function PreLabDesignCoachPanel({ coach }: { coach: PreLabDesignCoach }) {
+  return (
+    <section className={`pre-lab-design-coach pre-lab-design-${coach.status}`} aria-label="Pre-Lab Design Coach">
+      <div className="panel-title">
+        <ClipboardCheck size={18} />
+        <h3>Pre-Lab Design Coach</h3>
+      </div>
+      <div className="pre-lab-summary">
+        <div>
+          <p className="section-label">Before data collection</p>
+          <strong>{formatPreLabStatus(coach.status)}</strong>
+        </div>
+        <span>{coach.summary}</span>
+      </div>
+      <div className="pre-lab-variable-grid">
+        <article>
+          <p className="section-label">Independent variable</p>
+          <strong>{coach.variablePlan.independentVariable}</strong>
+        </article>
+        <article>
+          <p className="section-label">Dependent variable</p>
+          <strong>{coach.variablePlan.dependentVariable}</strong>
+        </article>
+        <article>
+          <p className="section-label">Repeat plan</p>
+          <strong>{coach.repeatPlan}</strong>
+        </article>
+      </div>
+      <div className="pre-lab-check-grid">
+        {coach.setupChecks.map((check) => (
+          <article className={`pre-lab-check pre-lab-check-${check.status}`} key={check.id}>
+            <div>
+              <strong>{check.label}</strong>
+              <span>{formatPreLabCheckStatus(check.status)}</span>
+            </div>
+            <p>{check.detail}</p>
+          </article>
+        ))}
+      </div>
+      <div className="pre-lab-lower-grid">
+        <article>
+          <p className="section-label">Table plan</p>
+          <div className="pre-lab-pill-list">
+            {coach.tablePlan.map((column) => (
+              <span key={column.key}>
+                {column.label}
+                {column.unit ? ` (${column.unit})` : ""}
+              </span>
+            ))}
+          </div>
+        </article>
+        <article>
+          <p className="section-label">Hypothesis starter</p>
+          <strong>{coach.hypothesisStarter}</strong>
+        </article>
+      </div>
+      <div className="pre-lab-action-grid">
+        <article>
+          <p className="section-label">Source task</p>
+          <strong>{coach.sourceTask}</strong>
+        </article>
+        <article>
+          <p className="section-label">Safety gate</p>
+          <strong>{coach.safetyGate}</strong>
+        </article>
+        <article>
+          <p className="section-label">Student next action</p>
+          <strong>{coach.studentNextAction}</strong>
+        </article>
+      </div>
+      <p className="pre-lab-judge-takeaway">{coach.judgeTakeaway}</p>
+    </section>
+  );
+}
+
 function GroundingAuditPanel({ audit }: { audit: GroundingAudit }) {
   return (
     <section className={`grounding-audit grounding-audit-${audit.status}`} aria-label="Grounding Audit">
@@ -653,6 +730,7 @@ function JudgeBriefPanel({ result }: { result: AnalyzeResult | null }) {
     "AI Evaluation Harness scores model behavior and safeguards.",
     "Official Rubric Fit maps all three visible AIYES criteria.",
     "Learning Impact Loop measures the student's outcome for each run.",
+    "Pre-Lab Design Coach helps students plan variables, controls, repeats, sources, and safety before collecting data.",
     "Learning Exit Ticket proves students must explain variables, patterns, and next steps themselves.",
     "Student Reflection Workspace captures student-authored exit-ticket drafts.",
     "Graph overlays expected pattern values against student data.",
@@ -665,7 +743,7 @@ function JudgeBriefPanel({ result }: { result: AnalyzeResult | null }) {
     "Data Handling Ledger shows privacy, retention, and student controls.",
     "Spreadsheet paste/import flows into data checks.",
     "Evidence Packet exports a student-owned reasoning handoff.",
-    "MCP Integration Coach previews Composio Docs, Sheets, Drive, and Notion handoffs without exposing credentials.",
+    "MCP Integration Coach previews Composio Docs, Sheets, Drive, Classroom, and Notion handoffs without exposing credentials.",
     "Next Trial Planner gives adaptive measurement guidance.",
     "Progress Portfolio shows learning over multiple saved runs.",
     "Evaluation Bench runs eight live cases.",
@@ -746,6 +824,7 @@ function ModelCardPanel({ result }: { result: AnalyzeResult | null }) {
     "Judge Demo Path reduces the live demo to problem fit, AI design, student workflow, evidence handoff, and submission proof.",
     "Official Rubric Fit maps problem relevance, AI design, and UX to concrete app evidence.",
     "Learning Impact Loop turns analysis into measurable student readiness and next-trial evidence.",
+    "Pre-Lab Design Coach turns classification into variables, controls, repeats, source checks, and safety before data collection.",
     "Learning Exit Ticket converts the AI feedback into student reflection prompts judges can inspect.",
     "Student Reflection Workspace stores student-written drafts without generating answers.",
     "Expected overlay gives students a visual comparison between their data and the expected pattern.",
@@ -2097,6 +2176,18 @@ function formatJudgeDemoStepStatus(status: JudgeDemoPath["steps"][number]["statu
 function formatCustomLabTriageStatus(status: CustomLabTriage["status"]) {
   if (status === "supported_template") return "Supported template";
   return "Needs student details";
+}
+
+function formatPreLabStatus(status: PreLabDesignCoach["status"]) {
+  if (status === "blocked") return "Blocked";
+  if (status === "needs_teacher_review") return "Teacher review";
+  return "Ready to plan";
+}
+
+function formatPreLabCheckStatus(status: PreLabDesignCoach["setupChecks"][number]["status"]) {
+  if (status === "blocked") return "Blocked";
+  if (status === "review") return "Review";
+  return "Ready";
 }
 
 function formatSavedTime(value: string) {

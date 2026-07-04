@@ -69,6 +69,17 @@ export function buildMcpIntegrationPlan({
         safetyNote: "Default sharing should stay private until the student or teacher chooses otherwise."
       },
       {
+        id: "google-classroom-prelab-checkpoint",
+        toolkit: "Google Classroom",
+        label: "Draft pre-lab checkpoint",
+        studentValue: "Turns the pre-lab setup checks into a teacher-reviewable checkpoint before students collect data.",
+        composioCapability: "create coursework draft and attach pre-lab evidence",
+        payloadSummary: `Pre-lab ${result.preLabDesignCoach.status.replaceAll("_", " ")}: ${result.preLabDesignCoach.setupChecks.length} setup checks, ${result.preLabDesignCoach.variablePlan.independentVariable} to ${result.preLabDesignCoach.variablePlan.dependentVariable}`,
+        mode,
+        requiresConsent: true,
+        safetyNote: "Classroom export should create a draft/checkpoint, not submit answers or write the student's conclusion."
+      },
+      {
         id: "notion-learning-record",
         toolkit: "Notion",
         label: "Create learning record",
@@ -91,6 +102,7 @@ export function buildMcpIntegrationPlan({
         "Student data table",
         "Trusted citation links",
         "Progress Portfolio summary",
+        "Pre-Lab Design Coach",
         "Learning Exit Ticket prompts",
         "Student Reflection Drafts",
         "Integrity boundary"
@@ -98,9 +110,10 @@ export function buildMcpIntegrationPlan({
       markdownExcerpt: buildMarkdownExcerpt(description, evidencePacket)
     },
     safeguards: [
-      "Preview mode does not call Composio, Google, or Notion APIs.",
+      "Preview mode does not call Composio, Google Classroom, Google Workspace, or Notion APIs.",
       "COMPOSIO_API_KEY must stay server-side and must never be bundled into the Vite client.",
       "Every export action requires student or teacher consent before a live connector runs.",
+      "Google Classroom handoff creates a teacher-review checkpoint, not an auto-submitted assignment.",
       "Exported packets preserve the academic-integrity blanks instead of writing conclusions.",
       "Reflection drafts are exported only when the student typed them in the workspace."
     ],

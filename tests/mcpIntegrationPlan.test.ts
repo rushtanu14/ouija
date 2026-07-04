@@ -39,19 +39,23 @@ describe("MCP integration plan", () => {
       "google-docs-evidence-packet",
       "google-sheets-data-log",
       "google-drive-portfolio-archive",
+      "google-classroom-prelab-checkpoint",
       "notion-learning-record"
     ]);
     expect(plan.actions.find((action) => action.id === "google-docs-evidence-packet")?.toolkit).toBe("Google Docs");
     expect(plan.actions.find((action) => action.id === "google-sheets-data-log")?.payloadSummary).toContain("4 rows");
+    expect(plan.actions.find((action) => action.id === "google-classroom-prelab-checkpoint")?.toolkit).toBe("Google Classroom");
+    expect(plan.actions.find((action) => action.id === "google-classroom-prelab-checkpoint")?.payloadSummary).toContain("Pre-lab");
     expect(plan.actions.every((action) => action.requiresConsent)).toBe(true);
     expect(plan.payloadPreview.title).toBe("Ouija Evidence Packet: Reaction Rate vs Temperature");
     expect(plan.payloadPreview.rowCount).toBe(4);
     expect(plan.payloadPreview.sourceCount).toBeGreaterThanOrEqual(1);
     expect(plan.payloadPreview.savedRunCount).toBe(1);
     expect(plan.payloadPreview.includedSections).toContain("Evidence Packet markdown");
+    expect(plan.payloadPreview.includedSections).toContain("Pre-Lab Design Coach");
     expect(plan.payloadPreview.includedSections).toContain("Student Reflection Drafts");
     expect(plan.payloadPreview.markdownExcerpt).toContain("## Student Description");
-    expect(plan.safeguards).toContain("Preview mode does not call Composio, Google, or Notion APIs.");
+    expect(plan.safeguards).toContain("Preview mode does not call Composio, Google Classroom, Google Workspace, or Notion APIs.");
     expect(plan.safeguards).toContain("Reflection drafts are exported only when the student typed them in the workspace.");
     expect(plan.privacyBoundary).toContain("Student chooses");
     expect(plan.judgeTakeaway).toContain("real classroom handoff");
@@ -74,6 +78,7 @@ describe("MCP integration plan", () => {
     expect(plan.summary).toContain("ready to route");
     expect(plan.actions.every((action) => action.mode === "server_mcp")).toBe(true);
     expect(plan.actions.find((action) => action.toolkit === "Google Sheets")?.composioCapability).toContain("append");
+    expect(plan.actions.find((action) => action.toolkit === "Google Classroom")?.composioCapability).toContain("create coursework draft");
     expect(plan.payloadPreview.savedRunCount).toBe(0);
   });
 });

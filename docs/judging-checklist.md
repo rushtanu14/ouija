@@ -8,10 +8,11 @@
 - Practical science behavior is visible: students see whether the whole graph supports the expected pattern and whether repeated trials have enough count, average, and spread to support a claim.
 - AIYES Rubric Fit gives judges concrete problem/relevance evidence for each analyzed run.
 - Learning Impact Loop measures whether a run leaves the student ready to reason, watching flags, or needing fixes.
+- Pre-Lab Design Coach helps students plan variables, controls, repeats, source checks, table columns, and safety before collecting data.
 - Learning Exit Ticket asks the student to explain variables, graph pattern, and next step in their own words before writing.
 - Student Reflection Workspace proves those exit-ticket answers are student-authored drafts, not generated conclusions.
 - Progress Portfolio shows whether saved runs demonstrate learning trend, subject breadth, and a next portfolio action.
-- MCP Integration Coach shows how the same student-owned evidence could move into classroom tools without sending data before consent.
+- MCP Integration Coach shows how the same student-owned evidence could move into classroom tools, including a Google Classroom pre-lab checkpoint, without sending data before consent.
 - Judge Demo Path gives evaluators a direct route through problem fit, AI design, student workflow, evidence handoff, and submission proof.
 - Custom Lab Triage keeps unsupported student experiments useful without claiming full V1 coverage, because it gives students a concrete investigation planner instead of a fake expected result.
 
@@ -22,7 +23,7 @@
 - Model Strategy exposes candidate rankings, matched signals, confidence, fallback behavior, validation layers, safety layer, and risk controls.
 - AI Evaluation Harness scores classifier confidence, coverage, source grounding, pattern validation, repeat reliability, row validators, safety/integrity, and fallback boundaries.
 - Data Handling Ledger exposes what student data is used, where it is stored, retention, local snapshots, student controls, and the server-only API-key boundary.
-- MCP Integration Coach previews Composio-powered Google Docs, Google Sheets, Google Drive, and Notion exports while keeping `COMPOSIO_API_KEY` server-side.
+- MCP Integration Coach previews Composio-powered Google Docs, Google Sheets, Google Drive, Google Classroom, and Notion exports while keeping `COMPOSIO_API_KEY` server-side.
 - Grounding Audit scores citation visibility, source agreement, mixed-evidence boundaries, and student source use.
 - Result schema separates classification, expected result, citations, row checks, hints, and Claim Coach.
 - Method Audit adds deterministic experiment-quality evaluation beyond plain text generation.
@@ -33,6 +34,7 @@
 - Concept Coach turns each supported lab into vocabulary, explanation steps, source tasks, and misconception checks.
 - Learning Exit Ticket turns model feedback into inspectable student reflection prompts rather than generated conclusions.
 - Student Reflection Workspace scores empty, short, and ready student-authored drafts without filling them in.
+- Pre-Lab Design Coach turns the same classification and triage output into a before-data checklist instead of waiting until after rows exist.
 - Custom Lab Triage turns low-confidence descriptions into inferred focus, starter columns, variables, controls, repeat guidance, starter rows, source-search queries, clarifying questions, and a teacher-confirmation boundary.
 - Fallback mode keeps demos reliable without credentials.
 - Guided Lab Flow turns the result schema into a student-facing next-action workflow.
@@ -59,10 +61,11 @@
 - Reasoning Trail visibly maps the run to AIYES Track 1 evidence: problem/impact, AI technical design, testing/evaluation, and ethics/constraints.
 - AIYES Rubric Fit visibly maps the run to the three official criteria: Problem Definition and Real-World Relevance, AI Technical Design and Model Strategy, and User Experience and Design.
 - Learning Impact Loop visibly scores outcome, data quality, concept learning, integrity, pattern evidence, repeat reliability, and next-trial readiness for every run.
+- Pre-Lab Design Coach visibly scores setup readiness before data collection.
 - Learning Exit Ticket visibly checks whether the student can explain variables, pattern evidence, and the next controlled step.
 - Student Reflection Workspace visibly captures the student's own variable, pattern, and next-step drafts.
 - Progress Portfolio visibly turns Saved Labs into repeated learning evidence instead of only storage.
-- MCP Integration Coach visibly turns the Evidence Packet and Progress Portfolio into a consent-gated classroom handoff plan.
+- MCP Integration Coach visibly turns the Evidence Packet, Pre-Lab Design Coach, and Progress Portfolio into a consent-gated classroom handoff plan.
 - AI Model Card visibly summarizes architecture, grounding mode, evaluation method, privacy boundary, and risk controls.
 - Data Handling Ledger visibly summarizes privacy, retention, browser-local saves, and student controls.
 - Evaluation Bench exposes eight live checks through the app and `/api/evaluate`.
@@ -84,10 +87,11 @@
 - Data Handling Ledger appears in the app and Evidence Packet so judges can inspect privacy and student-control claims during the demo or exported handoff.
 - AIYES Rubric Fit appears in the app and Evidence Packet so judges can inspect the official UX/design fit during the live demo or exported handoff.
 - Learning Impact Loop appears in the app and Evidence Packet so the user's practical benefit is measurable inside the workflow.
+- Pre-Lab Design Coach appears in the app and Evidence Packet so students can use Ouija before collecting data, not only after a table exists.
 - Learning Exit Ticket appears in the app and Evidence Packet so judges can inspect student understanding prompts during the demo or exported handoff.
 - Student Reflection Workspace appears in the app and Evidence Packet so judges can inspect student-authored answers without Ouija writing the conclusion.
 - Progress Portfolio appears near Saved Labs so judges can inspect score trend, subject breadth, and strongest saved run.
-- MCP Integration Coach appears near Progress Portfolio so judges can inspect the exact export payload, credential boundary, and Composio route before any live connector is enabled.
+- MCP Integration Coach appears near Progress Portfolio so judges can inspect the exact export payload, Google Classroom pre-lab checkpoint route, credential boundary, and Composio route before any live connector is enabled.
 - Desktop and mobile E2E checks verify no horizontal overflow.
 
 ## Remaining Submission Work

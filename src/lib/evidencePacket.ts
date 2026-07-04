@@ -121,6 +121,26 @@ export function buildEvidencePacket(
     "- Clarifying questions:",
     ...result.customLabTriage.clarifyingQuestions.map((question) => `  - ${question}`),
     "",
+    "## Pre-Lab Design Coach",
+    `- Status: ${formatPreLabStatus(result.preLabDesignCoach.status)}`,
+    `- Summary: ${result.preLabDesignCoach.summary}`,
+    "- Variable plan:",
+    `  - Independent variable: ${result.preLabDesignCoach.variablePlan.independentVariable}`,
+    `  - Dependent variable: ${result.preLabDesignCoach.variablePlan.dependentVariable}`,
+    `  - Controls: ${result.preLabDesignCoach.variablePlan.controlVariables.join(", ")}`,
+    `  - Repeat plan: ${result.preLabDesignCoach.repeatPlan}`,
+    `  - Hypothesis starter: ${result.preLabDesignCoach.hypothesisStarter}`,
+    `- Source task: ${result.preLabDesignCoach.sourceTask}`,
+    `- Safety gate: ${result.preLabDesignCoach.safetyGate}`,
+    "- Setup checks:",
+    ...result.preLabDesignCoach.setupChecks.map((check) => `  - ${check.label} (${check.status}): ${check.detail}`),
+    "- Table plan:",
+    ...result.preLabDesignCoach.tablePlan.map(
+      (column) => `  - ${column.label}${column.unit ? ` (${column.unit})` : ""}: ${column.numeric ? "number" : "text"}`
+    ),
+    `- Student next action: ${result.preLabDesignCoach.studentNextAction}`,
+    `- Judge takeaway: ${result.preLabDesignCoach.judgeTakeaway}`,
+    "",
     "## AIYES Rubric Fit",
     `- Score: ${result.officialRubricFit.score}/100`,
     `- Verdict: ${result.officialRubricFit.verdict}`,
@@ -335,6 +355,12 @@ function formatJudgeDemoStepStatus(status: AnalyzeResult["judgeDemoPath"]["steps
 function formatCustomLabTriageStatus(status: AnalyzeResult["customLabTriage"]["status"]): string {
   if (status === "supported_template") return "supported template";
   return "needs student details";
+}
+
+function formatPreLabStatus(status: AnalyzeResult["preLabDesignCoach"]["status"]): string {
+  if (status === "blocked") return "blocked";
+  if (status === "needs_teacher_review") return "needs teacher review";
+  return "ready to plan";
 }
 
 function formatNullableNumber(value: number | null): string {

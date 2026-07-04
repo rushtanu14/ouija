@@ -143,6 +143,7 @@ function runEvaluationCase(testCase: EvaluationCase): EvaluationCaseResult {
       `${result.safetyCoach.status.replaceAll("_", " ")} safety coach`,
       `${result.customLabTriage.status.replaceAll("_", " ")} custom lab triage`,
       `${result.customLabTriage.planner.starterRows.length} custom planner rows`,
+      `${result.preLabDesignCoach.setupChecks.length} pre-lab setup checks (${result.preLabDesignCoach.status.replaceAll("_", " ")})`,
       `${result.sources.length} visible citation${result.sources.length === 1 ? "" : "s"}`
     ]
   };

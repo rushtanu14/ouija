@@ -24,6 +24,10 @@ describe("buildEvidencePacket", () => {
     expect(packet).toContain("Student control:");
     expect(packet).toContain("## Judge Demo Path");
     expect(packet).toContain("Next best action:");
+    expect(packet).toContain("## Pre-Lab Design Coach");
+    expect(packet).toContain("Hypothesis starter:");
+    expect(packet).toContain("Safety gate:");
+    expect(packet).toContain("Setup checks:");
     expect(packet).toContain("## AIYES Rubric Fit");
     expect(packet).toContain("Problem Definition and Real-World Relevance");
     expect(packet).toContain("AI Technical Design and Model Strategy");
@@ -89,6 +93,8 @@ describe("buildEvidencePacket", () => {
     expect(packet).toContain("Variable plan:");
     expect(packet).toContain("Independent variable: Light color");
     expect(packet).toContain("Starter worksheet:");
+    expect(packet).toContain("## Pre-Lab Design Coach");
+    expect(packet).toContain("Status: needs teacher review");
     expect(packet).toContain("Red light");
     expect(packet).toContain("What exact condition did you change on purpose?");
     expect(packet).toContain("closest supported");

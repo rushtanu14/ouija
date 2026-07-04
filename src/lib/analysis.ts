@@ -21,6 +21,7 @@ import type {
   NextTrialPlan,
   OfficialRubricFit,
   PatternEvidence,
+  PreLabDesignCoach,
   ReliabilityCoach,
   SafetyCoach,
   SourceCard,
@@ -93,6 +94,7 @@ export function analyzeExperiment(request: AnalyzeRequest): AnalyzeResult {
   );
   const matchQuality = confidence >= 0.6 ? "supported_template" : "closest_supported";
   const customLabTriage = buildCustomLabTriage(request.description, template, confidence, matchQuality);
+  const preLabDesignCoach = buildPreLabDesignCoach(template, confidence, allIssues, safetyCoach, customLabTriage);
   const learningExitTicket = buildLearningExitTicket(
     template,
     confidence,
@@ -169,7 +171,8 @@ export function analyzeExperiment(request: AnalyzeRequest): AnalyzeResult {
     nextTrialPlan,
     impactSnapshot,
     dataHandlingLedger,
-    learningExitTicket
+    learningExitTicket,
+    preLabDesignCoach
   );
 
   return {
@@ -206,6 +209,7 @@ export function analyzeExperiment(request: AnalyzeRequest): AnalyzeResult {
     dataHandlingLedger,
     judgeDemoPath,
     customLabTriage,
+    preLabDesignCoach,
     nextTrialPlan,
     impactSnapshot,
     learningExitTicket,
@@ -229,7 +233,8 @@ export function analyzeExperiment(request: AnalyzeRequest): AnalyzeResult {
       modelStrategy,
       customLabTriage,
       dataHandlingLedger,
-      learningExitTicket
+      learningExitTicket,
+      preLabDesignCoach
     ),
     explanation: template.explanation,
     integrityNotice: INTEGRITY_NOTICE,
@@ -341,9 +346,9 @@ function buildSupportedLabPlanner(template: ExperimentTemplate): CustomLabPlanne
 
   return {
     title: `Use the supported ${template.shortName} worksheet.`,
-    independentVariable: xColumn?.label ?? template.expectedResult.xKey,
-    dependentVariable: yColumn?.label ?? template.expectedResult.yKey,
-    controlVariables: template.variables.slice(2, 6),
+    independentVariable: expandTemplateVariableName(xColumn?.label ?? template.expectedResult.xKey, template),
+    dependentVariable: expandTemplateVariableName(yColumn?.label ?? template.expectedResult.yKey, template),
+    controlVariables: controlsForSupportedTemplate(template.id),
     repeatPlan: "Run at least 3 repeat trials for each condition before trusting one graph point.",
     starterRows: template.sampleRows.slice(0, 3),
     qualityChecklist: [
@@ -353,6 +358,44 @@ function buildSupportedLabPlanner(template: ExperimentTemplate): CustomLabPlanne
     ],
     hypothesisStarter: "If ___ changes, then ___ may change because ___."
   };
+}
+
+function expandTemplateVariableName(label: string, template: ExperimentTemplate) {
+  const normalized = label.toLowerCase();
+  const expanded = template.variables.find((variable) => {
+    const candidate = variable.toLowerCase();
+    return candidate.includes(normalized) && candidate.length > normalized.length;
+  });
+  return expanded ? toTitleCase(expanded) : toTitleCase(label);
+}
+
+function controlsForSupportedTemplate(templateId: string) {
+  if (templateId === "projectile-motion") {
+    return ["launch speed", "launcher height", "projectile type", "landing surface"];
+  }
+  if (templateId === "reaction-rate-temperature") {
+    return ["reactant concentration", "tablet size", "liquid volume", "reaction endpoint"];
+  }
+  if (templateId === "enzyme-activity-temperature") {
+    return ["enzyme amount", "substrate amount", "pH", "timing method"];
+  }
+  if (templateId === "water-filtration-turbidity") {
+    return ["filter material amount", "water volume", "starting turbidity", "pour rate"];
+  }
+  if (templateId === "pendulum-period-length") {
+    return ["release angle", "bob mass", "number of swings timed", "support height"];
+  }
+  if (templateId === "ohms-law-circuits") {
+    return ["resistor", "meter settings", "power source", "component temperature"];
+  }
+  if (templateId === "density-layering") {
+    return ["liquid volume", "container size", "pouring method", "temperature"];
+  }
+  return ["materials", "amounts", "timing", "measurement method"];
+}
+
+function toTitleCase(value: string) {
+  return value.replace(/\b[a-z]/g, (letter) => letter.toUpperCase());
 }
 
 function buildUnsupportedLabPlanner(inferredFocus: string): CustomLabPlanner {
@@ -553,6 +596,9 @@ export function mergeEnrichment(base: AnalyzeResult, enrichment: Partial<Analyze
       )
     : base.judgeDemoPath;
   const dataHandlingLedger = base.dataHandlingLedger ?? buildDataHandlingLedger(groundingStatus.mode);
+  const preLabDesignCoach = template
+    ? buildPreLabDesignCoach(template, base.classification.confidence, issues, safetyCoach, base.customLabTriage)
+    : base.preLabDesignCoach;
   const learningExitTicket = template
     ? buildLearningExitTicket(
         template,
@@ -588,7 +634,8 @@ export function mergeEnrichment(base: AnalyzeResult, enrichment: Partial<Analyze
         nextTrialPlan,
         impactSnapshot,
         dataHandlingLedger,
-        learningExitTicket
+        learningExitTicket,
+        preLabDesignCoach
       )
     : base.officialRubricFit;
 
@@ -613,6 +660,7 @@ export function mergeEnrichment(base: AnalyzeResult, enrichment: Partial<Analyze
     dataHandlingLedger,
     judgeDemoPath,
     customLabTriage: base.customLabTriage,
+    preLabDesignCoach,
     nextTrialPlan,
     impactSnapshot,
     learningExitTicket,
@@ -637,7 +685,8 @@ export function mergeEnrichment(base: AnalyzeResult, enrichment: Partial<Analyze
           modelStrategy,
           base.customLabTriage,
           dataHandlingLedger,
-          learningExitTicket
+          learningExitTicket,
+          preLabDesignCoach
         )
       : base.trackEvidence,
     labBrief
@@ -713,6 +762,13 @@ export function refreshResultForRows(result: AnalyzeResult, rows: StudentDataRow
     labBrief
   );
   const dataHandlingLedger = result.dataHandlingLedger ?? buildDataHandlingLedger(result.groundingStatus.mode);
+  const preLabDesignCoach = buildPreLabDesignCoach(
+    template,
+    result.classification.confidence,
+    issues,
+    safetyCoach,
+    result.customLabTriage
+  );
   const learningExitTicket = buildLearningExitTicket(
     template,
     result.classification.confidence,
@@ -745,7 +801,8 @@ export function refreshResultForRows(result: AnalyzeResult, rows: StudentDataRow
     nextTrialPlan,
     impactSnapshot,
     dataHandlingLedger,
-    learningExitTicket
+    learningExitTicket,
+    preLabDesignCoach
   );
 
   return {
@@ -767,6 +824,7 @@ export function refreshResultForRows(result: AnalyzeResult, rows: StudentDataRow
     dataHandlingLedger,
     judgeDemoPath,
     customLabTriage: result.customLabTriage,
+    preLabDesignCoach,
     nextTrialPlan,
     impactSnapshot,
     learningExitTicket,
@@ -790,7 +848,8 @@ export function refreshResultForRows(result: AnalyzeResult, rows: StudentDataRow
       modelStrategy,
       result.customLabTriage,
       dataHandlingLedger,
-      learningExitTicket
+      learningExitTicket,
+      preLabDesignCoach
     )
   };
 }
@@ -2217,6 +2276,95 @@ function buildLearningExitTicket(
   };
 }
 
+function buildPreLabDesignCoach(
+  template: ExperimentTemplate,
+  confidence: number,
+  issues: Issue[],
+  safetyCoach: SafetyCoach,
+  customLabTriage: CustomLabTriage
+): PreLabDesignCoach {
+  const planner = customLabTriage.planner;
+  const hasBlockingIssue = issues.some((issue) => issue.severity === "error") || safetyCoach.status === "do_not_run";
+  const needsTeacherReview =
+    confidence < 0.6 || customLabTriage.status === "needs_student_details" || safetyCoach.status === "adult_review";
+  const status: PreLabDesignCoach["status"] = hasBlockingIssue
+    ? "blocked"
+    : needsTeacherReview
+      ? "needs_teacher_review"
+      : "ready_to_plan";
+  const sourceSearch = customLabTriage.sourceSearches[0] ?? `${template.title} expected results`;
+  const tablePlan = customLabTriage.suggestedColumns.length ? customLabTriage.suggestedColumns : template.columns;
+  const variablePlan = {
+    independentVariable: planner.independentVariable,
+    dependentVariable: planner.dependentVariable,
+    controlVariables: planner.controlVariables
+  };
+
+  return {
+    status,
+    summary:
+      status === "ready_to_plan"
+        ? "Before data collection, the student has a ready variable, control, repeat, table, source, and safety checklist."
+        : status === "needs_teacher_review"
+          ? "Before data collection, the student should get teacher confirmation on the match, variables, controls, and safety boundary."
+          : "Before data collection, the student should fix blocking data or safety issues before treating this as a runnable plan.",
+    variablePlan,
+    repeatPlan: planner.repeatPlan,
+    tablePlan,
+    hypothesisStarter: planner.hypothesisStarter,
+    setupChecks: [
+      {
+        id: "variables",
+        label: "Variables named",
+        detail: `${variablePlan.independentVariable} drives ${variablePlan.dependentVariable}.`,
+        status: needsTeacherReview ? "review" : "ready"
+      },
+      {
+        id: "controls",
+        label: "Controls listed",
+        detail: variablePlan.controlVariables.length
+          ? `Keep ${variablePlan.controlVariables.slice(0, 4).join(", ")} constant.`
+          : "Name the controls before collecting data.",
+        status: variablePlan.controlVariables.length ? "ready" : "review"
+      },
+      {
+        id: "repeats",
+        label: "Repeat plan",
+        detail: planner.repeatPlan,
+        status: "ready"
+      },
+      {
+        id: "table",
+        label: "Table ready",
+        detail: `Start with ${tablePlan.map((column) => column.label).join(", ")} before the first trial.`,
+        status: tablePlan.length >= 2 ? "ready" : "review"
+      },
+      {
+        id: "safety",
+        label: "Safety gate",
+        detail: safetyCoach.teacherCheck,
+        status: safetyCoach.status === "do_not_run" ? "blocked" : safetyCoach.status === "adult_review" ? "review" : "ready"
+      },
+      {
+        id: "source-check",
+        label: "Source check",
+        detail: `Search: ${sourceSearch}. Write the expected graph pattern in your own words before running trials.`,
+        status: customLabTriage.status === "needs_student_details" ? "review" : "ready"
+      }
+    ],
+    sourceTask: `Use the search query "${sourceSearch}" and write the expected pattern before collecting the first row.`,
+    safetyGate: `${safetyCoach.summary} ${safetyCoach.teacherCheck}`,
+    studentNextAction:
+      status === "ready_to_plan"
+        ? "Fill the table headers, run one small first trial, then repeat each condition before trusting the graph."
+        : status === "needs_teacher_review"
+          ? "Show the variable plan, controls, source task, and safety gate to a teacher before collecting data."
+          : "Fix blocking issues and get teacher approval before running or extending this experiment.",
+    judgeTakeaway:
+      "Pre-Lab Design Coach moves Ouija before data collection by planning variables, controls, repeats, sources, safety, and table structure without writing a conclusion."
+  };
+}
+
 function buildDataHandlingLedger(groundingMode: AnalyzeResult["groundingStatus"]["mode"]): DataHandlingLedger {
   const usesServerSearch = groundingMode === "web_enriched";
   const flows: DataHandlingLedger["flows"] = [
@@ -2313,7 +2461,8 @@ function buildOfficialRubricFit(
   nextTrialPlan: NextTrialPlan,
   impactSnapshot: LearningImpactSnapshot,
   dataHandlingLedger: DataHandlingLedger,
-  learningExitTicket: LearningExitTicket
+  learningExitTicket: LearningExitTicket,
+  preLabDesignCoach: PreLabDesignCoach
 ): OfficialRubricFit {
   const warningCount = issues.filter((issue) => issue.severity === "warning").length;
   const errorCount = issues.filter((issue) => issue.severity === "error").length;
@@ -2367,6 +2516,7 @@ function buildOfficialRubricFit(
           `Targets the real classroom bottleneck: students compare their own table against the expected ${formatColumnName(template, template.expectedResult.xKey)} to ${formatColumnName(template, template.expectedResult.yKey)} pattern.`,
           `Expected overlay: ${expectedComparison.summary}`,
           `Learning impact loop score: ${impactSnapshot.score}/100; ${impactSnapshot.headline}`,
+          `Pre-Lab Design Coach: ${preLabDesignCoach.summary}`,
           `Learning Exit Ticket: ${learningExitTicket.summary}`,
           `Judge Demo Path: ${judgeDemoPath.summary}`,
           `Custom Lab Triage: ${customLabTriage.summary}`,
@@ -2390,6 +2540,7 @@ function buildOfficialRubricFit(
           `AI Evaluation Harness scores classifier confidence, coverage, grounding, pattern validation, repeat reliability, row validators, safety, and fallback boundaries at ${aiEvaluationHarness.score}/100.`,
           `Data Handling Ledger scores privacy, retention, server-key boundaries, and student controls at ${dataHandlingLedger.score}/100.`,
           `${modelStrategy.signals.length} strategy signals are shown alongside deterministic table validators, Grounding Audit, Method Audit, Pattern Evidence Engine, Reliability Coach, Safety Coach, and Next Trial Planner.`,
+          `Pre-lab planning status is ${preLabDesignCoach.status.replaceAll("_", " ")} with ${preLabDesignCoach.setupChecks.length} setup checks before data collection.`,
           modelStrategy.fallbackStrategy
         ],
         judgeTakeaway: "The AI is inspectable: classification, grounding, validation, fallback behavior, and risk controls are visible instead of hidden behind a chat answer."
@@ -2402,6 +2553,7 @@ function buildOfficialRubricFit(
           `Guided Lab Flow current action: ${guidedFlow.currentAction}`,
           `Judge Demo Path next action: ${judgeDemoPath.nextBestAction}`,
           `Custom Lab Triage next action: ${customLabTriage.studentNextAction}`,
+          `Pre-Lab Design Coach next action: ${preLabDesignCoach.studentNextAction}`,
           `Students can paste or edit table data; the graph overlays student data with expected values for ${expectedComparison.points.length} row${expectedComparison.points.length === 1 ? "" : "s"}.`,
           `Current Method Audit score is ${methodAudit.score}/100.`,
           `Pattern Evidence question: ${patternEvidence.studentQuestion}`,
@@ -2435,7 +2587,8 @@ function buildTrackEvidence(
   modelStrategy: ModelStrategy,
   customLabTriage: CustomLabTriage,
   dataHandlingLedger: DataHandlingLedger,
-  learningExitTicket: LearningExitTicket
+  learningExitTicket: LearningExitTicket,
+  preLabDesignCoach: PreLabDesignCoach
 ): TrackEvidence {
   const errorCount = issues.filter((issue) => issue.severity === "error").length;
   const warningCount = issues.filter((issue) => issue.severity === "warning").length;
@@ -2515,6 +2668,17 @@ function buildTrackEvidence(
           customLabTriage.status === "supported_template"
             ? "Matched labs still expose variables, searches, and template-specific next steps."
             : `Unsupported lab support stays useful: ${customLabTriage.studentNextAction}`
+      },
+      {
+        id: "pre-lab-design",
+        label: "Pre-lab design",
+        status:
+          preLabDesignCoach.status === "blocked"
+            ? "blocked"
+            : preLabDesignCoach.status === "needs_teacher_review"
+              ? "review"
+              : "checked",
+        detail: preLabDesignCoach.judgeTakeaway
       },
       {
         id: "data-handling",
@@ -2607,6 +2771,17 @@ function buildTrackEvidence(
         label: "Map variables",
         status: "checked",
         detail: `${formatColumnName(template, template.expectedResult.xKey)} drives ${formatColumnName(template, template.expectedResult.yKey)}.`
+      },
+      {
+        id: "pre-lab",
+        label: "Plan pre-lab setup",
+        status:
+          preLabDesignCoach.status === "blocked"
+            ? "blocked"
+            : preLabDesignCoach.status === "needs_teacher_review"
+              ? "review"
+              : "checked",
+        detail: preLabDesignCoach.studentNextAction
       },
       {
         id: "ground",

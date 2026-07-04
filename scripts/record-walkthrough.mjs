@@ -11,7 +11,7 @@ const recordingDir = mkdtempSync(join(tmpdir(), "ouija-walkthrough-"));
 const outputPath = resolve(assetDir, "ouija-walkthrough.webm");
 const captionDurationMs = Number(process.env.OUIJA_CAPTION_MS ?? 8500);
 let captionIndex = 0;
-const captionTotal = 32;
+const captionTotal = 33;
 
 mkdirSync(assetDir, { recursive: true });
 
@@ -62,6 +62,13 @@ await caption(
   "Ouija maps the same run to the official criteria: problem relevance, AI technical design and model strategy, and user experience."
 );
 
+await page.getByRole("heading", { name: "Pre-Lab Design Coach" }).scrollIntoViewIfNeeded();
+await caption(
+  page,
+  "Pre-Lab Design Coach",
+  "Before data collection, Ouija plans variables, controls, repeats, table columns, source checks, and a safety gate without writing the student's hypothesis."
+);
+
 await page.getByRole("heading", { name: "Learning Impact Loop" }).scrollIntoViewIfNeeded();
 await caption(
   page,
@@ -109,7 +116,7 @@ await page.getByRole("heading", { name: "Reasoning trail" }).scrollIntoViewIfNee
 await caption(
   page,
   "AI pipeline",
-  "Reasoning Trail shows classification, model strategy, AI evaluation, judge demo guidance, variable mapping, source grounding audit, expected overlay, guided workflow, concept scaffolding, safety boundaries, table audit, pattern evidence, repeat reliability, next-trial planning, and claim coaching."
+  "Reasoning Trail shows classification, model strategy, AI evaluation, judge demo guidance, variable mapping, pre-lab setup, source grounding audit, expected overlay, guided workflow, concept scaffolding, safety boundaries, table audit, pattern evidence, repeat reliability, next-trial planning, and claim coaching."
 );
 
 await page.getByRole("heading", { name: "Pattern Evidence Engine" }).scrollIntoViewIfNeeded();
@@ -181,7 +188,7 @@ await page.locator("#mcp-export").scrollIntoViewIfNeeded();
 await caption(
   page,
   "MCP Integration Coach",
-  "Ouija previews Composio handoffs to Google Docs, Google Sheets, Google Drive, and Notion while keeping credentials server-side and requiring consent before export."
+  "Ouija previews Composio handoffs to Google Docs, Google Sheets, Google Drive, Google Classroom, and Notion while keeping credentials server-side and requiring consent before export."
 );
 
 await page.locator("#evaluation").scrollIntoViewIfNeeded();
@@ -193,7 +200,7 @@ await page.getByLabel("Judge Brief").getByText("AIYES Track 1").waitFor();
 await caption(
   page,
   "Judge Brief",
-  "The live app includes Track 1 fit, judge demo path, hosted links, official rubric fit, learning impact, learning exit ticket, student reflection workspace, progress portfolio, custom lab triage, grounding audit, AI evaluation harness, data handling, model strategy, evaluation, and integrity constraints."
+  "The live app includes Track 1 fit, judge demo path, hosted links, official rubric fit, pre-lab design, learning impact, learning exit ticket, student reflection workspace, progress portfolio, custom lab triage, grounding audit, AI evaluation harness, data handling, model strategy, evaluation, and integrity constraints."
 );
 
 await page.getByRole("heading", { name: "Reasoning trail" }).scrollIntoViewIfNeeded();

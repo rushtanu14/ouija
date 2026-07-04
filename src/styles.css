@@ -117,6 +117,7 @@ a {
 .analysis-panel > .classification,
 .judge-demo-path,
 .custom-lab-triage,
+.pre-lab-design-coach,
 .model-strategy,
 .ai-evaluation-harness,
 .data-handling-ledger,
@@ -355,6 +356,7 @@ a:focus-visible {
 .graph-card,
 .judge-demo-path,
 .custom-lab-triage,
+.pre-lab-design-coach,
 .model-strategy,
 .ai-evaluation-harness,
 .rubric-fit,
@@ -702,6 +704,176 @@ a:focus-visible {
   gap: 7px;
   margin: 0;
   padding-left: 18px;
+}
+
+.pre-lab-design-coach {
+  display: grid;
+  gap: 13px;
+}
+
+.pre-lab-summary {
+  display: grid;
+  grid-template-columns: minmax(160px, 0.45fr) minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+  border-radius: 8px;
+  padding: 13px;
+  color: #17446f;
+  background: #eef7ff;
+}
+
+.pre-lab-design-needs_teacher_review .pre-lab-summary {
+  color: #6e4a03;
+  background: #fff7e5;
+}
+
+.pre-lab-design-blocked .pre-lab-summary {
+  color: #8a1f12;
+  background: #fff0ee;
+}
+
+.pre-lab-summary strong,
+.pre-lab-summary span {
+  display: block;
+  color: inherit;
+  line-height: 1.35;
+}
+
+.pre-lab-summary span {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.pre-lab-variable-grid,
+.pre-lab-lower-grid,
+.pre-lab-action-grid {
+  display: grid;
+  gap: 8px;
+}
+
+.pre-lab-variable-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.pre-lab-lower-grid {
+  grid-template-columns: 1.1fr 0.9fr;
+}
+
+.pre-lab-action-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.pre-lab-variable-grid article,
+.pre-lab-lower-grid article,
+.pre-lab-action-grid article {
+  border: 1px solid #d9e5f2;
+  border-radius: 8px;
+  padding: 10px;
+  background: #fbfdff;
+  min-width: 0;
+}
+
+.pre-lab-variable-grid strong,
+.pre-lab-lower-grid strong,
+.pre-lab-action-grid strong {
+  display: block;
+  color: #172439;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.pre-lab-check-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.pre-lab-check {
+  display: grid;
+  gap: 7px;
+  border: 1px solid #d9e5f2;
+  border-left: 4px solid #2e9f65;
+  border-radius: 8px;
+  padding: 10px;
+  background: #fbfdff;
+}
+
+.pre-lab-check-review {
+  border-left-color: #d89100;
+  background: #fffaf0;
+}
+
+.pre-lab-check-blocked {
+  border-left-color: #d6452f;
+  background: #fff7f5;
+}
+
+.pre-lab-check div {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  align-items: center;
+}
+
+.pre-lab-check strong {
+  color: #172439;
+  font-size: 12px;
+  line-height: 1.25;
+}
+
+.pre-lab-check span {
+  flex: 0 0 auto;
+  border-radius: 8px;
+  padding: 4px 6px;
+  color: #1f5b3d;
+  background: #edf8f1;
+  font-size: 11px;
+  font-weight: 850;
+}
+
+.pre-lab-check-review span {
+  color: #6e4a03;
+  background: #fff0c7;
+}
+
+.pre-lab-check-blocked span {
+  color: #8a1f12;
+  background: #ffe0dc;
+}
+
+.pre-lab-check p {
+  margin: 0;
+  color: #536478;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.pre-lab-pill-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.pre-lab-pill-list span {
+  border-radius: 8px;
+  padding: 7px 8px;
+  color: #173b74;
+  background: #eef5ff;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.pre-lab-judge-takeaway {
+  margin: 0;
+  border-left: 4px solid #2368ff;
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: #173b74;
+  background: #eef5ff;
+  font-size: 13px;
+  font-weight: 760;
+  line-height: 1.4;
 }
 
 .model-strategy {
@@ -3490,6 +3662,16 @@ td input {
     grid-template-columns: 1fr;
   }
 
+  .pre-lab-variable-grid,
+  .pre-lab-check-grid,
+  .pre-lab-action-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .pre-lab-lower-grid {
+    grid-template-columns: 1fr;
+  }
+
   .rubric-criteria {
     grid-template-columns: 1fr;
   }
@@ -3564,6 +3746,13 @@ td input {
   .triage-summary {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .pre-lab-summary,
+  .pre-lab-variable-grid,
+  .pre-lab-check-grid,
+  .pre-lab-action-grid {
+    grid-template-columns: 1fr;
   }
 
   .impact-metric-grid {

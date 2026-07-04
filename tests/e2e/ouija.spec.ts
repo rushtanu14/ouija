@@ -113,8 +113,15 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(page.getByLabel("Reasoning trail").getByText("Repeat reliability", { exact: true })).toBeVisible();
   await expect(page.getByLabel("Reasoning trail").getByText("Audit data handling", { exact: true })).toBeVisible();
   await expect(page.getByLabel("Reasoning trail").getByText("Data ethics", { exact: true })).toBeVisible();
+  await expect(page.getByLabel("Reasoning trail").getByText("Plan pre-lab setup", { exact: true })).toBeVisible();
+  await expect(page.getByLabel("Reasoning trail").getByText("Pre-lab design", { exact: true })).toBeVisible();
   await expect(page.getByLabel("Reasoning trail").getByText("Check learning exit ticket", { exact: true })).toBeVisible();
   await expect(page.getByLabel("Reasoning trail").getByText("Learning exit ticket", { exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Pre-Lab Design Coach" })).toBeVisible();
+  await expect(page.getByLabel("Pre-Lab Design Coach").getByText("Before data collection", { exact: true })).toBeVisible();
+  await expect(page.getByLabel("Pre-Lab Design Coach").getByText("Independent variable", { exact: true })).toBeVisible();
+  await expect(page.getByLabel("Pre-Lab Design Coach").locator(".section-label").filter({ hasText: "Repeat plan" })).toBeVisible();
+  await expect(page.getByLabel("Pre-Lab Design Coach").getByText("Source task", { exact: true })).toBeVisible();
   await page.getByRole("link", { name: "Eval Bench" }).click();
   await expect(page.getByLabel("Evaluation Bench").getByText("100/100")).toBeVisible();
   await expect(page.getByLabel("Evaluation Bench").getByText("8/8 passed")).toBeVisible();
@@ -132,6 +139,7 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(page.getByLabel("AI Model Card").getByText("Judge Demo Path reduces the live demo to problem fit, AI design, student workflow, evidence handoff, and submission proof.")).toBeVisible();
   await expect(page.getByLabel("AI Model Card").getByText("Official Rubric Fit maps problem relevance, AI design, and UX to concrete app evidence.")).toBeVisible();
   await expect(page.getByLabel("AI Model Card").getByText("Learning Impact Loop turns analysis into measurable student readiness and next-trial evidence.")).toBeVisible();
+  await expect(page.getByLabel("AI Model Card").getByText("Pre-Lab Design Coach turns classification into variables, controls, repeats, source checks, and safety before data collection.")).toBeVisible();
   await expect(page.getByLabel("AI Model Card").getByText("Learning Exit Ticket converts the AI feedback into student reflection prompts judges can inspect.")).toBeVisible();
   await expect(page.getByLabel("AI Model Card").getByText("Student Reflection Workspace stores student-written drafts without generating answers.")).toBeVisible();
   await expect(page.getByLabel("AI Model Card").getByText("Grounding Audit checks source agreement before students use the expected pattern.")).toBeVisible();
@@ -157,11 +165,15 @@ test("student can analyze a sample experiment, edit table data, and see citation
     })
   ).toBeVisible();
   await expect(page.getByLabel("MCP Integration Coach").getByText("Google Drive", { exact: true })).toBeVisible();
+  await expect(page.getByLabel("MCP Integration Coach").getByText("Google Classroom", { exact: true })).toBeVisible();
+  await expect(page.getByLabel("MCP Integration Coach").getByText("Draft pre-lab checkpoint")).toBeVisible();
   await expect(page.getByLabel("MCP Integration Coach").getByText("Notion", { exact: true })).toBeVisible();
   await expect(page.getByLabel("MCP Integration Coach").getByText(/Add COMPOSIO_API_KEY and a server-side MCP bridge/)).toBeVisible();
-  await expect(page.getByLabel("MCP Integration Coach").getByText("Preview mode does not call Composio, Google, or Notion APIs.")).toBeVisible();
+  await expect(page.getByLabel("MCP Integration Coach").getByText("Preview mode does not call Composio, Google Classroom, Google Workspace, or Notion APIs.")).toBeVisible();
   await expect(page.getByLabel("MCP payload preview")).toHaveValue(/# Ouija Evidence Packet: Reaction Rate vs Temperature/);
   await expect(page.getByLabel("MCP payload preview")).toHaveValue(/Google Sheets: append spreadsheet rows/);
+  await expect(page.getByLabel("MCP payload preview")).toHaveValue(/Google Classroom: create coursework draft/);
+  await expect(page.getByLabel("MCP payload preview")).toHaveValue(/Pre-Lab Design Coach/);
   await expect(page.getByLabel("MCP payload preview")).toHaveValue(/Student Reflection Drafts/);
   await page.getByRole("link", { name: "Settings" }).click();
   await expect(page.getByLabel("Settings", { exact: true }).getByText("Local snapshots")).toBeVisible();
@@ -187,6 +199,7 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(page.getByLabel("Judge Brief").getByText("AI Evaluation Harness scores model behavior and safeguards.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Official Rubric Fit maps all three visible AIYES criteria.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Learning Impact Loop measures the student's outcome for each run.")).toBeVisible();
+  await expect(page.getByLabel("Judge Brief").getByText("Pre-Lab Design Coach helps students plan variables, controls, repeats, sources, and safety before collecting data.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Learning Exit Ticket proves students must explain variables, patterns, and next steps themselves.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Student Reflection Workspace captures student-authored exit-ticket drafts.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Grounding Audit makes citation trust and mixed evidence visible.")).toBeVisible();
@@ -198,7 +211,7 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(page.getByLabel("Judge Brief").getByText("Evaluation Bench runs eight live cases.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Data Handling Ledger shows privacy, retention, and student controls.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Evidence Packet exports a student-owned reasoning handoff.")).toBeVisible();
-  await expect(page.getByLabel("Judge Brief").getByText("MCP Integration Coach previews Composio Docs, Sheets, Drive, and Notion handoffs without exposing credentials.")).toBeVisible();
+  await expect(page.getByLabel("Judge Brief").getByText("MCP Integration Coach previews Composio Docs, Sheets, Drive, Classroom, and Notion handoffs without exposing credentials.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Next Trial Planner gives adaptive measurement guidance.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Hosted deck and walkthrough are public.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Low-confidence labs show a boundary warning.")).toBeVisible();
