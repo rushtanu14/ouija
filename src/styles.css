@@ -137,6 +137,7 @@ a {
 .evidence-packet,
 .saved-labs-panel,
 .progress-portfolio-panel,
+.mcp-integration-panel,
 .evaluation-panel,
 .judge-brief-panel,
 .settings-panel,
@@ -2344,6 +2345,7 @@ td input {
 
 .saved-labs-panel,
 .progress-portfolio-panel,
+.mcp-integration-panel,
 .evaluation-panel,
 .model-card-panel,
 .judge-brief-panel,
@@ -2779,6 +2781,159 @@ td input {
   line-height: 1.35;
 }
 
+.mcp-integration-panel {
+  align-content: start;
+  grid-column: span 2;
+}
+
+.mcp-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+}
+
+.mcp-header button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 36px;
+  border: 1px solid #c9dcff;
+  border-radius: 8px;
+  padding: 8px 10px;
+  color: #2368ff;
+  background: #f7fbff;
+  font-size: 13px;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.mcp-header button:disabled {
+  cursor: not-allowed;
+  color: #8fa0b5;
+  background: #f4f7fa;
+}
+
+.mcp-summary {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  border-radius: 8px;
+  padding: 12px;
+  color: #173b74;
+  background: #eef5ff;
+}
+
+.mcp-integration-ready .mcp-summary {
+  color: #1f5b3d;
+  background: #edf8f1;
+}
+
+.mcp-summary strong {
+  display: block;
+  color: inherit;
+  line-height: 1.2;
+}
+
+.mcp-summary > span {
+  min-width: 0;
+  color: #526276;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.mcp-action-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.mcp-action-card {
+  display: grid;
+  gap: 7px;
+  border: 1px solid #d9e5f2;
+  border-left: 4px solid #2368ff;
+  border-radius: 8px;
+  padding: 11px;
+  background: #fbfdff;
+}
+
+.mcp-action-card strong {
+  display: block;
+  color: #172439;
+  line-height: 1.25;
+}
+
+.mcp-action-card span,
+.mcp-action-card small,
+.mcp-action-card em {
+  color: #607087;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.mcp-action-card em {
+  color: #23543c;
+  font-style: normal;
+  font-weight: 700;
+}
+
+.mcp-payload-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.mcp-payload-grid article {
+  border: 1px solid #d9e5f2;
+  border-radius: 8px;
+  padding: 10px;
+  background: #fbfdff;
+}
+
+.mcp-payload-grid strong {
+  display: block;
+  color: #172439;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.mcp-preview-box {
+  min-height: 170px;
+  margin: 0;
+  color: #203047;
+  font-size: 12px;
+}
+
+.mcp-safeguards {
+  display: grid;
+  gap: 7px;
+  border-radius: 8px;
+  padding: 12px;
+  color: #23543c;
+  background: #edf8f1;
+}
+
+.mcp-safeguards strong,
+.mcp-safeguards span,
+.mcp-safeguards small {
+  color: inherit;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.mcp-judge-takeaway {
+  margin: 0;
+  border-radius: 8px;
+  padding: 11px;
+  color: #173b74;
+  background: #eef5ff;
+  font-size: 13px;
+  font-weight: 750;
+  line-height: 1.4;
+}
+
 .settings-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -3125,6 +3280,10 @@ td input {
     width: min(760px, calc(100vw - 28px));
   }
 
+  .mcp-integration-panel {
+    grid-column: auto;
+  }
+
   .source-rail {
     grid-template-columns: 1fr;
   }
@@ -3142,6 +3301,11 @@ td input {
   }
 
   .strategy-signal-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .mcp-action-grid,
+  .mcp-payload-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
@@ -3250,6 +3414,22 @@ td input {
   }
 
   .strategy-signal-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .mcp-header,
+  .mcp-summary {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .mcp-header button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .mcp-action-grid,
+  .mcp-payload-grid {
     grid-template-columns: 1fr;
   }
 

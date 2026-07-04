@@ -28,8 +28,9 @@ Ouija is a student-facing AI experiment interpreter for middle and high school s
 13. Open Evaluation Bench to see eight live checks: seven supported lab demos plus the unsupported-lab boundary.
 14. Save lab snapshots locally so a student can return to a checked run without sending data to an account system.
 15. Use Progress Portfolio to show saved-run count, score trend, subject breadth, strongest run, and next portfolio action.
-16. Open AI Model Card for the architecture, grounding, evaluation, privacy, and guardrail summary.
-17. Open Judge Brief for a compact Track 1 proof surface: live app, hosted deck/video, judge demo path, official rubric fit, learning impact, progress portfolio, AI pipeline, model strategy, evaluation, data-handling ethics, tests, and integrity constraints.
+16. Use MCP Integration Coach to preview Composio-powered Google Docs, Google Sheets, Google Drive, and Notion handoffs without exposing credentials or sending student data.
+17. Open AI Model Card for the architecture, grounding, evaluation, privacy, MCP-export boundary, and guardrail summary.
+18. Open Judge Brief for a compact Track 1 proof surface: live app, hosted deck/video, judge demo path, official rubric fit, learning impact, progress portfolio, MCP handoff plan, AI pipeline, model strategy, evaluation, data-handling ethics, tests, and integrity constraints.
 
 Guided Lab Flow gives students one current next action and six stable stages so the interface feels like a lab workflow rather than separate AI outputs.
 
@@ -78,6 +79,8 @@ Spreadsheet paste import turns copied lab-table rows into graph/check inputs wit
 Saved Labs stores up to six browser-local lab snapshots with the experiment, table rows, readiness score, and data flags.
 
 Progress Portfolio turns those saved labs into repeated learning evidence: saved-run count, score trend, subject breadth, strongest run, milestones, and the next portfolio action.
+
+MCP Integration Coach previews a practical Composio export path for the same student-owned evidence: create a Google Docs evidence packet, append table rows to Google Sheets, save a portfolio archive to Google Drive, or create a Notion learning record. The current public app is intentionally preview-only; live connector execution would require a server-side MCP bridge and `COMPOSIO_API_KEY`, with student or teacher consent before export.
 
 ## Run
 

@@ -37,6 +37,7 @@ import { requestAnalysis, requestEvaluation } from "./lib/api";
 import { refreshResultForRows } from "./lib/analysis";
 import { buildPasteExample, parsePastedTable } from "./lib/dataImport";
 import { buildEvidencePacket } from "./lib/evidencePacket";
+import { buildMcpIntegrationPlan } from "./lib/mcpIntegrationPlan";
 import { buildProgressPortfolio } from "./lib/progressPortfolio";
 import { SAMPLE_PROMPTS } from "./lib/samples";
 import type {
@@ -53,6 +54,7 @@ import type {
   LabBrief,
   LearningExitTicket,
   LearningImpactSnapshot,
+  McpIntegrationPlan,
   MethodAudit,
   ModelStrategy,
   NextTrialPlan,
@@ -160,6 +162,17 @@ export function App() {
     }));
   }, [result, rows]);
   const progressPortfolio = useMemo(() => buildProgressPortfolio(savedLabs), [savedLabs]);
+  const mcpIntegrationPlan = useMemo(() => {
+    if (!result) return null;
+    return buildMcpIntegrationPlan({
+      result,
+      rows,
+      description,
+      evidencePacket: buildEvidencePacket(result, rows, description),
+      portfolio: progressPortfolio,
+      configured: false
+    });
+  }, [description, progressPortfolio, result, rows]);
 
   return (
     <main className="app-shell">
@@ -179,6 +192,7 @@ export function App() {
           <a href="#evaluation">Eval Bench</a>
           <a href="#saved">Saved Labs</a>
           <a href="#progress">Progress</a>
+          <a href="#mcp-export">MCP Export</a>
           <a href="#model-card">Model Card</a>
           <a href="#judge">Judge Brief</a>
           <a href="#settings">Settings</a>
@@ -350,6 +364,7 @@ export function App() {
       <section className="lower-workspace" aria-label="Saved labs and settings">
         <SavedLabsPanel savedLabs={savedLabs} onLoad={loadSavedLab} onDelete={deleteSavedLab} />
         <ProgressPortfolioPanel portfolio={progressPortfolio} />
+        <McpIntegrationCoachPanel plan={mcpIntegrationPlan} />
         <EvaluationBenchPanel report={evaluationReport} />
         <ModelCardPanel result={result} />
         <JudgeBriefPanel result={result} />
@@ -596,6 +611,7 @@ function JudgeBriefPanel({ result }: { result: AnalyzeResult | null }) {
     { label: "Live app", value: "Deployed" },
     { label: "Slide deck", value: "Hosted" },
     { label: "Video", value: "Hosted" },
+    { label: "MCP export", value: "Preview-safe" },
     { label: "Integrity", value: "Guarded" }
   ];
   const submissionLinks = [
@@ -622,6 +638,7 @@ function JudgeBriefPanel({ result }: { result: AnalyzeResult | null }) {
     "Data Handling Ledger shows privacy, retention, and student controls.",
     "Spreadsheet paste/import flows into data checks.",
     "Evidence Packet exports a student-owned reasoning handoff.",
+    "MCP Integration Coach previews Composio Docs, Sheets, Drive, and Notion handoffs without exposing credentials.",
     "Next Trial Planner gives adaptive measurement guidance.",
     "Progress Portfolio shows learning over multiple saved runs.",
     "Evaluation Bench runs eight live cases.",
@@ -688,6 +705,10 @@ function ModelCardPanel({ result }: { result: AnalyzeResult | null }) {
     {
       label: "Privacy",
       value: "Local snapshots"
+    },
+    {
+      label: "MCP exports",
+      value: "Preview only"
     }
   ];
   const safeguards = [
@@ -703,6 +724,7 @@ function ModelCardPanel({ result }: { result: AnalyzeResult | null }) {
     "Grounding Audit checks source agreement before students use the expected pattern.",
     "Data Handling Ledger makes student data flow, retention, and controls inspectable.",
     "Progress Portfolio turns saved labs into repeated learning evidence for judges.",
+    "MCP Integration Coach keeps Composio credentials server-side and requires student consent before any export.",
     "Pattern Evidence Engine quantifies whether the dataset supports the expected science pattern.",
     "Reliability Coach checks repeated trials, averages, and spread before students trust a claim.",
     "Guided Lab Flow turns dense analysis into student next steps.",
@@ -850,6 +872,107 @@ function ProgressPortfolioPanel({ portfolio }: { portfolio: ProgressPortfolio })
   );
 }
 
+function McpIntegrationCoachPanel({ plan }: { plan: McpIntegrationPlan | null }) {
+  const [copyStatus, setCopyStatus] = useState("");
+  const payloadText = useMemo(() => (plan ? formatMcpPayloadPreview(plan) : ""), [plan]);
+
+  useEffect(() => {
+    setCopyStatus("");
+  }, [payloadText]);
+
+  async function copyPayload() {
+    if (!payloadText || !navigator.clipboard) {
+      setCopyStatus("Select the preview text to copy.");
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(payloadText);
+      setCopyStatus("MCP payload preview copied.");
+    } catch {
+      setCopyStatus("Select the preview text to copy.");
+    }
+  }
+
+  return (
+    <section
+      className={`mcp-integration-panel mcp-integration-${plan?.status ?? "empty"}`}
+      id="mcp-export"
+      aria-label="MCP Integration Coach"
+    >
+      <div className="mcp-header">
+        <div className="panel-title">
+          <Workflow size={18} />
+          <h3>MCP Integration Coach</h3>
+        </div>
+        <button type="button" onClick={() => void copyPayload()} disabled={!plan}>
+          <Copy size={16} />
+          Copy preview
+        </button>
+      </div>
+      {plan ? (
+        <>
+          <div className="mcp-summary">
+            <div>
+              <p className="section-label">Composio route</p>
+              <strong>{formatMcpStatus(plan.status)}</strong>
+            </div>
+            <span>{plan.summary}</span>
+          </div>
+          <div className="mcp-action-grid">
+            {plan.actions.map((action) => (
+              <article className="mcp-action-card" key={action.id}>
+                <div>
+                  <p className="section-label">{action.toolkit}</p>
+                  <strong>{action.label}</strong>
+                </div>
+                <span>{action.composioCapability}</span>
+                <small>{action.payloadSummary}</small>
+                <em>{action.safetyNote}</em>
+              </article>
+            ))}
+          </div>
+          <div className="mcp-payload-grid">
+            <article>
+              <p className="section-label">Packet</p>
+              <strong>{plan.payloadPreview.title}</strong>
+            </article>
+            <article>
+              <p className="section-label">Rows</p>
+              <strong>{plan.payloadPreview.rowCount}</strong>
+            </article>
+            <article>
+              <p className="section-label">Sources</p>
+              <strong>{plan.payloadPreview.sourceCount}</strong>
+            </article>
+            <article>
+              <p className="section-label">Saved runs</p>
+              <strong>{plan.payloadPreview.savedRunCount}</strong>
+            </article>
+          </div>
+          <textarea className="mcp-preview-box" aria-label="MCP payload preview" readOnly value={payloadText} />
+          <div className="mcp-safeguards">
+            <p className="section-label">Credential boundary</p>
+            <strong>{plan.setupHint}</strong>
+            <span>{plan.privacyBoundary}</span>
+            {plan.safeguards.map((safeguard) => (
+              <small key={safeguard}>{safeguard}</small>
+            ))}
+          </div>
+          <p className="mcp-judge-takeaway">{plan.judgeTakeaway}</p>
+          {copyStatus ? (
+            <p className="packet-status" aria-live="polite">
+              {copyStatus}
+            </p>
+          ) : null}
+        </>
+      ) : (
+        <p className="empty-copy">Analyze an experiment to preview the Composio MCP export workflow.</p>
+      )}
+    </section>
+  );
+}
+
 function SettingsPanel({ result, savedLabCount }: { result: AnalyzeResult | null; savedLabCount: number }) {
   const settings = [
     {
@@ -863,6 +986,10 @@ function SettingsPanel({ result, savedLabCount }: { result: AnalyzeResult | null
     {
       label: "Local snapshots",
       value: `${savedLabCount}/6`
+    },
+    {
+      label: "MCP exports",
+      value: "Preview only"
     },
     {
       label: "Coverage",
@@ -1819,6 +1946,31 @@ function formatReadiness(readiness: AnalyzeResult["trackEvidence"]["readiness"])
   if (readiness === "competitive") return "Competitive";
   if (readiness === "submittable") return "Submittable";
   return "Needs work";
+}
+
+function formatMcpStatus(status: McpIntegrationPlan["status"]) {
+  return status === "ready" ? "Server MCP ready" : "Preview only";
+}
+
+function formatMcpPayloadPreview(plan: McpIntegrationPlan) {
+  return [
+    `# ${plan.payloadPreview.title}`,
+    "",
+    `Status: ${formatMcpStatus(plan.status)}`,
+    `Rows: ${plan.payloadPreview.rowCount}`,
+    `Sources: ${plan.payloadPreview.sourceCount}`,
+    `Saved runs: ${plan.payloadPreview.savedRunCount}`,
+    `Columns: ${plan.payloadPreview.tableColumns.join(", ")}`,
+    "",
+    "Included sections:",
+    ...plan.payloadPreview.includedSections.map((section) => `- ${section}`),
+    "",
+    "Actions:",
+    ...plan.actions.map((action) => `- ${action.toolkit}: ${action.composioCapability} (${action.payloadSummary})`),
+    "",
+    "Markdown excerpt:",
+    plan.payloadPreview.markdownExcerpt
+  ].join("\n");
 }
 
 function formatProgressPortfolioStatus(status: ProgressPortfolio["status"]) {

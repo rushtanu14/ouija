@@ -11,7 +11,7 @@ const recordingDir = mkdtempSync(join(tmpdir(), "ouija-walkthrough-"));
 const outputPath = resolve(assetDir, "ouija-walkthrough.webm");
 const captionDurationMs = Number(process.env.OUIJA_CAPTION_MS ?? 8500);
 let captionIndex = 0;
-const captionTotal = 30;
+const captionTotal = 31;
 
 mkdirSync(assetDir, { recursive: true });
 
@@ -160,6 +160,12 @@ await page.locator("#saved").getByText("Water Filtration and Turbidity", { exact
 await caption(page, "Saved lab snapshot", "A student can save checked runs locally and return to the evidence trail later.");
 await page.locator("#progress").scrollIntoViewIfNeeded();
 await caption(page, "Progress Portfolio", "Saved runs become progress evidence: run count, score trend, subject breadth, strongest run, and the next portfolio action.");
+await page.locator("#mcp-export").scrollIntoViewIfNeeded();
+await caption(
+  page,
+  "MCP Integration Coach",
+  "Ouija previews Composio handoffs to Google Docs, Google Sheets, Google Drive, and Notion while keeping credentials server-side and requiring consent before export."
+);
 
 await page.locator("#evaluation").scrollIntoViewIfNeeded();
 await page.getByLabel("Evaluation Bench").getByText("100/100").waitFor();

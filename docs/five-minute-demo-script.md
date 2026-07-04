@@ -54,11 +54,11 @@ Click Projectile Motion, Pendulum, Ohm's Law, Enzyme Activity, Density Layers, a
 
 Type an unsupported plant-light lab. Show that Ouija labels it as a low-confidence closest supported match instead of pretending full coverage, then scroll to Custom Lab Triage: inferred focus, suggested columns, source searches, clarifying questions, and teacher-confirmation boundary.
 
-## 4:50-4:55 - Saved Lab Snapshot And Progress Portfolio
+## 4:50-4:56 - Saved Lab Snapshot, Progress Portfolio, And MCP Export
 
-Save the current run and show Saved Labs plus Progress Portfolio so judges see the workflow continues after one analysis and can measure saved-run trend, subject breadth, and the next portfolio action.
+Save the current run and show Saved Labs plus Progress Portfolio so judges see the workflow continues after one analysis and can measure saved-run trend, subject breadth, and the next portfolio action. Then show MCP Integration Coach: Ouija previews Google Docs, Google Sheets, Google Drive, and Notion handoffs but keeps Composio credentials server-side and requires consent before export.
 
-## 4:55-4:58 - Evaluation Bench
+## 4:56-4:58 - Evaluation Bench
 
 Show Evaluation Bench with 100/100 and 8/8 live checks: projectile, pendulum period vs length, Ohm's law circuits, reaction rate, enzyme activity, density layering, water filtration, and unsupported-boundary behavior.
 

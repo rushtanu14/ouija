@@ -411,6 +411,47 @@ export interface ProgressPortfolio {
   judgeTakeaway: string;
 }
 
+export type McpIntegrationStatus = "preview_only" | "ready";
+
+export type McpIntegrationActionId =
+  | "google-docs-evidence-packet"
+  | "google-sheets-data-log"
+  | "google-drive-portfolio-archive"
+  | "notion-learning-record";
+
+export interface McpIntegrationAction {
+  id: McpIntegrationActionId;
+  toolkit: "Google Docs" | "Google Sheets" | "Google Drive" | "Notion";
+  label: string;
+  studentValue: string;
+  composioCapability: string;
+  payloadSummary: string;
+  mode: "preview" | "server_mcp";
+  requiresConsent: boolean;
+  safetyNote: string;
+}
+
+export interface McpIntegrationPayloadPreview {
+  title: string;
+  rowCount: number;
+  sourceCount: number;
+  savedRunCount: number;
+  tableColumns: string[];
+  includedSections: string[];
+  markdownExcerpt: string;
+}
+
+export interface McpIntegrationPlan {
+  status: McpIntegrationStatus;
+  summary: string;
+  setupHint: string;
+  privacyBoundary: string;
+  actions: McpIntegrationAction[];
+  payloadPreview: McpIntegrationPayloadPreview;
+  safeguards: string[];
+  judgeTakeaway: string;
+}
+
 export type RubricStatus = "strong" | "ready" | "review";
 
 export interface RubricCriterionFit {
