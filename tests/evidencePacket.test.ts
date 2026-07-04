@@ -37,6 +37,8 @@ describe("buildEvidencePacket", () => {
     expect(packet).toContain("## Learning Exit Ticket");
     expect(packet).toContain("Exit ticket prompt:");
     expect(packet).toContain("Teacher signal:");
+    expect(packet).toContain("## Student Reflection Drafts");
+    expect(packet).toContain("No student reflection draft entered yet.");
     expect(packet).toContain("## Pattern Evidence");
     expect(packet).toContain("Pattern score:");
     expect(packet).toContain("## Guided Lab Flow");
@@ -90,5 +92,24 @@ describe("buildEvidencePacket", () => {
     expect(packet).toContain("Red light");
     expect(packet).toContain("What exact condition did you change on purpose?");
     expect(packet).toContain("closest supported");
+  });
+
+  it("exports student-authored reflection drafts without filling them in", () => {
+    const result = analyzeExperiment({
+      description: "temperature changes reaction rate for a tablet"
+    });
+
+    const packet = buildEvidencePacket(result, result.rows, "temperature changes reaction rate for a tablet", {
+      "variable-check": "The independent variable was water temperature and the dependent variable was reaction rate.",
+      "pattern-check": "The graph shows rate increased as the water temperature increased.",
+      "next-step-check": "I would repeat the hottest trial while keeping water volume and tablet size the same."
+    });
+
+    expect(packet).toContain("## Student Reflection Drafts");
+    expect(packet).toContain("Student draft: The independent variable was water temperature");
+    expect(packet).toContain("Student draft: The graph shows rate increased");
+    expect(packet).toContain("Student draft: I would repeat the hottest trial");
+    expect(packet).toContain("Reflection status: ready for review");
+    expect(packet).not.toContain("Ouija draft:");
   });
 });

@@ -40,6 +40,7 @@ import { buildEvidencePacket } from "./lib/evidencePacket";
 import { buildMcpIntegrationPlan } from "./lib/mcpIntegrationPlan";
 import { buildProgressPortfolio } from "./lib/progressPortfolio";
 import { SAMPLE_PROMPTS } from "./lib/samples";
+import { buildStudentReflectionWorkspace } from "./lib/studentReflectionWorkspace";
 import type {
   AnalyzeResult,
   AiEvaluationHarness,
@@ -64,7 +65,9 @@ import type {
   ProgressPortfolioSnapshot,
   ReliabilityCoach,
   SafetyCoach,
-  StudentDataRow
+  StudentDataRow,
+  StudentReflectionAnswers,
+  StudentReflectionWorkspace
 } from "./lib/types";
 
 const initialPrompt = SAMPLE_PROMPTS[0].text;
@@ -82,6 +85,7 @@ export function App() {
   const [description, setDescription] = useState(initialPrompt);
   const [result, setResult] = useState<AnalyzeResult | null>(null);
   const [rows, setRows] = useState<StudentDataRow[]>([]);
+  const [reflectionAnswers, setReflectionAnswers] = useState<StudentReflectionAnswers>({});
   const [savedLabs, setSavedLabs] = useState<SavedLab[]>(loadSavedLabs);
   const [evaluationReport, setEvaluationReport] = useState<EvaluationReport | null>(null);
   const [status, setStatus] = useState<"idle" | "loading" | "error">("idle");
@@ -99,6 +103,7 @@ export function App() {
       if (requestId !== analysisRequestId.current) return;
       setResult(analysis);
       setRows(analysis.rows);
+      setReflectionAnswers({});
       setStatus("idle");
     } catch (analysisError) {
       if (requestId !== analysisRequestId.current) return;
@@ -151,6 +156,13 @@ export function App() {
     storeSavedLabs(nextSavedLabs);
   }
 
+  function updateReflectionAnswer(promptId: keyof StudentReflectionAnswers, answer: string) {
+    setReflectionAnswers((current) => ({
+      ...current,
+      [promptId]: answer
+    }));
+  }
+
   const chartData = useMemo(() => {
     if (!result) return [];
     const comparisonByRow = new Map(result.expectedComparison.points.map((point) => [point.rowId, point]));
@@ -162,17 +174,25 @@ export function App() {
     }));
   }, [result, rows]);
   const progressPortfolio = useMemo(() => buildProgressPortfolio(savedLabs), [savedLabs]);
+  const studentReflectionWorkspace = useMemo(() => {
+    if (!result) return null;
+    return buildStudentReflectionWorkspace(result.learningExitTicket, reflectionAnswers);
+  }, [reflectionAnswers, result]);
+  const evidencePacket = useMemo(() => {
+    if (!result) return "";
+    return buildEvidencePacket(result, rows, description, reflectionAnswers);
+  }, [description, reflectionAnswers, result, rows]);
   const mcpIntegrationPlan = useMemo(() => {
     if (!result) return null;
     return buildMcpIntegrationPlan({
       result,
       rows,
       description,
-      evidencePacket: buildEvidencePacket(result, rows, description),
+      evidencePacket,
       portfolio: progressPortfolio,
       configured: false
     });
-  }, [description, progressPortfolio, result, rows]);
+  }, [description, evidencePacket, progressPortfolio, result, rows]);
 
   return (
     <main className="app-shell">
@@ -277,6 +297,12 @@ export function App() {
               <OfficialRubricPanel fit={result.officialRubricFit} />
               <LearningImpactPanel snapshot={result.impactSnapshot} />
               <LearningExitTicketPanel ticket={result.learningExitTicket} />
+              {studentReflectionWorkspace ? (
+                <StudentReflectionWorkspacePanel
+                  workspace={studentReflectionWorkspace}
+                  onAnswerChange={updateReflectionAnswer}
+                />
+              ) : null}
               <GuidedLabFlowPanel flow={result.guidedFlow} />
 
               <div className="graph-card">
@@ -311,7 +337,7 @@ export function App() {
               <ComparisonPanel issues={result.issues} hints={result.hints} />
               <LabBriefPanel brief={result.labBrief} />
               <NextTrialPanel plan={result.nextTrialPlan} />
-              <EvidencePacketPanel result={result} rows={rows} description={description} />
+              <EvidencePacketPanel packet={evidencePacket} />
             </>
           ) : (
             <div className="empty-state">
@@ -368,7 +394,7 @@ export function App() {
         <EvaluationBenchPanel report={evaluationReport} />
         <ModelCardPanel result={result} />
         <JudgeBriefPanel result={result} />
-        <SettingsPanel result={result} savedLabCount={savedLabs.length} />
+        <SettingsPanel result={result} savedLabCount={savedLabs.length} reflectionWorkspace={studentReflectionWorkspace} />
       </section>
     </main>
   );
@@ -628,6 +654,7 @@ function JudgeBriefPanel({ result }: { result: AnalyzeResult | null }) {
     "Official Rubric Fit maps all three visible AIYES criteria.",
     "Learning Impact Loop measures the student's outcome for each run.",
     "Learning Exit Ticket proves students must explain variables, patterns, and next steps themselves.",
+    "Student Reflection Workspace captures student-authored exit-ticket drafts.",
     "Graph overlays expected pattern values against student data.",
     "Grounding Audit makes citation trust and mixed evidence visible.",
     "Pattern Evidence Engine scores the whole graph against the expected pattern.",
@@ -720,6 +747,7 @@ function ModelCardPanel({ result }: { result: AnalyzeResult | null }) {
     "Official Rubric Fit maps problem relevance, AI design, and UX to concrete app evidence.",
     "Learning Impact Loop turns analysis into measurable student readiness and next-trial evidence.",
     "Learning Exit Ticket converts the AI feedback into student reflection prompts judges can inspect.",
+    "Student Reflection Workspace stores student-written drafts without generating answers.",
     "Expected overlay gives students a visual comparison between their data and the expected pattern.",
     "Grounding Audit checks source agreement before students use the expected pattern.",
     "Data Handling Ledger makes student data flow, retention, and controls inspectable.",
@@ -973,7 +1001,15 @@ function McpIntegrationCoachPanel({ plan }: { plan: McpIntegrationPlan | null })
   );
 }
 
-function SettingsPanel({ result, savedLabCount }: { result: AnalyzeResult | null; savedLabCount: number }) {
+function SettingsPanel({
+  result,
+  savedLabCount,
+  reflectionWorkspace
+}: {
+  result: AnalyzeResult | null;
+  savedLabCount: number;
+  reflectionWorkspace: StudentReflectionWorkspace | null;
+}) {
   const settings = [
     {
       label: "Grounding",
@@ -990,6 +1026,10 @@ function SettingsPanel({ result, savedLabCount }: { result: AnalyzeResult | null
     {
       label: "MCP exports",
       value: "Preview only"
+    },
+    {
+      label: "Reflections",
+      value: reflectionWorkspace ? `${reflectionWorkspace.readyCount}/${reflectionWorkspace.totalCount}` : "0/3"
     },
     {
       label: "Coverage",
@@ -1386,6 +1426,66 @@ function LearningExitTicketPanel({ ticket }: { ticket: LearningExitTicket }) {
         ))}
       </div>
       <p className="exit-ticket-boundary">{ticket.integrityBoundary}</p>
+    </section>
+  );
+}
+
+function StudentReflectionWorkspacePanel({
+  workspace,
+  onAnswerChange
+}: {
+  workspace: StudentReflectionWorkspace;
+  onAnswerChange: (promptId: StudentReflectionWorkspace["entries"][number]["promptId"], answer: string) => void;
+}) {
+  return (
+    <section
+      className={`student-reflection-workspace student-reflection-${workspace.status}`}
+      aria-label="Student Reflection Workspace"
+    >
+      <div className="panel-title">
+        <FileText size={18} />
+        <h3>Student Reflection Workspace</h3>
+      </div>
+      <div className="reflection-summary">
+        <div>
+          <p className="section-label">Student-authored drafts</p>
+          <strong>
+            {workspace.readyCount}/{workspace.totalCount} ready
+          </strong>
+        </div>
+        <span>{workspace.summary}</span>
+      </div>
+      <div className="reflection-next-action">
+        <p className="section-label">Next reflection move</p>
+        <strong>{workspace.nextAction}</strong>
+      </div>
+      <div className="reflection-entry-grid">
+        {workspace.entries.map((entry) => (
+          <article className={`reflection-entry reflection-entry-${entry.status}`} key={entry.promptId}>
+            <div className="reflection-entry-header">
+              <strong>{entry.label}</strong>
+              <span>{formatStudentReflectionEntryStatus(entry.status)}</span>
+            </div>
+            <p>{entry.studentPrompt}</p>
+            <textarea
+              className="reflection-answer"
+              aria-label={`Reflection answer ${entry.label}`}
+              value={entry.answer}
+              onChange={(event) => onAnswerChange(entry.promptId, event.target.value)}
+            />
+            <div className="reflection-entry-footer">
+              <span>{entry.wordCount} words</span>
+              <small>{entry.evidenceToUse}</small>
+              <em>Teacher signal: {entry.teacherSignal}</em>
+            </div>
+          </article>
+        ))}
+      </div>
+      <div className="reflection-boundary">
+        <p className="section-label">Integrity boundary</p>
+        <strong>{workspace.integrityBoundary}</strong>
+        <span>{workspace.teacherTakeaway}</span>
+      </div>
     </section>
   );
 }
@@ -1799,17 +1899,8 @@ function NextTrialPanel({ plan }: { plan: NextTrialPlan }) {
   );
 }
 
-function EvidencePacketPanel({
-  result,
-  rows,
-  description
-}: {
-  result: AnalyzeResult;
-  rows: StudentDataRow[];
-  description: string;
-}) {
+function EvidencePacketPanel({ packet }: { packet: string }) {
   const [copyStatus, setCopyStatus] = useState("");
-  const packet = useMemo(() => buildEvidencePacket(result, rows, description), [description, result, rows]);
 
   useEffect(() => {
     setCopyStatus("");
@@ -1915,6 +2006,12 @@ function formatLearningExitTicketStatus(status: LearningExitTicket["status"]) {
   if (status === "blocked") return "Blocked";
   if (status === "review") return "Review first";
   return "Ready";
+}
+
+function formatStudentReflectionEntryStatus(status: StudentReflectionWorkspace["entries"][number]["status"]) {
+  if (status === "ready") return "Ready";
+  if (status === "too_short") return "Add evidence";
+  return "Empty";
 }
 
 function formatAiEvaluationCheckStatus(status: AiEvaluationHarness["checks"][number]["status"]) {

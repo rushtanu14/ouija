@@ -9,6 +9,7 @@
 - AIYES Rubric Fit gives judges concrete problem/relevance evidence for each analyzed run.
 - Learning Impact Loop measures whether a run leaves the student ready to reason, watching flags, or needing fixes.
 - Learning Exit Ticket asks the student to explain variables, graph pattern, and next step in their own words before writing.
+- Student Reflection Workspace proves those exit-ticket answers are student-authored drafts, not generated conclusions.
 - Progress Portfolio shows whether saved runs demonstrate learning trend, subject breadth, and a next portfolio action.
 - MCP Integration Coach shows how the same student-owned evidence could move into classroom tools without sending data before consent.
 - Judge Demo Path gives evaluators a direct route through problem fit, AI design, student workflow, evidence handoff, and submission proof.
@@ -31,6 +32,7 @@
 - Safety Coach adds deterministic school-lab PPE, material, cleanup, stop-condition, and adult-review guidance.
 - Concept Coach turns each supported lab into vocabulary, explanation steps, source tasks, and misconception checks.
 - Learning Exit Ticket turns model feedback into inspectable student reflection prompts rather than generated conclusions.
+- Student Reflection Workspace scores empty, short, and ready student-authored drafts without filling them in.
 - Custom Lab Triage turns low-confidence descriptions into inferred focus, starter columns, variables, controls, repeat guidance, starter rows, source-search queries, clarifying questions, and a teacher-confirmation boundary.
 - Fallback mode keeps demos reliable without credentials.
 - Guided Lab Flow turns the result schema into a student-facing next-action workflow.
@@ -58,6 +60,7 @@
 - AIYES Rubric Fit visibly maps the run to the three official criteria: Problem Definition and Real-World Relevance, AI Technical Design and Model Strategy, and User Experience and Design.
 - Learning Impact Loop visibly scores outcome, data quality, concept learning, integrity, pattern evidence, repeat reliability, and next-trial readiness for every run.
 - Learning Exit Ticket visibly checks whether the student can explain variables, pattern evidence, and the next controlled step.
+- Student Reflection Workspace visibly captures the student's own variable, pattern, and next-step drafts.
 - Progress Portfolio visibly turns Saved Labs into repeated learning evidence instead of only storage.
 - MCP Integration Coach visibly turns the Evidence Packet and Progress Portfolio into a consent-gated classroom handoff plan.
 - AI Model Card visibly summarizes architecture, grounding mode, evaluation method, privacy boundary, and risk controls.
@@ -82,6 +85,7 @@
 - AIYES Rubric Fit appears in the app and Evidence Packet so judges can inspect the official UX/design fit during the live demo or exported handoff.
 - Learning Impact Loop appears in the app and Evidence Packet so the user's practical benefit is measurable inside the workflow.
 - Learning Exit Ticket appears in the app and Evidence Packet so judges can inspect student understanding prompts during the demo or exported handoff.
+- Student Reflection Workspace appears in the app and Evidence Packet so judges can inspect student-authored answers without Ouija writing the conclusion.
 - Progress Portfolio appears near Saved Labs so judges can inspect score trend, subject breadth, and strongest saved run.
 - MCP Integration Coach appears near Progress Portfolio so judges can inspect the exact export payload, credential boundary, and Composio route before any live connector is enabled.
 - Desktop and mobile E2E checks verify no horizontal overflow.

@@ -49,8 +49,10 @@ describe("MCP integration plan", () => {
     expect(plan.payloadPreview.sourceCount).toBeGreaterThanOrEqual(1);
     expect(plan.payloadPreview.savedRunCount).toBe(1);
     expect(plan.payloadPreview.includedSections).toContain("Evidence Packet markdown");
+    expect(plan.payloadPreview.includedSections).toContain("Student Reflection Drafts");
     expect(plan.payloadPreview.markdownExcerpt).toContain("## Student Description");
     expect(plan.safeguards).toContain("Preview mode does not call Composio, Google, or Notion APIs.");
+    expect(plan.safeguards).toContain("Reflection drafts are exported only when the student typed them in the workspace.");
     expect(plan.privacyBoundary).toContain("Student chooses");
     expect(plan.judgeTakeaway).toContain("real classroom handoff");
   });

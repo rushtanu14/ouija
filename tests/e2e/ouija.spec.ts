@@ -38,6 +38,24 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(page.getByLabel("Learning Exit Ticket").getByText("Exit ticket prompts")).toBeVisible();
   await expect(page.getByLabel("Learning Exit Ticket").getByText(/Which part of your setup was the independent variable/i)).toBeVisible();
   await expect(page.getByLabel("Learning Exit Ticket").getByText("Teacher signal").first()).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Student Reflection Workspace" })).toBeVisible();
+  await expect(page.getByLabel("Student Reflection Workspace").getByText("0/3 ready")).toBeVisible();
+  await expect(page.getByLabel("Student Reflection Workspace").getByText("Start with Variable check")).toBeVisible();
+  await page
+    .getByLabel("Reflection answer Variable check")
+    .fill("The independent variable was water temperature and the dependent variable was reaction rate.");
+  await page
+    .getByLabel("Reflection answer Pattern check")
+    .fill("The graph shows rate increased as the water temperature increased, which matches the expected pattern.");
+  await page
+    .getByLabel("Reflection answer Next-step check")
+    .fill("I would repeat the hottest trial while keeping water volume and tablet size the same.");
+  await expect(page.getByLabel("Student Reflection Workspace").getByText("3/3 ready")).toBeVisible();
+  await expect(
+    page
+      .getByLabel("Student Reflection Workspace")
+      .getByText("All exit-ticket responses are student-authored and ready for teacher review.", { exact: true })
+  ).toBeVisible();
   await expect(page.getByRole("heading", { name: "Judge Demo Path" })).toBeVisible();
   await expect(page.getByLabel("Judge Demo Path").getByText("Next best action")).toBeVisible();
   await expect(page.getByLabel("Judge Demo Path").getByText("Problem fit", { exact: true })).toBeVisible();
@@ -72,6 +90,9 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(page.getByLabel("Student evidence packet")).toHaveValue(/Learning Impact Loop/);
   await expect(page.getByLabel("Student evidence packet")).toHaveValue(/Learning Exit Ticket/);
   await expect(page.getByLabel("Student evidence packet")).toHaveValue(/Exit ticket prompt:/);
+  await expect(page.getByLabel("Student evidence packet")).toHaveValue(/Student Reflection Drafts/);
+  await expect(page.getByLabel("Student evidence packet")).toHaveValue(/Student draft: The independent variable was water temperature/);
+  await expect(page.getByLabel("Student evidence packet")).toHaveValue(/Reflection status: ready for review/);
   await expect(page.getByLabel("Student evidence packet")).toHaveValue(/Pattern Evidence/);
   await expect(page.getByLabel("Student evidence packet")).toHaveValue(/Guided Lab Flow/);
   await expect(page.getByLabel("Student evidence packet")).toHaveValue(/Concept Coach/);
@@ -112,6 +133,7 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(page.getByLabel("AI Model Card").getByText("Official Rubric Fit maps problem relevance, AI design, and UX to concrete app evidence.")).toBeVisible();
   await expect(page.getByLabel("AI Model Card").getByText("Learning Impact Loop turns analysis into measurable student readiness and next-trial evidence.")).toBeVisible();
   await expect(page.getByLabel("AI Model Card").getByText("Learning Exit Ticket converts the AI feedback into student reflection prompts judges can inspect.")).toBeVisible();
+  await expect(page.getByLabel("AI Model Card").getByText("Student Reflection Workspace stores student-written drafts without generating answers.")).toBeVisible();
   await expect(page.getByLabel("AI Model Card").getByText("Grounding Audit checks source agreement before students use the expected pattern.")).toBeVisible();
   await expect(page.getByLabel("AI Model Card").getByText("Pattern Evidence Engine quantifies whether the dataset supports the expected science pattern.")).toBeVisible();
   await expect(page.getByLabel("AI Model Card").getByText("Reliability Coach checks repeated trials, averages, and spread before students trust a claim.")).toBeVisible();
@@ -140,11 +162,14 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(page.getByLabel("MCP Integration Coach").getByText("Preview mode does not call Composio, Google, or Notion APIs.")).toBeVisible();
   await expect(page.getByLabel("MCP payload preview")).toHaveValue(/# Ouija Evidence Packet: Reaction Rate vs Temperature/);
   await expect(page.getByLabel("MCP payload preview")).toHaveValue(/Google Sheets: append spreadsheet rows/);
+  await expect(page.getByLabel("MCP payload preview")).toHaveValue(/Student Reflection Drafts/);
   await page.getByRole("link", { name: "Settings" }).click();
   await expect(page.getByLabel("Settings", { exact: true }).getByText("Local snapshots")).toBeVisible();
   await expect(page.getByLabel("Settings", { exact: true }).getByText("1/6")).toBeVisible();
   await expect(page.getByLabel("Settings", { exact: true }).getByText("MCP exports")).toBeVisible();
   await expect(page.getByLabel("Settings", { exact: true }).getByText("Preview only")).toBeVisible();
+  await expect(page.getByLabel("Settings", { exact: true }).getByText("Reflections")).toBeVisible();
+  await expect(page.getByLabel("Settings", { exact: true }).getByText("3/3")).toBeVisible();
   await page.getByRole("link", { name: "Judge Brief" }).click();
   await expect(page.getByLabel("Judge Brief").getByText("AIYES Track 1")).toBeVisible();
   await expect(page.locator(".judge-status-grid").getByText("Hosted")).toHaveCount(2);
@@ -163,6 +188,7 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(page.getByLabel("Judge Brief").getByText("Official Rubric Fit maps all three visible AIYES criteria.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Learning Impact Loop measures the student's outcome for each run.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Learning Exit Ticket proves students must explain variables, patterns, and next steps themselves.")).toBeVisible();
+  await expect(page.getByLabel("Judge Brief").getByText("Student Reflection Workspace captures student-authored exit-ticket drafts.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Grounding Audit makes citation trust and mixed evidence visible.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Pattern Evidence Engine scores the whole graph against the expected pattern.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Reliability Coach checks repeats, averages, and spread.")).toBeVisible();

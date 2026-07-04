@@ -24,6 +24,7 @@ describe("AIYES submission assets", () => {
     expect(copy).toContain("Ouija");
     expect(copy).toContain("Built With");
     expect(copy).toContain("Progress Portfolio");
+    expect(copy).toContain("Student Reflection Workspace");
     expect(copy).toContain("MCP Integration Coach");
     expect(assets).toContain("Progress Portfolio");
     expect(assets).toContain("npm run capture:submission");

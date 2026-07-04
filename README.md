@@ -18,19 +18,19 @@ Ouija is a student-facing AI experiment interpreter for middle and high school s
 3. Use Judge Demo Path to walk evaluators through problem fit, AI design, student workflow, evidence handoff, and submission proof.
 4. Inspect Model Strategy, AI Evaluation Harness, and Data Handling Ledger to show candidate ranking, matched signals, fallback logic, validators, model-behavior checks, privacy flow, retention, student controls, and risk controls.
 5. Review AIYES Rubric Fit to see how the run maps to the official problem/relevance, AI technical design/model strategy, and UX/design criteria.
-6. Review Learning Impact Loop and Learning Exit Ticket to see whether the student is ready to reason and what they must explain themselves before writing.
+6. Review Learning Impact Loop, Learning Exit Ticket, and Student Reflection Workspace to see whether the student is ready to reason and what they must explain themselves before writing.
 7. Use Guided Lab Flow to see the current next action across identify, prepare safely, understand, check data, plan, and write-your-own-claim stages.
 8. Paste spreadsheet rows or edit table data.
 9. Use Grounding Audit, the expected overlay, Pattern Evidence Engine, Method Audit, Reliability Coach, Safety Coach, Concept Coach, Comparison Insights, Custom Lab Triage, and Claim Coach to find source-trust gaps, visual pattern mismatches, whole-graph support, control-variable issues, repeat-trial gaps, safety boundaries, data problems, vocabulary gaps, evidence gaps, unsupported-lab next questions, and the next reasoning question.
 10. Use Pattern Evidence Engine, Reliability Coach, and Next Trial Planner to decide what to repeat, average, tighten, or measure next before writing the claim.
 11. Use Reasoning Trail to show how Ouija classified the experiment, exposed model strategy, ran the AI evaluation harness, guided the judge demo, audited source grounding, guided the student path, built the concept scaffold, checked the learning exit ticket, checked the safety boundary, audited student-data handling, audited the table data, scored whole-pattern evidence, checked repeat reliability, planned the next trial, and maps the run to AIYES Track 1 evidence.
-12. Copy the Evidence Packet as a student-owned reasoning handoff with judge demo path, Custom Lab Triage, AIYES rubric fit, learning impact, Learning Exit Ticket, guided flow, Grounding Audit, AI Evaluation Harness, Data Handling Ledger, sources, checks, safety notes, concept vocabulary, pattern evidence, repeat reliability, data table, next-trial plan, blanks, and next question.
+12. Copy the Evidence Packet as a student-owned reasoning handoff with judge demo path, Custom Lab Triage, AIYES rubric fit, learning impact, Learning Exit Ticket, student reflection drafts, guided flow, Grounding Audit, AI Evaluation Harness, Data Handling Ledger, sources, checks, safety notes, concept vocabulary, pattern evidence, repeat reliability, data table, next-trial plan, blanks, and next question.
 13. Open Evaluation Bench to see eight live checks: seven supported lab demos plus the unsupported-lab boundary.
 14. Save lab snapshots locally so a student can return to a checked run without sending data to an account system.
 15. Use Progress Portfolio to show saved-run count, score trend, subject breadth, strongest run, and next portfolio action.
 16. Use MCP Integration Coach to preview Composio-powered Google Docs, Google Sheets, Google Drive, and Notion handoffs without exposing credentials or sending student data.
 17. Open AI Model Card for the architecture, grounding, evaluation, privacy, MCP-export boundary, and guardrail summary.
-18. Open Judge Brief for a compact Track 1 proof surface: live app, hosted deck/video, judge demo path, official rubric fit, learning impact, progress portfolio, MCP handoff plan, AI pipeline, model strategy, evaluation, data-handling ethics, tests, and integrity constraints.
+18. Open Judge Brief for a compact Track 1 proof surface: live app, hosted deck/video, judge demo path, official rubric fit, learning impact, student reflection drafts, progress portfolio, MCP handoff plan, AI pipeline, model strategy, evaluation, data-handling ethics, tests, and integrity constraints.
 
 Guided Lab Flow gives students one current next action and six stable stages so the interface feels like a lab workflow rather than separate AI outputs.
 
@@ -74,13 +74,15 @@ Learning Impact Loop measures student readiness for each run through outcome, da
 
 Learning Exit Ticket turns AI feedback into three student reflection prompts for variables, graph pattern, and next step, so the app proves understanding without writing the conclusion.
 
+Student Reflection Workspace lets students draft those exit-ticket answers in their own words, marks empty or too-short answers for revision, and exports only student-authored text.
+
 Spreadsheet paste import turns copied lab-table rows into graph/check inputs without requiring students to retype every cell, and the expected overlay updates with the edited table.
 
 Saved Labs stores up to six browser-local lab snapshots with the experiment, table rows, readiness score, and data flags.
 
 Progress Portfolio turns those saved labs into repeated learning evidence: saved-run count, score trend, subject breadth, strongest run, milestones, and the next portfolio action.
 
-MCP Integration Coach previews a practical Composio export path for the same student-owned evidence: create a Google Docs evidence packet, append table rows to Google Sheets, save a portfolio archive to Google Drive, or create a Notion learning record. The current public app is intentionally preview-only; live connector execution would require a server-side MCP bridge and `COMPOSIO_API_KEY`, with student or teacher consent before export.
+MCP Integration Coach previews a practical Composio export path for the same student-owned evidence: create a Google Docs evidence packet, append table rows to Google Sheets, save a portfolio archive to Google Drive, or create a Notion learning record with student-authored reflection drafts. The current public app is intentionally preview-only; live connector execution would require a server-side MCP bridge and `COMPOSIO_API_KEY`, with student or teacher consent before export.
 
 ## Run
 

@@ -77,7 +77,7 @@ export function buildMcpIntegrationPlan({
         payloadSummary: `${result.trackEvidence.score}/100 readiness, ${result.learningExitTicket.prompts.length} exit-ticket prompts, next action`,
         mode,
         requiresConsent: true,
-        safetyNote: "Reflection prompts should ask the student to explain; they should not become completed answers."
+        safetyNote: "Reflection prompts and drafts should stay student-authored; the connector must not complete answers."
       }
     ],
     payloadPreview: {
@@ -92,6 +92,7 @@ export function buildMcpIntegrationPlan({
         "Trusted citation links",
         "Progress Portfolio summary",
         "Learning Exit Ticket prompts",
+        "Student Reflection Drafts",
         "Integrity boundary"
       ],
       markdownExcerpt: buildMarkdownExcerpt(description, evidencePacket)
@@ -100,7 +101,8 @@ export function buildMcpIntegrationPlan({
       "Preview mode does not call Composio, Google, or Notion APIs.",
       "COMPOSIO_API_KEY must stay server-side and must never be bundled into the Vite client.",
       "Every export action requires student or teacher consent before a live connector runs.",
-      "Exported packets preserve the academic-integrity blanks instead of writing conclusions."
+      "Exported packets preserve the academic-integrity blanks instead of writing conclusions.",
+      "Reflection drafts are exported only when the student typed them in the workspace."
     ],
     judgeTakeaway:
       "MCP Integration Coach connects Ouija to a real classroom handoff path while keeping the demo honest, privacy-preserving, and credentials-safe."

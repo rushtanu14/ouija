@@ -1,9 +1,16 @@
-import type { AnalyzeResult, StudentDataRow } from "./types";
+import { buildStudentReflectionWorkspace } from "./studentReflectionWorkspace";
+import type { AnalyzeResult, StudentDataRow, StudentReflectionAnswers } from "./types";
 
-export function buildEvidencePacket(result: AnalyzeResult, rows: StudentDataRow[], description: string): string {
+export function buildEvidencePacket(
+  result: AnalyzeResult,
+  rows: StudentDataRow[],
+  description: string,
+  reflectionAnswers: StudentReflectionAnswers = {}
+): string {
   const warnings = result.issues.filter((issue) => issue.severity !== "info");
   const dataTable = formatDataTable(result, rows);
   const sourceList = result.sources.map((source) => `- ${source.publisher}: ${source.title} (${source.url})`).join("\n");
+  const reflectionWorkspace = buildStudentReflectionWorkspace(result.learningExitTicket, reflectionAnswers);
   const issueList =
     warnings.length > 0
       ? warnings.map((issue) => `- ${issue.title}: ${issue.detail}`).join("\n")
@@ -144,6 +151,19 @@ export function buildEvidencePacket(result: AnalyzeResult, rows: StudentDataRow[
     ]),
     `- Integrity boundary: ${result.learningExitTicket.integrityBoundary}`,
     "",
+    "## Student Reflection Drafts",
+    `- Reflection status: ${formatStudentReflectionStatus(reflectionWorkspace.status)}`,
+    `- Summary: ${reflectionWorkspace.summary}`,
+    `- Integrity boundary: ${reflectionWorkspace.integrityBoundary}`,
+    "- Drafts:",
+    ...reflectionWorkspace.entries.flatMap((entry) => [
+      `  - ${entry.label}: Student draft: ${entry.answer || "No student reflection draft entered yet."}`,
+      `    - Word count: ${entry.wordCount}`,
+      `    - Evidence to use: ${entry.evidenceToUse}`,
+      `    - Teacher signal: ${entry.teacherSignal}`
+    ]),
+    `- Teacher takeaway: ${reflectionWorkspace.teacherTakeaway}`,
+    "",
     "## Pattern Evidence",
     `- Pattern score: ${result.patternEvidence.score}/100 (${formatPatternEvidenceStatus(result.patternEvidence.status)})`,
     `- Summary: ${result.patternEvidence.summary}`,
@@ -219,6 +239,12 @@ function formatDataTable(result: AnalyzeResult, rows: StudentDataRow[]): string 
   const lines = [header, header.map(() => "---"), ...body];
 
   return lines.map((line) => `| ${line.join(" | ")} |`).join("\n");
+}
+
+function formatStudentReflectionStatus(status: ReturnType<typeof buildStudentReflectionWorkspace>["status"]) {
+  if (status === "ready_for_review") return "ready for review";
+  if (status === "not_started") return "not started";
+  return "drafting";
 }
 
 function formatColumnLabel(result: AnalyzeResult, key: string): string {

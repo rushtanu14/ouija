@@ -180,6 +180,34 @@ export interface LearningExitTicket {
   judgeTakeaway: string;
 }
 
+export type StudentReflectionStatus = "not_started" | "drafting" | "ready_for_review";
+
+export type StudentReflectionEntryStatus = "empty" | "too_short" | "ready";
+
+export type StudentReflectionAnswers = Partial<Record<LearningExitTicketPrompt["id"], string>>;
+
+export interface StudentReflectionEntry {
+  promptId: LearningExitTicketPrompt["id"];
+  label: string;
+  studentPrompt: string;
+  evidenceToUse: string;
+  teacherSignal: string;
+  answer: string;
+  wordCount: number;
+  status: StudentReflectionEntryStatus;
+}
+
+export interface StudentReflectionWorkspace {
+  status: StudentReflectionStatus;
+  summary: string;
+  readyCount: number;
+  totalCount: number;
+  entries: StudentReflectionEntry[];
+  nextAction: string;
+  integrityBoundary: string;
+  teacherTakeaway: string;
+}
+
 export interface MethodAudit {
   status: "strong" | "needs_review" | "blocked";
   score: number;

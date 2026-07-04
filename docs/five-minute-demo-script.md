@@ -28,11 +28,11 @@ Show Data Handling Ledger: privacy score, description flow, student data flow, b
 
 Show AIYES Rubric Fit: each run maps to Problem Definition and Real-World Relevance, AI Technical Design and Model Strategy, and User Experience and Design with concrete evidence from the app.
 
-## 2:10-2:26 - Learning Impact Loop And Exit Ticket
+## 2:10-2:26 - Learning Impact Loop, Exit Ticket, And Reflection Workspace
 
 Show Learning Impact Loop: Ouija scores whether the student is ready to reason, should review flags, or needs to fix the run, using outcome, data quality, concept learning, integrity, pattern evidence, repeat reliability, and next-trial metrics.
 
-Show Learning Exit Ticket: students must explain the independent/dependent variables, graph pattern, and next step themselves. This turns AI feedback into observable learning evidence instead of a generated answer.
+Show Learning Exit Ticket: students must explain the independent/dependent variables, graph pattern, and next step themselves. Then show Student Reflection Workspace: students type their own exit-ticket drafts, Ouija marks empty or too-short answers for revision, and the final Evidence Packet carries only student-authored text.
 
 ## 2:26-2:38 - Grounded Expected Results
 
@@ -40,11 +40,11 @@ Point to Guided Lab Flow, Grounding Audit, the expected-results graph, the dashe
 
 ## 2:38-3:16 - Data Table, Pattern Evidence, Method Audit, Safety Coach, Concept Coach, And Error Detection
 
-Show Pattern Evidence Engine first: whole-graph support, trend checks, and the student question. Then show Method Audit: controlled variables, assumptions, reproducibility score, and limits. Then show Reliability Coach: repeated-trial count, average, spread, and retest recommendation. Then show Safety Coach: PPE, material limits, cleanup, stop conditions, and adult-review boundary. Then show Concept Coach: vocabulary, explanation steps, and misconception check. Then paste a copied spreadsheet-style reaction-rate table with a wrong trend. Show the imported rows driving the graph overlay and warning updates in Comparison Insights, Pattern Evidence Engine, Method Audit, Reliability Coach, Safety Coach, Learning Exit Ticket, Next Trial Planner, Claim Coach, and Reasoning Trail.
+Show Pattern Evidence Engine first: whole-graph support, trend checks, and the student question. Then show Method Audit: controlled variables, assumptions, reproducibility score, and limits. Then show Reliability Coach: repeated-trial count, average, spread, and retest recommendation. Then show Safety Coach: PPE, material limits, cleanup, stop conditions, and adult-review boundary. Then show Concept Coach: vocabulary, explanation steps, and misconception check. Then paste a copied spreadsheet-style reaction-rate table with a wrong trend. Show the imported rows driving the graph overlay and warning updates in Comparison Insights, Pattern Evidence Engine, Method Audit, Reliability Coach, Safety Coach, Learning Exit Ticket, Student Reflection Workspace, Next Trial Planner, Claim Coach, and Reasoning Trail.
 
 ## 3:16-4:05 - Next Trial Planner, Claim Coach, And Evidence Packet
 
-Scroll to Next Trial Planner, Claim Coach, and Evidence Packet. Show that Ouija does not write the conclusion. It first tells the student whether to extend the pattern or repeat/fix a warning, then gives a claim starter with blanks, Judge Demo Path, Learning Exit Ticket, Data Handling Ledger, safety notes, an evidence checklist, source trail, copied table data, and a next question.
+Scroll to Next Trial Planner, Claim Coach, and Evidence Packet. Show that Ouija does not write the conclusion. It first tells the student whether to extend the pattern or repeat/fix a warning, then gives a claim starter with blanks, Judge Demo Path, Learning Exit Ticket, Student Reflection Drafts, Data Handling Ledger, safety notes, an evidence checklist, source trail, copied table data, and a next question.
 
 ## 4:05-4:40 - Breadth
 
@@ -64,7 +64,7 @@ Show Evaluation Bench with 100/100 and 8/8 live checks: projectile, pendulum per
 
 ## 4:58-5:00 - Judge Brief
 
-Show Judge Brief so evaluators see Track 1 fit, Judge Demo Path, live app, hosted deck/video links, official rubric fit, learning impact, learning exit ticket, progress portfolio, grounding audit, AI evaluation harness, data-handling ethics, pattern evidence, model strategy, AI pipeline, evaluation, tests, and integrity constraints in one place.
+Show Judge Brief so evaluators see Track 1 fit, Judge Demo Path, live app, hosted deck/video links, official rubric fit, learning impact, learning exit ticket, student reflection workspace, progress portfolio, grounding audit, AI evaluation harness, data-handling ethics, pattern evidence, model strategy, AI pipeline, evaluation, tests, and integrity constraints in one place.
 
 ## Closing Line
 
