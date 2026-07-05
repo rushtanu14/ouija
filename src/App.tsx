@@ -743,7 +743,8 @@ function JudgeBriefPanel({ result }: { result: AnalyzeResult | null }) {
     "Data Handling Ledger shows privacy, retention, and student controls.",
     "Spreadsheet paste/import flows into data checks.",
     "Evidence Packet exports a student-owned reasoning handoff.",
-    "MCP Integration Coach previews Composio Docs, Sheets, Drive, Classroom, and Notion handoffs without exposing credentials.",
+    "MCP Integration Coach previews Composio Docs, Sheets, Drive, Classroom, Forms, and Notion handoffs without exposing credentials.",
+    "MCP Readiness Matrix shows exact connector env vars, scopes, data shared, dry-run checks, and consent gates.",
     "Next Trial Planner gives adaptive measurement guidance.",
     "Progress Portfolio shows learning over multiple saved runs.",
     "Evaluation Bench runs eight live cases.",
@@ -832,6 +833,7 @@ function ModelCardPanel({ result }: { result: AnalyzeResult | null }) {
     "Data Handling Ledger makes student data flow, retention, and controls inspectable.",
     "Progress Portfolio turns saved labs into repeated learning evidence for judges.",
     "MCP Integration Coach keeps Composio credentials server-side and requires student consent before any export.",
+    "MCP Readiness Matrix makes connector scopes, dry-run checks, and least-privilege boundaries inspectable.",
     "Pattern Evidence Engine quantifies whether the dataset supports the expected science pattern.",
     "Reliability Coach checks repeated trials, averages, and spread before students trust a claim.",
     "Guided Lab Flow turns dense analysis into student next steps.",
@@ -1036,6 +1038,37 @@ function McpIntegrationCoachPanel({ plan }: { plan: McpIntegrationPlan | null })
                 <span>{action.composioCapability}</span>
                 <small>{action.payloadSummary}</small>
                 <em>{action.safetyNote}</em>
+              </article>
+            ))}
+          </div>
+          <div className="mcp-readiness-matrix" aria-label="MCP Readiness Matrix">
+            <div>
+              <p className="section-label">MCP readiness matrix</p>
+              <strong>{plan.readinessMatrix.length} connector routes checked</strong>
+              <span>{plan.executionBoundary}</span>
+            </div>
+            <div className="mcp-readiness-grid">
+              {plan.readinessMatrix.map((connector) => (
+                <article className={`mcp-readiness-card mcp-readiness-${connector.status}`} key={connector.actionId}>
+                  <div>
+                    <p className="section-label">{connector.toolkit}</p>
+                    <strong>{formatMcpConnectorStatus(connector.status)}</strong>
+                  </div>
+                  <span>{connector.dataShared}</span>
+                  <small>Env: {connector.requiredEnv.join(", ")}</small>
+                  <small>Scopes: {connector.requiredScopes.join(", ")}</small>
+                  <em>{connector.consentGate}</em>
+                </article>
+              ))}
+            </div>
+          </div>
+          <div className="mcp-dry-run-checks" aria-label="MCP dry-run checks">
+            <p className="section-label">Dry-run checks</p>
+            {plan.dryRunChecks.map((check) => (
+              <article className={`mcp-dry-run-check mcp-dry-run-${check.status}`} key={check.id}>
+                <strong>{check.label}</strong>
+                <span>{formatMcpDryRunStatus(check.status)}</span>
+                <small>{check.detail}</small>
               </article>
             ))}
           </div>
@@ -2128,6 +2161,14 @@ function formatMcpStatus(status: McpIntegrationPlan["status"]) {
   return status === "ready" ? "Server MCP ready" : "Preview only";
 }
 
+function formatMcpConnectorStatus(status: McpIntegrationPlan["readinessMatrix"][number]["status"]) {
+  return status === "ready" ? "Ready" : "Needs server setup";
+}
+
+function formatMcpDryRunStatus(status: McpIntegrationPlan["dryRunChecks"][number]["status"]) {
+  return status === "pass" ? "Pass" : "Review";
+}
+
 function formatMcpPayloadPreview(plan: McpIntegrationPlan) {
   return [
     `# ${plan.payloadPreview.title}`,
@@ -2143,6 +2184,17 @@ function formatMcpPayloadPreview(plan: McpIntegrationPlan) {
     "",
     "Actions:",
     ...plan.actions.map((action) => `- ${action.toolkit}: ${action.composioCapability} (${action.payloadSummary})`),
+    "",
+    "MCP readiness matrix:",
+    ...plan.readinessMatrix.map(
+      (connector) =>
+        `- ${connector.toolkit}: ${formatMcpConnectorStatus(connector.status)}; env ${connector.requiredEnv.join(", ")}; scopes ${connector.requiredScopes.join(", ")}; data ${connector.dataShared}`
+    ),
+    "",
+    "Dry-run checks:",
+    ...plan.dryRunChecks.map((check) => `- ${check.label}: ${formatMcpDryRunStatus(check.status)} - ${check.detail}`),
+    "",
+    `Execution boundary: ${plan.executionBoundary}`,
     "",
     "Markdown excerpt:",
     plan.payloadPreview.markdownExcerpt

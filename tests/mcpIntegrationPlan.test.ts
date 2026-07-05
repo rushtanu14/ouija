@@ -40,19 +40,31 @@ describe("MCP integration plan", () => {
       "google-sheets-data-log",
       "google-drive-portfolio-archive",
       "google-classroom-prelab-checkpoint",
+      "google-forms-readiness-check",
       "notion-learning-record"
     ]);
     expect(plan.actions.find((action) => action.id === "google-docs-evidence-packet")?.toolkit).toBe("Google Docs");
     expect(plan.actions.find((action) => action.id === "google-sheets-data-log")?.payloadSummary).toContain("4 rows");
     expect(plan.actions.find((action) => action.id === "google-classroom-prelab-checkpoint")?.toolkit).toBe("Google Classroom");
     expect(plan.actions.find((action) => action.id === "google-classroom-prelab-checkpoint")?.payloadSummary).toContain("Pre-lab");
+    expect(plan.actions.find((action) => action.id === "google-forms-readiness-check")?.toolkit).toBe("Google Forms");
+    expect(plan.actions.find((action) => action.id === "google-forms-readiness-check")?.payloadSummary).toContain("student reflection prompts");
     expect(plan.actions.every((action) => action.requiresConsent)).toBe(true);
+    expect(plan.readinessMatrix).toHaveLength(6);
+    expect(plan.readinessMatrix.every((connector) => connector.status === "needs_server_setup")).toBe(true);
+    expect(plan.readinessMatrix.find((connector) => connector.toolkit === "Google Forms")?.requiredEnv).toContain("COMPOSIO_GOOGLE_FORMS_AUTH_CONFIG_ID");
+    expect(plan.readinessMatrix.find((connector) => connector.toolkit === "Google Classroom")?.consentGate).toContain("class/course draft");
+    expect(plan.dryRunChecks).toHaveLength(5);
+    expect(plan.dryRunChecks.find((check) => check.id === "least-privilege")?.detail).toContain("Forms");
+    expect(plan.dryRunChecks.find((check) => check.id === "server-only")?.status).toBe("review");
+    expect(plan.executionBoundary).toContain("dry-run only");
     expect(plan.payloadPreview.title).toBe("Ouija Evidence Packet: Reaction Rate vs Temperature");
     expect(plan.payloadPreview.rowCount).toBe(4);
     expect(plan.payloadPreview.sourceCount).toBeGreaterThanOrEqual(1);
     expect(plan.payloadPreview.savedRunCount).toBe(1);
     expect(plan.payloadPreview.includedSections).toContain("Evidence Packet markdown");
     expect(plan.payloadPreview.includedSections).toContain("Pre-Lab Design Coach");
+    expect(plan.payloadPreview.includedSections).toContain("Google Forms readiness prompts");
     expect(plan.payloadPreview.includedSections).toContain("Student Reflection Drafts");
     expect(plan.payloadPreview.markdownExcerpt).toContain("## Student Description");
     expect(plan.safeguards).toContain("Preview mode does not call Composio, Google Classroom, Google Workspace, or Notion APIs.");
@@ -77,8 +89,12 @@ describe("MCP integration plan", () => {
     expect(plan.status).toBe("ready");
     expect(plan.summary).toContain("ready to route");
     expect(plan.actions.every((action) => action.mode === "server_mcp")).toBe(true);
+    expect(plan.readinessMatrix.every((connector) => connector.status === "ready")).toBe(true);
+    expect(plan.dryRunChecks.find((check) => check.id === "server-only")?.status).toBe("pass");
+    expect(plan.executionBoundary).toContain("Express API");
     expect(plan.actions.find((action) => action.toolkit === "Google Sheets")?.composioCapability).toContain("append");
     expect(plan.actions.find((action) => action.toolkit === "Google Classroom")?.composioCapability).toContain("create coursework draft");
+    expect(plan.actions.find((action) => action.toolkit === "Google Forms")?.composioCapability).toContain("Forms draft");
     expect(plan.payloadPreview.savedRunCount).toBe(0);
   });
 });

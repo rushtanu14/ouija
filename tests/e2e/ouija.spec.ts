@@ -146,6 +146,7 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(page.getByLabel("AI Model Card").getByText("Pattern Evidence Engine quantifies whether the dataset supports the expected science pattern.")).toBeVisible();
   await expect(page.getByLabel("AI Model Card").getByText("Reliability Coach checks repeated trials, averages, and spread before students trust a claim.")).toBeVisible();
   await expect(page.getByLabel("AI Model Card").getByText("MCP Integration Coach keeps Composio credentials server-side and requires student consent before any export.")).toBeVisible();
+  await expect(page.getByLabel("AI Model Card").getByText("MCP Readiness Matrix makes connector scopes, dry-run checks, and least-privilege boundaries inspectable.")).toBeVisible();
   await expect(page.getByLabel("AI Model Card").getByText("Safety Coach forces adult-review language when a lab match is uncertain.")).toBeVisible();
   await expect(page.getByLabel("AI Model Card").getByText("Evaluation Bench tests seven supported labs plus the unsupported boundary.")).toBeVisible();
   await expect(page.getByLabel("AI Model Card").getByText("Data Handling Ledger makes student data flow, retention, and controls inspectable.")).toBeVisible();
@@ -156,23 +157,33 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await page.getByRole("link", { name: "MCP Export" }).click();
   await expect(page.getByRole("heading", { name: "MCP Integration Coach" })).toBeVisible();
   await expect(page.getByLabel("MCP Integration Coach").getByText("Preview only", { exact: true })).toBeVisible();
-  await expect(page.getByLabel("MCP Integration Coach").getByText("Google Docs", { exact: true })).toBeVisible();
+  await expect(page.locator(".mcp-action-card").filter({ hasText: "Google Docs" }).getByText("Google Docs", { exact: true })).toBeVisible();
   await expect(page.getByLabel("MCP Integration Coach").getByText("Create evidence packet doc")).toBeVisible();
-  await expect(page.getByLabel("MCP Integration Coach").getByText("Google Sheets", { exact: true })).toBeVisible();
+  await expect(page.locator(".mcp-action-card").filter({ hasText: "Google Sheets" }).getByText("Google Sheets", { exact: true })).toBeVisible();
   await expect(
     page.locator(".mcp-action-card").filter({ hasText: "Google Sheets" }).getByText("append spreadsheet rows and update worksheets", {
       exact: true
     })
   ).toBeVisible();
-  await expect(page.getByLabel("MCP Integration Coach").getByText("Google Drive", { exact: true })).toBeVisible();
-  await expect(page.getByLabel("MCP Integration Coach").getByText("Google Classroom", { exact: true })).toBeVisible();
+  await expect(page.locator(".mcp-action-card").filter({ hasText: "Google Drive" }).getByText("Google Drive", { exact: true })).toBeVisible();
+  await expect(page.locator(".mcp-action-card").filter({ hasText: "Google Classroom" }).getByText("Google Classroom", { exact: true })).toBeVisible();
   await expect(page.getByLabel("MCP Integration Coach").getByText("Draft pre-lab checkpoint")).toBeVisible();
-  await expect(page.getByLabel("MCP Integration Coach").getByText("Notion", { exact: true })).toBeVisible();
+  await expect(page.locator(".mcp-action-card").filter({ hasText: "Google Forms" }).getByText("Google Forms", { exact: true })).toBeVisible();
+  await expect(page.getByLabel("MCP Integration Coach").getByText("Create readiness check form")).toBeVisible();
+  await expect(page.locator(".mcp-action-card").filter({ hasText: "Notion" }).getByText("Notion", { exact: true })).toBeVisible();
+  await expect(page.getByLabel("MCP Readiness Matrix").getByText("6 connector routes checked")).toBeVisible();
+  await expect(page.getByLabel("MCP Readiness Matrix").getByText("COMPOSIO_GOOGLE_FORMS_AUTH_CONFIG_ID")).toBeVisible();
+  await expect(page.getByLabel("MCP dry-run checks").getByText("Payload completeness")).toBeVisible();
+  await expect(page.getByLabel("MCP dry-run checks").getByText("Least privilege")).toBeVisible();
+  await expect(page.getByLabel("MCP dry-run checks").getByText("Server-only credentials")).toBeVisible();
   await expect(page.getByLabel("MCP Integration Coach").getByText(/Add COMPOSIO_API_KEY and a server-side MCP bridge/)).toBeVisible();
   await expect(page.getByLabel("MCP Integration Coach").getByText("Preview mode does not call Composio, Google Classroom, Google Workspace, or Notion APIs.")).toBeVisible();
   await expect(page.getByLabel("MCP payload preview")).toHaveValue(/# Ouija Evidence Packet: Reaction Rate vs Temperature/);
   await expect(page.getByLabel("MCP payload preview")).toHaveValue(/Google Sheets: append spreadsheet rows/);
   await expect(page.getByLabel("MCP payload preview")).toHaveValue(/Google Classroom: create coursework draft/);
+  await expect(page.getByLabel("MCP payload preview")).toHaveValue(/Google Forms: create Google Forms draft/);
+  await expect(page.getByLabel("MCP payload preview")).toHaveValue(/MCP readiness matrix/);
+  await expect(page.getByLabel("MCP payload preview")).toHaveValue(/Dry-run checks/);
   await expect(page.getByLabel("MCP payload preview")).toHaveValue(/Pre-Lab Design Coach/);
   await expect(page.getByLabel("MCP payload preview")).toHaveValue(/Student Reflection Drafts/);
   await page.getByRole("link", { name: "Settings" }).click();
@@ -211,7 +222,8 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(page.getByLabel("Judge Brief").getByText("Evaluation Bench runs eight live cases.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Data Handling Ledger shows privacy, retention, and student controls.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Evidence Packet exports a student-owned reasoning handoff.")).toBeVisible();
-  await expect(page.getByLabel("Judge Brief").getByText("MCP Integration Coach previews Composio Docs, Sheets, Drive, Classroom, and Notion handoffs without exposing credentials.")).toBeVisible();
+  await expect(page.getByLabel("Judge Brief").getByText("MCP Integration Coach previews Composio Docs, Sheets, Drive, Classroom, Forms, and Notion handoffs without exposing credentials.")).toBeVisible();
+  await expect(page.getByLabel("Judge Brief").getByText("MCP Readiness Matrix shows exact connector env vars, scopes, data shared, dry-run checks, and consent gates.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Next Trial Planner gives adaptive measurement guidance.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Hosted deck and walkthrough are public.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Low-confidence labs show a boundary warning.")).toBeVisible();

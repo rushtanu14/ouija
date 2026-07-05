@@ -56,7 +56,7 @@ Type an unsupported plant-light lab. Show that Ouija labels it as a low-confiden
 
 ## 4:50-4:56 - Saved Lab Snapshot, Progress Portfolio, And MCP Export
 
-Save the current run and show Saved Labs plus Progress Portfolio so judges see the workflow continues after one analysis and can measure saved-run trend, subject breadth, and the next portfolio action. Then show MCP Integration Coach: Ouija previews Google Docs, Google Sheets, Google Drive, Google Classroom, and Notion handoffs but keeps Composio credentials server-side and requires consent before export.
+Save the current run and show Saved Labs plus Progress Portfolio so judges see the workflow continues after one analysis and can measure saved-run trend, subject breadth, and the next portfolio action. Then show MCP Integration Coach: Ouija previews Google Docs, Google Sheets, Google Drive, Google Classroom, Google Forms, and Notion handoffs, shows connector env vars/scopes/data/dry-run checks, keeps Composio credentials server-side, and requires consent before export.
 
 ## 4:56-4:58 - Evaluation Bench
 

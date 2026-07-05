@@ -16,3 +16,7 @@ Generated from `server/index.ts`, `server/openaiGrounding.ts`, `scripts/capture-
 
 There is no checked-in `.env.example` at the time this reference was generated. Keep credentials out of repo files; set optional secrets in the deployment environment.
 <!-- AUTO-GENERATED:ENV:END -->
+
+## Future Composio MCP Bridge
+
+Ouija's public MCP Integration Coach is preview-only. A live server-side bridge would need deployment secrets such as `COMPOSIO_API_KEY`, `COMPOSIO_<TOOLKIT>_AUTH_CONFIG_ID`, and `COMPOSIO_<TOOLKIT>_ALLOWED_TOOLS` for the exact Google Docs, Sheets, Drive, Classroom, Forms, or Notion actions enabled. Do not expose these values to the Vite client.

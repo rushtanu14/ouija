@@ -3212,6 +3212,109 @@ td input {
   font-weight: 700;
 }
 
+.mcp-readiness-matrix,
+.mcp-dry-run-checks {
+  display: grid;
+  gap: 10px;
+  border: 1px solid #d9e5f2;
+  border-radius: 8px;
+  padding: 12px;
+  background: #fbfdff;
+}
+
+.mcp-readiness-matrix > div:first-child {
+  display: grid;
+  gap: 4px;
+}
+
+.mcp-readiness-matrix strong,
+.mcp-dry-run-checks strong {
+  color: #172439;
+  line-height: 1.25;
+}
+
+.mcp-readiness-matrix span,
+.mcp-dry-run-checks small {
+  color: #607087;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.mcp-readiness-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.mcp-readiness-card {
+  display: grid;
+  gap: 7px;
+  border: 1px solid #d9e5f2;
+  border-left: 4px solid #a9b7c8;
+  border-radius: 8px;
+  padding: 10px;
+  background: #ffffff;
+}
+
+.mcp-readiness-ready {
+  border-left-color: #2f9e62;
+  background: #f6fcf8;
+}
+
+.mcp-readiness-needs_server_setup {
+  border-left-color: #2368ff;
+}
+
+.mcp-readiness-card > div,
+.mcp-dry-run-check {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  align-items: center;
+}
+
+.mcp-readiness-card small,
+.mcp-readiness-card em {
+  color: #607087;
+  font-size: 11px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.mcp-readiness-card em {
+  color: #23543c;
+  font-style: normal;
+  font-weight: 700;
+}
+
+.mcp-dry-run-checks {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.mcp-dry-run-check {
+  display: grid;
+  align-content: start;
+  min-width: 0;
+  border-radius: 8px;
+  padding: 9px;
+  background: #f7fbff;
+}
+
+.mcp-dry-run-check span {
+  width: max-content;
+  border-radius: 999px;
+  padding: 4px 7px;
+  color: #173b74;
+  background: #e7f0ff;
+  font-size: 11px;
+  font-weight: 850;
+}
+
+.mcp-dry-run-pass span {
+  color: #1f5b3d;
+  background: #e4f5eb;
+}
+
 .mcp-payload-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -3638,7 +3741,12 @@ td input {
   }
 
   .mcp-action-grid,
+  .mcp-readiness-grid,
   .mcp-payload-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .mcp-dry-run-checks {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
@@ -3783,6 +3891,8 @@ td input {
   }
 
   .mcp-action-grid,
+  .mcp-readiness-grid,
+  .mcp-dry-run-checks,
   .mcp-payload-grid {
     grid-template-columns: 1fr;
   }

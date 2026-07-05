@@ -188,7 +188,7 @@ await page.locator("#mcp-export").scrollIntoViewIfNeeded();
 await caption(
   page,
   "MCP Integration Coach",
-  "Ouija previews Composio handoffs to Google Docs, Google Sheets, Google Drive, Google Classroom, and Notion while keeping credentials server-side and requiring consent before export."
+  "Ouija previews Composio handoffs to Docs, Sheets, Drive, Classroom, Forms, and Notion, then shows env vars, scopes, data shared, dry-run checks, and consent gates."
 );
 
 await page.locator("#evaluation").scrollIntoViewIfNeeded();

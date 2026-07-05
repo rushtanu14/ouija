@@ -473,11 +473,12 @@ export type McpIntegrationActionId =
   | "google-sheets-data-log"
   | "google-drive-portfolio-archive"
   | "google-classroom-prelab-checkpoint"
+  | "google-forms-readiness-check"
   | "notion-learning-record";
 
 export interface McpIntegrationAction {
   id: McpIntegrationActionId;
-  toolkit: "Google Docs" | "Google Sheets" | "Google Drive" | "Google Classroom" | "Notion";
+  toolkit: "Google Docs" | "Google Sheets" | "Google Drive" | "Google Classroom" | "Google Forms" | "Notion";
   label: string;
   studentValue: string;
   composioCapability: string;
@@ -485,6 +486,25 @@ export interface McpIntegrationAction {
   mode: "preview" | "server_mcp";
   requiresConsent: boolean;
   safetyNote: string;
+}
+
+export interface McpConnectorReadiness {
+  actionId: McpIntegrationActionId;
+  toolkit: McpIntegrationAction["toolkit"];
+  status: "ready" | "needs_server_setup";
+  requiredEnv: string[];
+  requiredScopes: string[];
+  dataShared: string;
+  consentGate: string;
+  dryRunStatus: "pass" | "review";
+  dryRunDetail: string;
+}
+
+export interface McpDryRunCheck {
+  id: "payload" | "least-privilege" | "consent" | "integrity" | "server-only";
+  label: string;
+  status: "pass" | "review";
+  detail: string;
 }
 
 export interface McpIntegrationPayloadPreview {
@@ -503,6 +523,9 @@ export interface McpIntegrationPlan {
   setupHint: string;
   privacyBoundary: string;
   actions: McpIntegrationAction[];
+  readinessMatrix: McpConnectorReadiness[];
+  dryRunChecks: McpDryRunCheck[];
+  executionBoundary: string;
   payloadPreview: McpIntegrationPayloadPreview;
   safeguards: string[];
   judgeTakeaway: string;
