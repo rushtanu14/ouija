@@ -4,6 +4,7 @@ import path from "node:path";
 import { analyzeExperiment, mergeEnrichment } from "../src/lib/analysis";
 import { runEvaluationSuite } from "../src/lib/evaluation";
 import type { AnalyzeRequest } from "../src/lib/types";
+import { getMcpBridgeStatus, validateMcpExportRequest } from "./mcpBridge";
 import { enrichWithOpenAIWebSearch } from "./openaiGrounding";
 
 interface AppOptions {
@@ -22,6 +23,15 @@ export function createApp(options: AppOptions = {}) {
 
   app.get("/api/evaluate", (_req, res) => {
     res.json(runEvaluationSuite());
+  });
+
+  app.get("/api/mcp/status", (_req, res) => {
+    res.json(getMcpBridgeStatus());
+  });
+
+  app.post("/api/mcp/export", (req, res) => {
+    const response = validateMcpExportRequest(req.body);
+    res.status(response.statusCode).json(response.body);
   });
 
   app.post("/api/analyze", async (req, res) => {

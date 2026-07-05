@@ -2,11 +2,33 @@ import { describe, expect, it, afterEach } from "vitest";
 import analyzeHandler from "../api/analyze";
 import evaluateHandler from "../api/evaluate";
 import healthHandler from "../api/health";
+import mcpExportHandler from "../api/mcp/export";
+import mcpStatusHandler from "../api/mcp/status";
+import { analyzeExperiment } from "../src/lib/analysis";
+import { buildEvidencePacket } from "../src/lib/evidencePacket";
+import { MCP_CONNECTOR_CATALOG } from "../src/lib/mcpIntegrationPlan";
 
 const originalKey = process.env.OPENAI_API_KEY;
+const composioEnvKeys = [
+  "COMPOSIO_API_KEY",
+  "COMPOSIO_LIVE_EXPORTS",
+  ...MCP_CONNECTOR_CATALOG.flatMap((connector) => [
+    `COMPOSIO_${connector.envSuffix}_AUTH_CONFIG_ID`,
+    `COMPOSIO_${connector.envSuffix}_ALLOWED_TOOLS`
+  ])
+];
+const originalComposioEnv = new Map(composioEnvKeys.map((key) => [key, process.env[key]]));
 
 afterEach(() => {
   process.env.OPENAI_API_KEY = originalKey;
+  for (const key of composioEnvKeys) {
+    const value = originalComposioEnv.get(key);
+    if (value === undefined) {
+      delete process.env[key];
+    } else {
+      process.env[key] = value;
+    }
+  }
 });
 
 describe("Vercel API functions", () => {
@@ -83,6 +105,50 @@ describe("Vercel API functions", () => {
     expect(response.body.cases[0].evidence.some((item: string) => item.includes("data handling ledger"))).toBe(true);
     expect(response.body.cases[0].evidence.some((item: string) => item.includes("learning exit ticket"))).toBe(true);
   });
+
+  it("returns Composio MCP dry-run status from the serverless status function", () => {
+    clearComposioEnv();
+    const response = createMockResponse();
+
+    mcpStatusHandler({ method: "GET" }, response.res);
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body.status).toBe("server_dry_run");
+    expect(response.body.toolkits).toHaveLength(7);
+    expect(response.body.toolkits.find((toolkit: { toolkit: string }) => toolkit.toolkit === "Google Calendar")?.toolkitSlug).toBe("googlecalendar");
+  });
+
+  it("validates a Composio MCP packet through the serverless export function", () => {
+    clearComposioEnv();
+    const result = analyzeExperiment({
+      description: "Temperature changes reaction rate for an effervescent tablet."
+    });
+    const response = createMockResponse();
+
+    mcpExportHandler(
+      {
+        method: "POST",
+        body: {
+          actionId: "google-forms-readiness-check",
+          consent: true,
+          payload: {
+            title: `Ouija Evidence Packet: ${result.classification.title}`,
+            description: "Temperature changes reaction rate for an effervescent tablet.",
+            evidencePacket: buildEvidencePacket(result, result.rows, "Temperature changes reaction rate for an effervescent tablet."),
+            rows: result.rows,
+            sources: result.sources
+          }
+        }
+      },
+      response.res
+    );
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body.status).toBe("dry_run");
+    expect(response.body.toolkit).toBe("Google Forms");
+    expect(response.body.target.authConfigEnv).toBe("COMPOSIO_GOOGLE_FORMS_AUTH_CONFIG_ID");
+    expect(response.body.checks.find((check: { id: string }) => check.id === "payload")?.status).toBe("pass");
+  });
 });
 
 function createMockResponse() {
@@ -119,4 +185,10 @@ function createMockResponse() {
       }
     }
   };
+}
+
+function clearComposioEnv() {
+  for (const key of composioEnvKeys) {
+    delete process.env[key];
+  }
 }

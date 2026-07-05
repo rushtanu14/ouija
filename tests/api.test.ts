@@ -4,11 +4,31 @@ import { createApp } from "../server/app";
 import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { analyzeExperiment } from "../src/lib/analysis";
+import { buildEvidencePacket } from "../src/lib/evidencePacket";
+import { MCP_CONNECTOR_CATALOG } from "../src/lib/mcpIntegrationPlan";
 
 const originalKey = process.env.OPENAI_API_KEY;
+const composioEnvKeys = [
+  "COMPOSIO_API_KEY",
+  "COMPOSIO_LIVE_EXPORTS",
+  ...MCP_CONNECTOR_CATALOG.flatMap((connector) => [
+    `COMPOSIO_${connector.envSuffix}_AUTH_CONFIG_ID`,
+    `COMPOSIO_${connector.envSuffix}_ALLOWED_TOOLS`
+  ])
+];
+const originalComposioEnv = new Map(composioEnvKeys.map((key) => [key, process.env[key]]));
 
 afterEach(() => {
   process.env.OPENAI_API_KEY = originalKey;
+  for (const key of composioEnvKeys) {
+    const value = originalComposioEnv.get(key);
+    if (value === undefined) {
+      delete process.env[key];
+    } else {
+      process.env[key] = value;
+    }
+  }
 });
 
 describe("POST /api/analyze", () => {
@@ -135,3 +155,80 @@ describe("GET /api/evaluate", () => {
     expect(response.body.cases[0].evidence.some((item: string) => item.includes("learning exit ticket"))).toBe(true);
   });
 });
+
+describe("Composio MCP bridge API", () => {
+  it("reports server dry-run readiness without exposing Composio credentials", async () => {
+    clearComposioEnv();
+    const app = createApp();
+    const response = await request(app).get("/api/mcp/status").expect(200);
+
+    expect(response.body.status).toBe("server_dry_run");
+    expect(response.body.mode).toBe("server_dry_run");
+    expect(response.body.apiKeyConfigured).toBe(false);
+    expect(response.body.missingEnv).toContain("COMPOSIO_API_KEY");
+    expect(response.body.toolkits).toHaveLength(7);
+    expect(response.body.toolkits.find((toolkit: { toolkit: string }) => toolkit.toolkit === "Google Calendar")?.recommendedTools).toContain(
+      "GOOGLECALENDAR_CREATE_EVENT"
+    );
+    expect(JSON.stringify(response.body)).not.toContain("sk-");
+  });
+
+  it("validates a consent-gated MCP action packet as a dry run", async () => {
+    clearComposioEnv();
+    const app = createApp();
+    const result = analyzeExperiment({
+      description: "Projectile launch angle and measured range."
+    });
+    const packet = buildEvidencePacket(result, result.rows, "Projectile launch angle and measured range.");
+
+    const response = await request(app)
+      .post("/api/mcp/export")
+      .send({
+        actionId: "google-calendar-next-trial-reminder",
+        consent: true,
+        payload: {
+          title: `Ouija Evidence Packet: ${result.classification.title}`,
+          description: "Projectile launch angle and measured range.",
+          evidencePacket: packet,
+          rows: result.rows,
+          sources: result.sources
+        }
+      })
+      .expect(200);
+
+    expect(response.body.status).toBe("dry_run");
+    expect(response.body.toolkit).toBe("Google Calendar");
+    expect(response.body.summary).toContain("no Composio");
+    expect(response.body.target.toolkitSlug).toBe("googlecalendar");
+    expect(response.body.target.authConfigEnv).toBe("COMPOSIO_GOOGLE_CALENDAR_AUTH_CONFIG_ID");
+    expect(response.body.sanitizedPayload.rowCount).toBe(result.rows.length);
+    expect(response.body.checks.find((check: { id: string }) => check.id === "consent")?.status).toBe("pass");
+    expect(response.body.checks.find((check: { id: string }) => check.id === "credentials")?.status).toBe("review");
+  });
+
+  it("rejects MCP dry-runs without explicit consent", async () => {
+    const app = createApp();
+    const response = await request(app)
+      .post("/api/mcp/export")
+      .send({
+        actionId: "google-docs-evidence-packet",
+        consent: false,
+        payload: {
+          title: "Ouija Evidence Packet",
+          description: "A lab",
+          evidencePacket: "Claim: ___",
+          rows: [{ id: "row-1" }],
+          sources: [{ id: "source-1", publisher: "Demo", title: "Demo", url: "https://example.com", note: "Demo" }]
+        }
+      })
+      .expect(400);
+
+    expect(response.body.error).toContain("consent");
+  });
+});
+
+function clearComposioEnv() {
+  for (const key of composioEnvKeys) {
+    delete process.env[key];
+  }
+}

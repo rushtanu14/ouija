@@ -1,4 +1,121 @@
-import type { AnalyzeResult, McpConnectorReadiness, McpDryRunCheck, McpIntegrationAction, McpIntegrationPlan, ProgressPortfolio, StudentDataRow } from "./types";
+import type {
+  AnalyzeResult,
+  McpConnectorCatalogItem,
+  McpConnectorReadiness,
+  McpDryRunCheck,
+  McpIntegrationAction,
+  McpIntegrationPlan,
+  ProgressPortfolio,
+  StudentDataRow
+} from "./types";
+
+export const MCP_CONNECTOR_CATALOG: McpConnectorCatalogItem[] = [
+  {
+    id: "google-docs-evidence-packet",
+    toolkit: "Google Docs",
+    toolkitSlug: "googledocs",
+    envSuffix: "GOOGLE_DOCS",
+    label: "Create evidence packet doc",
+    studentValue: "Turns the Evidence Packet into a teacher-shareable draft while preserving the blank claim starter.",
+    composioCapability: "create Google Docs document from markdown",
+    safetyNote: "Doc export should keep the conclusion blanks and must not generate a final lab report.",
+    requiredScopes: ["documents create/update"],
+    dataShared: "Evidence Packet markdown, citations, claim blanks, and safety notes.",
+    consentGate: "Student reviews the payload preview before export.",
+    docsUrl: "https://docs.composio.dev/toolkits/googledocs",
+    recommendedTools: ["GOOGLEDOCS_CREATE_DOCUMENT_MARKDOWN", "GOOGLEDOCS_CREATE_DOCUMENT"]
+  },
+  {
+    id: "google-sheets-data-log",
+    toolkit: "Google Sheets",
+    toolkitSlug: "googlesheets",
+    envSuffix: "GOOGLE_SHEETS",
+    label: "Append checked table rows",
+    studentValue: "Moves the current lab table into a spreadsheet so the student can keep calculating and graphing.",
+    composioCapability: "append spreadsheet rows and update worksheets",
+    safetyNote: "Only export the active rows the student can already see and edit.",
+    requiredScopes: ["spreadsheets append/update"],
+    dataShared: "Visible table columns and student-entered rows only.",
+    consentGate: "Student reviews the payload preview before export.",
+    docsUrl: "https://docs.composio.dev/toolkits/googlesheets",
+    recommendedTools: ["GOOGLESHEETS_SPREADSHEETS_VALUES_APPEND", "GOOGLESHEETS_SHEET_FROM_JSON"]
+  },
+  {
+    id: "google-drive-portfolio-archive",
+    toolkit: "Google Drive",
+    toolkitSlug: "googledrive",
+    envSuffix: "GOOGLE_DRIVE",
+    label: "Save portfolio archive",
+    studentValue: "Creates a folder-ready archive for deck, walkthrough, evidence packet, and saved progress proof.",
+    composioCapability: "upload files, create folders, and manage Drive permissions",
+    safetyNote: "Default sharing should stay private until the student or teacher chooses otherwise.",
+    requiredScopes: ["drive file create", "private sharing"],
+    dataShared: "Saved-run summary, hosted submission links, and selected exported files.",
+    consentGate: "Student reviews the payload preview before export.",
+    docsUrl: "https://docs.composio.dev/toolkits/googledrive",
+    recommendedTools: ["GOOGLEDRIVE_CREATE_FOLDER", "GOOGLEDRIVE_CREATE_FILE_FROM_TEXT"]
+  },
+  {
+    id: "google-classroom-prelab-checkpoint",
+    toolkit: "Google Classroom",
+    toolkitSlug: "google_classroom",
+    envSuffix: "GOOGLE_CLASSROOM",
+    label: "Draft pre-lab checkpoint",
+    studentValue: "Turns the pre-lab setup checks into a teacher-reviewable checkpoint before students collect data.",
+    composioCapability: "create coursework draft and attach pre-lab evidence",
+    safetyNote: "Classroom export should create a draft/checkpoint, not submit answers or write the student's conclusion.",
+    requiredScopes: ["coursework draft create", "attachment add"],
+    dataShared: "Pre-Lab Design Coach status, setup checks, and variable plan.",
+    consentGate: "Student or teacher confirms class/course draft before posting.",
+    docsUrl: "https://composio.dev/toolkits/google_classroom",
+    recommendedTools: ["GOOGLE_CLASSROOM_CREATE_COURSEWORK", "GOOGLE_CLASSROOM_CREATE_COURSE_WORK_MATERIAL"]
+  },
+  {
+    id: "google-forms-readiness-check",
+    toolkit: "Google Forms",
+    toolkitSlug: "googleforms",
+    envSuffix: "GOOGLE_FORMS",
+    label: "Create readiness check form",
+    studentValue: "Turns the pre-lab setup and exit-ticket prompts into a student self-check before submission.",
+    composioCapability: "create Google Forms draft with short-answer readiness prompts",
+    safetyNote: "Forms export should ask questions and collect student answers, not fill the answers for them.",
+    requiredScopes: ["forms draft create", "short-answer questions"],
+    dataShared: "Setup checks and exit-ticket prompts without answers.",
+    consentGate: "Student reviews the payload preview before export.",
+    docsUrl: "https://docs.composio.dev/toolkits/googleforms",
+    recommendedTools: ["GOOGLEFORMS_CREATE_FORM", "GOOGLEFORMS_BATCH_UPDATE_FORM"]
+  },
+  {
+    id: "google-calendar-next-trial-reminder",
+    toolkit: "Google Calendar",
+    toolkitSlug: "googlecalendar",
+    envSuffix: "GOOGLE_CALENDAR",
+    label: "Schedule next trial reminder",
+    studentValue: "Places the next safe measurement or repeat trial on the student's calendar.",
+    composioCapability: "create calendar event draft/reminder from next-trial plan",
+    safetyNote: "Calendar export should schedule the next measurement task, not invent results or conclusions.",
+    requiredScopes: ["calendar event create", "reminder add"],
+    dataShared: "Next-trial reminder title, due window, and student-owned lab title only.",
+    consentGate: "Student reviews the reminder before export.",
+    docsUrl: "https://docs.composio.dev/toolkits/googlecalendar",
+    recommendedTools: ["GOOGLECALENDAR_CREATE_EVENT", "GOOGLECALENDAR_QUICK_ADD"]
+  },
+  {
+    id: "notion-learning-record",
+    toolkit: "Notion",
+    toolkitSlug: "notion",
+    envSuffix: "NOTION",
+    label: "Create learning record",
+    studentValue: "Logs the lab status, next trial, and exit-ticket prompts in a study workspace.",
+    composioCapability: "create Notion page or database item",
+    safetyNote: "Reflection prompts and drafts should stay student-authored; the connector must not complete answers.",
+    requiredScopes: ["page create", "database item create"],
+    dataShared: "Learning status, next action, and student-authored reflection drafts when present.",
+    consentGate: "Student reviews the payload preview before export.",
+    docsUrl: "https://docs.composio.dev/toolkits/notion",
+    recommendedTools: ["NOTION_CREATE_PAGE", "NOTION_CREATE_DATABASE_ITEM"]
+  }
+];
 
 interface BuildMcpIntegrationPlanInput {
   result: AnalyzeResult;
@@ -7,6 +124,7 @@ interface BuildMcpIntegrationPlanInput {
   evidencePacket: string;
   portfolio: ProgressPortfolio;
   configured?: boolean;
+  serverBridgeAvailable?: boolean;
 }
 
 export function buildMcpIntegrationPlan({
@@ -15,105 +133,46 @@ export function buildMcpIntegrationPlan({
   description,
   evidencePacket,
   portfolio,
-  configured = false
+  configured = false,
+  serverBridgeAvailable = false
 }: BuildMcpIntegrationPlanInput): McpIntegrationPlan {
-  const mode = configured ? "server_mcp" : "preview";
-  const status = configured ? "ready" : "preview_only";
+  const mode = configured ? "server_mcp" : serverBridgeAvailable ? "server_dry_run" : "preview";
+  const status = configured ? "ready" : serverBridgeAvailable ? "server_dry_run" : "preview_only";
   const rowCount = rows.length;
   const sourceCount = result.sources.length;
   const savedRunCount = extractSavedRunCount(portfolio);
   const title = `Ouija Evidence Packet: ${result.classification.title}`;
-  const actions: McpIntegrationAction[] = [
-    {
-      id: "google-docs-evidence-packet",
-      toolkit: "Google Docs",
-      label: "Create evidence packet doc",
-      studentValue: "Turns the Evidence Packet into a teacher-shareable draft while preserving the blank claim starter.",
-      composioCapability: "create Google Docs document from markdown",
-      payloadSummary: `${title} with source trail, checks, and integrity boundary`,
-      mode,
-      requiresConsent: true,
-      safetyNote: "Doc export should keep the conclusion blanks and must not generate a final lab report."
-    },
-    {
-      id: "google-sheets-data-log",
-      toolkit: "Google Sheets",
-      label: "Append checked table rows",
-      studentValue: "Moves the current lab table into a spreadsheet so the student can keep calculating and graphing.",
-      composioCapability: "append spreadsheet rows and update worksheets",
-      payloadSummary: `${rowCount} rows across ${result.columns.length} columns: ${formatColumnList(result)}`,
-      mode,
-      requiresConsent: true,
-      safetyNote: "Only export the active rows the student can already see and edit."
-    },
-    {
-      id: "google-drive-portfolio-archive",
-      toolkit: "Google Drive",
-      label: "Save portfolio archive",
-      studentValue: "Creates a folder-ready archive for deck, walkthrough, evidence packet, and saved progress proof.",
-      composioCapability: "upload files, create folders, and manage Drive permissions",
-      payloadSummary: `${savedRunCount} saved run${savedRunCount === 1 ? "" : "s"}, ${sourceCount} citation${sourceCount === 1 ? "" : "s"}, hosted submission links`,
-      mode,
-      requiresConsent: true,
-      safetyNote: "Default sharing should stay private until the student or teacher chooses otherwise."
-    },
-    {
-      id: "google-classroom-prelab-checkpoint",
-      toolkit: "Google Classroom",
-      label: "Draft pre-lab checkpoint",
-      studentValue: "Turns the pre-lab setup checks into a teacher-reviewable checkpoint before students collect data.",
-      composioCapability: "create coursework draft and attach pre-lab evidence",
-      payloadSummary: `Pre-lab ${result.preLabDesignCoach.status.replaceAll("_", " ")}: ${result.preLabDesignCoach.setupChecks.length} setup checks, ${result.preLabDesignCoach.variablePlan.independentVariable} to ${result.preLabDesignCoach.variablePlan.dependentVariable}`,
-      mode,
-      requiresConsent: true,
-      safetyNote: "Classroom export should create a draft/checkpoint, not submit answers or write the student's conclusion."
-    },
-    {
-      id: "google-forms-readiness-check",
-      toolkit: "Google Forms",
-      label: "Create readiness check form",
-      studentValue: "Turns the pre-lab setup and exit-ticket prompts into a student self-check before submission.",
-      composioCapability: "create Google Forms draft with short-answer readiness prompts",
-      payloadSummary: `${result.preLabDesignCoach.setupChecks.length} setup checks plus ${result.learningExitTicket.prompts.length} student reflection prompts`,
-      mode,
-      requiresConsent: true,
-      safetyNote: "Forms export should ask questions and collect student answers, not fill the answers for them."
-    },
-    {
-      id: "notion-learning-record",
-      toolkit: "Notion",
-      label: "Create learning record",
-      studentValue: "Logs the lab status, next trial, and exit-ticket prompts in a study workspace.",
-      composioCapability: "create Notion page or database item",
-      payloadSummary: `${result.trackEvidence.score}/100 readiness, ${result.learningExitTicket.prompts.length} exit-ticket prompts, next action`,
-      mode,
-      requiresConsent: true,
-      safetyNote: "Reflection prompts and drafts should stay student-authored; the connector must not complete answers."
-    }
-  ];
+  const actions: McpIntegrationAction[] = MCP_CONNECTOR_CATALOG.map((connector) => ({
+    id: connector.id,
+    toolkit: connector.toolkit,
+    label: connector.label,
+    studentValue: connector.studentValue,
+    composioCapability: connector.composioCapability,
+    payloadSummary: buildPayloadSummary(connector, result, rowCount, sourceCount, savedRunCount, title),
+    mode,
+    requiresConsent: true,
+    safetyNote: connector.safetyNote,
+    docsUrl: connector.docsUrl,
+    recommendedTools: connector.recommendedTools
+  }));
 
   return {
     status,
-    summary: configured
-      ? "Composio MCP exports are ready to route through the server after student confirmation."
-      : "Preview only: Ouija shows the Composio MCP workflow and payload before any account connection exists.",
-    setupHint: configured
-      ? "Server-side MCP bridge is enabled. Keep COMPOSIO_API_KEY and any MCP URL on the server, never in browser code."
-      : "Add COMPOSIO_API_KEY and a server-side MCP bridge before enabling live exports.",
+    summary: buildSummary(status),
+    setupHint: buildSetupHint(status),
     privacyBoundary:
-      "Student chooses what to export; preview mode never sends lab descriptions, table rows, sources, or saved portfolio data to third-party apps.",
+      "Student chooses what to validate or export; dry-run mode never sends lab descriptions, table rows, sources, or saved portfolio data to third-party apps.",
     actions,
     readinessMatrix: buildReadinessMatrix(actions, configured),
     dryRunChecks: buildDryRunChecks({
       configured,
+      serverBridgeAvailable,
       rowCount,
       sourceCount,
       actions,
       result
     }),
-    executionBoundary: configured
-      ? "Live execution may run only from the Express API after explicit confirmation; the browser never receives Composio credentials."
-      : "Public demo is dry-run only: it validates the packet, scopes, consent, and integrity rules before any Composio connector can run.",
+    executionBoundary: buildExecutionBoundary(status),
     payloadPreview: {
       title,
       rowCount,
@@ -128,52 +187,88 @@ export function buildMcpIntegrationPlan({
         "Pre-Lab Design Coach",
         "Learning Exit Ticket prompts",
         "Google Forms readiness prompts",
+        "Google Calendar next-trial reminder",
         "Student Reflection Drafts",
         "Integrity boundary"
       ],
       markdownExcerpt: buildMarkdownExcerpt(description, evidencePacket)
     },
-    safeguards: [
-      "Preview mode does not call Composio, Google Classroom, Google Workspace, or Notion APIs.",
+    safeguards: buildSafeguards(status),
+    judgeTakeaway:
+      "MCP Integration Coach connects Ouija to a real classroom handoff path with connector prerequisites, least-privilege scopes, server dry-runs, and consent gates visible to judges."
+  };
+}
+
+function buildSummary(status: McpIntegrationPlan["status"]) {
+  if (status === "ready") return "Composio MCP exports are ready to route through the server after student confirmation.";
+  if (status === "server_dry_run") return "Server dry-run bridge is active: Ouija validates Composio action packets before any account connection or live connector runs.";
+  return "Preview only: Ouija shows the Composio MCP workflow and payload before any account connection exists.";
+}
+
+function buildSetupHint(status: McpIntegrationPlan["status"]) {
+  if (status === "ready") return "Server-side MCP bridge is enabled. Keep COMPOSIO_API_KEY and any MCP URL on the server, never in browser code.";
+  if (status === "server_dry_run") return "Server-side MCP bridge validates packets now; live exports require COMPOSIO_API_KEY, auth config IDs, allowed tools, and COMPOSIO_LIVE_EXPORTS=true.";
+  return "Add COMPOSIO_API_KEY and a server-side MCP bridge before enabling live exports.";
+}
+
+function buildExecutionBoundary(status: McpIntegrationPlan["status"]) {
+  if (status === "ready") return "Live execution may run only from the Express API after explicit confirmation; the browser never receives Composio credentials.";
+  if (status === "server_dry_run") return "Public demo calls /api/mcp/export for dry-run validation, then stops before Composio or Google Workspace execution.";
+  return "Public demo is dry-run only: it validates the packet, scopes, consent, and integrity rules before any Composio connector can run.";
+}
+
+function buildSafeguards(status: McpIntegrationPlan["status"]) {
+  const firstLine =
+    status === "ready"
+      ? "Live MCP mode keeps Composio, Google Workspace, Notion, and Calendar execution on the server after consent."
+      : status === "server_dry_run"
+      ? "Server dry-run mode validates Composio packets but does not call Google Classroom, Google Workspace, Notion, or Calendar APIs."
+      : "Preview mode does not call Composio, Google Classroom, Google Workspace, or Notion APIs.";
+
+  return [
+    firstLine,
       "COMPOSIO_API_KEY must stay server-side and must never be bundled into the Vite client.",
       "Every export action requires student or teacher consent before a live connector runs.",
       "Google Classroom handoff creates a teacher-review checkpoint, not an auto-submitted assignment.",
       "Google Forms handoff creates student prompts, not completed answers.",
+      "Google Calendar handoff schedules a next-trial reminder, not a generated result.",
       "Exported packets preserve the academic-integrity blanks instead of writing conclusions.",
       "Reflection drafts are exported only when the student typed them in the workspace."
-    ],
-    judgeTakeaway:
-      "MCP Integration Coach connects Ouija to a real classroom handoff path with connector prerequisites, least-privilege scopes, dry-run checks, and consent gates visible to judges."
-  };
+  ];
 }
 
 function buildReadinessMatrix(actions: McpIntegrationAction[], configured: boolean): McpConnectorReadiness[] {
   return actions.map((action) => {
-    const envSuffix = action.toolkit.toUpperCase().replaceAll(" ", "_");
+    const connector = MCP_CONNECTOR_CATALOG.find((candidate) => candidate.id === action.id);
+    const envSuffix = connector?.envSuffix ?? action.toolkit.toUpperCase().replaceAll(" ", "_");
     return {
       actionId: action.id,
       toolkit: action.toolkit,
       status: configured ? "ready" : "needs_server_setup",
       requiredEnv: [`COMPOSIO_${envSuffix}_AUTH_CONFIG_ID`, `COMPOSIO_${envSuffix}_ALLOWED_TOOLS`],
-      requiredScopes: scopesForToolkit(action.toolkit),
-      dataShared: dataSharedForAction(action),
-      consentGate: action.id === "google-classroom-prelab-checkpoint" ? "Student or teacher confirms class/course draft before posting." : "Student reviews the payload preview before export.",
+      requiredScopes: connector?.requiredScopes ?? [],
+      dataShared: connector?.dataShared ?? "",
+      consentGate: connector?.consentGate ?? "Student reviews the payload preview before export.",
       dryRunStatus: "pass",
       dryRunDetail: configured
         ? "Server bridge can receive this action after consent."
-        : "Preview payload is complete, but live execution waits for server credentials."
+        : "Dry-run payload is complete, but live execution waits for server credentials.",
+      docsUrl: connector?.docsUrl ?? "",
+      recommendedTools: connector?.recommendedTools ?? action.recommendedTools
     };
   });
 }
 
 function buildDryRunChecks({
   configured,
+  serverBridgeAvailable,
   rowCount,
   sourceCount,
   actions,
   result
 }: {
   configured: boolean;
+  serverBridgeAvailable: boolean;
   rowCount: number;
   sourceCount: number;
   actions: McpIntegrationAction[];
@@ -195,7 +290,7 @@ function buildDryRunChecks({
       id: "least-privilege",
       label: "Least privilege",
       status: "pass",
-      detail: `${actions.length} connector routes use specific Docs, Sheets, Drive, Classroom, Forms, or Notion scopes instead of a broad all-Google handoff.`
+      detail: `${actions.length} connector routes use specific Docs, Sheets, Drive, Classroom, Forms, Calendar, or Notion scopes instead of a broad all-Google handoff.`
     },
     {
       id: "consent",
@@ -210,34 +305,48 @@ function buildDryRunChecks({
       detail: "Exports preserve claim blanks, source tasks, and student-authored reflection boundaries."
     },
     {
+      id: "server-bridge",
+      label: "Server dry-run bridge",
+      status: serverBridgeAvailable || configured ? "pass" : "review",
+      detail: serverBridgeAvailable || configured ? "Server API can validate the action packet before live connector execution." : "Static preview is visible, but /api/mcp/export is not connected yet."
+    },
+    {
       id: "server-only",
       label: "Server-only credentials",
       status: configured ? "pass" : "review",
-      detail: configured ? "Server MCP mode is selected; credentials remain outside the browser bundle." : "Dry-run mode is active until COMPOSIO_API_KEY and auth config IDs exist server-side."
+      detail: configured ? "Server MCP mode is selected; credentials remain outside the browser bundle." : "Dry-run mode is active until COMPOSIO_API_KEY, auth config IDs, and allowed tools exist server-side."
     }
   ];
 }
 
-function scopesForToolkit(toolkit: McpIntegrationAction["toolkit"]) {
-  if (toolkit === "Google Docs") return ["documents create/update"];
-  if (toolkit === "Google Sheets") return ["spreadsheets append/update"];
-  if (toolkit === "Google Drive") return ["drive file create", "private sharing"];
-  if (toolkit === "Google Classroom") return ["coursework draft create", "attachment add"];
-  if (toolkit === "Google Forms") return ["forms draft create", "short-answer questions"];
-  return ["page create", "database item create"];
-}
-
-function dataSharedForAction(action: McpIntegrationAction) {
-  if (action.id === "google-docs-evidence-packet") return "Evidence Packet markdown, citations, claim blanks, and safety notes.";
-  if (action.id === "google-sheets-data-log") return "Visible table columns and student-entered rows only.";
-  if (action.id === "google-drive-portfolio-archive") return "Saved-run summary, hosted submission links, and selected exported files.";
-  if (action.id === "google-classroom-prelab-checkpoint") return "Pre-Lab Design Coach status, setup checks, and variable plan.";
-  if (action.id === "google-forms-readiness-check") return "Setup checks and exit-ticket prompts without answers.";
-  return "Learning status, next action, and student-authored reflection drafts when present.";
-}
-
 function formatColumnList(result: AnalyzeResult) {
   return result.columns.map((column) => (column.unit ? `${column.label} (${column.unit})` : column.label)).join(", ");
+}
+
+function buildPayloadSummary(
+  connector: McpConnectorCatalogItem,
+  result: AnalyzeResult,
+  rowCount: number,
+  sourceCount: number,
+  savedRunCount: number,
+  title: string
+) {
+  if (connector.id === "google-docs-evidence-packet") return `${title} with source trail, checks, and integrity boundary`;
+  if (connector.id === "google-sheets-data-log") return `${rowCount} rows across ${result.columns.length} columns: ${formatColumnList(result)}`;
+  if (connector.id === "google-drive-portfolio-archive") {
+    return `${savedRunCount} saved run${savedRunCount === 1 ? "" : "s"}, ${sourceCount} citation${sourceCount === 1 ? "" : "s"}, hosted submission links`;
+  }
+  if (connector.id === "google-classroom-prelab-checkpoint") {
+    return `Pre-lab ${result.preLabDesignCoach.status.replaceAll("_", " ")}: ${result.preLabDesignCoach.setupChecks.length} setup checks, ${result.preLabDesignCoach.variablePlan.independentVariable} to ${result.preLabDesignCoach.variablePlan.dependentVariable}`;
+  }
+  if (connector.id === "google-forms-readiness-check") {
+    return `${result.preLabDesignCoach.setupChecks.length} setup checks plus ${result.learningExitTicket.prompts.length} student reflection prompts`;
+  }
+  if (connector.id === "google-calendar-next-trial-reminder") {
+    return `Next trial reminder: ${result.nextTrialPlan.nextMeasurement}`;
+  }
+
+  return `${result.trackEvidence.score}/100 readiness, ${result.learningExitTicket.prompts.length} exit-ticket prompts, next action`;
 }
 
 function extractSavedRunCount(portfolio: ProgressPortfolio) {

@@ -56,7 +56,7 @@ Type an unsupported paper towel absorbency lab. Show that Ouija labels it as a l
 
 ## 4:50-4:56 - Saved Lab Snapshot, Progress Portfolio, And MCP Export
 
-Save the current run and show Saved Labs plus Progress Portfolio so judges see the workflow continues after one analysis and can measure saved-run trend, subject breadth, and the next portfolio action. Then show MCP Integration Coach: Ouija previews Google Docs, Google Sheets, Google Drive, Google Classroom, Google Forms, and Notion handoffs, shows connector env vars/scopes/data/dry-run checks, keeps Composio credentials server-side, and requires consent before export.
+Save the current run and show Saved Labs plus Progress Portfolio so judges see the workflow continues after one analysis and can measure saved-run trend, subject breadth, and the next portfolio action. Then show MCP Integration Coach: Ouija validates Google Docs, Google Sheets, Google Drive, Google Classroom, Google Forms, Google Calendar, and Notion handoffs through a server dry-run, shows connector env vars/tools/scopes/data/checks, keeps Composio credentials server-side, and requires consent before export.
 
 ## 4:56-4:58 - Evaluation Bench
 

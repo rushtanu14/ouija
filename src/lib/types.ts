@@ -466,7 +466,7 @@ export interface ProgressPortfolio {
   judgeTakeaway: string;
 }
 
-export type McpIntegrationStatus = "preview_only" | "ready";
+export type McpIntegrationStatus = "preview_only" | "server_dry_run" | "ready";
 
 export type McpIntegrationActionId =
   | "google-docs-evidence-packet"
@@ -474,18 +474,21 @@ export type McpIntegrationActionId =
   | "google-drive-portfolio-archive"
   | "google-classroom-prelab-checkpoint"
   | "google-forms-readiness-check"
+  | "google-calendar-next-trial-reminder"
   | "notion-learning-record";
 
 export interface McpIntegrationAction {
   id: McpIntegrationActionId;
-  toolkit: "Google Docs" | "Google Sheets" | "Google Drive" | "Google Classroom" | "Google Forms" | "Notion";
+  toolkit: "Google Docs" | "Google Sheets" | "Google Drive" | "Google Classroom" | "Google Forms" | "Google Calendar" | "Notion";
   label: string;
   studentValue: string;
   composioCapability: string;
   payloadSummary: string;
-  mode: "preview" | "server_mcp";
+  mode: "preview" | "server_dry_run" | "server_mcp";
   requiresConsent: boolean;
   safetyNote: string;
+  docsUrl: string;
+  recommendedTools: string[];
 }
 
 export interface McpConnectorReadiness {
@@ -498,10 +501,12 @@ export interface McpConnectorReadiness {
   consentGate: string;
   dryRunStatus: "pass" | "review";
   dryRunDetail: string;
+  docsUrl: string;
+  recommendedTools: string[];
 }
 
 export interface McpDryRunCheck {
-  id: "payload" | "least-privilege" | "consent" | "integrity" | "server-only";
+  id: "payload" | "least-privilege" | "consent" | "integrity" | "server-bridge" | "server-only";
   label: string;
   status: "pass" | "review";
   detail: string;
@@ -529,6 +534,94 @@ export interface McpIntegrationPlan {
   payloadPreview: McpIntegrationPayloadPreview;
   safeguards: string[];
   judgeTakeaway: string;
+}
+
+export interface McpConnectorCatalogItem {
+  id: McpIntegrationActionId;
+  toolkit: McpIntegrationAction["toolkit"];
+  toolkitSlug: string;
+  envSuffix: string;
+  label: string;
+  studentValue: string;
+  composioCapability: string;
+  safetyNote: string;
+  requiredScopes: string[];
+  dataShared: string;
+  consentGate: string;
+  docsUrl: string;
+  recommendedTools: string[];
+}
+
+export interface McpBridgeToolkitStatus {
+  actionId: McpIntegrationActionId;
+  toolkit: McpIntegrationAction["toolkit"];
+  toolkitSlug: string;
+  docsUrl: string;
+  configured: boolean;
+  authConfigEnv: string;
+  allowedToolsEnv: string;
+  authConfigConfigured: boolean;
+  allowedToolsConfigured: boolean;
+  allowedTools: string[];
+  recommendedTools: string[];
+  missingEnv: string[];
+}
+
+export interface McpBridgeStatus {
+  status: Extract<McpIntegrationStatus, "server_dry_run" | "ready">;
+  mode: "server_dry_run" | "server_mcp";
+  liveExportsEnabled: boolean;
+  apiKeyConfigured: boolean;
+  summary: string;
+  executionBoundary: string;
+  missingEnv: string[];
+  toolkits: McpBridgeToolkitStatus[];
+  docs: Array<{ label: string; url: string }>;
+}
+
+export interface McpBridgeExportRequest {
+  actionId: McpIntegrationActionId;
+  consent: boolean;
+  payload: {
+    title: string;
+    description: string;
+    evidencePacket: string;
+    rows: StudentDataRow[];
+    sources: SourceCard[];
+    reflectionAnswers?: StudentReflectionAnswers;
+  };
+}
+
+export interface McpBridgeExportCheck {
+  id: "supported-action" | "consent" | "payload" | "integrity" | "credentials";
+  label: string;
+  status: "pass" | "review" | "blocked";
+  detail: string;
+}
+
+export interface McpBridgeExportResponse {
+  status: "dry_run" | "ready" | "blocked";
+  actionId: McpIntegrationActionId;
+  toolkit: McpIntegrationAction["toolkit"];
+  mode: McpBridgeStatus["mode"];
+  summary: string;
+  executionBoundary: string;
+  checks: McpBridgeExportCheck[];
+  target: {
+    toolkitSlug: string;
+    authConfigEnv: string;
+    allowedToolsEnv: string;
+    recommendedTools: string[];
+    docsUrl: string;
+  };
+  sanitizedPayload: {
+    title: string;
+    rowCount: number;
+    sourceCount: number;
+    descriptionPreview: string;
+    evidenceExcerpt: string;
+  };
+  nextStep: string;
 }
 
 export type RubricStatus = "strong" | "ready" | "review";

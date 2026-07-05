@@ -8,6 +8,8 @@ Generated from `server/app.ts` and `api/*.ts`.
 | `/api/health` | `GET`, `OPTIONS` | Health check for the Ouija API. | `{ "ok": true, "service": "ouija-api" }` | `405` with `Use GET /api/health to check the Ouija API.` |
 | `/api/evaluate` | `GET`, `OPTIONS` | Runs the deterministic Ouija evaluation bench: eight supported demos plus the unsupported-boundary case. | `EvaluationReport` with `score`, `passed`, `total`, `status`, `verdict`, and `cases`. | `405` with `Use GET /api/evaluate to run the Ouija evaluation bench.` |
 | `/api/analyze` | `POST`, `OPTIONS` | Analyzes a student experiment description and optional rows. Returns classification, citations, pre-lab design checks, expected overlay, checks, Data Handling Ledger, Learning Exit Ticket, Student Reflection Workspace prompts, Evidence Packet inputs, and Track 1 evidence. | `AnalyzeResult` from `src/lib/types.ts`. | `400` when `description` is empty; `405` with `Use POST /api/analyze to analyze a student experiment.` |
+| `/api/mcp/status` | `GET`, `OPTIONS` | Reports the Composio MCP bridge mode, missing server env vars, connector readiness, docs links, and allowed-tool plan without exposing secret values. | `McpBridgeStatus` from `src/lib/types.ts`. | `405` with `Use GET /api/mcp/status to inspect Composio MCP readiness.` |
+| `/api/mcp/export` | `POST`, `OPTIONS` | Validates a consent-gated Composio packet for Google Docs, Sheets, Drive, Classroom, Forms, Calendar, or Notion. The public mode is server dry-run and stops before external writes. | `McpBridgeExportResponse` from `src/lib/types.ts`. | `400` for missing action, missing payload, or missing consent; `405` with `Use POST /api/mcp/export to dry-run a consent-gated Composio MCP packet.` |
 
 `POST /api/analyze` input:
 
@@ -17,6 +19,32 @@ Generated from `server/app.ts` and `api/*.ts`.
   "rows": [
     { "id": "trial-1", "angleDeg": 45, "rangeM": 14.6 }
   ]
+}
+```
+
+`POST /api/mcp/export` input:
+
+```json
+{
+  "actionId": "google-calendar-next-trial-reminder",
+  "consent": true,
+  "payload": {
+    "title": "Ouija Evidence Packet: Projectile Motion",
+    "description": "Projectile motion lab using launch angle and range data.",
+    "evidencePacket": "Claim starter: ___",
+    "rows": [
+      { "id": "trial-1", "angleDeg": 45, "rangeM": 14.6 }
+    ],
+    "sources": [
+      {
+        "id": "source-1",
+        "publisher": "Physics Classroom",
+        "title": "Projectile Motion",
+        "url": "https://www.physicsclassroom.com/",
+        "note": "Projectile range pattern."
+      }
+    ]
+  }
 }
 ```
 

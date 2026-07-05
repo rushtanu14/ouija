@@ -48,7 +48,8 @@ Generated from `server/app.ts`, `api/health.ts`, and `api/evaluate.ts`.
 | Check | Expected |
 | --- | --- |
 | `GET /api/health` | `200` with `{ "ok": true, "service": "ouija-api" }` |
-| `GET /api/evaluate` | `200` with `score: 100`, `passed: 8`, and `total: 8` for the current evaluation suite. |
+| `GET /api/evaluate` | `200` with `score: 100`, `passed: 9`, and `total: 9` for the current evaluation suite. |
+| `GET /api/mcp/status` | `200` with `status: "server_dry_run"` unless live Composio env vars are configured. |
 | Hosted video | `https://ouija-olive.vercel.app/submission/assets/ouija-walkthrough.webm` returns `200` and a non-trivial `video/webm` asset. |
 | Hosted slide deck | `https://ouija-olive.vercel.app/submission/slide-deck.html` returns `200`. |
 <!-- AUTO-GENERATED:HEALTH:END -->
@@ -58,7 +59,7 @@ Generated from `server/app.ts`, `api/health.ts`, and `api/evaluate.ts`.
 | Issue | Fix |
 | --- | --- |
 | `/api/analyze` returns fallback grounding | Set `OPENAI_API_KEY` in the server environment if a web-search-enriched demo is required; fallback mode is expected without credentials. |
-| MCP Integration Coach shows preview-only | Expected for the public demo. Enable live exports only after adding a server-side Composio MCP bridge, keeping `COMPOSIO_API_KEY` out of the Vite client, configuring `COMPOSIO_<TOOLKIT>_AUTH_CONFIG_ID` / `COMPOSIO_<TOOLKIT>_ALLOWED_TOOLS`, and adding a consent step. |
+| MCP Integration Coach shows server dry-run | Expected for the public demo. Enable live exports only after keeping `COMPOSIO_API_KEY` out of the Vite client, configuring `COMPOSIO_LIVE_EXPORTS=true`, `COMPOSIO_<TOOLKIT>_AUTH_CONFIG_ID`, `COMPOSIO_<TOOLKIT>_ALLOWED_TOOLS`, and preserving the consent step. |
 | Empty description returns `400` | Enter a non-empty experiment description before analyzing. |
 | Walkthrough recording hangs | Run with `OUIJA_CAPTION_MS=4000`; the script sets a Playwright default timeout to avoid infinite waits. |
 | Vercel API works but frontend is stale | Run `npm run build`, refresh submission assets, sync `public/submission`, then redeploy. |

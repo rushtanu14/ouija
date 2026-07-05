@@ -28,7 +28,7 @@ Ouija is a student-facing AI experiment interpreter for middle and high school s
 13. Open Evaluation Bench to see nine live checks: eight supported lab demos plus the unsupported-lab boundary.
 14. Save lab snapshots locally so a student can return to a checked run without sending data to an account system.
 15. Use Progress Portfolio to show saved-run count, score trend, subject breadth, strongest run, and next portfolio action.
-16. Use MCP Integration Coach to preview Composio-powered Google Docs, Google Sheets, Google Drive, Google Classroom, Google Forms, and Notion handoffs, plus the readiness matrix, without exposing credentials or sending student data.
+16. Use MCP Integration Coach to validate Composio-powered Google Docs, Google Sheets, Google Drive, Google Classroom, Google Forms, Google Calendar, and Notion handoffs through the server dry-run bridge, plus the readiness matrix, without exposing credentials or sending student data.
 17. Open AI Model Card for the architecture, grounding, evaluation, privacy, MCP-export boundary, and guardrail summary.
 18. Open Judge Brief for a compact Track 1 proof surface: live app, hosted deck/video, judge demo path, official rubric fit, learning impact, student reflection drafts, progress portfolio, MCP readiness plan, AI pipeline, model strategy, evaluation, data-handling ethics, tests, and integrity constraints.
 
@@ -84,7 +84,7 @@ Saved Labs stores up to six browser-local lab snapshots with the experiment, tab
 
 Progress Portfolio turns those saved labs into repeated learning evidence: saved-run count, score trend, subject breadth, strongest run, milestones, and the next portfolio action.
 
-MCP Integration Coach previews a practical Composio export path for the same student-owned evidence: create a Google Docs evidence packet, append table rows to Google Sheets, save a portfolio archive to Google Drive, draft a Google Classroom pre-lab checkpoint, create a Google Forms readiness check, or create a Notion learning record with student-authored reflection drafts. The readiness matrix shows required auth config env vars, least-privilege scopes, data shared, consent gates, and dry-run checks. The current public app is intentionally preview-only; live connector execution would require a server-side MCP bridge and `COMPOSIO_API_KEY`, with student or teacher consent before export.
+MCP Integration Coach validates a practical Composio export path for the same student-owned evidence: create a Google Docs evidence packet, append table rows to Google Sheets, save a portfolio archive to Google Drive, draft a Google Classroom pre-lab checkpoint, create a Google Forms readiness check, schedule a Google Calendar next-trial reminder, or create a Notion learning record with student-authored reflection drafts. The readiness matrix shows required auth config env vars, allowed tools, least-privilege scopes, data shared, consent gates, and dry-run checks. The public app now includes `/api/mcp/status` and `/api/mcp/export` for server-side dry-run validation; live connector execution still requires `COMPOSIO_API_KEY`, connector auth config IDs, allowed tools, `COMPOSIO_LIVE_EXPORTS=true`, and student or teacher consent before export.
 
 ## Run
 
@@ -116,13 +116,17 @@ PORT=8799 HOST=127.0.0.1 npm start
 
 ## Deployment
 
-The repo includes `vercel.json` and serverless API adapters under `api/` so Vercel can host the Vite app and the same-origin `/api/health`, `/api/evaluate`, and `/api/analyze` endpoints.
+The repo includes `vercel.json` and serverless API adapters under `api/` so Vercel can host the Vite app and the same-origin `/api/health`, `/api/evaluate`, `/api/analyze`, `/api/mcp/status`, and `/api/mcp/export` endpoints.
 
 Production deployment: https://ouija-olive.vercel.app
 
 ## AI Grounding
 
 Ouija works without credentials through deterministic built-in experiment templates and trusted citations. When `OPENAI_API_KEY` is present in the environment, the server attempts OpenAI Responses API web-search enrichment and falls back safely if enrichment is unavailable.
+
+## Composio MCP Bridge
+
+Ouija works without Composio credentials through server dry-run validation. `GET /api/mcp/status` reports connector readiness without leaking secret values. `POST /api/mcp/export` validates a consent-gated packet for Google Docs, Sheets, Drive, Classroom, Forms, Calendar, or Notion and stops before any external write unless a future live bridge is configured server-side.
 
 ## Submission Assets
 

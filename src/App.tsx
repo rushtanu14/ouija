@@ -33,7 +33,7 @@ import {
   XAxis,
   YAxis
 } from "recharts";
-import { requestAnalysis, requestEvaluation } from "./lib/api";
+import { requestAnalysis, requestEvaluation, requestMcpExport, requestMcpStatus } from "./lib/api";
 import { refreshResultForRows } from "./lib/analysis";
 import { buildPasteExample, parsePastedTable } from "./lib/dataImport";
 import { buildEvidencePacket } from "./lib/evidencePacket";
@@ -55,6 +55,9 @@ import type {
   LabBrief,
   LearningExitTicket,
   LearningImpactSnapshot,
+  McpBridgeExportResponse,
+  McpBridgeStatus,
+  McpIntegrationActionId,
   McpIntegrationPlan,
   MethodAudit,
   ModelStrategy,
@@ -89,6 +92,10 @@ export function App() {
   const [reflectionAnswers, setReflectionAnswers] = useState<StudentReflectionAnswers>({});
   const [savedLabs, setSavedLabs] = useState<SavedLab[]>(loadSavedLabs);
   const [evaluationReport, setEvaluationReport] = useState<EvaluationReport | null>(null);
+  const [mcpBridgeStatus, setMcpBridgeStatus] = useState<McpBridgeStatus | null>(null);
+  const [mcpExportResult, setMcpExportResult] = useState<McpBridgeExportResponse | null>(null);
+  const [mcpExportStatus, setMcpExportStatus] = useState<"idle" | "loading" | "error">("idle");
+  const [mcpExportError, setMcpExportError] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "error">("idle");
   const [error, setError] = useState("");
   const analysisRequestId = useRef(0);
@@ -105,6 +112,8 @@ export function App() {
       setResult(analysis);
       setRows(analysis.rows);
       setReflectionAnswers({});
+      setMcpExportResult(null);
+      setMcpExportError("");
       setStatus("idle");
     } catch (analysisError) {
       if (requestId !== analysisRequestId.current) return;
@@ -116,6 +125,7 @@ export function App() {
   useEffect(() => {
     void analyze(initialPrompt);
     void requestEvaluation().then(setEvaluationReport).catch(() => setEvaluationReport(null));
+    void requestMcpStatus().then(setMcpBridgeStatus).catch(() => setMcpBridgeStatus(null));
   }, []);
 
   function updateCell(rowId: string, key: string, value: string) {
@@ -191,9 +201,37 @@ export function App() {
       description,
       evidencePacket,
       portfolio: progressPortfolio,
-      configured: false
+      configured: mcpBridgeStatus?.status === "ready",
+      serverBridgeAvailable: Boolean(mcpBridgeStatus)
     });
-  }, [description, evidencePacket, progressPortfolio, result, rows]);
+  }, [description, evidencePacket, mcpBridgeStatus, progressPortfolio, result, rows]);
+
+  async function validateMcpAction(actionId: McpIntegrationActionId) {
+    if (!result || !mcpIntegrationPlan) return;
+
+    setMcpExportStatus("loading");
+    setMcpExportError("");
+
+    try {
+      const response = await requestMcpExport({
+        actionId,
+        consent: true,
+        payload: {
+          title: mcpIntegrationPlan.payloadPreview.title,
+          description,
+          evidencePacket,
+          rows,
+          sources: result.sources,
+          reflectionAnswers
+        }
+      });
+      setMcpExportResult(response);
+      setMcpExportStatus("idle");
+    } catch (exportError) {
+      setMcpExportStatus("error");
+      setMcpExportError(exportError instanceof Error ? exportError.message : "Unable to validate this MCP packet.");
+    }
+  }
 
   return (
     <main className="app-shell">
@@ -392,11 +430,23 @@ export function App() {
       <section className="lower-workspace" aria-label="Saved labs and settings">
         <SavedLabsPanel savedLabs={savedLabs} onLoad={loadSavedLab} onDelete={deleteSavedLab} />
         <ProgressPortfolioPanel portfolio={progressPortfolio} />
-        <McpIntegrationCoachPanel plan={mcpIntegrationPlan} />
+        <McpIntegrationCoachPanel
+          plan={mcpIntegrationPlan}
+          bridgeStatus={mcpBridgeStatus}
+          exportResult={mcpExportResult}
+          exportStatus={mcpExportStatus}
+          exportError={mcpExportError}
+          onValidateAction={validateMcpAction}
+        />
         <EvaluationBenchPanel report={evaluationReport} />
         <ModelCardPanel result={result} />
         <JudgeBriefPanel result={result} />
-        <SettingsPanel result={result} savedLabCount={savedLabs.length} reflectionWorkspace={studentReflectionWorkspace} />
+        <SettingsPanel
+          result={result}
+          savedLabCount={savedLabs.length}
+          reflectionWorkspace={studentReflectionWorkspace}
+          mcpStatus={mcpIntegrationPlan?.status ?? "preview_only"}
+        />
       </section>
     </main>
   );
@@ -714,7 +764,7 @@ function JudgeBriefPanel({ result }: { result: AnalyzeResult | null }) {
     { label: "Live app", value: "Deployed" },
     { label: "Slide deck", value: "Hosted" },
     { label: "Video", value: "Hosted" },
-    { label: "MCP export", value: "Preview-safe" },
+    { label: "MCP export", value: "Server dry-run" },
     { label: "Integrity", value: "Guarded" }
   ];
   const submissionLinks = [
@@ -743,8 +793,8 @@ function JudgeBriefPanel({ result }: { result: AnalyzeResult | null }) {
     "Data Handling Ledger shows privacy, retention, and student controls.",
     "Spreadsheet paste/import flows into data checks.",
     "Evidence Packet exports a student-owned reasoning handoff.",
-    "MCP Integration Coach previews Composio Docs, Sheets, Drive, Classroom, Forms, and Notion handoffs without exposing credentials.",
-    "MCP Readiness Matrix shows exact connector env vars, scopes, data shared, dry-run checks, and consent gates.",
+    "MCP Integration Coach validates Composio Docs, Sheets, Drive, Classroom, Forms, Calendar, and Notion handoffs through a server dry-run without exposing credentials.",
+    "MCP Readiness Matrix shows exact connector env vars, tools, scopes, data shared, dry-run checks, and consent gates.",
     "Next Trial Planner gives adaptive measurement guidance.",
     "Progress Portfolio shows learning over multiple saved runs.",
     "Evaluation Bench runs nine live cases.",
@@ -814,7 +864,7 @@ function ModelCardPanel({ result }: { result: AnalyzeResult | null }) {
     },
     {
       label: "MCP exports",
-      value: "Preview only"
+      value: "Server dry-run"
     }
   ];
   const safeguards = [
@@ -832,8 +882,8 @@ function ModelCardPanel({ result }: { result: AnalyzeResult | null }) {
     "Grounding Audit checks source agreement before students use the expected pattern.",
     "Data Handling Ledger makes student data flow, retention, and controls inspectable.",
     "Progress Portfolio turns saved labs into repeated learning evidence for judges.",
-    "MCP Integration Coach keeps Composio credentials server-side and requires student consent before any export.",
-    "MCP Readiness Matrix makes connector scopes, dry-run checks, and least-privilege boundaries inspectable.",
+    "MCP Integration Coach keeps Composio credentials server-side, validates packets with /api/mcp/export, and requires student consent before any export.",
+    "MCP Readiness Matrix makes connector tools, scopes, dry-run checks, and least-privilege boundaries inspectable.",
     "Pattern Evidence Engine quantifies whether the dataset supports the expected science pattern.",
     "Reliability Coach checks repeated trials, averages, and spread before students trust a claim.",
     "Guided Lab Flow turns dense analysis into student next steps.",
@@ -981,7 +1031,21 @@ function ProgressPortfolioPanel({ portfolio }: { portfolio: ProgressPortfolio })
   );
 }
 
-function McpIntegrationCoachPanel({ plan }: { plan: McpIntegrationPlan | null }) {
+function McpIntegrationCoachPanel({
+  plan,
+  bridgeStatus,
+  exportResult,
+  exportStatus,
+  exportError,
+  onValidateAction
+}: {
+  plan: McpIntegrationPlan | null;
+  bridgeStatus: McpBridgeStatus | null;
+  exportResult: McpBridgeExportResponse | null;
+  exportStatus: "idle" | "loading" | "error";
+  exportError: string;
+  onValidateAction: (actionId: McpIntegrationActionId) => void;
+}) {
   const [copyStatus, setCopyStatus] = useState("");
   const payloadText = useMemo(() => (plan ? formatMcpPayloadPreview(plan) : ""), [plan]);
 
@@ -1028,6 +1092,27 @@ function McpIntegrationCoachPanel({ plan }: { plan: McpIntegrationPlan | null })
             </div>
             <span>{plan.summary}</span>
           </div>
+          {bridgeStatus ? (
+            <div className={`mcp-bridge-strip mcp-bridge-${bridgeStatus.status}`} aria-label="MCP server bridge">
+              <div>
+                <p className="section-label">Server bridge</p>
+                <strong>{formatMcpStatus(bridgeStatus.status)}</strong>
+              </div>
+              <span>{bridgeStatus.summary}</span>
+              <small>
+                {bridgeStatus.missingEnv.length > 0
+                  ? `Missing: ${bridgeStatus.missingEnv.slice(0, 5).join(", ")}${bridgeStatus.missingEnv.length > 5 ? ", ..." : ""}`
+                  : "All server-side Composio env gates are present."}
+              </small>
+              <div className="mcp-doc-links">
+                {bridgeStatus.docs.map((doc) => (
+                  <a href={doc.url} key={doc.url} target="_blank" rel="noreferrer">
+                    {doc.label}
+                  </a>
+                ))}
+              </div>
+            </div>
+          ) : null}
           <div className="mcp-action-grid">
             {plan.actions.map((action) => (
               <article className="mcp-action-card" key={action.id}>
@@ -1038,6 +1123,14 @@ function McpIntegrationCoachPanel({ plan }: { plan: McpIntegrationPlan | null })
                 <span>{action.composioCapability}</span>
                 <small>{action.payloadSummary}</small>
                 <em>{action.safetyNote}</em>
+                <button
+                  className="mcp-action-button"
+                  type="button"
+                  onClick={() => onValidateAction(action.id)}
+                  disabled={exportStatus === "loading"}
+                >
+                  {exportStatus === "loading" ? "Validating..." : "Validate route"}
+                </button>
               </article>
             ))}
           </div>
@@ -1057,7 +1150,11 @@ function McpIntegrationCoachPanel({ plan }: { plan: McpIntegrationPlan | null })
                   <span>{connector.dataShared}</span>
                   <small>Env: {connector.requiredEnv.join(", ")}</small>
                   <small>Scopes: {connector.requiredScopes.join(", ")}</small>
+                  <small>Tools: {connector.recommendedTools.join(", ")}</small>
                   <em>{connector.consentGate}</em>
+                  <a href={connector.docsUrl} target="_blank" rel="noreferrer">
+                    Toolkit docs
+                  </a>
                 </article>
               ))}
             </div>
@@ -1099,6 +1196,32 @@ function McpIntegrationCoachPanel({ plan }: { plan: McpIntegrationPlan | null })
               <small key={safeguard}>{safeguard}</small>
             ))}
           </div>
+          {exportResult ? (
+            <div className={`mcp-export-result mcp-export-${exportResult.status}`} aria-label="MCP export dry-run result">
+              <div>
+                <p className="section-label">Server validation</p>
+                <strong>{formatMcpExportStatus(exportResult.status)}</strong>
+              </div>
+              <span>{exportResult.summary}</span>
+              <small>
+                {exportResult.toolkit} via {exportResult.target.toolkitSlug}: {exportResult.target.recommendedTools.join(", ")}
+              </small>
+              <small>
+                Payload: {exportResult.sanitizedPayload.rowCount} rows, {exportResult.sanitizedPayload.sourceCount} sources
+              </small>
+              <div className="mcp-export-check-grid">
+                {exportResult.checks.map((check) => (
+                  <article className={`mcp-export-check mcp-export-check-${check.status}`} key={check.id}>
+                    <strong>{check.label}</strong>
+                    <span>{formatMcpExportCheckStatus(check.status)}</span>
+                    <small>{check.detail}</small>
+                  </article>
+                ))}
+              </div>
+              <em>{exportResult.nextStep}</em>
+            </div>
+          ) : null}
+          {exportStatus === "error" ? <p className="error-text">{exportError}</p> : null}
           <p className="mcp-judge-takeaway">{plan.judgeTakeaway}</p>
           {copyStatus ? (
             <p className="packet-status" aria-live="polite">
@@ -1116,11 +1239,13 @@ function McpIntegrationCoachPanel({ plan }: { plan: McpIntegrationPlan | null })
 function SettingsPanel({
   result,
   savedLabCount,
-  reflectionWorkspace
+  reflectionWorkspace,
+  mcpStatus
 }: {
   result: AnalyzeResult | null;
   savedLabCount: number;
   reflectionWorkspace: StudentReflectionWorkspace | null;
+  mcpStatus: McpIntegrationPlan["status"];
 }) {
   const settings = [
     {
@@ -1137,7 +1262,7 @@ function SettingsPanel({
     },
     {
       label: "MCP exports",
-      value: "Preview only"
+      value: formatMcpStatus(mcpStatus)
     },
     {
       label: "Reflections",
@@ -2158,7 +2283,9 @@ function formatReadiness(readiness: AnalyzeResult["trackEvidence"]["readiness"])
 }
 
 function formatMcpStatus(status: McpIntegrationPlan["status"]) {
-  return status === "ready" ? "Server MCP ready" : "Preview only";
+  if (status === "ready") return "Server MCP ready";
+  if (status === "server_dry_run") return "Server dry-run";
+  return "Preview only";
 }
 
 function formatMcpConnectorStatus(status: McpIntegrationPlan["readinessMatrix"][number]["status"]) {
@@ -2167,6 +2294,18 @@ function formatMcpConnectorStatus(status: McpIntegrationPlan["readinessMatrix"][
 
 function formatMcpDryRunStatus(status: McpIntegrationPlan["dryRunChecks"][number]["status"]) {
   return status === "pass" ? "Pass" : "Review";
+}
+
+function formatMcpExportStatus(status: McpBridgeExportResponse["status"]) {
+  if (status === "ready") return "Ready";
+  if (status === "blocked") return "Blocked";
+  return "Dry-run passed";
+}
+
+function formatMcpExportCheckStatus(status: McpBridgeExportResponse["checks"][number]["status"]) {
+  if (status === "pass") return "Pass";
+  if (status === "blocked") return "Blocked";
+  return "Review";
 }
 
 function formatMcpPayloadPreview(plan: McpIntegrationPlan) {

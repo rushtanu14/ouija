@@ -12,7 +12,7 @@
 - Learning Exit Ticket asks the student to explain variables, graph pattern, and next step in their own words before writing.
 - Student Reflection Workspace proves those exit-ticket answers are student-authored drafts, not generated conclusions.
 - Progress Portfolio shows whether saved runs demonstrate learning trend, subject breadth, and a next portfolio action.
-- MCP Integration Coach shows how the same student-owned evidence could move into classroom tools, including a Google Classroom pre-lab checkpoint and Google Forms readiness check, without sending data before consent.
+- MCP Integration Coach shows how the same student-owned evidence could move into classroom tools, including a Google Classroom pre-lab checkpoint, Google Forms readiness check, and Google Calendar next-trial reminder, without sending data before consent.
 - Judge Demo Path gives evaluators a direct route through problem fit, AI design, student workflow, evidence handoff, and submission proof.
 - Custom Lab Triage keeps unsupported student experiments useful without claiming full V1 coverage, because it gives students a concrete investigation planner instead of a fake expected result.
 
@@ -23,7 +23,7 @@
 - Model Strategy exposes candidate rankings, matched signals, confidence, fallback behavior, validation layers, safety layer, and risk controls.
 - AI Evaluation Harness scores classifier confidence, coverage, source grounding, pattern validation, repeat reliability, row validators, safety/integrity, and fallback boundaries.
 - Data Handling Ledger exposes what student data is used, where it is stored, retention, local snapshots, student controls, and the server-only API-key boundary.
-- MCP Integration Coach previews Composio-powered Google Docs, Google Sheets, Google Drive, Google Classroom, Google Forms, and Notion exports while keeping `COMPOSIO_API_KEY` server-side.
+- MCP Integration Coach validates Composio-powered Google Docs, Google Sheets, Google Drive, Google Classroom, Google Forms, Google Calendar, and Notion exports through `/api/mcp/export` while keeping `COMPOSIO_API_KEY` server-side.
 - Grounding Audit scores citation visibility, source agreement, mixed-evidence boundaries, and student source use.
 - Result schema separates classification, expected result, citations, row checks, hints, and Claim Coach.
 - Method Audit adds deterministic experiment-quality evaluation beyond plain text generation.
@@ -65,7 +65,7 @@
 - Learning Exit Ticket visibly checks whether the student can explain variables, pattern evidence, and the next controlled step.
 - Student Reflection Workspace visibly captures the student's own variable, pattern, and next-step drafts.
 - Progress Portfolio visibly turns Saved Labs into repeated learning evidence instead of only storage.
-- MCP Integration Coach visibly turns the Evidence Packet, Pre-Lab Design Coach, and Progress Portfolio into a consent-gated classroom handoff plan with a readiness matrix for env vars, scopes, dry-run checks, and data shared.
+- MCP Integration Coach visibly turns the Evidence Packet, Pre-Lab Design Coach, Next Trial Planner, and Progress Portfolio into a consent-gated classroom handoff plan with a readiness matrix for env vars, allowed tools, scopes, dry-run checks, and data shared.
 - AI Model Card visibly summarizes architecture, grounding mode, evaluation method, privacy boundary, and risk controls.
 - Data Handling Ledger visibly summarizes privacy, retention, browser-local saves, and student controls.
 - Evaluation Bench exposes nine live checks through the app and `/api/evaluate`.
@@ -91,13 +91,13 @@
 - Learning Exit Ticket appears in the app and Evidence Packet so judges can inspect student understanding prompts during the demo or exported handoff.
 - Student Reflection Workspace appears in the app and Evidence Packet so judges can inspect student-authored answers without Ouija writing the conclusion.
 - Progress Portfolio appears near Saved Labs so judges can inspect score trend, subject breadth, and strongest saved run.
-- MCP Integration Coach appears near Progress Portfolio so judges can inspect the exact export payload, Google Classroom pre-lab checkpoint route, Google Forms readiness route, credential boundary, Composio route, and dry-run readiness matrix before any live connector is enabled.
+- MCP Integration Coach appears near Progress Portfolio so judges can inspect the exact export payload, Google Classroom pre-lab checkpoint route, Google Forms readiness route, Google Calendar next-trial reminder route, credential boundary, Composio route, and server dry-run readiness matrix before any live connector is enabled.
 - Desktop and mobile E2E checks verify no horizontal overflow.
 
 ## Remaining Submission Work
 
 - Submit the hosted live demo, slide deck, and video walkthrough on Devpost.
 - Handle the live Devpost page's listed 2-5 member team requirement; the overview text also says participants may work individually, so verify the submission form behavior before final submit.
-- Optionally configure a real OpenAI API key for one web-search-enriched demo and a server-side Composio MCP bridge for live classroom exports.
+- Optionally configure a real OpenAI API key for one web-search-enriched demo and live Composio credentials for classroom exports.
 - Present or export `docs/aiyes-slide-deck.html`.
 - Paste `docs/devpost-submission-copy.md` into Devpost.

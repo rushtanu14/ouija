@@ -41,6 +41,7 @@ describe("MCP integration plan", () => {
       "google-drive-portfolio-archive",
       "google-classroom-prelab-checkpoint",
       "google-forms-readiness-check",
+      "google-calendar-next-trial-reminder",
       "notion-learning-record"
     ]);
     expect(plan.actions.find((action) => action.id === "google-docs-evidence-packet")?.toolkit).toBe("Google Docs");
@@ -49,13 +50,17 @@ describe("MCP integration plan", () => {
     expect(plan.actions.find((action) => action.id === "google-classroom-prelab-checkpoint")?.payloadSummary).toContain("Pre-lab");
     expect(plan.actions.find((action) => action.id === "google-forms-readiness-check")?.toolkit).toBe("Google Forms");
     expect(plan.actions.find((action) => action.id === "google-forms-readiness-check")?.payloadSummary).toContain("student reflection prompts");
+    expect(plan.actions.find((action) => action.id === "google-calendar-next-trial-reminder")?.toolkit).toBe("Google Calendar");
+    expect(plan.actions.find((action) => action.id === "google-calendar-next-trial-reminder")?.payloadSummary).toContain("Next trial reminder");
     expect(plan.actions.every((action) => action.requiresConsent)).toBe(true);
-    expect(plan.readinessMatrix).toHaveLength(6);
+    expect(plan.readinessMatrix).toHaveLength(7);
     expect(plan.readinessMatrix.every((connector) => connector.status === "needs_server_setup")).toBe(true);
     expect(plan.readinessMatrix.find((connector) => connector.toolkit === "Google Forms")?.requiredEnv).toContain("COMPOSIO_GOOGLE_FORMS_AUTH_CONFIG_ID");
+    expect(plan.readinessMatrix.find((connector) => connector.toolkit === "Google Calendar")?.recommendedTools).toContain("GOOGLECALENDAR_CREATE_EVENT");
     expect(plan.readinessMatrix.find((connector) => connector.toolkit === "Google Classroom")?.consentGate).toContain("class/course draft");
-    expect(plan.dryRunChecks).toHaveLength(5);
-    expect(plan.dryRunChecks.find((check) => check.id === "least-privilege")?.detail).toContain("Forms");
+    expect(plan.dryRunChecks).toHaveLength(6);
+    expect(plan.dryRunChecks.find((check) => check.id === "least-privilege")?.detail).toContain("Calendar");
+    expect(plan.dryRunChecks.find((check) => check.id === "server-bridge")?.status).toBe("review");
     expect(plan.dryRunChecks.find((check) => check.id === "server-only")?.status).toBe("review");
     expect(plan.executionBoundary).toContain("dry-run only");
     expect(plan.payloadPreview.title).toBe("Ouija Evidence Packet: Reaction Rate vs Temperature");
@@ -65,9 +70,11 @@ describe("MCP integration plan", () => {
     expect(plan.payloadPreview.includedSections).toContain("Evidence Packet markdown");
     expect(plan.payloadPreview.includedSections).toContain("Pre-Lab Design Coach");
     expect(plan.payloadPreview.includedSections).toContain("Google Forms readiness prompts");
+    expect(plan.payloadPreview.includedSections).toContain("Google Calendar next-trial reminder");
     expect(plan.payloadPreview.includedSections).toContain("Student Reflection Drafts");
     expect(plan.payloadPreview.markdownExcerpt).toContain("## Student Description");
     expect(plan.safeguards).toContain("Preview mode does not call Composio, Google Classroom, Google Workspace, or Notion APIs.");
+    expect(plan.safeguards).toContain("Google Calendar handoff schedules a next-trial reminder, not a generated result.");
     expect(plan.safeguards).toContain("Reflection drafts are exported only when the student typed them in the workspace.");
     expect(plan.privacyBoundary).toContain("Student chooses");
     expect(plan.judgeTakeaway).toContain("real classroom handoff");
@@ -95,6 +102,27 @@ describe("MCP integration plan", () => {
     expect(plan.actions.find((action) => action.toolkit === "Google Sheets")?.composioCapability).toContain("append");
     expect(plan.actions.find((action) => action.toolkit === "Google Classroom")?.composioCapability).toContain("create coursework draft");
     expect(plan.actions.find((action) => action.toolkit === "Google Forms")?.composioCapability).toContain("Forms draft");
+    expect(plan.actions.find((action) => action.toolkit === "Google Calendar")?.composioCapability).toContain("calendar event");
     expect(plan.payloadPreview.savedRunCount).toBe(0);
+  });
+
+  it("marks the public bridge as server dry-run when the API can validate packets without live credentials", () => {
+    const result = analyzeExperiment({
+      description: "Projectile launch angle and measured range."
+    });
+    const plan = buildMcpIntegrationPlan({
+      result,
+      rows: result.rows,
+      description: "Projectile launch angle and measured range.",
+      evidencePacket: buildEvidencePacket(result, result.rows, "Projectile launch angle and measured range."),
+      portfolio: buildProgressPortfolio([]),
+      serverBridgeAvailable: true
+    });
+
+    expect(plan.status).toBe("server_dry_run");
+    expect(plan.summary).toContain("Server dry-run bridge");
+    expect(plan.actions.every((action) => action.mode === "server_dry_run")).toBe(true);
+    expect(plan.dryRunChecks.find((check) => check.id === "server-bridge")?.status).toBe("pass");
+    expect(plan.executionBoundary).toContain("/api/mcp/export");
   });
 });
