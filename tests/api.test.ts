@@ -23,7 +23,7 @@ describe("POST /api/analyze", () => {
     expect(response.body.templateId).toBe("enzyme-activity-temperature");
     expect(response.body.columns.length).toBeGreaterThan(1);
     expect(response.body.guidedFlow.steps.length).toBe(6);
-    expect(response.body.modelStrategy.candidates.length).toBe(7);
+    expect(response.body.modelStrategy.candidates.length).toBe(8);
     expect(response.body.modelStrategy.signals.some((signal: { label: string }) => signal.label === "Classifier confidence")).toBe(true);
     expect(response.body.officialRubricFit.criteria).toHaveLength(3);
     expect(response.body.officialRubricFit.criteria.some((criterion: { label: string }) => criterion.label === "Problem Definition and Real-World Relevance")).toBe(true);
@@ -80,17 +80,17 @@ describe("POST /api/analyze", () => {
     const app = createApp();
     const response = await request(app)
       .post("/api/analyze")
-      .send({ description: "We grew bean seedlings under red, blue, and white light and measured plant height." })
+      .send({ description: "We compared paper towel brands by measuring how much water each towel absorbed." })
       .expect(200);
 
     expect(response.body.classification.matchQuality).toBe("closest_supported");
     expect(response.body.customLabTriage.status).toBe("needs_student_details");
-    expect(response.body.customLabTriage.planner.independentVariable).toBe("Light color");
-    expect(response.body.customLabTriage.planner.dependentVariable).toBe("Plant height");
+    expect(response.body.customLabTriage.planner.independentVariable).toBe("Paper towel brand or type");
+    expect(response.body.customLabTriage.planner.dependentVariable).toBe("Water absorbed");
     expect(response.body.customLabTriage.planner.starterRows.map((row: { condition: string }) => row.condition)).toEqual([
-      "Red light",
-      "Blue light",
-      "White light"
+      "Brand A",
+      "Brand B",
+      "Brand C"
     ]);
   });
 
@@ -111,10 +111,11 @@ describe("GET /api/evaluate", () => {
     const response = await request(app).get("/api/evaluate").expect(200);
 
     expect(response.body.score).toBe(100);
-    expect(response.body.passed).toBe(8);
-    expect(response.body.total).toBe(8);
+    expect(response.body.passed).toBe(9);
+    expect(response.body.total).toBe(9);
     expect(response.body.cases.some((testCase: { id: string }) => testCase.id === "eval-pendulum")).toBe(true);
     expect(response.body.cases.some((testCase: { id: string }) => testCase.id === "eval-ohms-law")).toBe(true);
+    expect(response.body.cases.some((testCase: { id: string }) => testCase.id === "eval-plant-light")).toBe(true);
     expect(response.body.cases.some((testCase: { id: string }) => testCase.id === "eval-density")).toBe(true);
     expect(response.body.cases.some((testCase: { id: string }) => testCase.id === "eval-unsupported-boundary")).toBe(true);
     expect(response.body.cases[0].evidence.some((item: string) => item.includes("guided workflow"))).toBe(true);

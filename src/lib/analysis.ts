@@ -379,6 +379,9 @@ function controlsForSupportedTemplate(templateId: string) {
   if (templateId === "enzyme-activity-temperature") {
     return ["enzyme amount", "substrate amount", "pH", "timing method"];
   }
+  if (templateId === "plant-growth-light-color") {
+    return ["plant species", "starting height", "soil amount", "water amount", "light distance", "light duration"];
+  }
   if (templateId === "water-filtration-turbidity") {
     return ["filter material amount", "water volume", "starting turbidity", "pour rate"];
   }
@@ -421,6 +424,28 @@ function buildUnsupportedLabPlanner(inferredFocus: string): CustomLabPlanner {
     };
   }
 
+  if (inferredFocus === "paper towel absorbency") {
+    return {
+      title: "Plan the paper towel absorbency lab before collecting data.",
+      independentVariable: "Paper towel brand or type",
+      dependentVariable: "Water absorbed",
+      controlVariables: ["paper towel size", "water volume", "soak time", "drain time", "container", "measurement method"],
+      repeatPlan: "Use at least 3 towel pieces per brand or type before comparing average water absorbed.",
+      starterRows: [
+        { id: "custom-brand-a", condition: "Brand A", measurement: "", trial: "1", notes: "Use the same towel size." },
+        { id: "custom-brand-b", condition: "Brand B", measurement: "", trial: "1", notes: "Use the same soak time." },
+        { id: "custom-brand-c", condition: "Brand C", measurement: "", trial: "1", notes: "Measure water absorbed in mL or grams." }
+      ],
+      qualityChecklist: [
+        "Cut every sample to the same size.",
+        "Use the same starting water amount and soak time.",
+        "Let samples drain for the same time before measuring.",
+        "Average repeat samples before ranking towel brands."
+      ],
+      hypothesisStarter: "If the paper towel type changes from ___ to ___, then water absorbed may ___ because ___."
+    };
+  }
+
   return {
     title: `Plan the ${inferredFocus} lab before collecting data.`,
     independentVariable: "Condition changed on purpose",
@@ -447,6 +472,10 @@ function inferCustomLabFocus(description: string): string {
 
   if (/(plant|seedling|bean|germinat|sprout|light color|red light|blue light)/.test(normalized)) {
     return "plant growth light color";
+  }
+
+  if (/(paper towel|towel|absorb|absorbency|soak)/.test(normalized)) {
+    return "paper towel absorbency";
   }
 
   if (/(mold|bacteria|yeast|microbe|microbial)/.test(normalized)) {
@@ -490,6 +519,10 @@ export function evaluateRows(templateId: string, rows: StudentDataRow[]): Issue[
 
   if (templateId === "enzyme-activity-temperature") {
     issues.push(...evaluateEnzymeRows(rows));
+  }
+
+  if (templateId === "plant-growth-light-color") {
+    issues.push(...evaluatePlantGrowthRows(rows));
   }
 
   if (templateId === "density-layering") {
@@ -1401,6 +1434,11 @@ export function buildPatternEvidence(template: ExperimentTemplate, rows: Student
         "Activity should rise toward the optimum and drop after overheating."
       )
     ];
+  } else if (template.id === "plant-growth-light-color") {
+    observations = [
+      buildPlantLightUsableLightObservation(rows),
+      buildPlantLightColorObservation(rows)
+    ];
   } else if (template.id === "density-layering") {
     observations = [
       buildTrendObservation(
@@ -1648,6 +1686,95 @@ function buildOhmsRatioObservation(rows: StudentDataRow[]): ScoredPatternObserva
   );
 }
 
+function buildPlantLightUsableLightObservation(rows: StudentDataRow[]): ScoredPatternObservation {
+  const grouped = groupPlantLightHeights(rows);
+  const litValues = [...(grouped.white ?? []), ...(grouped.red ?? []), ...(grouped.blue ?? []), ...(grouped.green ?? [])];
+  const darkValues = grouped.dark ?? [];
+
+  if (!litValues.length || !darkValues.length) {
+    return buildInsufficientObservation(
+      "plant-light-vs-dark",
+      "Light vs dark",
+      "Plants should generally grow more with usable light than in darkness.",
+      "Include at least one lit condition and one dark condition to compare light-supported growth."
+    );
+  }
+
+  const litAverage = averageValues(litValues);
+  const darkAverage = averageValues(darkValues);
+  const ratio = litAverage / Math.max(darkAverage, 0.1);
+  const score = ratio >= 2.5 ? 100 : ratio >= 1.6 ? 80 : ratio >= 1.1 ? 60 : 35;
+
+  return buildScoredObservation(
+    "plant-light-vs-dark",
+    "Light vs dark",
+    "Plants should generally grow more with usable light than in darkness.",
+    `Lit conditions average ${formatPatternNumber(litAverage)} cm; dark conditions average ${formatPatternNumber(darkAverage)} cm.`,
+    score,
+    score >= 80
+      ? "The light-grown plants are clearly taller than the dark-grown plants."
+      : "The light/dark difference is weak, so the setup needs repeats or control checks."
+  );
+}
+
+function buildPlantLightColorObservation(rows: StudentDataRow[]): ScoredPatternObservation {
+  const grouped = groupPlantLightHeights(rows);
+  const usableColorValues = [...(grouped.white ?? []), ...(grouped.red ?? []), ...(grouped.blue ?? [])];
+  const greenValues = grouped.green ?? [];
+
+  if (!usableColorValues.length || !greenValues.length) {
+    return buildInsufficientObservation(
+      "plant-light-color-comparison",
+      "Color comparison",
+      "White, red, and blue light should generally support more growth than green light when brightness and duration stay controlled.",
+      "Include white/red/blue and green conditions to compare the expected color pattern."
+    );
+  }
+
+  const usableAverage = averageValues(usableColorValues);
+  const greenAverage = averageValues(greenValues);
+  const ratio = usableAverage / Math.max(greenAverage, 0.1);
+  const score = ratio >= 1.4 ? 100 : ratio >= 1.15 ? 80 : ratio >= 0.95 ? 60 : 35;
+
+  return buildScoredObservation(
+    "plant-light-color-comparison",
+    "Color comparison",
+    "White, red, and blue light should generally support more growth than green light when brightness and duration stay controlled.",
+    `White/red/blue conditions average ${formatPatternNumber(usableAverage)} cm; green averages ${formatPatternNumber(greenAverage)} cm.`,
+    score,
+    score >= 80
+      ? "The color groups follow the expected photosynthesis pattern well enough for a classroom claim."
+      : "The color pattern is mixed, so check light intensity, distance, duration, and repeat plants."
+  );
+}
+
+function groupPlantLightHeights(rows: StudentDataRow[]): Partial<Record<"white" | "red" | "blue" | "green" | "dark", number[]>> {
+  const grouped: Partial<Record<"white" | "red" | "blue" | "green" | "dark", number[]>> = {};
+
+  for (const row of rows) {
+    const height = readFiniteNumber(row, "heightCm");
+    if (height === null) continue;
+
+    const color = normalizePlantLightColor(row.lightColor);
+    if (!color) continue;
+
+    grouped[color] = [...(grouped[color] ?? []), height];
+  }
+
+  return grouped;
+}
+
+function normalizePlantLightColor(value: unknown): "white" | "red" | "blue" | "green" | "dark" | null {
+  const normalized = String(value ?? "").toLowerCase();
+
+  if (normalized.includes("white") || normalized.includes("full") || normalized.includes("sun")) return "white";
+  if (normalized.includes("red")) return "red";
+  if (normalized.includes("blue")) return "blue";
+  if (normalized.includes("green")) return "green";
+  if (normalized.includes("dark") || normalized.includes("no light") || normalized.includes("black")) return "dark";
+  return null;
+}
+
 function buildConsistencyObservation(
   id: string,
   label: string,
@@ -1890,7 +2017,7 @@ function buildAiEvaluationHarness(
   const integrityFlagged = issues.some((issue) => issue.id.startsWith("integrity-"));
   const lowConfidence = matchQuality === "closest_supported" || confidence < 0.6;
   const claimGuarded = labBrief.claimStarter.includes("___");
-  const coverageDetail = "Seven supported middle/high school lab templates plus one unsupported-boundary case are exercised in the live Evaluation Bench.";
+  const coverageDetail = "Eight supported middle/high school lab templates plus one unsupported-boundary case are exercised in the live Evaluation Bench.";
 
   const checks: AiEvaluationHarness["checks"] = [
     {
@@ -1906,8 +2033,8 @@ function buildAiEvaluationHarness(
     {
       id: "coverage-benchmark",
       label: "Coverage benchmark",
-      status: candidates.length >= 7 ? "pass" : "review",
-      score: candidates.length >= 7 ? 96 : 72,
+      status: candidates.length >= 8 ? "pass" : "review",
+      score: candidates.length >= 8 ? 96 : 72,
       detail: `${candidates.length} candidate templates ranked. ${coverageDetail}`
     },
     {
@@ -2070,7 +2197,7 @@ function buildJudgeDemoPath(
         label: "Submission proof",
         criterion: "Submission Proof",
         status: "show",
-        proof: `Evaluation Bench runs eight live cases; pattern evidence is ${patternEvidence.score}/100 and repeat reliability is ${reliabilityCoach.score}/100.`,
+        proof: `Evaluation Bench runs nine live cases; pattern evidence is ${patternEvidence.score}/100 and repeat reliability is ${reliabilityCoach.score}/100.`,
         demoAction: "End on Evaluation Bench, Judge Brief, and hosted deck/video/source links."
       }
     ]
@@ -3156,6 +3283,31 @@ function safetyProfileForTemplate(templateId: string): SafetyCoach {
     };
   }
 
+  if (templateId === "plant-growth-light-color") {
+    return {
+      status: "adult_review",
+      summary: "Adult review recommended because grow lights, lamps, cords, soil, and seeds need heat, electrical, and classroom hygiene checks.",
+      checks: [
+        {
+          id: "lamp-heat",
+          label: "Check lamp heat",
+          detail: "Keep lamps or grow lights teacher-approved, stable, and far enough away that leaves, paper, soil, or containers do not overheat.",
+          required: true
+        },
+        {
+          id: "plant-hygiene",
+          label: "Handle plants as lab materials",
+          detail: "Do not taste seeds, soil, fertilizer, or plant samples; wash hands after handling materials.",
+          required: true
+        }
+      ],
+      materialNotes: ["Use teacher-approved LEDs or low-heat classroom grow lights.", "Label each color condition and keep water away from cords."],
+      cleanup: "Unplug lights before moving the setup, wipe spilled water or soil, and dispose of plant materials as directed.",
+      stopCondition: "Stop if a lamp or cord gets hot, water spills near electricity, mold appears, or a plant sample is unlabeled.",
+      teacherCheck: "Confirm light type, distance, duration, water schedule, and electrical setup before students begin repeated measurements."
+    };
+  }
+
   if (templateId === "density-layering") {
     return {
       status: "classroom_ready",
@@ -3311,6 +3463,28 @@ function conceptCoachProfileForTemplate(templateId: string): Omit<ConceptCoach, 
           misconception: "Hotter is always better for enzymes.",
           correction: "Moderate warmth can help, but high heat can denature the enzyme.",
           checkQuestion: "Where does your data show the activity peak and then fall?"
+        }
+      ]
+    };
+  }
+
+  if (templateId === "plant-growth-light-color") {
+    return {
+      vocabulary: [
+        { term: "photosynthesis", definition: "The process plants use to turn light energy, carbon dioxide, and water into sugars." },
+        { term: "chlorophyll", definition: "A green pigment that absorbs light energy, especially red and blue wavelengths." },
+        { term: "wavelength", definition: "A property of light that students often see as color." }
+      ],
+      explanationSteps: [
+        "Watch whether plants with usable light grow more than plants kept in darkness.",
+        "Compare white, red, blue, and green conditions as a pattern, not as one perfect ranking.",
+        "Use the sources to explain why chlorophyll absorbs red and blue light strongly while classroom height results still depend on brightness, distance, water, and repeat plants."
+      ],
+      misconceptionChecks: [
+        {
+          misconception: "Green light must be best because plants are green.",
+          correction: "Plants look green partly because chlorophyll reflects much green light instead of using it as strongly.",
+          checkQuestion: "Did your data compare light color while keeping light distance, duration, water, soil, and plant type controlled?"
         }
       ]
     };
@@ -3479,6 +3653,15 @@ function nextTrialProfileForTemplate(templateId: string): Pick<NextTrialPlan, "n
     };
   }
 
+  if (templateId === "plant-growth-light-color") {
+    return {
+      nextMeasurement: "Add one repeat plant for the light color with the weakest evidence, then measure height after the same number of growth days.",
+      repeatMeasurement: "repeat the color condition where height conflicts with the usable-light or green-light pattern.",
+      controlToTighten: "Keep plant species, starting height, soil amount, water amount, light distance, light duration, and growth days the same.",
+      whyItMatters: "One more controlled plant helps separate a real light-color effect from a seedling that simply started stronger or got different water."
+    };
+  }
+
   if (templateId === "density-layering") {
     return {
       nextMeasurement: "Retest the two closest-density liquids with equal volumes and record bottom-to-top order after settling.",
@@ -3563,6 +3746,17 @@ function methodProfileForTemplate(templateId: string): Pick<MethodAudit, "contro
       controlVariables: ["enzyme amount", "substrate amount", "pH", "reaction time"],
       assumptions: ["Activity is measured on one consistent relative scale.", "Temperature is the only changed independent variable."],
       safetyLimit: "Treat biological samples and enzyme mixtures as lab materials, not food."
+    };
+  }
+
+  if (templateId === "plant-growth-light-color") {
+    return {
+      controlVariables: ["plant species", "starting height", "soil amount", "water amount", "light distance", "light duration", "growth days"],
+      assumptions: [
+        "Light color is the main changed variable.",
+        "Brightness, distance, water, and starting plant size are close enough to compare growth fairly."
+      ],
+      safetyLimit: "Use teacher-approved low-heat lights and keep water away from cords or outlets."
     };
   }
 
@@ -3840,6 +4034,85 @@ function evaluateEnzymeRows(rows: StudentDataRow[]): Issue[] {
       severity: "warning",
       title: "Peak activity is not near the expected warm optimum",
       detail: "Many school enzyme demos peak around warm room/body-temperature conditions, then drop after overheating."
+    });
+  }
+
+  return issues;
+}
+
+function evaluatePlantGrowthRows(rows: StudentDataRow[]): Issue[] {
+  const issues: Issue[] = [];
+  const numericRows = rows
+    .map((row) => ({
+      id: row.id,
+      color: normalizePlantLightColor(row.lightColor),
+      rawColor: row.lightColor,
+      height: Number(row.heightCm),
+      days: Number(row.days)
+    }))
+    .filter((row) => Number.isFinite(row.height) && Number.isFinite(row.days));
+
+  for (const row of numericRows) {
+    if (!row.color) {
+      issues.push({
+        id: `plant-light-color-${row.id}`,
+        severity: "warning",
+        title: "Light color needs a recognizable label",
+        detail: `Use a clear label such as white, red, blue, green, or dark instead of "${String(row.rawColor ?? "")}".`
+      });
+    }
+
+    if (row.height < 0) {
+      issues.push({
+        id: `plant-height-negative-${row.id}`,
+        severity: "error",
+        title: "Plant height cannot be negative",
+        detail: "Plant height should be recorded as a zero-or-positive value in centimeters."
+      });
+    }
+
+    if (row.days <= 0) {
+      issues.push({
+        id: `plant-days-nonpositive-${row.id}`,
+        severity: "error",
+        title: "Growth time must be positive",
+        detail: "Growth time should be recorded as a positive number of days."
+      });
+    }
+  }
+
+  const days = numericRows.map((row) => row.days).filter((day) => day > 0);
+  if (days.length >= 2 && Math.max(...days) - Math.min(...days) > 1) {
+    issues.push({
+      id: "plant-growth-time-not-controlled",
+      severity: "warning",
+      title: "Growth time is not controlled",
+      detail: "Compare plant heights after the same number of days, or clearly explain why the time difference is part of the experiment."
+    });
+  }
+
+  const grouped = groupPlantLightHeights(rows);
+  const litValues = [...(grouped.white ?? []), ...(grouped.red ?? []), ...(grouped.blue ?? []), ...(grouped.green ?? [])];
+  const darkValues = grouped.dark ?? [];
+
+  if (litValues.length > 0 && darkValues.length > 0 && averageValues(darkValues) > averageValues(litValues) * 0.75) {
+    issues.push({
+      id: "plant-light-dark-pattern",
+      severity: "warning",
+      title: "Light and dark growth pattern needs review",
+      detail: "If dark-grown plants are close to or taller than lit plants, check starting height, hidden light, water, and measurement timing."
+    });
+  }
+
+  const usableLightValues = [...(grouped.white ?? []), ...(grouped.red ?? []), ...(grouped.blue ?? [])];
+  const greenValues = grouped.green ?? [];
+
+  if (usableLightValues.length > 0 && greenValues.length > 0 && averageValues(greenValues) > averageValues(usableLightValues) * 0.95) {
+    issues.push({
+      id: "plant-light-color-pattern",
+      severity: "warning",
+      title: "Light-color pattern is mixed",
+      detail: "If green light matches or beats white/red/blue light, check brightness, distance, duration, plant species, and repeat count before claiming a color effect."
     });
   }
 

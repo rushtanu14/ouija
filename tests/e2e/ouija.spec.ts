@@ -124,15 +124,16 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(page.getByLabel("Pre-Lab Design Coach").getByText("Source task", { exact: true })).toBeVisible();
   await page.getByRole("link", { name: "Eval Bench" }).click();
   await expect(page.getByLabel("Evaluation Bench").getByText("100/100")).toBeVisible();
-  await expect(page.getByLabel("Evaluation Bench").getByText("8/8 passed")).toBeVisible();
+  await expect(page.getByLabel("Evaluation Bench").getByText("9/9 passed")).toBeVisible();
   await expect(page.getByLabel("Evaluation Bench").getByText("Pendulum coverage")).toBeVisible();
   await expect(page.getByLabel("Evaluation Bench").getByText("Circuit coverage")).toBeVisible();
+  await expect(page.getByLabel("Evaluation Bench").getByText("Plant light coverage")).toBeVisible();
   await expect(page.getByLabel("Evaluation Bench").getByText("Density coverage")).toBeVisible();
   await expect(page.getByLabel("Evaluation Bench").getByText("Coverage boundary")).toBeVisible();
   await page.getByRole("link", { name: "Model Card" }).click();
   await expect(page.getByLabel("AI Model Card").getByText("Hybrid and inspectable")).toBeVisible();
   await expect(page.getByLabel("AI Model Card").getByText("Trusted fallback")).toBeVisible();
-  await expect(page.getByLabel("AI Model Card").getByText("8 live cases")).toBeVisible();
+  await expect(page.getByLabel("AI Model Card").getByText("9 live cases")).toBeVisible();
   await expect(page.getByLabel("AI Model Card").getByText("Server keeps API keys out of the browser.")).toBeVisible();
   await expect(page.getByLabel("AI Model Card").getByText("Model Strategy exposes candidate ranking, signals, fallback behavior, and risk controls.")).toBeVisible();
   await expect(page.getByLabel("AI Model Card").getByText("AI Evaluation Harness scores classifier confidence, coverage, grounding, validators, safety, and fallback boundaries.")).toBeVisible();
@@ -148,7 +149,7 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(page.getByLabel("AI Model Card").getByText("MCP Integration Coach keeps Composio credentials server-side and requires student consent before any export.")).toBeVisible();
   await expect(page.getByLabel("AI Model Card").getByText("MCP Readiness Matrix makes connector scopes, dry-run checks, and least-privilege boundaries inspectable.")).toBeVisible();
   await expect(page.getByLabel("AI Model Card").getByText("Safety Coach forces adult-review language when a lab match is uncertain.")).toBeVisible();
-  await expect(page.getByLabel("AI Model Card").getByText("Evaluation Bench tests seven supported labs plus the unsupported boundary.")).toBeVisible();
+  await expect(page.getByLabel("AI Model Card").getByText("Evaluation Bench tests eight supported labs plus the unsupported boundary.")).toBeVisible();
   await expect(page.getByLabel("AI Model Card").getByText("Data Handling Ledger makes student data flow, retention, and controls inspectable.")).toBeVisible();
   await page.getByRole("button", { name: "Save current lab" }).click();
   await page.getByRole("link", { name: "Saved Labs" }).click();
@@ -219,7 +220,7 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(page.getByLabel("Judge Brief").getByText("Guided Lab Flow gives students a clear next action.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Concept Coach turns results into student learning scaffolds.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Safety Coach makes school-lab risk checks visible.")).toBeVisible();
-  await expect(page.getByLabel("Judge Brief").getByText("Evaluation Bench runs eight live cases.")).toBeVisible();
+  await expect(page.getByLabel("Judge Brief").getByText("Evaluation Bench runs nine live cases.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Data Handling Ledger shows privacy, retention, and student controls.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Evidence Packet exports a student-owned reasoning handoff.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("MCP Integration Coach previews Composio Docs, Sheets, Drive, Classroom, Forms, and Notion handoffs without exposing credentials.")).toBeVisible();
@@ -245,19 +246,19 @@ test("student can analyze a sample experiment, edit table data, and see citation
 
 test("unsupported experiment descriptions show a low-confidence boundary", async ({ page }) => {
   await page.goto("/");
-  await page.getByLabel("Describe your experiment").fill("We grew bean seedlings under red, blue, and white light and measured plant height.");
+  await page.getByLabel("Describe your experiment").fill("We compared paper towel brands by measuring how much water each towel absorbed.");
   await page.getByRole("button", { name: "Analyze" }).click();
 
   await expect(page.locator(".classification").getByText("Closest supported match", { exact: true })).toBeVisible();
   await expect(page.locator(".classification-note").getByText("Low-confidence description", { exact: false })).toBeVisible();
   await expect(page.getByLabel("Comparison insights").getByText("Closest supported experiment only")).toBeVisible();
   await expect(page.getByRole("heading", { name: "Custom Lab Triage" })).toBeVisible();
-  await expect(page.locator(".triage-summary").getByText("plant growth light color", { exact: true })).toBeVisible();
+  await expect(page.locator(".triage-summary").getByText("paper towel absorbency", { exact: true })).toBeVisible();
   await expect(page.getByLabel("Custom Lab Triage").getByText("Variable plan")).toBeVisible();
-  await expect(page.locator(".triage-variable-grid article").filter({ hasText: "Independent variable" }).getByText("Light color", { exact: true })).toBeVisible();
-  await expect(page.locator(".triage-variable-grid article").filter({ hasText: "Dependent variable" }).getByText("Plant height", { exact: true })).toBeVisible();
-  await expect(page.locator(".triage-starter-table").getByText("Red light", { exact: true })).toBeVisible();
-  await expect(page.locator(".triage-variable-grid article").filter({ hasText: "Repeat plan" }).getByText("Use at least 3 plants per light color")).toBeVisible();
+  await expect(page.locator(".triage-variable-grid article").filter({ hasText: "Independent variable" }).getByText("Paper towel brand or type", { exact: true })).toBeVisible();
+  await expect(page.locator(".triage-variable-grid article").filter({ hasText: "Dependent variable" }).getByText("Water absorbed", { exact: true })).toBeVisible();
+  await expect(page.locator(".triage-starter-table").getByText("Brand A", { exact: true })).toBeVisible();
+  await expect(page.locator(".triage-variable-grid article").filter({ hasText: "Repeat plan" }).getByText("Use at least 3 towel pieces")).toBeVisible();
   await expect(page.getByLabel("Custom Lab Triage").getByText("What exact condition did you change on purpose?")).toBeVisible();
   await expect(page.getByLabel("Model Strategy").getByText("Closest supported match is")).toBeVisible();
   await expect(page.getByLabel("Guided Lab Flow").getByText("Confirm this is the right experiment before using the guidance.")).toBeVisible();
@@ -285,7 +286,7 @@ test("saved labs build a visible progress portfolio for judges", async ({ page }
   await page.addInitScript(() => window.localStorage.clear());
   await page.goto("/");
 
-  await page.getByLabel("Describe your experiment").fill("We grew bean seedlings under red, blue, and white light and measured plant height.");
+  await page.getByLabel("Describe your experiment").fill("We compared paper towel brands by measuring how much water each towel absorbed.");
   await page.getByRole("button", { name: "Analyze" }).click();
   await expect(page.getByRole("heading", { name: "Custom Lab Triage" })).toBeVisible();
   await page.getByRole("button", { name: "Save current lab" }).click();

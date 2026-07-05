@@ -59,6 +59,15 @@ const EVALUATION_CASES: EvaluationCase[] = [
     expectedReadiness: "competitive"
   },
   {
+    id: "eval-plant-light",
+    label: "Plant light coverage",
+    description: "Bean seedlings grown under white, red, blue, green, and dark light with plant height measured after two weeks.",
+    goal: "Classify plant growth vs light color and return a competitive supported run.",
+    expectedTemplateId: "plant-growth-light-color",
+    expectedMatchQuality: "supported_template",
+    expectedReadiness: "competitive"
+  },
+  {
     id: "eval-turbidity",
     label: "Earth science coverage",
     description: "Water filtration turbidity before gravel, sand, and charcoal filter stages.",
@@ -79,7 +88,7 @@ const EVALUATION_CASES: EvaluationCase[] = [
   {
     id: "eval-unsupported-boundary",
     label: "Coverage boundary",
-    description: "We grew bean seedlings under red, blue, and white light and measured plant height.",
+    description: "We compared paper towel brands by measuring how much water each towel absorbed.",
     goal: "Mark an unsupported lab as low confidence instead of pretending full coverage.",
     expectedMatchQuality: "closest_supported",
     expectedReadiness: "needs_work",

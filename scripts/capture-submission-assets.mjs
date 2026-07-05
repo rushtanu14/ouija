@@ -55,12 +55,12 @@ await capture({
   width: 1440,
   height: 900,
   afterOpen: async (page) => {
-    await page.getByLabel("Describe your experiment").fill("We grew bean seedlings under red, blue, and white light and measured plant height.");
+    await page.getByLabel("Describe your experiment").fill("We compared paper towel brands by measuring how much water each towel absorbed.");
     await page.getByRole("button", { name: "Analyze" }).click();
     await page.getByRole("heading", { name: "Custom Lab Triage" }).waitFor();
     await page.getByRole("heading", { name: "Custom Lab Triage" }).scrollIntoViewIfNeeded();
     await page.getByLabel("Custom Lab Triage").getByText("What exact condition did you change on purpose?").waitFor();
-    await page.getByLabel("Custom Lab Triage").getByText("Red light").waitFor();
+    await page.getByLabel("Custom Lab Triage").getByText("Brand A").waitFor();
   }
 });
 

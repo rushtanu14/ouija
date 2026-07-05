@@ -747,7 +747,7 @@ function JudgeBriefPanel({ result }: { result: AnalyzeResult | null }) {
     "MCP Readiness Matrix shows exact connector env vars, scopes, data shared, dry-run checks, and consent gates.",
     "Next Trial Planner gives adaptive measurement guidance.",
     "Progress Portfolio shows learning over multiple saved runs.",
-    "Evaluation Bench runs eight live cases.",
+    "Evaluation Bench runs nine live cases.",
     "Custom Lab Triage keeps unsupported labs useful without pretending full coverage.",
     "Hosted deck and walkthrough are public.",
     "Testing/evaluation proof is in the app and repo.",
@@ -806,7 +806,7 @@ function ModelCardPanel({ result }: { result: AnalyzeResult | null }) {
     },
     {
       label: "Evaluation",
-      value: "8 live cases"
+      value: "9 live cases"
     },
     {
       label: "Privacy",
@@ -841,7 +841,7 @@ function ModelCardPanel({ result }: { result: AnalyzeResult | null }) {
     "Claim Coach leaves blanks instead of writing conclusions.",
     "Safety Coach forces adult-review language when a lab match is uncertain.",
     "Next Trial Planner suggests what to measure next without writing claims.",
-    "Evaluation Bench tests seven supported labs plus the unsupported boundary."
+    "Evaluation Bench tests eight supported labs plus the unsupported boundary."
   ];
 
   return (
@@ -1145,7 +1145,7 @@ function SettingsPanel({
     },
     {
       label: "Coverage",
-      value: "7 demos"
+      value: "8 demos"
     }
   ];
 

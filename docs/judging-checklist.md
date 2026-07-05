@@ -43,7 +43,7 @@
 
 ## Technical Depth Beyond Simple API Use
 
-- Seven supported demo labs across physics, chemistry, biology, and earth science.
+- Eight supported demo labs across physics, chemistry, biology, and earth science.
 - Model Strategy prevents the AI design from looking like a black-box chatbot or a simple prompt wrapper.
 - AI Evaluation Harness turns model behavior and safeguards into visible pass/review/fail checks.
 - Judge Demo Path prevents the technical depth from becoming a maze during the live evaluation.
@@ -68,8 +68,8 @@
 - MCP Integration Coach visibly turns the Evidence Packet, Pre-Lab Design Coach, and Progress Portfolio into a consent-gated classroom handoff plan with a readiness matrix for env vars, scopes, dry-run checks, and data shared.
 - AI Model Card visibly summarizes architecture, grounding mode, evaluation method, privacy boundary, and risk controls.
 - Data Handling Ledger visibly summarizes privacy, retention, browser-local saves, and student controls.
-- Evaluation Bench exposes eight live checks through the app and `/api/evaluate`.
-- Unsupported-boundary evaluation now proves Custom Lab Triage and custom planner rows appear when a student asks about an off-template plant-light experiment.
+- Evaluation Bench exposes nine live checks through the app and `/api/evaluate`.
+- Unsupported-boundary evaluation now proves Custom Lab Triage and custom planner rows appear when a student asks about an off-template paper towel absorbency experiment.
 - Saved Labs and Settings nav items render real workflow sections; no dead top-nav placeholders.
 - Academic-integrity guard is implemented in both data model and UI.
 - Production start path serves the built frontend and API from one Express server.

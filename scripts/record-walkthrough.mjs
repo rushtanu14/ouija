@@ -159,13 +159,13 @@ await caption(
   "The output is a source-backed reasoning handoff with student reflection drafts, blanks, and questions, not a completed lab report."
 );
 
-for (const sample of ["Projectile Motion", "Pendulum", "Ohm's Law", "Enzyme Activity", "Density Layers", "Water Filtration"]) {
+for (const sample of ["Projectile Motion", "Pendulum", "Ohm's Law", "Reaction Rate", "Enzyme Activity", "Plant Light", "Density Layers", "Water Filtration"]) {
   await page.getByRole("button", { name: sample }).click();
   await page.waitForTimeout(650);
 }
-await caption(page, "Breadth", "The same workflow covers projectile motion, pendulums, circuits, reaction rates, enzymes, density layers, and water filtration.");
+await caption(page, "Breadth", "The same workflow covers projectile motion, pendulums, circuits, reaction rates, enzymes, plant light, density layers, and water filtration.");
 
-await page.getByLabel("Describe your experiment").fill("We grew bean seedlings under red, blue, and white light and measured plant height.");
+await page.getByLabel("Describe your experiment").fill("We compared paper towel brands by measuring how much water each towel absorbed.");
 await page.getByRole("button", { name: "Analyze" }).click();
 await page.locator(".classification").getByText("Closest supported match", { exact: true }).waitFor();
 await caption(page, "Honest coverage boundary", "Unsupported labs are marked as low confidence instead of being passed off as solved.");
@@ -193,7 +193,7 @@ await caption(
 
 await page.locator("#evaluation").scrollIntoViewIfNeeded();
 await page.getByLabel("Evaluation Bench").getByText("100/100").waitFor();
-await caption(page, "Evaluation Bench", "The live app runs eight checks: seven supported labs plus custom triage for the unsupported-lab boundary.");
+await caption(page, "Evaluation Bench", "The live app runs nine checks: eight supported labs plus custom triage for the unsupported-lab boundary.");
 
 await page.locator("#judge").scrollIntoViewIfNeeded();
 await page.getByLabel("Judge Brief").getByText("AIYES Track 1").waitFor();

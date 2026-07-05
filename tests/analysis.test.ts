@@ -8,6 +8,7 @@ describe("experiment matching", () => {
     expect(matchExperiment("simple circuit measuring current voltage and resistance").template.id).toBe("ohms-law-circuits");
     expect(matchExperiment("temperature changes reaction rate for a tablet").template.id).toBe("reaction-rate-temperature");
     expect(matchExperiment("enzyme catalase activity at different temperatures").template.id).toBe("enzyme-activity-temperature");
+    expect(matchExperiment("bean seedlings under red blue green and white light measured for plant height").template.id).toBe("plant-growth-light-color");
     expect(matchExperiment("density layering with corn syrup water and oil").template.id).toBe("density-layering");
     expect(matchExperiment("water filtration turbidity before and after charcoal").template.id).toBe("water-filtration-turbidity");
   });
@@ -28,7 +29,7 @@ describe("fallback analysis", () => {
     expect(result.guidedFlow.steps.map((step) => step.id)).toEqual(["identify", "prepare", "understand", "check-data", "plan", "claim"]);
     expect(result.guidedFlow.steps.some((step) => step.id === "claim" && step.status === "next")).toBe(true);
     expect(result.modelStrategy.selectedTemplateId).toBe("projectile-motion");
-    expect(result.modelStrategy.candidates).toHaveLength(7);
+    expect(result.modelStrategy.candidates).toHaveLength(8);
     expect(result.modelStrategy.candidates[0].evidence).toContain("launch");
     expect(result.modelStrategy.riskControls.some((control) => control.includes("Low-confidence"))).toBe(true);
     expect(result.conceptCoach.level).toBe("middle_high_school");
@@ -57,7 +58,7 @@ describe("fallback analysis", () => {
     expect(result.modelStrategy.signals.some((signal) => signal.label === "Grounding audit")).toBe(true);
     expect(result.aiEvaluationHarness.status).toBe("review");
     expect(result.aiEvaluationHarness.score).toBeGreaterThanOrEqual(85);
-    expect(result.aiEvaluationHarness.coverage).toContain("Seven supported");
+    expect(result.aiEvaluationHarness.coverage).toContain("Eight supported");
     expect(result.aiEvaluationHarness.checks.map((check) => check.id)).toEqual([
       "classification-confidence",
       "coverage-benchmark",
@@ -161,9 +162,30 @@ describe("fallback analysis", () => {
     expect(result.trackEvidence.criteria.some((criterion) => criterion.id === "data-ethics" && criterion.status === "checked")).toBe(true);
   });
 
+  it("supports plant growth light-color experiments as a full template", () => {
+    const result = analyzeExperiment({
+      description: "We grew bean seedlings under white, red, blue, green, and dark light and measured plant height after two weeks."
+    });
+
+    expect(result.templateId).toBe("plant-growth-light-color");
+    expect(result.classification.matchQuality).toBe("supported_template");
+    expect(result.classification.title).toBe("Plant Growth vs Light Color");
+    expect(result.expectedResult.mixedEvidence).toBe(true);
+    expect(result.columns.map((column) => column.key)).toEqual(["lightColor", "heightCm", "days", "trial"]);
+    expect(result.sources.map((source) => source.publisher)).toEqual(["Ask A Biologist", "KidsGardening"]);
+    expect(result.safetyCoach.status).toBe("adult_review");
+    expect(result.conceptCoach.vocabulary.some((item) => item.term === "chlorophyll")).toBe(true);
+    expect(result.preLabDesignCoach.variablePlan.independentVariable).toBe("Light Color");
+    expect(result.preLabDesignCoach.variablePlan.dependentVariable).toBe("Plant Height");
+    expect(result.patternEvidence.status).toBe("supports_expected");
+    expect(result.patternEvidence.observations.some((observation) => observation.id === "plant-light-vs-dark")).toBe(true);
+    expect(result.nextTrialPlan.controlToTighten).toContain("plant species");
+    expect(result.trackEvidence.readiness).toBe("competitive");
+  });
+
   it("marks unsupported descriptions as low-confidence closest matches instead of pretending full coverage", () => {
     const result = analyzeExperiment({
-      description: "We grew bean seedlings under red, blue, and white light and measured plant height."
+      description: "We compared paper towel brands by measuring how much water each towel absorbed."
     });
 
     expect(result.classification.matchQuality).toBe("closest_supported");
@@ -191,22 +213,22 @@ describe("fallback analysis", () => {
     expect(result.judgeDemoPath.status).toBe("review");
     expect(result.judgeDemoPath.steps.some((step) => step.id === "problem" && step.status === "review")).toBe(true);
     expect((result as any).customLabTriage.status).toBe("needs_student_details");
-    expect((result as any).customLabTriage.inferredFocus).toContain("plant");
+    expect((result as any).customLabTriage.inferredFocus).toContain("paper towel absorbency");
     expect((result as any).customLabTriage.suggestedColumns.map((column: { key: string }) => column.key)).toEqual([
       "condition",
       "measurement",
       "trial"
     ]);
-    expect((result as any).customLabTriage.sourceSearches[0]).toContain("plant growth light color");
+    expect((result as any).customLabTriage.sourceSearches[0]).toContain("paper towel absorbency");
     expect((result as any).customLabTriage.clarifyingQuestions).toHaveLength(3);
-    expect((result as any).customLabTriage.planner.independentVariable).toBe("Light color");
-    expect((result as any).customLabTriage.planner.dependentVariable).toBe("Plant height");
-    expect((result as any).customLabTriage.planner.controlVariables).toContain("water amount");
-    expect((result as any).customLabTriage.planner.repeatPlan).toContain("3 plants per light color");
+    expect((result as any).customLabTriage.planner.independentVariable).toBe("Paper towel brand or type");
+    expect((result as any).customLabTriage.planner.dependentVariable).toBe("Water absorbed");
+    expect((result as any).customLabTriage.planner.controlVariables).toContain("soak time");
+    expect((result as any).customLabTriage.planner.repeatPlan).toContain("3 towel pieces");
     expect((result as any).customLabTriage.planner.starterRows.map((row: { condition: string }) => row.condition)).toEqual([
-      "Red light",
-      "Blue light",
-      "White light"
+      "Brand A",
+      "Brand B",
+      "Brand C"
     ]);
     expect((result as any).customLabTriage.planner.hypothesisStarter).toContain("___");
     expect(result.trackEvidence.criteria.some((criterion) => criterion.id === "custom-lab-triage" && criterion.status === "review")).toBe(true);

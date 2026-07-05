@@ -52,7 +52,7 @@ Click Projectile Motion, Pendulum, Ohm's Law, Enzyme Activity, Density Layers, a
 
 ## 4:40-4:50 - Honest Boundary And Custom Lab Triage
 
-Type an unsupported plant-light lab. Show that Ouija labels it as a low-confidence closest supported match instead of pretending full coverage, then scroll to Custom Lab Triage: inferred focus, suggested columns, source searches, clarifying questions, and teacher-confirmation boundary.
+Type an unsupported paper towel absorbency lab. Show that Ouija labels it as a low-confidence closest supported match instead of pretending full coverage, then scroll to Custom Lab Triage: inferred focus, suggested columns, source searches, clarifying questions, and teacher-confirmation boundary.
 
 ## 4:50-4:56 - Saved Lab Snapshot, Progress Portfolio, And MCP Export
 
@@ -60,7 +60,7 @@ Save the current run and show Saved Labs plus Progress Portfolio so judges see t
 
 ## 4:56-4:58 - Evaluation Bench
 
-Show Evaluation Bench with 100/100 and 8/8 live checks: projectile, pendulum period vs length, Ohm's law circuits, reaction rate, enzyme activity, density layering, water filtration, and unsupported-boundary behavior.
+Show Evaluation Bench with 100/100 and 9/9 live checks: projectile, pendulum period vs length, Ohm's law circuits, reaction rate, enzyme activity, plant growth vs light color, density layering, water filtration, and unsupported-boundary behavior.
 
 ## 4:58-5:00 - Judge Brief
 

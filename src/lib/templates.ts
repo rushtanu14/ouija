@@ -49,6 +49,22 @@ export const TRUSTED_SOURCES = {
     confidence: "built-in" as const,
     note: "Explains enzyme activity, optimum conditions, and denaturation."
   },
+  asuChlorophyll: {
+    id: "source-plant-light-asu",
+    title: "Chlorophyll and Chloroplasts",
+    url: "https://askabiologist.asu.edu/chlorophyll-and-chloroplasts",
+    publisher: "Ask A Biologist",
+    confidence: "built-in" as const,
+    note: "Explains why chlorophyll captures red and blue wavelengths and reflects green wavelengths."
+  },
+  kidsGardeningLight: {
+    id: "source-plant-light-kidsgardening",
+    title: "Light Experiments",
+    url: "https://kidsgardening.org/resources/lesson-plan-light-experiments/",
+    publisher: "KidsGardening",
+    confidence: "built-in" as const,
+    note: "Classroom-friendly reference for comparing plant growth under different light conditions."
+  },
   usgsTurbidity: {
     id: "source-turbidity-usgs",
     title: "Turbidity and water",
@@ -254,6 +270,61 @@ export const EXPERIMENT_TEMPLATES: ExperimentTemplate[] = [
       "Comparing different enzyme amounts between trials."
     ],
     fallbackSources: [TRUSTED_SOURCES.bioLibreEnzymes]
+  },
+  {
+    id: "plant-growth-light-color",
+    subject: "Biology",
+    title: "Plant Growth vs Light Color",
+    shortName: "Plant Light",
+    matcherKeywords: [
+      "plant",
+      "seedling",
+      "bean",
+      "sprout",
+      "germination",
+      "light color",
+      "red light",
+      "blue light",
+      "green light",
+      "white light",
+      "photosynthesis",
+      "chlorophyll",
+      "growth"
+    ],
+    concepts: ["photosynthesis", "chlorophyll", "wavelength", "controlled variables"],
+    variables: ["light color", "plant height", "light duration", "water amount"],
+    columns: [
+      { key: "lightColor", label: "Light color", numeric: false },
+      { key: "heightCm", label: "Plant height", unit: "cm", numeric: true },
+      { key: "days", label: "Growth time", unit: "days", numeric: true },
+      { key: "trial", label: "Trial", numeric: false }
+    ],
+    sampleRows: [
+      { id: "l1", lightColor: "White light", heightCm: 13.1, days: 14, trial: "control" },
+      { id: "l2", lightColor: "Red light", heightCm: 12.4, days: 14, trial: "red filter" },
+      { id: "l3", lightColor: "Blue light", heightCm: 11.8, days: 14, trial: "blue filter" },
+      { id: "l4", lightColor: "Green light", heightCm: 6.2, days: 14, trial: "green filter" },
+      { id: "l5", lightColor: "Dark", heightCm: 1.4, days: 14, trial: "no light" }
+    ],
+    expectedResult: {
+      summary:
+        "Plants usually grow better with usable light than in darkness, and chlorophyll uses red and blue wavelengths strongly. Exact height depends on plant species, brightness, duration, and setup.",
+      pattern:
+        "Grouped relationship: white, red, and blue light should generally support more growth than green light or darkness when light duration, distance, water, soil, and plant type stay controlled.",
+      graphTitle: "Light color vs plant height",
+      xKey: "lightColor",
+      yKey: "heightCm",
+      graphKind: "stage",
+      mixedEvidence: true
+    },
+    explanation:
+      "Plant growth depends on photosynthesis, where pigments such as chlorophyll capture light energy. Because chlorophyll absorbs red and blue wavelengths strongly and reflects much green light, color can affect growth, but classroom results also depend heavily on intensity, distance, duration, plant type, and water.",
+    commonMistakes: [
+      "Changing light distance or brightness while testing color.",
+      "Using only one plant per color and treating it as enough evidence.",
+      "Measuring at different times or starting plants at different sizes."
+    ],
+    fallbackSources: [TRUSTED_SOURCES.asuChlorophyll, TRUSTED_SOURCES.kidsGardeningLight]
   },
   {
     id: "density-layering",

@@ -39,7 +39,7 @@ Ouija connects four pieces in one workflow:
 - Concept Coach for vocabulary, explanation steps, source tasks, and misconception checks.
 - Next Trial Planner that suggests whether to extend the pattern or repeat/fix a flagged measurement.
 - Reasoning Trail that exposes the AI pipeline and maps each run to Track 1 evidence.
-- Evaluation Bench that runs eight live checks against the analysis engine.
+- Evaluation Bench that runs nine live checks against the analysis engine.
 - AI Model Card that summarizes architecture, grounding, evaluation, privacy, and safeguards.
 - Saved Labs plus Progress Portfolio for browser-local snapshots and repeated learning evidence across runs.
 - Evidence Packet for a copyable source-backed handoff that keeps the final conclusion student-written.
@@ -50,10 +50,10 @@ Ouija connects four pieces in one workflow:
 
 ## AI Use
 
-- Local deterministic templates keep the demo reliable for seven common school-lab demos.
+- Local deterministic templates keep the demo reliable for eight common school-lab demos.
 - Server-side OpenAI Responses API `web_search` can enrich expected-results explanations and source citations when `OPENAI_API_KEY` is configured.
 - Judge Demo Path, Model Strategy, AI Evaluation Harness, Data Handling Ledger, AIYES Rubric Fit, Pre-Lab Design Coach, Learning Impact Loop, Learning Exit Ticket, Student Reflection Workspace, Progress Portfolio, MCP Integration Coach, Grounding Audit, Custom Lab Triage, and Reasoning Trail show the architecture clearly: five-step judge walkthrough, candidate ranking, matched signals, fallback boundary behavior, model-behavior checks, privacy and retention boundaries, official rubric mapping, pre-data variable/control/repeat/source/safety planning, measurable student-readiness impact, student reflection prompts, student-authored draft capture, saved-run progress evidence, credentials-safe classroom export planning with connector scopes and dry-run checks, experiment classification, variable mapping, source grounding, citation agreement, expected-pattern overlay, guided student workflow, concept scaffolding, school-lab safety checks, unsupported-lab investigation planning, pasted/edited data audit, whole-pattern evidence scoring, repeat-trial reliability checks, adaptive next-trial planning, and integrity-safe claim coaching.
-- `/api/evaluate` runs deterministic evaluation cases for seven supported lab demos plus the unsupported-lab boundary.
+- `/api/evaluate` runs deterministic evaluation cases for eight supported lab demos plus the unsupported-lab boundary.
 - Academic integrity is enforced in prompts, result schema, UI copy, and the Claim Coach starter format.
 - The hosted walkthrough is a paced captioned demo, not a fast smoke recording: it shows the problem, build architecture, AI pipeline, model strategy, pattern evidence, safety coaching, concept coaching, spreadsheet data import, live row recomputation, next-trial planning, evaluation, and Judge Brief.
 
@@ -61,7 +61,7 @@ Ouija connects four pieces in one workflow:
 
 - Physics: projectile motion, pendulum period vs length, and Ohm's law circuits.
 - Chemistry: reaction rate vs temperature and density layering.
-- Biology: enzyme activity vs temperature.
+- Biology: enzyme activity vs temperature and plant growth vs light color.
 - Earth science: water filtration and turbidity.
 
 ## Differentiator

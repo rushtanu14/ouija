@@ -27,13 +27,13 @@ describe("Pre-Lab Design Coach", () => {
 
   it("keeps unsupported labs in teacher-review mode", () => {
     const result = analyzeExperiment({
-      description: "Bean seedlings under red, blue, and white light for plant growth."
+      description: "Paper towel brands tested by measuring water absorbed after soaking."
     });
 
     expect(result.preLabDesignCoach.status).toBe("needs_teacher_review");
-    expect(result.preLabDesignCoach.variablePlan.independentVariable).toBe("Light color");
-    expect(result.preLabDesignCoach.variablePlan.dependentVariable).toBe("Plant height");
-    expect(result.preLabDesignCoach.sourceTask).toContain("plant growth light color");
+    expect(result.preLabDesignCoach.variablePlan.independentVariable).toBe("Paper towel brand or type");
+    expect(result.preLabDesignCoach.variablePlan.dependentVariable).toBe("Water absorbed");
+    expect(result.preLabDesignCoach.sourceTask).toContain("paper towel absorbency");
     expect(result.preLabDesignCoach.studentNextAction).toContain("teacher");
   });
 });

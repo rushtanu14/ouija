@@ -6,7 +6,7 @@ Ouija is a student-facing AI experiment interpreter for middle and high school s
 
 - Physics: projectile motion, pendulum period vs length, and Ohm's law circuits.
 - Chemistry: reaction rate vs temperature and density layering.
-- Biology: enzyme activity vs temperature.
+- Biology: enzyme activity vs temperature and plant growth vs light color.
 - Earth science: water filtration and turbidity.
 - Input mode: editable table data plus spreadsheet/CSV paste import.
 - Academic integrity and safety: hints, whole-pattern evidence checks, repeat reliability, safety boundaries, next-trial planning, explanations, and Claim Coach prompts only.
@@ -25,7 +25,7 @@ Ouija is a student-facing AI experiment interpreter for middle and high school s
 10. Use Pattern Evidence Engine, Reliability Coach, and Next Trial Planner to decide what to repeat, average, tighten, or measure next before writing the claim.
 11. Use Reasoning Trail to show how Ouija classified the experiment, exposed model strategy, ran the AI evaluation harness, guided the judge demo, planned the pre-lab setup, audited source grounding, guided the student path, built the concept scaffold, checked the learning exit ticket, checked the safety boundary, audited student-data handling, audited the table data, scored whole-pattern evidence, checked repeat reliability, planned the next trial, and maps the run to AIYES Track 1 evidence.
 12. Copy the Evidence Packet as a student-owned reasoning handoff with judge demo path, Custom Lab Triage, Pre-Lab Design Coach, AIYES rubric fit, learning impact, Learning Exit Ticket, student reflection drafts, guided flow, Grounding Audit, AI Evaluation Harness, Data Handling Ledger, sources, checks, safety notes, concept vocabulary, pattern evidence, repeat reliability, data table, next-trial plan, blanks, and next question.
-13. Open Evaluation Bench to see eight live checks: seven supported lab demos plus the unsupported-lab boundary.
+13. Open Evaluation Bench to see nine live checks: eight supported lab demos plus the unsupported-lab boundary.
 14. Save lab snapshots locally so a student can return to a checked run without sending data to an account system.
 15. Use Progress Portfolio to show saved-run count, score trend, subject breadth, strongest run, and next portfolio action.
 16. Use MCP Integration Coach to preview Composio-powered Google Docs, Google Sheets, Google Drive, Google Classroom, Google Forms, and Notion handoffs, plus the readiness matrix, without exposing credentials or sending student data.

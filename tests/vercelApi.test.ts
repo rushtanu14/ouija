@@ -71,10 +71,11 @@ describe("Vercel API functions", () => {
 
     expect(response.statusCode).toBe(200);
     expect(response.body.score).toBe(100);
-    expect(response.body.passed).toBe(8);
-    expect(response.body.total).toBe(8);
+    expect(response.body.passed).toBe(9);
+    expect(response.body.total).toBe(9);
     expect(response.body.cases.some((testCase: { id: string }) => testCase.id === "eval-pendulum")).toBe(true);
     expect(response.body.cases.some((testCase: { id: string }) => testCase.id === "eval-ohms-law")).toBe(true);
+    expect(response.body.cases.some((testCase: { id: string }) => testCase.id === "eval-plant-light")).toBe(true);
     expect(response.body.cases.some((testCase: { id: string }) => testCase.id === "eval-density")).toBe(true);
     expect(response.body.cases.some((testCase: { id: string }) => testCase.id === "eval-unsupported-boundary")).toBe(true);
     expect(response.body.cases[0].evidence.some((item: string) => item.includes("custom lab triage"))).toBe(true);

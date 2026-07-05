@@ -25,6 +25,11 @@ export const SAMPLE_PROMPTS = [
     text: "We measured catalase enzyme activity at different temperatures to see where the reaction worked fastest."
   },
   {
+    id: "plant-growth-light-color",
+    label: "Plant Light",
+    text: "We grew bean seedlings under white, red, blue, green, and dark conditions and measured plant height after two weeks."
+  },
+  {
     id: "density-layering",
     label: "Density Layers",
     text: "We measured density by layering corn syrup, salt water, water, and oil in a graduated cylinder."

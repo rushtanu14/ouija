@@ -83,19 +83,19 @@ describe("buildEvidencePacket", () => {
 
   it("exports custom lab triage for unsupported descriptions", () => {
     const result = analyzeExperiment({
-      description: "We grew bean seedlings under red, blue, and white light and measured plant height."
+      description: "We compared paper towel brands by measuring how much water each towel absorbed."
     });
 
-    const packet = buildEvidencePacket(result, result.rows, "We grew bean seedlings under red, blue, and white light and measured plant height.");
+    const packet = buildEvidencePacket(result, result.rows, "We compared paper towel brands by measuring how much water each towel absorbed.");
 
     expect(packet).toContain("## Custom Lab Triage");
-    expect(packet).toContain("plant growth light color");
+    expect(packet).toContain("paper towel absorbency");
     expect(packet).toContain("Variable plan:");
-    expect(packet).toContain("Independent variable: Light color");
+    expect(packet).toContain("Independent variable: Paper towel brand or type");
     expect(packet).toContain("Starter worksheet:");
     expect(packet).toContain("## Pre-Lab Design Coach");
     expect(packet).toContain("Status: needs teacher review");
-    expect(packet).toContain("Red light");
+    expect(packet).toContain("Brand A");
     expect(packet).toContain("What exact condition did you change on purpose?");
     expect(packet).toContain("closest supported");
   });
