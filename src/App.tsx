@@ -390,6 +390,7 @@ export function App() {
               <LabBriefPanel brief={result.labBrief} />
               <EvidencePacketPanel packet={evidencePacket} />
               <ModelStrategyPanel strategy={result.modelStrategy} />
+              <TechnicalDepthProofPanel result={result} />
               <AiEvaluationHarnessPanel harness={result.aiEvaluationHarness} />
               <DataHandlingLedgerPanel ledger={result.dataHandlingLedger} />
               <OfficialRubricPanel fit={result.officialRubricFit} />
@@ -949,6 +950,7 @@ function JudgeBriefPanel({ result }: { result: AnalyzeResult | null }) {
     "Judge Demo Path gives evaluators a five-step walkthrough.",
     "AI pipeline is visible in Reasoning Trail.",
     "Model Strategy shows candidate ranking and risk controls.",
+    "Technical Depth Proof makes beyond-simple-API architecture evidence visible.",
     "AI Evaluation Harness scores model behavior and safeguards.",
     "Official Rubric Fit maps all three visible AIYES criteria.",
     "Learning Impact Loop measures the student's outcome for each run.",
@@ -1055,6 +1057,7 @@ function ModelCardPanel({ result }: { result: AnalyzeResult | null }) {
     "Server keeps API keys out of the browser.",
     "Unsupported labs are marked low confidence instead of treated as solved.",
     "Model Strategy exposes candidate ranking, signals, fallback behavior, and risk controls.",
+    "Technical Depth Proof summarizes decision trace, evaluation harness, grounding quality, pattern engine, privacy, and integrity signals.",
     "AI Evaluation Harness scores classifier confidence, coverage, grounding, validators, safety, and fallback boundaries.",
     "Judge Demo Path reduces the live demo to problem fit, AI design, student workflow, evidence handoff, and submission proof.",
     "Official Rubric Fit maps problem relevance, AI design, and UX to concrete app evidence.",
@@ -1719,6 +1722,70 @@ function ModelStrategyPanel({ strategy }: { strategy: ModelStrategy }) {
           <span key={control}>{control}</span>
         ))}
       </div>
+    </section>
+  );
+}
+
+function TechnicalDepthProofPanel({ result }: { result: AnalyzeResult }) {
+  const topCandidate = result.modelStrategy.candidates[0];
+  const runnerUp = result.modelStrategy.candidates[1];
+  const selectedTitle = topCandidate?.title ?? result.classification.title;
+  const expectedPointCount = result.expectedComparison.points.filter((point) => point.expectedY !== null).length;
+  const depthItems = [
+    {
+      label: "Decision trace",
+      value: `${result.modelStrategy.candidates.length} candidates`,
+      detail: topCandidate && runnerUp
+        ? `${topCandidate.title} beat ${runnerUp.title} by ${Math.max(0, topCandidate.score - runnerUp.score)} score points.`
+        : `${selectedTitle} selected from the supported lab catalog.`
+    },
+    {
+      label: "Evaluation harness",
+      value: `${result.aiEvaluationHarness.score}/100`,
+      detail: `${result.aiEvaluationHarness.checks.length} model-behavior checks plus the public 9-case regression suite.`
+    },
+    {
+      label: "Grounding quality",
+      value: `${result.groundingAudit.score}/100`,
+      detail: `${result.sources.length} visible citation${result.sources.length === 1 ? "" : "s"} with source-agreement and mixed-evidence checks.`
+    },
+    {
+      label: "Pattern engine",
+      value: `${result.patternEvidence.score}/100`,
+      detail: `${expectedPointCount} expected-overlay points compared against student data.`
+    },
+    {
+      label: "Privacy and integrity",
+      value: `${result.dataHandlingLedger.score}/100`,
+      detail: "Server-only keys, local saved labs, blank claim starters, and consent-gated MCP packets."
+    }
+  ];
+
+  return (
+    <section className="technical-depth-proof" aria-label="Technical Depth Proof">
+      <div className="panel-title">
+        <Gauge size={18} />
+        <h3>Technical Depth Proof</h3>
+      </div>
+      <div className="technical-depth-summary">
+        <div>
+          <p className="section-label">Beyond simple API use</p>
+          <strong>{result.aiEvaluationHarness.judgeSignal}</strong>
+        </div>
+        <span>{result.modelStrategy.decisionSummary}</span>
+      </div>
+      <div className="technical-depth-grid">
+        {depthItems.map((item) => (
+          <article key={item.label}>
+            <p className="section-label">{item.label}</p>
+            <strong>{item.value}</strong>
+            <span>{item.detail}</span>
+          </article>
+        ))}
+      </div>
+      <p className="technical-depth-boundary">
+        Fallback mode is still AI strategy proof: the classifier, validators, overlays, audits, and eval suite run deterministically without exposing keys, while OpenAI web search can enrich citations server-side when configured.
+      </p>
     </section>
   );
 }

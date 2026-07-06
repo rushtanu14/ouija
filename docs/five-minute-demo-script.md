@@ -16,21 +16,21 @@ Show Judge Demo Path: problem fit, AI design, student workflow, evidence handoff
 
 Show AI Runtime Proof: fallback/web-search readiness, live evaluation coverage, server-only secret boundary, and MCP bridge mode. Mention that `/api/runtime-proof`, `/api/evaluate`, `/api/mcp/status`, and the consent-gated `/api/mcp/session` dry-run are public smoke checks.
 
-## 1:20-1:38 - Model Strategy
+## 1:20-1:42 - Model Strategy And Technical Depth
 
-Show Model Strategy: candidate ranking, matched signals, confidence, fallback behavior, validators, pattern evidence, safety layer, repeat reliability, and risk controls. This proves the AI design is inspectable instead of a simple prompt wrapper.
+Show Model Strategy and Technical Depth Proof: candidate ranking, matched signals, confidence, fallback behavior, validators, pattern evidence, safety layer, repeat reliability, decision trace, evaluation harness, grounding quality, privacy, integrity, and risk controls. This proves the AI design is inspectable instead of a simple prompt wrapper.
 
-## 1:38-1:58 - AI Evaluation Harness And Data Handling Ledger
+## 1:42-2:02 - AI Evaluation Harness And Data Handling Ledger
 
 Show AI Evaluation Harness: classifier confidence, coverage benchmark, source grounding, pattern validation, repeat reliability, row validators, safety/integrity, and fallback boundary checks. This answers whether Ouija is evaluated like an AI system, not just presented like a polished demo.
 
 Show Data Handling Ledger: privacy score, description flow, student data flow, browser-local saved labs, grounding sources, student controls, and the server-only API-key boundary. This answers the AIYES ethics/data-handling question inside the app.
 
-## 1:58-2:10 - AIYES Rubric Fit
+## 2:02-2:14 - AIYES Rubric Fit
 
 Show AIYES Rubric Fit: each run maps to Problem Definition and Real-World Relevance, AI Technical Design and Model Strategy, and User Experience and Design with concrete evidence from the app.
 
-## 2:10-2:26 - Pre-Lab, Learning Impact, Exit Ticket, And Reflection Workspace
+## 2:14-2:30 - Pre-Lab, Learning Impact, Exit Ticket, And Reflection Workspace
 
 Show Pre-Lab Design Coach: Ouija turns the match into variables, controls, repeats, source checks, table columns, and a safety gate before data collection. Then show Learning Impact Loop: Ouija scores whether the student is ready to reason, should review flags, or needs to fix the run, using outcome, data quality, concept learning, integrity, pattern evidence, repeat reliability, and next-trial metrics.
 

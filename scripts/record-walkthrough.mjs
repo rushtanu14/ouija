@@ -167,6 +167,9 @@ await caption(
 await page.getByRole("heading", { name: "Model Strategy" }).scrollIntoViewIfNeeded();
 await caption(page, "Model Strategy", "Ouija exposes candidate ranking, matched signals, fallback behavior, validation layers, pattern evidence, repeat reliability, safety layer, and risk controls.");
 
+await page.getByRole("heading", { name: "Technical Depth Proof" }).scrollIntoViewIfNeeded();
+await caption(page, "Technical Depth Proof", "Judges see beyond-simple-API evidence: decision trace, evaluation harness, grounding quality, expected-pattern engine, privacy, and integrity signals.");
+
 await page.getByRole("heading", { name: "AI Evaluation Harness" }).scrollIntoViewIfNeeded();
 await caption(page, "AI Evaluation Harness", "Ouija scores classifier confidence, coverage, source grounding, pattern validation, row validators, safety, and fallback boundaries in the live run.");
 

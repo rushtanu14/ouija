@@ -34,6 +34,11 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(page.getByRole("heading", { name: "Model Strategy" })).toBeVisible();
   await expect(page.getByLabel("Model Strategy").getByText("Selected Reaction Rate vs Temperature")).toBeVisible();
   await expect(page.getByLabel("Model Strategy").getByText("Top candidates")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Technical Depth Proof" })).toBeVisible();
+  await expect(page.getByLabel("Technical Depth Proof").getByText("Beyond simple API use")).toBeVisible();
+  await expect(page.getByLabel("Technical Depth Proof").getByText("Decision trace")).toBeVisible();
+  await expect(page.getByLabel("Technical Depth Proof").getByText("9-case regression suite")).toBeVisible();
+  await expect(page.getByLabel("Technical Depth Proof").getByText("Fallback mode is still AI strategy proof")).toBeVisible();
   await expect(page.getByRole("heading", { name: "AI Evaluation Harness" })).toBeVisible();
   await expect(page.getByLabel("AI Evaluation Harness").getByText("Model evidence")).toBeVisible();
   await expect(page.getByLabel("AI Evaluation Harness").getByText("Coverage benchmark")).toBeVisible();
@@ -108,6 +113,8 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(page.getByRole("heading", { name: "Evidence Packet" })).toBeVisible();
   await expect(page.getByLabel("Student evidence packet")).toHaveValue(/Ouija Evidence Packet: Reaction Rate vs Temperature/);
   await expect(page.getByLabel("Student evidence packet")).toHaveValue(/Model Strategy/);
+  await expect(page.getByLabel("Student evidence packet")).toHaveValue(/Technical Depth Proof/);
+  await expect(page.getByLabel("Student evidence packet")).toHaveValue(/Beyond simple API use/);
   await expect(page.getByLabel("Student evidence packet")).toHaveValue(/AI Evaluation Harness/);
   await expect(page.getByLabel("Student evidence packet")).toHaveValue(/Data Handling Ledger/);
   await expect(page.getByLabel("Student evidence packet")).toHaveValue(/Browser-local saved labs/);
@@ -165,6 +172,7 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(page.getByLabel("AI Model Card").getByText("9 live cases")).toBeVisible();
   await expect(page.getByLabel("AI Model Card").getByText("Server keeps API keys out of the browser.")).toBeVisible();
   await expect(page.getByLabel("AI Model Card").getByText("Model Strategy exposes candidate ranking, signals, fallback behavior, and risk controls.")).toBeVisible();
+  await expect(page.getByLabel("AI Model Card").getByText("Technical Depth Proof summarizes decision trace, evaluation harness, grounding quality, pattern engine, privacy, and integrity signals.")).toBeVisible();
   await expect(page.getByLabel("AI Model Card").getByText("AI Evaluation Harness scores classifier confidence, coverage, grounding, validators, safety, and fallback boundaries.")).toBeVisible();
   await expect(page.getByLabel("AI Model Card").getByText("Judge Demo Path reduces the live demo to problem fit, AI design, student workflow, evidence handoff, and submission proof.")).toBeVisible();
   await expect(page.getByLabel("AI Model Card").getByText("Official Rubric Fit maps problem relevance, AI design, and UX to concrete app evidence.")).toBeVisible();
@@ -271,6 +279,7 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(page.getByLabel("Judge Brief").getByText("AI pipeline is visible in Reasoning Trail.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Judge Demo Path gives evaluators a five-step walkthrough.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Model Strategy shows candidate ranking and risk controls.")).toBeVisible();
+  await expect(page.getByLabel("Judge Brief").getByText("Technical Depth Proof makes beyond-simple-API architecture evidence visible.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("AI Evaluation Harness scores model behavior and safeguards.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Official Rubric Fit maps all three visible AIYES criteria.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Learning Impact Loop measures the student's outcome for each run.")).toBeVisible();

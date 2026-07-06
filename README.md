@@ -23,7 +23,7 @@ Ouija is a student-facing AI experiment interpreter for middle and high school s
 8. Use Pattern Evidence Engine, Reliability Coach, and Next Trial Planner to decide what to repeat, average, tighten, or measure next before writing the claim.
 9. Review Learning Impact Loop, Learning Exit Ticket, and Student Reflection Workspace to see whether the student is ready to plan, reason, and explain answers themselves before writing.
 10. Copy the Evidence Packet as a student-owned reasoning handoff with judge demo path, Custom Lab Triage, Pre-Lab Design Coach, AIYES rubric fit, learning impact, Learning Exit Ticket, student reflection drafts, guided flow, Grounding Audit, AI Evaluation Harness, Data Handling Ledger, sources, checks, safety notes, concept vocabulary, pattern evidence, repeat reliability, data table, next-trial plan, blanks, and next question.
-11. Inspect Model Strategy, AI Evaluation Harness, Data Handling Ledger, and AIYES Rubric Fit to show candidate ranking, matched signals, fallback logic, validators, model-behavior checks, privacy flow, retention, student controls, risk controls, and official criteria mapping.
+11. Inspect Model Strategy, Technical Depth Proof, AI Evaluation Harness, Data Handling Ledger, and AIYES Rubric Fit to show candidate ranking, matched signals, fallback logic, validators, model-behavior checks, privacy flow, retention, student controls, risk controls, and official criteria mapping.
 12. Use Reasoning Trail to show how Ouija classified the experiment, exposed model strategy, ran the AI evaluation harness, guided the judge demo, planned the pre-lab setup, audited source grounding, guided the student path, built the concept scaffold, checked the learning exit ticket, checked the safety boundary, audited student-data handling, audited the table data, scored whole-pattern evidence, checked repeat reliability, planned the next trial, and maps the run to AIYES Track 1 evidence.
 13. Open Evaluation Bench to see nine live checks: eight supported lab demos plus the unsupported-lab boundary.
 14. Save lab snapshots locally so a student can return to a checked run without sending data to an account system.
@@ -73,6 +73,8 @@ Pre-Lab Design Coach turns classification and triage into a before-data checklis
 Evaluation Bench runs a deterministic live suite against the same analysis engine used by students.
 
 AI Model Card makes the model strategy inspectable: deterministic template matching, trusted fallback references, Grounding Audit, AI Evaluation Harness, Data Handling Ledger, Custom Lab Triage, Pre-Lab Design Coach, optional server-side OpenAI web-search enrichment, live evaluation, privacy boundaries, and academic-integrity safeguards.
+
+Technical Depth Proof makes the "beyond simple API use" argument visible in the live app: decision trace, evaluation harness, grounding quality, pattern engine, privacy, and integrity are summarized from the current run before the judge reaches the deeper evidence panels.
 
 AIYES Rubric Fit maps each run to the three visible official judging criteria using concrete app evidence, so judges see problem relevance, AI design/model strategy, and UX/design without guessing.
 

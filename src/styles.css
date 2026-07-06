@@ -121,6 +121,7 @@ a {
 .custom-lab-triage,
 .pre-lab-design-coach,
 .model-strategy,
+.technical-depth-proof,
 .ai-evaluation-harness,
 .data-handling-ledger,
 .rubric-fit,
@@ -1062,6 +1063,11 @@ a:focus-visible {
   gap: 13px;
 }
 
+.technical-depth-proof {
+  display: grid;
+  gap: 13px;
+}
+
 .ai-evaluation-harness {
   display: grid;
   gap: 13px;
@@ -1549,6 +1555,64 @@ a:focus-visible {
   font-size: 13px;
   font-weight: 720;
   line-height: 1.35;
+}
+
+.technical-depth-summary {
+  display: grid;
+  gap: 8px;
+  border-radius: 8px;
+  padding: 13px;
+  color: #173b74;
+  background: #eef5ff;
+}
+
+.technical-depth-summary strong {
+  color: #173b74;
+  font-size: 16px;
+  line-height: 1.35;
+}
+
+.technical-depth-summary span,
+.technical-depth-boundary {
+  margin: 0;
+  color: #526276;
+  font-size: 13px;
+  font-weight: 720;
+  line-height: 1.4;
+}
+
+.technical-depth-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(120px, 1fr));
+  gap: 8px;
+}
+
+.technical-depth-grid article {
+  display: grid;
+  gap: 7px;
+  border: 1px solid #d9e5f2;
+  border-radius: 8px;
+  padding: 10px;
+  background: #fbfdff;
+}
+
+.technical-depth-grid strong {
+  color: #172439;
+  font-size: 17px;
+  line-height: 1.1;
+}
+
+.technical-depth-grid span {
+  color: #536478;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.technical-depth-boundary {
+  border-left: 4px solid #2368ff;
+  border-radius: 8px;
+  padding: 10px 12px;
+  background: #f8fbff;
 }
 
 .ai-eval-summary {
@@ -4130,6 +4194,10 @@ td input {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .technical-depth-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .mcp-action-grid,
   .mcp-readiness-grid,
   .mcp-export-check-grid,
@@ -4286,6 +4354,10 @@ td input {
   }
 
   .strategy-signal-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .technical-depth-grid {
     grid-template-columns: 1fr;
   }
 

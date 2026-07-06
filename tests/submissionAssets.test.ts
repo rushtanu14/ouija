@@ -25,6 +25,7 @@ describe("AIYES submission assets", () => {
     expect(deck).toContain("/api/runtime-proof");
     expect(deck).toContain("/api/mcp/session");
     expect(deck).toContain("Composio Search source-audit");
+    expect(deck).toContain("Technical Depth Proof");
     expect(deck).toContain("plant growth vs light color");
     expect(deck).not.toMatch(/TODO|TBD|placeholder/i);
   });
@@ -42,6 +43,7 @@ describe("AIYES submission assets", () => {
     expect(copy).toContain("MCP Integration Coach");
     expect(copy).toContain("/api/mcp/session");
     expect(copy).toContain("Composio Search source audit");
+    expect(copy).toContain("Technical Depth Proof");
     expect(copy).toContain("Google Classroom");
     expect(assets).toContain("Progress Portfolio");
     expect(assets).toContain("npm run capture:submission");

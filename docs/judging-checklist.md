@@ -23,6 +23,7 @@
 - Server-side grounding keeps the API key out of the browser.
 - AI Runtime Proof shows fallback/web-search readiness, template count, evaluation coverage, server-only key boundary, and MCP bridge mode through the UI and `/api/runtime-proof`.
 - Model Strategy exposes candidate rankings, matched signals, confidence, fallback behavior, validation layers, safety layer, and risk controls.
+- Technical Depth Proof gives judges a compact beyond-simple-API scorecard for decision trace, evaluation harness, grounding quality, expected-pattern engine, privacy, and integrity.
 - AI Evaluation Harness scores classifier confidence, coverage, source grounding, pattern validation, repeat reliability, row validators, safety/integrity, and fallback boundaries.
 - Data Handling Ledger exposes what student data is used, where it is stored, retention, local snapshots, student controls, and the server-only API-key boundary.
 - MCP Integration Coach validates Composio-powered Search, Google Docs, Google Sheets, Google Drive, Google Classroom, Google Forms, Google Calendar, and Notion routes through `/api/mcp/export`, then prepares a scoped `/api/mcp/session` ticket while keeping `COMPOSIO_API_KEY`, auth config IDs where required, and raw MCP URLs server-side.
@@ -47,6 +48,7 @@
 
 - Eight supported demo labs across physics, chemistry, biology, and earth science.
 - Model Strategy prevents the AI design from looking like a black-box chatbot or a simple prompt wrapper.
+- Technical Depth Proof prevents the fallback demo from looking template-only by showing the live decision trace, validators, overlays, audits, and evaluation suite in one place.
 - AI Runtime Proof gives judges a live endpoint for the deployed AI path instead of asking them to trust screenshots or prose.
 - AI Evaluation Harness turns model behavior and safeguards into visible pass/review/fail checks.
 - Judge Demo Path prevents the technical depth from becoming a maze during the live evaluation.
@@ -63,6 +65,7 @@
 - Spreadsheet/CSV paste import and editable table rows recompute graph comparison and Claim Coach state live.
 - Reasoning Trail visibly maps the run to AIYES Track 1 evidence: problem/impact, AI technical design, testing/evaluation, and ethics/constraints.
 - AIYES Rubric Fit visibly maps the run to the three official criteria: Problem Definition and Real-World Relevance, AI Technical Design and Model Strategy, and User Experience and Design.
+- Technical Depth Proof visibly answers the AI technical design criterion with concrete run metrics before judges read the deeper model cards.
 - Learning Impact Loop visibly scores outcome, data quality, concept learning, integrity, pattern evidence, repeat reliability, and next-trial readiness for every run.
 - Pre-Lab Design Coach visibly scores setup readiness before data collection.
 - Learning Exit Ticket visibly checks whether the student can explain variables, pattern evidence, and the next controlled step.

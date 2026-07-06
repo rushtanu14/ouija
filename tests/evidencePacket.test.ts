@@ -14,6 +14,10 @@ describe("buildEvidencePacket", () => {
     expect(packet).toContain("## Student Data");
     expect(packet).toContain("## Model Strategy");
     expect(packet).toContain("Top candidates:");
+    expect(packet).toContain("## Technical Depth Proof");
+    expect(packet).toContain("Beyond simple API use:");
+    expect(packet).toContain("Decision trace:");
+    expect(packet).toContain("Pattern engine:");
     expect(packet).toContain("## AI Evaluation Harness");
     expect(packet).toContain("Coverage:");
     expect(packet).toContain("Judge signal:");
