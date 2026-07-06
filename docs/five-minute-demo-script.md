@@ -58,7 +58,7 @@ Type an unsupported paper towel absorbency lab. Show that Ouija labels it as a l
 
 ## 4:50-4:56 - Saved Lab Snapshot, Progress Portfolio, And MCP Export
 
-Save the current run and show Saved Labs plus Progress Portfolio so judges see the workflow continues after one analysis and can measure saved-run trend, subject breadth, and the next portfolio action. Then show MCP Integration Coach: Ouija validates Google Docs, Google Sheets, Google Drive, Google Classroom, Google Forms, Google Calendar, and Notion handoffs through a server dry-run, shows connector env vars/tools/scopes/data/checks, keeps Composio credentials server-side, and requires consent before export.
+Save the current run and show Saved Labs plus Progress Portfolio so judges see the workflow continues after one analysis and can measure saved-run trend, subject breadth, and the next portfolio action. Then show MCP Integration Coach: Ouija validates a Composio Search source audit plus Google Docs, Google Sheets, Google Drive, Google Classroom, Google Forms, Google Calendar, and Notion handoffs through a server dry-run, shows connector env vars/tools/scopes/data/checks, keeps Composio credentials server-side, and requires consent before source audit or export.
 
 ## 4:56-4:58 - Evaluation Bench
 
@@ -66,7 +66,7 @@ Show Evaluation Bench with 100/100 and 9/9 live checks: projectile, pendulum per
 
 ## 4:58-5:00 - Judge Brief
 
-Show Judge Brief so evaluators see Track 1 fit, Judge Demo Path, live app, hosted deck/video links, official rubric fit, learning impact, learning exit ticket, student reflection workspace, progress portfolio, grounding audit, AI evaluation harness, data-handling ethics, pattern evidence, model strategy, AI pipeline, evaluation, tests, and integrity constraints in one place.
+Show Judge Brief so evaluators see Track 1 fit, Judge Demo Path, live app, hosted deck/video/source links, AIYES submission checklist, official rubric fit, learning impact, learning exit ticket, student reflection workspace, progress portfolio, grounding audit, AI evaluation harness, data-handling ethics, pattern evidence, model strategy, AI pipeline, evaluation, tests, and integrity constraints in one place.
 
 ## Closing Line
 

@@ -209,7 +209,7 @@ await page.locator("#mcp-export").scrollIntoViewIfNeeded();
 await caption(
   page,
   "MCP Integration Coach",
-  "Ouija validates Composio handoffs to Docs, Sheets, Drive, Classroom, Forms, Calendar, and Notion, then shows env vars, tools, scopes, data shared, dry-run checks, and consent gates."
+  "Ouija validates a Composio Search source-audit route plus handoffs to Docs, Sheets, Drive, Classroom, Forms, Calendar, and Notion, then shows env vars, tools, scopes, data shared, dry-run checks, and consent gates."
 );
 await page.locator(".mcp-action-card").filter({ hasText: "Google Calendar" }).getByRole("button", { name: "Validate route" }).click();
 await page.getByLabel("MCP export dry-run result").getByText("Dry-run passed", { exact: true }).waitFor();
@@ -217,7 +217,7 @@ await page.getByLabel("MCP export dry-run result").scrollIntoViewIfNeeded();
 await caption(
   page,
   "Server MCP dry-run",
-  "The public app calls /api/mcp/export, validates consent, payload, integrity blanks, and credential boundaries, then stops before any external Google or Composio write."
+  "The public app calls /api/mcp/export, validates consent, payload, integrity blanks, and credential boundaries, then stops before any external source search, Google action, or Composio write."
 );
 await page.getByLabel("MCP session ticket result").getByText("Session dry-run", { exact: true }).waitFor();
 await page.getByLabel("MCP session ticket result").scrollIntoViewIfNeeded();
@@ -236,7 +236,7 @@ await page.getByLabel("Judge Brief").getByText("AIYES Track 1").waitFor();
 await caption(
   page,
   "Judge Brief",
-  "The live app includes Track 1 fit, judge demo path, hosted links, official rubric fit, pre-lab design, learning impact, learning exit ticket, student reflection workspace, progress portfolio, custom lab triage, grounding audit, AI evaluation harness, data handling, model strategy, evaluation, and integrity constraints."
+  "The live app includes Track 1 fit, judge demo path, hosted source, deck, and video links, the AIYES submission checklist, official rubric fit, learning impact, progress portfolio, evaluation, and integrity constraints."
 );
 
 await page.getByRole("heading", { name: "Reasoning trail" }).scrollIntoViewIfNeeded();

@@ -135,7 +135,9 @@ describe("Vercel API functions", () => {
 
     expect(response.statusCode).toBe(200);
     expect(response.body.status).toBe("server_dry_run");
-    expect(response.body.toolkits).toHaveLength(7);
+    expect(response.body.toolkits).toHaveLength(8);
+    expect(response.body.toolkits.find((toolkit: { toolkit: string }) => toolkit.toolkit === "Composio Search")?.toolkitSlug).toBe("composio_search");
+    expect(response.body.toolkits.find((toolkit: { toolkit: string }) => toolkit.toolkit === "Composio Search")?.authConfigRequired).toBe(false);
     expect(response.body.toolkits.find((toolkit: { toolkit: string }) => toolkit.toolkit === "Google Calendar")?.toolkitSlug).toBe("googlecalendar");
   });
 

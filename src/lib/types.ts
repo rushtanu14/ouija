@@ -469,6 +469,7 @@ export interface ProgressPortfolio {
 export type McpIntegrationStatus = "preview_only" | "server_dry_run" | "ready";
 
 export type McpIntegrationActionId =
+  | "composio-search-source-audit"
   | "google-docs-evidence-packet"
   | "google-sheets-data-log"
   | "google-drive-portfolio-archive"
@@ -479,7 +480,7 @@ export type McpIntegrationActionId =
 
 export interface McpIntegrationAction {
   id: McpIntegrationActionId;
-  toolkit: "Google Docs" | "Google Sheets" | "Google Drive" | "Google Classroom" | "Google Forms" | "Google Calendar" | "Notion";
+  toolkit: "Composio Search" | "Google Docs" | "Google Sheets" | "Google Drive" | "Google Classroom" | "Google Forms" | "Google Calendar" | "Notion";
   label: string;
   studentValue: string;
   composioCapability: string;
@@ -541,6 +542,8 @@ export interface McpConnectorCatalogItem {
   toolkit: McpIntegrationAction["toolkit"];
   toolkitSlug: string;
   envSuffix: string;
+  requiresAuthConfig?: boolean;
+  requiresAllowedToolsEnv?: boolean;
   label: string;
   studentValue: string;
   composioCapability: string;
@@ -558,6 +561,8 @@ export interface McpBridgeToolkitStatus {
   toolkitSlug: string;
   docsUrl: string;
   configured: boolean;
+  authConfigRequired: boolean;
+  allowedToolsRequired: boolean;
   authConfigEnv: string;
   allowedToolsEnv: string;
   authConfigConfigured: boolean;

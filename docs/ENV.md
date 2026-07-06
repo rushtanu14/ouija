@@ -17,12 +17,12 @@ Generated from `server/index.ts`, `server/openaiGrounding.ts`, `server/mcpBridge
 | `COMPOSIO_LIVE_EXPORTS` | No | Must be `true` before any live Composio export path is considered ready. Omit or set anything else for dry-run only. | `true` |
 | `COMPOSIO_SESSION_USER_ID` | No | Server-side Composio user id used when `/api/mcp/session` creates a scoped Tool Router session. Keep it non-PII for demos. | `ouija-demo-student` |
 | `COMPOSIO_API_BASE_URL` | No | Optional Composio API base URL override for tests or staging. | `https://backend.composio.dev/api/v3.1` |
-| `COMPOSIO_<TOOLKIT>_AUTH_CONFIG_ID` | No | Auth config ID for a specific connector route. Supported suffixes: `GOOGLE_DOCS`, `GOOGLE_SHEETS`, `GOOGLE_DRIVE`, `GOOGLE_CLASSROOM`, `GOOGLE_FORMS`, `GOOGLE_CALENDAR`, `NOTION`. | `ac_...` |
-| `COMPOSIO_<TOOLKIT>_ALLOWED_TOOLS` | No | Comma-separated allowlist of Composio tool names for that connector route. The app displays recommended tools in `/api/mcp/status`. | `GOOGLECALENDAR_CREATE_EVENT,GOOGLECALENDAR_QUICK_ADD` |
+| `COMPOSIO_<TOOLKIT>_AUTH_CONFIG_ID` | No | Auth config ID for a specific private-account connector route. Supported suffixes: `GOOGLE_DOCS`, `GOOGLE_SHEETS`, `GOOGLE_DRIVE`, `GOOGLE_CLASSROOM`, `GOOGLE_FORMS`, `GOOGLE_CALENDAR`, `NOTION`. Composio Search does not need an account auth config. | `ac_...` |
+| `COMPOSIO_<TOOLKIT>_ALLOWED_TOOLS` | No | Comma-separated allowlist of Composio tool names for that connector route. The app displays recommended tools in `/api/mcp/status`; use `COMPOSIO_SEARCH_ALLOWED_TOOLS` for the source-audit route. | `COMPOSIO_SEARCH_WEB,COMPOSIO_SEARCH_SCHOLAR,COMPOSIO_SEARCH_FETCH_URL_CONTENT` |
 
 There is no checked-in `.env.example` at the time this reference was generated. Keep credentials out of repo files; set optional secrets in the deployment environment.
 <!-- AUTO-GENERATED:ENV:END -->
 
 ## Composio MCP Bridge
 
-Ouija's public MCP Integration Coach uses server dry-run validation through `/api/mcp/status`, `/api/mcp/export`, and `/api/mcp/session`. Live sessions remain disabled unless `COMPOSIO_API_KEY`, `COMPOSIO_SESSION_USER_ID`, `COMPOSIO_LIVE_EXPORTS=true`, connector-specific auth config IDs, and connector-specific allowed tools are configured server-side. Do not expose these values, auth config IDs, API keys, or raw MCP URLs to the Vite client.
+Ouija's public MCP Integration Coach uses server dry-run validation through `/api/mcp/status`, `/api/mcp/export`, and `/api/mcp/session`. Live sessions remain disabled unless `COMPOSIO_API_KEY`, `COMPOSIO_SESSION_USER_ID`, `COMPOSIO_LIVE_EXPORTS=true`, connector-specific allowed tools, and toolkit auth config IDs where required are configured server-side. Composio Search source-audit sessions need an allowed-tool allowlist but no private account auth config. Do not expose these values, auth config IDs, API keys, or raw MCP URLs to the Vite client.

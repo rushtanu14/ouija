@@ -79,6 +79,7 @@ import type {
 
 const initialPrompt = SAMPLE_PROMPTS[0].text;
 const savedLabsKey = "ouija:saved-labs";
+const sourceCodeUrl = "https://github.com/rushtanu14/ouija";
 const liveDemoUrl = "https://ouija-olive.vercel.app";
 const slideDeckUrl = "https://ouija-olive.vercel.app/submission/slide-deck.html";
 const walkthroughVideoUrl = "https://ouija-olive.vercel.app/submission/assets/ouija-walkthrough.webm";
@@ -911,13 +912,37 @@ function JudgeBriefPanel({ result }: { result: AnalyzeResult | null }) {
     { label: "Live app", value: "Deployed" },
     { label: "Slide deck", value: "Hosted" },
     { label: "Video", value: "Hosted" },
+    { label: "Source code", value: "Public" },
     { label: "MCP export", value: "Server dry-run" },
     { label: "Integrity", value: "Guarded" }
   ];
   const submissionLinks = [
+    { label: "Source code", href: sourceCodeUrl },
     { label: "Live demo", href: liveDemoUrl },
     { label: "Slide deck", href: slideDeckUrl },
     { label: "Video walkthrough", href: walkthroughVideoUrl }
+  ];
+  const submissionChecklist = [
+    {
+      label: "Slide presentation",
+      status: "Ready",
+      detail: "Hosted deck covers problem, AI architecture, runtime proof, UX, ethics, verification, and impact."
+    },
+    {
+      label: "Video walkthrough",
+      status: "Ready",
+      detail: "Hosted 2:02.88 walkthrough stays under the 5-minute cap and shows live workflow plus session-ticket proof."
+    },
+    {
+      label: "Source or deployment",
+      status: "Ready",
+      detail: "Public GitHub source and deployed Vercel app are listed separately for judge verification."
+    },
+    {
+      label: "Student team",
+      status: "External step",
+      detail: "Devpost lists a required 2-5 student team; final submission still needs the team roster handled on Devpost."
+    }
   ];
   const proofItems = [
     "Student problem and user are specific.",
@@ -940,10 +965,11 @@ function JudgeBriefPanel({ result }: { result: AnalyzeResult | null }) {
     "Data Handling Ledger shows privacy, retention, and student controls.",
     "Spreadsheet paste/import flows into data checks.",
     "Evidence Packet exports a student-owned reasoning handoff.",
-    "MCP Integration Coach validates Composio Docs, Sheets, Drive, Classroom, Forms, Calendar, and Notion handoffs through a server dry-run and scoped session ticket without exposing credentials.",
+    "MCP Integration Coach validates Composio Search source audits plus Docs, Sheets, Drive, Classroom, Forms, Calendar, and Notion handoffs through a server dry-run and scoped session ticket without exposing credentials.",
     "MCP Readiness Matrix shows exact connector env vars, tools, scopes, data shared, dry-run checks, and consent gates.",
     "Next Trial Planner gives adaptive measurement guidance.",
     "Progress Portfolio shows learning over multiple saved runs.",
+    "AIYES submission checklist makes deck, video, source/deploy link, and team requirement status visible.",
     "Evaluation Bench runs nine live cases.",
     "Custom Lab Triage keeps unsupported labs useful without pretending full coverage.",
     "Hosted deck and walkthrough are public.",
@@ -970,6 +996,17 @@ function JudgeBriefPanel({ result }: { result: AnalyzeResult | null }) {
           <article key={item.label}>
             <p className="section-label">{item.label}</p>
             <strong>{item.value}</strong>
+          </article>
+        ))}
+      </div>
+      <div className="submission-readiness-grid" aria-label="AIYES Submission Checklist">
+        {submissionChecklist.map((item) => (
+          <article key={item.label}>
+            <div>
+              <p className="section-label">{item.label}</p>
+              <strong>{item.status}</strong>
+            </div>
+            <span>{item.detail}</span>
           </article>
         ))}
       </div>
@@ -1029,7 +1066,7 @@ function ModelCardPanel({ result }: { result: AnalyzeResult | null }) {
     "Grounding Audit checks source agreement before students use the expected pattern.",
     "Data Handling Ledger makes student data flow, retention, and controls inspectable.",
     "Progress Portfolio turns saved labs into repeated learning evidence for judges.",
-    "MCP Integration Coach keeps Composio credentials server-side, validates packets with /api/mcp/export, prepares session tickets with /api/mcp/session, and requires student consent before any export.",
+    "MCP Integration Coach keeps Composio credentials server-side, validates packets with /api/mcp/export, prepares session tickets with /api/mcp/session, and requires student consent before any source audit or export.",
     "MCP Readiness Matrix makes connector tools, scopes, dry-run checks, and least-privilege boundaries inspectable.",
     "Pattern Evidence Engine quantifies whether the dataset supports the expected science pattern.",
     "Reliability Coach checks repeated trials, averages, and spread before students trust a claim.",

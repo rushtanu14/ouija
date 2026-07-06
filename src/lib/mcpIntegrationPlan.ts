@@ -11,6 +11,22 @@ import type {
 
 export const MCP_CONNECTOR_CATALOG: McpConnectorCatalogItem[] = [
   {
+    id: "composio-search-source-audit",
+    toolkit: "Composio Search",
+    toolkitSlug: "composio_search",
+    envSuffix: "SEARCH",
+    requiresAuthConfig: false,
+    label: "Run source audit search",
+    studentValue: "Checks the experiment topic against public web and scholar sources before the student trusts an expected pattern.",
+    composioCapability: "search public web, scholar results, and fetched page text through Composio Search",
+    safetyNote: "Search audit should return source choices and trust checks, not a completed explanation or final conclusion.",
+    requiredScopes: ["public web search", "scholar search", "URL content fetch"],
+    dataShared: "Experiment title, variable names, current citation links, and a source-quality question.",
+    consentGate: "Student reviews the research query before any live source-audit search.",
+    docsUrl: "https://docs.composio.dev/toolkits/composio_search",
+    recommendedTools: ["COMPOSIO_SEARCH_WEB", "COMPOSIO_SEARCH_SCHOLAR", "COMPOSIO_SEARCH_FETCH_URL_CONTENT"]
+  },
+  {
     id: "google-docs-evidence-packet",
     toolkit: "Google Docs",
     toolkitSlug: "googledocs",
@@ -183,6 +199,7 @@ export function buildMcpIntegrationPlan({
         "Evidence Packet markdown",
         "Student data table",
         "Trusted citation links",
+        "Composio Search source-audit query",
         "Progress Portfolio summary",
         "Pre-Lab Design Coach",
         "Learning Exit Ticket prompts",
@@ -196,7 +213,7 @@ export function buildMcpIntegrationPlan({
     },
     safeguards: buildSafeguards(status),
     judgeTakeaway:
-      "MCP Integration Coach connects Ouija to a real classroom handoff path with connector prerequisites, least-privilege scopes, server dry-runs, scoped session tickets, and consent gates visible to judges."
+      "MCP Integration Coach connects Ouija to a real research-and-classroom handoff path with connector prerequisites, least-privilege scopes, server dry-runs, scoped session tickets, and consent gates visible to judges."
   };
 }
 
@@ -208,7 +225,7 @@ function buildSummary(status: McpIntegrationPlan["status"]) {
 
 function buildSetupHint(status: McpIntegrationPlan["status"]) {
   if (status === "ready") return "Server-side MCP bridge is enabled. Keep COMPOSIO_API_KEY and any MCP URL on the server, never in browser code.";
-  if (status === "server_dry_run") return "Server-side MCP bridge validates packets now; live exports require COMPOSIO_API_KEY, auth config IDs, allowed tools, and COMPOSIO_LIVE_EXPORTS=true.";
+  if (status === "server_dry_run") return "Server-side MCP bridge validates packets now; live routes require COMPOSIO_API_KEY, allowed tools, toolkit auth config where required, and COMPOSIO_LIVE_EXPORTS=true.";
   return "Add COMPOSIO_API_KEY and a server-side MCP bridge before enabling live exports.";
 }
 
@@ -223,14 +240,15 @@ function buildSafeguards(status: McpIntegrationPlan["status"]) {
     status === "ready"
       ? "Live MCP mode keeps Composio, Google Workspace, Notion, and Calendar execution on the server after consent."
       : status === "server_dry_run"
-      ? "Server dry-run mode validates Composio packets but does not call Google Classroom, Google Workspace, Notion, or Calendar APIs."
-      : "Preview mode does not call Composio, Google Classroom, Google Workspace, or Notion APIs.";
+      ? "Server dry-run mode validates Composio packets but does not call Composio Search, Google Classroom, Google Workspace, Notion, or Calendar APIs."
+      : "Preview mode does not call Composio Search, Google Classroom, Google Workspace, or Notion APIs.";
 
   return [
     firstLine,
       "COMPOSIO_API_KEY must stay server-side and must never be bundled into the Vite client.",
       "Every export action requires student or teacher consent before a live connector runs.",
       "Scoped Composio sessions are prepared server-side and raw MCP URLs are withheld from browser responses.",
+      "Composio Search source audits use topic and variable terms only; students review the query before live lookup.",
       "Google Classroom handoff creates a teacher-review checkpoint, not an auto-submitted assignment.",
       "Google Forms handoff creates student prompts, not completed answers.",
       "Google Calendar handoff schedules a next-trial reminder, not a generated result.",
@@ -243,11 +261,18 @@ function buildReadinessMatrix(actions: McpIntegrationAction[], configured: boole
   return actions.map((action) => {
     const connector = MCP_CONNECTOR_CATALOG.find((candidate) => candidate.id === action.id);
     const envSuffix = connector?.envSuffix ?? action.toolkit.toUpperCase().replaceAll(" ", "_");
+    const authConfigEnv = `COMPOSIO_${envSuffix}_AUTH_CONFIG_ID`;
+    const allowedToolsEnv = `COMPOSIO_${envSuffix}_ALLOWED_TOOLS`;
+    const requiredEnv = [
+      connector?.requiresAuthConfig === false ? "" : authConfigEnv,
+      connector?.requiresAllowedToolsEnv === false ? "" : allowedToolsEnv
+    ].filter(Boolean);
+
     return {
       actionId: action.id,
       toolkit: action.toolkit,
       status: configured ? "ready" : "needs_server_setup",
-      requiredEnv: [`COMPOSIO_${envSuffix}_AUTH_CONFIG_ID`, `COMPOSIO_${envSuffix}_ALLOWED_TOOLS`],
+      requiredEnv,
       requiredScopes: connector?.requiredScopes ?? [],
       dataShared: connector?.dataShared ?? "",
       consentGate: connector?.consentGate ?? "Student reviews the payload preview before export.",
@@ -280,6 +305,7 @@ function buildDryRunChecks({
   const hasSources = sourceCount > 0;
   const allConsentGated = actions.every((action) => action.requiresConsent);
   const hasIntegrityBoundaries = actions.every((action) => action.safetyNote.length > 0) && result.labBrief.claimStarter.includes("___");
+  const toolkitNames = actions.map((action) => action.toolkit).join(", ");
 
   return [
     {
@@ -292,7 +318,7 @@ function buildDryRunChecks({
       id: "least-privilege",
       label: "Least privilege",
       status: "pass",
-      detail: `${actions.length} connector routes use specific Docs, Sheets, Drive, Classroom, Forms, Calendar, or Notion scopes instead of a broad all-Google handoff.`
+      detail: `${actions.length} connector routes use specific ${toolkitNames} scopes instead of a broad all-app handoff.`
     },
     {
       id: "consent",
@@ -316,7 +342,7 @@ function buildDryRunChecks({
       id: "server-only",
       label: "Server-only credentials",
       status: configured ? "pass" : "review",
-      detail: configured ? "Server MCP mode is selected; credentials remain outside the browser bundle." : "Dry-run mode is active until COMPOSIO_API_KEY, auth config IDs, and allowed tools exist server-side."
+      detail: configured ? "Server MCP mode is selected; credentials remain outside the browser bundle." : "Dry-run mode is active until COMPOSIO_API_KEY, allowed tools, and any required auth config IDs exist server-side."
     }
   ];
 }
@@ -333,6 +359,9 @@ function buildPayloadSummary(
   savedRunCount: number,
   title: string
 ) {
+  if (connector.id === "composio-search-source-audit") {
+    return `Source audit query for ${title} with ${sourceCount} citation${sourceCount === 1 ? "" : "s"} and variables: ${formatColumnList(result)}`;
+  }
   if (connector.id === "google-docs-evidence-packet") return `${title} with source trail, checks, and integrity boundary`;
   if (connector.id === "google-sheets-data-log") return `${rowCount} rows across ${result.columns.length} columns: ${formatColumnList(result)}`;
   if (connector.id === "google-drive-portfolio-archive") {

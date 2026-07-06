@@ -190,7 +190,11 @@ describe("Composio MCP bridge API", () => {
     expect(response.body.mode).toBe("server_dry_run");
     expect(response.body.apiKeyConfigured).toBe(false);
     expect(response.body.missingEnv).toContain("COMPOSIO_API_KEY");
-    expect(response.body.toolkits).toHaveLength(7);
+    expect(response.body.toolkits).toHaveLength(8);
+    expect(response.body.toolkits.find((toolkit: { toolkit: string }) => toolkit.toolkit === "Composio Search")?.authConfigRequired).toBe(false);
+    expect(response.body.toolkits.find((toolkit: { toolkit: string }) => toolkit.toolkit === "Composio Search")?.missingEnv).toEqual([
+      "COMPOSIO_SEARCH_ALLOWED_TOOLS"
+    ]);
     expect(response.body.toolkits.find((toolkit: { toolkit: string }) => toolkit.toolkit === "Google Calendar")?.recommendedTools).toContain(
       "GOOGLECALENDAR_CREATE_EVENT"
     );
@@ -227,6 +231,37 @@ describe("Composio MCP bridge API", () => {
     expect(response.body.target.authConfigEnv).toBe("COMPOSIO_GOOGLE_CALENDAR_AUTH_CONFIG_ID");
     expect(response.body.sanitizedPayload.rowCount).toBe(result.rows.length);
     expect(response.body.checks.find((check: { id: string }) => check.id === "consent")?.status).toBe("pass");
+    expect(response.body.checks.find((check: { id: string }) => check.id === "credentials")?.status).toBe("review");
+  });
+
+  it("validates a Composio Search source-audit packet without requiring an account auth config", async () => {
+    clearComposioEnv();
+    const app = createApp();
+    const result = analyzeExperiment({
+      description: "Projectile launch angle and measured range."
+    });
+    const packet = buildEvidencePacket(result, result.rows, "Projectile launch angle and measured range.");
+
+    const response = await request(app)
+      .post("/api/mcp/export")
+      .send({
+        actionId: "composio-search-source-audit",
+        consent: true,
+        payload: {
+          title: `Ouija Evidence Packet: ${result.classification.title}`,
+          description: "Projectile launch angle and measured range.",
+          evidencePacket: packet,
+          rows: result.rows,
+          sources: result.sources
+        }
+      })
+      .expect(200);
+
+    expect(response.body.status).toBe("dry_run");
+    expect(response.body.toolkit).toBe("Composio Search");
+    expect(response.body.target.toolkitSlug).toBe("composio_search");
+    expect(response.body.target.authConfigEnv).toBe("COMPOSIO_SEARCH_AUTH_CONFIG_ID");
+    expect(response.body.target.recommendedTools).toContain("COMPOSIO_SEARCH_SCHOLAR");
     expect(response.body.checks.find((check: { id: string }) => check.id === "credentials")?.status).toBe("review");
   });
 
@@ -329,6 +364,71 @@ describe("Composio MCP bridge API", () => {
     expect(body.toolkits.enable).toEqual(["googlecalendar"]);
     expect(body.auth_configs.googlecalendar).toBe("ac_calendar_secret");
     expect(body.tools.googlecalendar.enable).toEqual(["GOOGLECALENDAR_CREATE_EVENT"]);
+  });
+
+  it("creates a live Composio Search session without sending an auth config", async () => {
+    const result = analyzeExperiment({
+      description: "Projectile launch angle and measured range."
+    });
+    const packet = buildEvidencePacket(result, result.rows, "Projectile launch angle and measured range.");
+    const fetchCalls: Array<{ url: string; init?: RequestInit }> = [];
+    const fetchMock = async (url: string, init?: RequestInit) => {
+      fetchCalls.push({ url, init });
+      return {
+        ok: true,
+        json: async () => ({
+          session_id: "trs_search123456",
+          mcp: {
+            url: "https://app.composio.dev/tool_router/v3/trs_search123456/mcp"
+          }
+        })
+      } as Response;
+    };
+
+    const response = await createMcpSessionTicket(
+      {
+        actionId: "composio-search-source-audit",
+        consent: true,
+        payload: {
+          title: `Ouija Evidence Packet: ${result.classification.title}`,
+          description: "Projectile launch angle and measured range.",
+          evidencePacket: packet,
+          rows: result.rows,
+          sources: result.sources
+        }
+      },
+      {
+        COMPOSIO_API_KEY: "ak_test_secret",
+        COMPOSIO_LIVE_EXPORTS: "true",
+        COMPOSIO_SESSION_USER_ID: "ouija-demo-student",
+        COMPOSIO_SEARCH_ALLOWED_TOOLS: "COMPOSIO_SEARCH_WEB,COMPOSIO_SEARCH_SCHOLAR,COMPOSIO_SEARCH_FETCH_URL_CONTENT"
+      },
+      fetchMock
+    );
+
+    expect(response.statusCode).toBe(200);
+    expect("sessionPlan" in response.body).toBe(true);
+    if (!("sessionPlan" in response.body)) {
+      throw new Error("Expected a Composio Search session response.");
+    }
+    expect(response.body.status).toBe("created");
+    expect(response.body.sessionPlan.enabledToolkit).toBe("composio_search");
+    expect(response.body.sessionPlan.authConfigConfigured).toBe(true);
+    expect(response.body.sessionPlan.enabledTools).toContain("COMPOSIO_SEARCH_SCHOLAR");
+    expect(fetchCalls).toHaveLength(1);
+    const body = JSON.parse(fetchCalls[0].init?.body as string) as {
+      user_id: string;
+      toolkits: { enable: string[] };
+      auth_configs?: Record<string, string>;
+      tools: Record<string, { enable: string[] }>;
+    };
+    expect(body.toolkits.enable).toEqual(["composio_search"]);
+    expect(body.auth_configs).toBeUndefined();
+    expect(body.tools.composio_search.enable).toEqual([
+      "COMPOSIO_SEARCH_WEB",
+      "COMPOSIO_SEARCH_SCHOLAR",
+      "COMPOSIO_SEARCH_FETCH_URL_CONTENT"
+    ]);
   });
 
   it("rejects MCP dry-runs without explicit consent", async () => {

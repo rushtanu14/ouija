@@ -38,7 +38,7 @@ export function getMcpBridgeStatus(env: EnvMap = process.env): McpBridgeStatus {
     apiKeyConfigured,
     summary: ready
       ? "Composio bridge is configured for server-side MCP sessions after consent."
-      : "Server dry-run bridge is active; live Composio execution is disabled until credentials, auth configs, allowed tools, and COMPOSIO_LIVE_EXPORTS=true are present.",
+      : "Server dry-run bridge is active; live Composio execution is disabled until credentials, allowed tools, required auth configs, and COMPOSIO_LIVE_EXPORTS=true are present.",
     executionBoundary: ready
       ? "The browser can request validation, but Composio credentials and MCP session details remain server-side."
       : "The public app validates action packets and reports connector readiness without calling Composio or third-party apps.",
@@ -252,12 +252,14 @@ export async function createMcpSessionTicket(
 function buildToolkitStatus(connector: McpConnectorCatalogItem, apiKeyConfigured: boolean, env: EnvMap): McpBridgeToolkitStatus {
   const authConfigEnv = `COMPOSIO_${connector.envSuffix}_AUTH_CONFIG_ID`;
   const allowedToolsEnv = `COMPOSIO_${connector.envSuffix}_ALLOWED_TOOLS`;
+  const authConfigRequired = connector.requiresAuthConfig !== false;
+  const allowedToolsRequired = connector.requiresAllowedToolsEnv !== false;
   const allowedTools = parseAllowedTools(env[allowedToolsEnv]);
   const authConfigConfigured = hasValue(env[authConfigEnv]);
   const allowedToolsConfigured = allowedTools.length > 0;
   const missingEnv = [
-    authConfigConfigured ? "" : authConfigEnv,
-    allowedToolsConfigured ? "" : allowedToolsEnv
+    !authConfigRequired || authConfigConfigured ? "" : authConfigEnv,
+    !allowedToolsRequired || allowedToolsConfigured ? "" : allowedToolsEnv
   ].filter(Boolean);
 
   return {
@@ -265,11 +267,13 @@ function buildToolkitStatus(connector: McpConnectorCatalogItem, apiKeyConfigured
     toolkit: connector.toolkit,
     toolkitSlug: connector.toolkitSlug,
     docsUrl: connector.docsUrl,
-    configured: apiKeyConfigured && authConfigConfigured && allowedToolsConfigured,
+    configured: apiKeyConfigured && (!authConfigRequired || authConfigConfigured) && (!allowedToolsRequired || allowedToolsConfigured),
+    authConfigRequired,
+    allowedToolsRequired,
     authConfigEnv,
     allowedToolsEnv,
-    authConfigConfigured,
-    allowedToolsConfigured,
+    authConfigConfigured: authConfigRequired ? authConfigConfigured : true,
+    allowedToolsConfigured: allowedToolsRequired ? allowedToolsConfigured : true,
     allowedTools,
     recommendedTools: connector.recommendedTools,
     missingEnv
@@ -488,7 +492,7 @@ function buildSessionResponse({
     nextStep:
       status === "created"
         ? "Attach the server-side agent runner to the issued MCP session; do not paste the raw MCP URL into client code."
-        : "Configure COMPOSIO_API_KEY, COMPOSIO_SESSION_USER_ID, live exports, this toolkit auth config, and the allowed tools before creating a live session."
+        : "Configure COMPOSIO_API_KEY, COMPOSIO_SESSION_USER_ID, live exports, allowed tools, and this toolkit auth config when required before creating a live session."
   };
 }
 
@@ -507,39 +511,44 @@ async function createComposioSession({
   const userId = env[composioSessionUserEnv]?.trim();
   const authConfigId = env[toolkit.authConfigEnv]?.trim();
 
-  if (!apiKey || !userId || !authConfigId || toolkit.allowedTools.length === 0) {
-    return { ok: false, error: "Composio session creation requires API key, session user id, auth config, and allowed tools." };
+  if (!apiKey || !userId || (toolkit.authConfigRequired && !authConfigId) || (toolkit.allowedToolsRequired && toolkit.allowedTools.length === 0)) {
+    return { ok: false, error: "Composio session creation requires API key, session user id, required auth config, and allowed tools." };
   }
 
   const baseUrl = (env[composioApiBaseUrlEnv]?.trim() || defaultComposioApiBaseUrl).replace(/\/$/, "");
+  const requestBody: Record<string, unknown> = {
+    user_id: userId,
+    toolkits: {
+      enable: [connector.toolkitSlug]
+    },
+    tools: {
+      [connector.toolkitSlug]: {
+        enable: toolkit.allowedTools.length > 0 ? toolkit.allowedTools : connector.recommendedTools
+      }
+    },
+    preload: {
+      tools: toolkit.allowedTools.length > 0 ? toolkit.allowedTools : connector.recommendedTools
+    },
+    manage_connections: {
+      enable: true,
+      enable_wait_for_connections: false,
+      enable_connection_removal: true
+    }
+  };
+
+  if (authConfigId) {
+    requestBody.auth_configs = {
+      [connector.toolkitSlug]: authConfigId
+    };
+  }
+
   const response = await fetchImpl(`${baseUrl}/tool_router/session`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       "x-api-key": apiKey
     },
-    body: JSON.stringify({
-      user_id: userId,
-      toolkits: {
-        enable: [connector.toolkitSlug]
-      },
-      auth_configs: {
-        [connector.toolkitSlug]: authConfigId
-      },
-      tools: {
-        [connector.toolkitSlug]: {
-          enable: toolkit.allowedTools
-        }
-      },
-      preload: {
-        tools: toolkit.allowedTools
-      },
-      manage_connections: {
-        enable: true,
-        enable_wait_for_connections: false,
-        enable_connection_removal: true
-      }
-    })
+    body: JSON.stringify(requestBody)
   });
   const body = (await response.json().catch(() => ({}))) as Record<string, unknown>;
 

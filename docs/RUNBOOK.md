@@ -60,7 +60,7 @@ Generated from `server/app.ts`, `api/health.ts`, and `api/evaluate.ts`.
 | Issue | Fix |
 | --- | --- |
 | `/api/analyze` returns fallback grounding | Set `OPENAI_API_KEY` in the server environment if a web-search-enriched demo is required; fallback mode is expected without credentials. |
-| MCP Integration Coach shows server dry-run | Expected for the public demo. Enable live exports only after keeping `COMPOSIO_API_KEY` out of the Vite client, configuring `COMPOSIO_SESSION_USER_ID`, `COMPOSIO_LIVE_EXPORTS=true`, `COMPOSIO_<TOOLKIT>_AUTH_CONFIG_ID`, `COMPOSIO_<TOOLKIT>_ALLOWED_TOOLS`, and preserving the consent step. |
+| MCP Integration Coach shows server dry-run | Expected for the public demo. Enable live exports only after keeping `COMPOSIO_API_KEY` out of the Vite client, configuring `COMPOSIO_SESSION_USER_ID`, `COMPOSIO_LIVE_EXPORTS=true`, `COMPOSIO_<TOOLKIT>_ALLOWED_TOOLS`, toolkit auth config IDs where required, and preserving the consent step. Composio Search uses `COMPOSIO_SEARCH_ALLOWED_TOOLS` without a private account auth config. |
 | Empty description returns `400` | Enter a non-empty experiment description before analyzing. |
 | Walkthrough recording hangs | Run with `OUIJA_CAPTION_MS=4000`; the script sets a Playwright default timeout to avoid infinite waits. |
 | Vercel API works but frontend is stale | Run `npm run build`, refresh submission assets, sync `public/submission`, then redeploy. |
