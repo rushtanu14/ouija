@@ -185,6 +185,7 @@
         <div class="panel">
           <ul>
             <li>Classifies the experiment from a student description.</li>
+            <li>Starts with Run Snapshot, Judge Demo Path, and AI Runtime Proof so evaluators immediately see workflow, rubric fit, runtime mode, and testing coverage.</li>
             <li>Shows Model Strategy with candidate ranking, matched signals, fallback logic, and risk controls.</li>
             <li>Runs AI Evaluation Harness so model behavior and safeguards are visible per analysis.</li>
             <li>Shows Data Handling Ledger with privacy score, retention, student controls, and server-only API-key boundary.</li>
@@ -224,6 +225,7 @@
             <li>Deterministic templates support eight school-lab demos without credentials.</li>
             <li>Express server optionally enriches explanations with OpenAI Responses API <code>web_search</code>.</li>
             <li>API key stays server-side; citations stay visible and clickable.</li>
+            <li>AI Runtime Proof exposes fallback/web-search readiness, eight templates, 9/9 evaluation coverage, server-only key boundary, and MCP bridge mode through <code>/api/runtime-proof</code>.</li>
             <li>AI Evaluation Harness scores classifier confidence, coverage, grounding, validation, safety, and fallback boundaries.</li>
             <li>Data Handling Ledger makes descriptions, table data, local snapshots, source use, retention, and student controls inspectable.</li>
             <li>Grounding Audit makes citation trust and source agreement visible in fallback or web-enriched mode.</li>
@@ -237,6 +239,31 @@
             <li>MCP Integration Coach turns the Evidence Packet, Pre-Lab Design Coach, Next Trial Planner, and Progress Portfolio into a consent-gated classroom export plan with env vars, tools, scopes, server dry-run checks, and data boundaries visible.</li>
             <li><code>/api/evaluate</code> tests supported coverage and low-confidence boundary behavior.</li>
           </ul>
+        </div>
+      </section>
+
+      <section>
+        <div>
+          <p class="eyebrow">Runtime Proof</p>
+          <h2>The deployed AI path is inspectable.</h2>
+        </div>
+        <div class="metric-grid">
+          <div class="metric">
+            <strong>8</strong>
+            <span>Templates ranked</span>
+          </div>
+          <div class="metric">
+            <strong>9/9</strong>
+            <span>Evaluation cases passing</span>
+          </div>
+          <div class="metric">
+            <strong>Safe</strong>
+            <span>Server-only key boundary</span>
+          </div>
+          <div class="metric">
+            <strong>Dry-run</strong>
+            <span>MCP bridge mode</span>
+          </div>
         </div>
       </section>
 
@@ -273,7 +300,7 @@
         <div class="panel">
           <ul>
             <li>Concept Coach teaches vocabulary, explanation steps, and misconception checks.</li>
-            <li>Model Strategy and AI Evaluation Harness make the AI technical design visible instead of asking judges to trust a black box.</li>
+            <li>AI Runtime Proof, Model Strategy, and AI Evaluation Harness make the AI technical design visible instead of asking judges to trust a black box.</li>
             <li>Data Handling Ledger makes the privacy and student-control story visible instead of buried in policy copy.</li>
             <li>Judge Demo Path gives evaluators a five-step route through problem fit, AI design, student workflow, evidence handoff, and submission proof.</li>
             <li>AIYES Rubric Fit shows problem relevance, AI design/model strategy, and UX/design in the live app and Evidence Packet.</li>
@@ -304,7 +331,7 @@
           <ul>
             <li>Physics: projectile motion, pendulum period vs length, and Ohm's law circuits.</li>
             <li>Chemistry: reaction rate vs temperature and density layering.</li>
-            <li>Biology: enzyme activity vs temperature.</li>
+            <li>Biology: enzyme activity vs temperature and plant growth vs light color.</li>
             <li>Earth science: water filtration and turbidity.</li>
           </ul>
         </div>
@@ -320,6 +347,7 @@
             <li><code>npm run test</code>: unit and API coverage.</li>
             <li><code>npm run build</code>: TypeScript and production build.</li>
             <li><code>npm run test:e2e</code>: browser flow and mobile overflow.</li>
+            <li><code>/api/runtime-proof</code>: active AI path, eight templates, 9/9 coverage, secret boundary, and MCP mode.</li>
             <li><code>/api/evaluate</code>: 9/9 live app evaluation bench.</li>
             <li><code>npm audit --json</code>: dependency security check.</li>
             <li><code>npm start</code>: production frontend and API smoke.</li>
@@ -336,7 +364,7 @@
           <ul>
             <li>Real student problem with a concrete user.</li>
             <li>AI used for classification, grounding, and coaching instead of generic generation.</li>
-            <li>Strong UX with Judge Demo Path, Model Strategy, AI Evaluation Harness, Data Handling Ledger, AIYES Rubric Fit, Pre-Lab Design Coach, Learning Impact Loop, Learning Exit Ticket, Student Reflection Workspace, Progress Portfolio, MCP Integration Coach and Readiness Matrix, Guided Lab Flow, Grounding Audit, visible citations, expected overlay, data checks, Pattern Evidence Engine, Method Audit, Reliability Coach, Safety Coach, Concept Coach, Custom Lab Triage, Next Trial Planner, Reasoning Trail, Evaluation Bench, Claim Coach, and Evidence Packet.</li>
+            <li>Strong UX with Run Snapshot, Judge Demo Path, AI Runtime Proof, Model Strategy, AI Evaluation Harness, Data Handling Ledger, AIYES Rubric Fit, Pre-Lab Design Coach, Learning Impact Loop, Learning Exit Ticket, Student Reflection Workspace, Progress Portfolio, MCP Integration Coach and Readiness Matrix, Guided Lab Flow, Grounding Audit, visible citations, expected overlay, data checks, Pattern Evidence Engine, Method Audit, Reliability Coach, Safety Coach, Concept Coach, Custom Lab Triage, Next Trial Planner, Reasoning Trail, Evaluation Bench, Claim Coach, and Evidence Packet.</li>
             <li>Clear next step: submit the hosted live demo, deck, and walkthrough.</li>
           </ul>
         </div>

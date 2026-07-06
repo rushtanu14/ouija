@@ -578,3 +578,14 @@ The technical-depth layer for experiment quality. Ouija evaluates independent/de
 - Public proof: `/api/runtime-proof` returns `fallback_ready`, `webSearchConfigured: false`, `templateCount: 8`, `9/9` evaluation coverage, `mcpBridgeMode: server_dry_run`, and six runtime signals; `/api/evaluate` returns `100`, `9/9`, `pass`; `/api/mcp/status` returns `server_dry_run` with seven toolkits; hosted deck and walkthrough return HTTP 200.
 - Fresh verification passed: `npm run test` (`55 passed`), `npm run build`, `npm run test:e2e` (`8 passed`), `npm audit --json` (`0 vulnerabilities`), `git diff --check`, `npm run capture:submission`, `OUIJA_URL=http://127.0.0.1:5188 OUIJA_CAPTION_MS=3000 npm run record:walkthrough`, `npm run sync:public-submission`, `ffprobe`, `shasum -a 256`, production Vercel deploy, public endpoint checks, hosted asset checks, and public desktop/mobile Playwright smoke for AI Runtime Proof with no overflow.
 - Remaining external loops: actual Devpost submission, resolving the Devpost 2-5 member team requirement ambiguity, optional live Composio credentials/export execution only after server-side setup and consent flow, and optional real OpenAI web-search demo only with explicit API-key approval.
+
+## Runtime Proof Slide Deck Sync - 2026-07-06
+
+- Council follow-up verdict: Ouija is submittable; first-place cannot be guaranteed, and the next real gap was the required slide presentation lagging the live app/video after AI Runtime Proof shipped.
+- Updated `docs/aiyes-slide-deck.html` with Runtime Proof, `/api/runtime-proof`, eight templates, 9/9 coverage, server-only key boundary, MCP bridge mode, and Plant Light biology coverage.
+- Added `tests/submissionAssets.test.ts` assertions so the required deck must include `Runtime Proof`, `/api/runtime-proof`, and `plant growth vs light color`.
+- Synced the corrected deck to `public/submission/slide-deck.html`.
+- Latest verified production deployment: `dpl_B1pd2RvZNDmByzEsapFt347MfkXb`, aliased at `https://ouija-olive.vercel.app`.
+- Public proof: hosted slide deck HTTP 200 and contains `Runtime Proof`, `/api/runtime-proof`, and `plant growth vs light color`; `/api/runtime-proof` still returns `fallback_ready`, `8` templates, `9/9` evaluation, and `server_dry_run` MCP mode.
+- Verification passed: focused `npx vitest run tests/submissionAssets.test.ts`, `npm run test` (`55 passed`), `npm run build`, `npm run test:e2e` (`8 passed`), `npm audit --json` (`0 vulnerabilities`), `git diff --check`, production deploy, hosted deck content check, and public `/api/runtime-proof`.
+- Remaining external loops: Devpost submission, 2-5 member team ambiguity, optional live Composio credentials/export after consent/server setup, and optional OpenAI web-search demo only with explicit API-key approval.

@@ -9,10 +9,21 @@ describe("AIYES submission assets", () => {
   it("includes a complete slide deck outline for the required presentation", () => {
     const deck = read("docs/aiyes-slide-deck.html");
 
-    for (const section of ["Problem", "Solution", "AI Architecture", "Technical Depth", "Academic Integrity", "Demo Flow", "Verification"]) {
+    for (const section of [
+      "Problem",
+      "Solution",
+      "AI Architecture",
+      "Runtime Proof",
+      "Technical Depth",
+      "Academic Integrity",
+      "Demo Flow",
+      "Verification"
+    ]) {
       expect(deck).toContain(section);
     }
 
+    expect(deck).toContain("/api/runtime-proof");
+    expect(deck).toContain("plant growth vs light color");
     expect(deck).not.toMatch(/TODO|TBD|placeholder/i);
   });
 
