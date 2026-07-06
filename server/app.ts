@@ -5,7 +5,7 @@ import { analyzeExperiment, mergeEnrichment } from "../src/lib/analysis";
 import { runEvaluationSuite } from "../src/lib/evaluation";
 import { buildRuntimeProof } from "../src/lib/runtimeProof";
 import type { AnalyzeRequest } from "../src/lib/types";
-import { getMcpBridgeStatus, validateMcpExportRequest } from "./mcpBridge";
+import { createMcpSessionTicket, getMcpBridgeStatus, validateMcpExportRequest } from "./mcpBridge";
 import { enrichWithOpenAIWebSearch } from "./openaiGrounding";
 
 interface AppOptions {
@@ -40,6 +40,11 @@ export function createApp(options: AppOptions = {}) {
 
   app.post("/api/mcp/export", (req, res) => {
     const response = validateMcpExportRequest(req.body);
+    res.status(response.statusCode).json(response.body);
+  });
+
+  app.post("/api/mcp/session", async (req, res) => {
+    const response = await createMcpSessionTicket(req.body);
     res.status(response.statusCode).json(response.body);
   });
 

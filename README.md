@@ -88,7 +88,7 @@ Saved Labs stores up to six browser-local lab snapshots with the experiment, tab
 
 Progress Portfolio turns those saved labs into repeated learning evidence: saved-run count, score trend, subject breadth, strongest run, milestones, and the next portfolio action.
 
-MCP Integration Coach validates a practical Composio export path for the same student-owned evidence: create a Google Docs evidence packet, append table rows to Google Sheets, save a portfolio archive to Google Drive, draft a Google Classroom pre-lab checkpoint, create a Google Forms readiness check, schedule a Google Calendar next-trial reminder, or create a Notion learning record with student-authored reflection drafts. The readiness matrix shows required auth config env vars, allowed tools, least-privilege scopes, data shared, consent gates, and dry-run checks. The public app now includes `/api/mcp/status` and `/api/mcp/export` for server-side dry-run validation; live connector execution still requires `COMPOSIO_API_KEY`, connector auth config IDs, allowed tools, `COMPOSIO_LIVE_EXPORTS=true`, and student or teacher consent before export.
+MCP Integration Coach validates a practical Composio export path for the same student-owned evidence: create a Google Docs evidence packet, append table rows to Google Sheets, save a portfolio archive to Google Drive, draft a Google Classroom pre-lab checkpoint, create a Google Forms readiness check, schedule a Google Calendar next-trial reminder, or create a Notion learning record with student-authored reflection drafts. The readiness matrix shows required auth config env vars, allowed tools, least-privilege scopes, data shared, consent gates, dry-run checks, and a scoped Composio session ticket path. The public app now includes `/api/mcp/status`, `/api/mcp/export`, and `/api/mcp/session` for server-side validation; live connector execution still requires `COMPOSIO_API_KEY`, `COMPOSIO_SESSION_USER_ID`, connector auth config IDs, allowed tools, `COMPOSIO_LIVE_EXPORTS=true`, and student or teacher consent before export.
 
 ## Run
 
@@ -120,7 +120,7 @@ PORT=8799 HOST=127.0.0.1 npm start
 
 ## Deployment
 
-The repo includes `vercel.json` and serverless API adapters under `api/` so Vercel can host the Vite app and the same-origin `/api/health`, `/api/evaluate`, `/api/runtime-proof`, `/api/analyze`, `/api/mcp/status`, and `/api/mcp/export` endpoints.
+The repo includes `vercel.json` and serverless API adapters under `api/` so Vercel can host the Vite app and the same-origin `/api/health`, `/api/evaluate`, `/api/runtime-proof`, `/api/analyze`, `/api/mcp/status`, `/api/mcp/export`, and `/api/mcp/session` endpoints.
 
 Production deployment: https://ouija-olive.vercel.app
 
@@ -130,7 +130,7 @@ Ouija works without credentials through deterministic built-in experiment templa
 
 ## Composio MCP Bridge
 
-Ouija works without Composio credentials through server dry-run validation. `GET /api/mcp/status` reports connector readiness without leaking secret values. `POST /api/mcp/export` validates a consent-gated packet for Google Docs, Sheets, Drive, Classroom, Forms, Calendar, or Notion and stops before any external write unless a future live bridge is configured server-side.
+Ouija works without Composio credentials through server dry-run validation. `GET /api/mcp/status` reports connector readiness without leaking secret values. `POST /api/mcp/export` validates a consent-gated packet for Google Docs, Sheets, Drive, Classroom, Forms, Calendar, or Notion. `POST /api/mcp/session` shows the scoped Tool Router session plan in public mode and can create a server-side Composio session only when live env gates are configured; it withholds raw MCP URLs from browser responses.
 
 ## Submission Assets
 
@@ -155,5 +155,7 @@ npm run sync:public-submission
 
 Hosted submission links after deployment:
 
+- Source code: https://github.com/rushtanu14/ouija
+- Live demo: https://ouija-olive.vercel.app
 - Slide deck: https://ouija-olive.vercel.app/submission/slide-deck.html
 - Video walkthrough: https://ouija-olive.vercel.app/submission/assets/ouija-walkthrough.webm

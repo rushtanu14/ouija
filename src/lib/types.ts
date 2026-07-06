@@ -624,6 +624,32 @@ export interface McpBridgeExportResponse {
   nextStep: string;
 }
 
+export interface McpBridgeSessionResponse {
+  status: "dry_run" | "created" | "blocked";
+  actionId: McpIntegrationActionId;
+  toolkit: McpIntegrationAction["toolkit"];
+  mode: McpBridgeStatus["mode"];
+  summary: string;
+  executionBoundary: string;
+  checks: McpBridgeExportCheck[];
+  target: McpBridgeExportResponse["target"] & {
+    sessionUserEnv: string;
+    apiBaseUrlEnv: string;
+  };
+  sessionPlan: {
+    endpoint: string;
+    userIdConfigured: boolean;
+    authConfigConfigured: boolean;
+    allowedToolsConfigured: boolean;
+    enabledToolkit: string;
+    enabledTools: string[];
+    mcpUrlIssued: boolean;
+    sessionIdPreview?: string;
+  };
+  sanitizedPayload: McpBridgeExportResponse["sanitizedPayload"];
+  nextStep: string;
+}
+
 export type RubricStatus = "strong" | "ready" | "review";
 
 export interface RubricCriterionFit {

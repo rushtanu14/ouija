@@ -11,7 +11,7 @@ const recordingDir = mkdtempSync(join(tmpdir(), "ouija-walkthrough-"));
 const outputPath = resolve(assetDir, "ouija-walkthrough.webm");
 const captionDurationMs = Number(process.env.OUIJA_CAPTION_MS ?? 8500);
 let captionIndex = 0;
-const captionTotal = 37;
+const captionTotal = 38;
 
 mkdirSync(assetDir, { recursive: true });
 
@@ -218,6 +218,13 @@ await caption(
   page,
   "Server MCP dry-run",
   "The public app calls /api/mcp/export, validates consent, payload, integrity blanks, and credential boundaries, then stops before any external Google or Composio write."
+);
+await page.getByLabel("MCP session ticket result").getByText("Session dry-run", { exact: true }).waitFor();
+await page.getByLabel("MCP session ticket result").scrollIntoViewIfNeeded();
+await caption(
+  page,
+  "Scoped Composio session ticket",
+  "Ouija also prepares the /api/mcp/session scope: selected toolkit, allowed tools, session user env, and raw MCP URL withholding stay visible before any live connector runs."
 );
 
 await page.locator("#evaluation").scrollIntoViewIfNeeded();

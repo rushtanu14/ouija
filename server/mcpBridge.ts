@@ -3,6 +3,7 @@ import type {
   McpBridgeExportCheck,
   McpBridgeExportRequest,
   McpBridgeExportResponse,
+  McpBridgeSessionResponse,
   McpBridgeStatus,
   McpBridgeToolkitStatus,
   McpConnectorCatalogItem,
@@ -11,18 +12,24 @@ import type {
 } from "../src/lib/types.js";
 
 type EnvMap = Record<string, string | undefined>;
+type FetchLike = (input: string, init?: RequestInit) => Promise<Response>;
 
 interface BridgeResponse<T> {
   statusCode: number;
   body: T;
 }
 
+const composioSessionUserEnv = "COMPOSIO_SESSION_USER_ID";
+const composioApiBaseUrlEnv = "COMPOSIO_API_BASE_URL";
+const defaultComposioApiBaseUrl = "https://backend.composio.dev/api/v3.1";
+
 export function getMcpBridgeStatus(env: EnvMap = process.env): McpBridgeStatus {
   const apiKeyConfigured = hasValue(env.COMPOSIO_API_KEY);
   const liveExportsEnabled = env.COMPOSIO_LIVE_EXPORTS === "true";
   const toolkits = MCP_CONNECTOR_CATALOG.map((connector) => buildToolkitStatus(connector, apiKeyConfigured, env));
-  const missingEnv = buildMissingEnv(apiKeyConfigured, liveExportsEnabled, toolkits);
-  const ready = liveExportsEnabled && apiKeyConfigured && toolkits.every((toolkit) => toolkit.configured);
+  const sessionUserConfigured = hasValue(env[composioSessionUserEnv]);
+  const missingEnv = buildMissingEnv(apiKeyConfigured, liveExportsEnabled, sessionUserConfigured, toolkits);
+  const ready = liveExportsEnabled && apiKeyConfigured && sessionUserConfigured && toolkits.every((toolkit) => toolkit.configured);
 
   return {
     status: ready ? "ready" : "server_dry_run",
@@ -41,6 +48,10 @@ export function getMcpBridgeStatus(env: EnvMap = process.env): McpBridgeStatus {
       {
         label: "Composio sessions",
         url: "https://docs.composio.dev/docs/how-composio-works"
+      },
+      {
+        label: "Configuring sessions",
+        url: "https://docs.composio.dev/docs/configuring-sessions"
       },
       {
         label: "MCP sessions migration",
@@ -125,6 +136,119 @@ export function validateMcpExportRequest(rawBody: unknown, env: EnvMap = process
   };
 }
 
+export async function createMcpSessionTicket(
+  rawBody: unknown,
+  env: EnvMap = process.env,
+  fetchImpl: FetchLike = fetch
+): Promise<BridgeResponse<McpBridgeSessionResponse | { error: string }>> {
+  const request = parseRequest(rawBody);
+
+  if (!request) {
+    return {
+      statusCode: 400,
+      body: { error: "Send an MCP session action, consent flag, and payload for a scoped Composio session ticket." }
+    };
+  }
+
+  const connector = MCP_CONNECTOR_CATALOG.find((candidate) => candidate.id === request.actionId);
+
+  if (!connector) {
+    return {
+      statusCode: 400,
+      body: { error: "Choose one of Ouija's supported Composio MCP actions." }
+    };
+  }
+
+  if (!request.consent) {
+    return {
+      statusCode: 400,
+      body: { error: "Student or teacher consent is required before preparing a Composio MCP session." }
+    };
+  }
+
+  const bridge = getMcpBridgeStatus(env);
+  const toolkit = bridge.toolkits.find((candidate) => candidate.actionId === connector.id) ?? buildToolkitStatus(connector, bridge.apiKeyConfigured, env);
+  const payload = normalizePayload(request.payload);
+  const checks = buildExportChecks({
+    payload,
+    bridge,
+    toolkit
+  });
+  const sessionReady = isToolkitReadyForSession({
+    bridge,
+    toolkit,
+    env
+  });
+  const sessionChecks = sessionReady ? markSelectedSessionCredentialsReady(checks, toolkit) : checks;
+  const blocked = sessionChecks.some((check) => check.status === "blocked");
+
+  if (blocked) {
+    return {
+      statusCode: 200,
+      body: buildSessionResponse({
+        status: "blocked",
+        connector,
+        toolkit,
+        payload,
+        bridgeMode: bridge.mode,
+        bridge,
+        env,
+        checks: sessionChecks,
+        sessionCreated: false,
+        sessionId: undefined
+      })
+    };
+  }
+
+  if (!sessionReady) {
+    return {
+      statusCode: 200,
+      body: buildSessionResponse({
+        status: "dry_run",
+        connector,
+        toolkit,
+        payload,
+        bridgeMode: "server_dry_run",
+        bridge,
+        env,
+        checks: sessionChecks,
+        sessionCreated: false,
+        sessionId: undefined
+      })
+    };
+  }
+
+  const sessionResult = await createComposioSession({
+    connector,
+    toolkit,
+    env,
+    fetchImpl
+  });
+
+  if (!sessionResult.ok) {
+    return {
+      statusCode: 502,
+      body: { error: sessionResult.error }
+    };
+  }
+
+  return {
+    statusCode: 200,
+    body: buildSessionResponse({
+      status: "created",
+      connector,
+      toolkit,
+      payload,
+      bridgeMode: "server_mcp",
+      bridge,
+      env,
+      checks: sessionChecks,
+      sessionCreated: sessionResult.mcpUrlIssued,
+      sessionId: sessionResult.sessionId
+    })
+  };
+}
+
 function buildToolkitStatus(connector: McpConnectorCatalogItem, apiKeyConfigured: boolean, env: EnvMap): McpBridgeToolkitStatus {
   const authConfigEnv = `COMPOSIO_${connector.envSuffix}_AUTH_CONFIG_ID`;
   const allowedToolsEnv = `COMPOSIO_${connector.envSuffix}_ALLOWED_TOOLS`;
@@ -152,10 +276,16 @@ function buildToolkitStatus(connector: McpConnectorCatalogItem, apiKeyConfigured
   };
 }
 
-function buildMissingEnv(apiKeyConfigured: boolean, liveExportsEnabled: boolean, toolkits: McpBridgeToolkitStatus[]) {
+function buildMissingEnv(
+  apiKeyConfigured: boolean,
+  liveExportsEnabled: boolean,
+  sessionUserConfigured: boolean,
+  toolkits: McpBridgeToolkitStatus[]
+) {
   return [
     apiKeyConfigured ? "" : "COMPOSIO_API_KEY",
     liveExportsEnabled ? "" : "COMPOSIO_LIVE_EXPORTS=true",
+    sessionUserConfigured ? "" : composioSessionUserEnv,
     ...toolkits.flatMap((toolkit) => toolkit.missingEnv)
   ].filter(Boolean);
 }
@@ -212,6 +342,18 @@ function buildExportChecks({
   ];
 }
 
+function markSelectedSessionCredentialsReady(checks: McpBridgeExportCheck[], toolkit: McpBridgeToolkitStatus): McpBridgeExportCheck[] {
+  return checks.map((check) =>
+    check.id === "credentials"
+      ? {
+          ...check,
+          status: "pass",
+          detail: `${toolkit.toolkit} has server-side Composio env vars configured for this scoped session without exposing values to the browser.`
+        }
+      : check
+  );
+}
+
 function parseRequest(rawBody: unknown): McpBridgeExportRequest | null {
   const body = typeof rawBody === "string" ? parseJson(rawBody) : rawBody;
   if (!isRecord(body) || typeof body.actionId !== "string" || typeof body.consent !== "boolean" || !isRecord(body.payload)) return null;
@@ -264,4 +406,157 @@ function hasValue(value: string | undefined) {
 function previewText(value: string, length: number) {
   const compact = value.replace(/\s+/g, " ").trim();
   return compact.length > length ? `${compact.slice(0, length - 3)}...` : compact;
+}
+
+function isToolkitReadyForSession({
+  bridge,
+  toolkit,
+  env
+}: {
+  bridge: McpBridgeStatus;
+  toolkit: McpBridgeToolkitStatus;
+  env: EnvMap;
+}) {
+  return bridge.liveExportsEnabled && bridge.apiKeyConfigured && toolkit.configured && hasValue(env[composioSessionUserEnv]);
+}
+
+function buildSessionResponse({
+  status,
+  connector,
+  toolkit,
+  payload,
+  bridgeMode,
+  bridge,
+  env,
+  checks,
+  sessionCreated,
+  sessionId
+}: {
+  status: McpBridgeSessionResponse["status"];
+  connector: McpConnectorCatalogItem;
+  toolkit: McpBridgeToolkitStatus;
+  payload: McpBridgeExportRequest["payload"];
+  bridgeMode: McpBridgeStatus["mode"];
+  bridge: McpBridgeStatus;
+  env: EnvMap;
+  checks: McpBridgeExportCheck[];
+  sessionCreated: boolean;
+  sessionId: string | undefined;
+}): McpBridgeSessionResponse {
+  return {
+    status,
+    actionId: connector.id,
+    toolkit: connector.toolkit,
+    mode: bridgeMode,
+    summary:
+      status === "created"
+        ? "A scoped Composio Tool Router session was created server-side for this consent-gated action."
+        : status === "blocked"
+          ? "The session ticket is blocked until the packet has enough student-visible evidence."
+          : "Session dry-run only: Ouija shows the exact Composio session scope but does not contact Composio without live server credentials.",
+    executionBoundary:
+      status === "created"
+        ? "The server created the session and withheld the raw MCP URL from browser code."
+        : bridge.executionBoundary,
+    checks,
+    target: {
+      toolkitSlug: connector.toolkitSlug,
+      authConfigEnv: toolkit.authConfigEnv,
+      allowedToolsEnv: toolkit.allowedToolsEnv,
+      recommendedTools: toolkit.allowedTools.length > 0 ? toolkit.allowedTools : connector.recommendedTools,
+      docsUrl: connector.docsUrl,
+      sessionUserEnv: composioSessionUserEnv,
+      apiBaseUrlEnv: composioApiBaseUrlEnv
+    },
+    sessionPlan: {
+      endpoint: "/api/v3.1/tool_router/session",
+      userIdConfigured: hasValue(env[composioSessionUserEnv]),
+      authConfigConfigured: toolkit.authConfigConfigured,
+      allowedToolsConfigured: toolkit.allowedToolsConfigured,
+      enabledToolkit: connector.toolkitSlug,
+      enabledTools: toolkit.allowedTools.length > 0 ? toolkit.allowedTools : connector.recommendedTools,
+      mcpUrlIssued: sessionCreated,
+      sessionIdPreview: sessionId ? previewIdentifier(sessionId) : undefined
+    },
+    sanitizedPayload: {
+      title: payload.title,
+      rowCount: payload.rows.length,
+      sourceCount: payload.sources.length,
+      descriptionPreview: previewText(payload.description, 180),
+      evidenceExcerpt: previewText(payload.evidencePacket, 500)
+    },
+    nextStep:
+      status === "created"
+        ? "Attach the server-side agent runner to the issued MCP session; do not paste the raw MCP URL into client code."
+        : "Configure COMPOSIO_API_KEY, COMPOSIO_SESSION_USER_ID, live exports, this toolkit auth config, and the allowed tools before creating a live session."
+  };
+}
+
+async function createComposioSession({
+  connector,
+  toolkit,
+  env,
+  fetchImpl
+}: {
+  connector: McpConnectorCatalogItem;
+  toolkit: McpBridgeToolkitStatus;
+  env: EnvMap;
+  fetchImpl: FetchLike;
+}): Promise<{ ok: true; sessionId: string | undefined; mcpUrlIssued: boolean } | { ok: false; error: string }> {
+  const apiKey = env.COMPOSIO_API_KEY?.trim();
+  const userId = env[composioSessionUserEnv]?.trim();
+  const authConfigId = env[toolkit.authConfigEnv]?.trim();
+
+  if (!apiKey || !userId || !authConfigId || toolkit.allowedTools.length === 0) {
+    return { ok: false, error: "Composio session creation requires API key, session user id, auth config, and allowed tools." };
+  }
+
+  const baseUrl = (env[composioApiBaseUrlEnv]?.trim() || defaultComposioApiBaseUrl).replace(/\/$/, "");
+  const response = await fetchImpl(`${baseUrl}/tool_router/session`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": apiKey
+    },
+    body: JSON.stringify({
+      user_id: userId,
+      toolkits: {
+        enable: [connector.toolkitSlug]
+      },
+      auth_configs: {
+        [connector.toolkitSlug]: authConfigId
+      },
+      tools: {
+        [connector.toolkitSlug]: {
+          enable: toolkit.allowedTools
+        }
+      },
+      preload: {
+        tools: toolkit.allowedTools
+      },
+      manage_connections: {
+        enable: true,
+        enable_wait_for_connections: false,
+        enable_connection_removal: true
+      }
+    })
+  });
+  const body = (await response.json().catch(() => ({}))) as Record<string, unknown>;
+
+  if (!response.ok) {
+    const error = isRecord(body.error) && typeof body.error.message === "string" ? body.error.message : "Composio session creation failed.";
+    return { ok: false, error };
+  }
+
+  const mcp = isRecord(body.mcp) ? body.mcp : {};
+  return {
+    ok: true,
+    sessionId: typeof body.session_id === "string" ? body.session_id : undefined,
+    mcpUrlIssued: typeof mcp.url === "string" && mcp.url.length > 0
+  };
+}
+
+function previewIdentifier(value: string) {
+  if (value.length <= 10) return value;
+  return `${value.slice(0, 6)}...${value.slice(-4)}`;
 }

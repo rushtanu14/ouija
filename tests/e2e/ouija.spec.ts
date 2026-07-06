@@ -175,7 +175,11 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(page.getByLabel("AI Model Card").getByText("Grounding Audit checks source agreement before students use the expected pattern.")).toBeVisible();
   await expect(page.getByLabel("AI Model Card").getByText("Pattern Evidence Engine quantifies whether the dataset supports the expected science pattern.")).toBeVisible();
   await expect(page.getByLabel("AI Model Card").getByText("Reliability Coach checks repeated trials, averages, and spread before students trust a claim.")).toBeVisible();
-  await expect(page.getByLabel("AI Model Card").getByText("MCP Integration Coach keeps Composio credentials server-side, validates packets with /api/mcp/export, and requires student consent before any export.")).toBeVisible();
+  await expect(
+    page
+      .getByLabel("AI Model Card")
+      .getByText("MCP Integration Coach keeps Composio credentials server-side, validates packets with /api/mcp/export, prepares session tickets with /api/mcp/session, and requires student consent before any export.")
+  ).toBeVisible();
   await expect(page.getByLabel("AI Model Card").getByText("MCP Readiness Matrix makes connector tools, scopes, dry-run checks, and least-privilege boundaries inspectable.")).toBeVisible();
   await expect(page.getByLabel("AI Model Card").getByText("Safety Coach forces adult-review language when a lab match is uncertain.")).toBeVisible();
   await expect(page.getByLabel("AI Model Card").getByText("Evaluation Bench tests eight supported labs plus the unsupported boundary.")).toBeVisible();
@@ -224,6 +228,9 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await page.locator(".mcp-action-card").filter({ hasText: "Google Calendar" }).getByRole("button", { name: "Validate route" }).click();
   await expect(page.getByLabel("MCP export dry-run result").getByText("Dry-run passed", { exact: true })).toBeVisible();
   await expect(page.getByLabel("MCP export dry-run result").getByText("GOOGLECALENDAR_CREATE_EVENT")).toBeVisible();
+  await expect(page.getByLabel("MCP session ticket result").getByText("Session dry-run", { exact: true })).toBeVisible();
+  await expect(page.getByLabel("MCP session ticket result").getByText("/api/v3.1/tool_router/session")).toBeVisible();
+  await expect(page.getByLabel("MCP session ticket result").getByText("MCP URL issued: no")).toBeVisible();
   await page.getByRole("link", { name: "Settings" }).click();
   await expect(page.getByLabel("Settings", { exact: true }).getByText("Local snapshots")).toBeVisible();
   await expect(page.getByLabel("Settings", { exact: true }).getByText("1/6")).toBeVisible();
@@ -260,7 +267,11 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(page.getByLabel("Judge Brief").getByText("Evaluation Bench runs nine live cases.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Data Handling Ledger shows privacy, retention, and student controls.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Evidence Packet exports a student-owned reasoning handoff.")).toBeVisible();
-  await expect(page.getByLabel("Judge Brief").getByText("MCP Integration Coach validates Composio Docs, Sheets, Drive, Classroom, Forms, Calendar, and Notion handoffs through a server dry-run without exposing credentials.")).toBeVisible();
+  await expect(
+    page
+      .getByLabel("Judge Brief")
+      .getByText("MCP Integration Coach validates Composio Docs, Sheets, Drive, Classroom, Forms, Calendar, and Notion handoffs through a server dry-run and scoped session ticket without exposing credentials.")
+  ).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("MCP Readiness Matrix shows exact connector env vars, tools, scopes, data shared, dry-run checks, and consent gates.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Next Trial Planner gives adaptive measurement guidance.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Hosted deck and walkthrough are public.")).toBeVisible();

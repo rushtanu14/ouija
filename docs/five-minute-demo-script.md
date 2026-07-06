@@ -14,7 +14,7 @@ Open Ouija. Click `Reaction Rate`. Show that a normal student description become
 
 Show Judge Demo Path: problem fit, AI design, student workflow, evidence handoff, and submission proof. This keeps the live walkthrough easy for judges to follow before you scroll into the deeper panels.
 
-Show AI Runtime Proof: fallback/web-search readiness, live evaluation coverage, server-only secret boundary, and MCP bridge mode. Mention that `/api/runtime-proof`, `/api/evaluate`, and `/api/mcp/status` are public smoke checks.
+Show AI Runtime Proof: fallback/web-search readiness, live evaluation coverage, server-only secret boundary, and MCP bridge mode. Mention that `/api/runtime-proof`, `/api/evaluate`, `/api/mcp/status`, and the consent-gated `/api/mcp/session` dry-run are public smoke checks.
 
 ## 1:20-1:38 - Model Strategy
 

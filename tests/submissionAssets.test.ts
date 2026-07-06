@@ -23,6 +23,7 @@ describe("AIYES submission assets", () => {
     }
 
     expect(deck).toContain("/api/runtime-proof");
+    expect(deck).toContain("/api/mcp/session");
     expect(deck).toContain("plant growth vs light color");
     expect(deck).not.toMatch(/TODO|TBD|placeholder/i);
   });
@@ -38,6 +39,7 @@ describe("AIYES submission assets", () => {
     expect(copy).toContain("Student Reflection Workspace");
     expect(copy).toContain("Pre-Lab Design Coach");
     expect(copy).toContain("MCP Integration Coach");
+    expect(copy).toContain("/api/mcp/session");
     expect(copy).toContain("Google Classroom");
     expect(assets).toContain("Progress Portfolio");
     expect(assets).toContain("npm run capture:submission");
@@ -45,6 +47,8 @@ describe("AIYES submission assets", () => {
     expect(assets).toContain("npm run sync:public-submission");
     expect(copy).toContain("https://ouija-olive.vercel.app/submission/slide-deck.html");
     expect(copy).toContain("https://ouija-olive.vercel.app/submission/assets/ouija-walkthrough.webm");
+    expect(copy).toContain("https://github.com/rushtanu14/ouija");
+    expect(assets).toContain("https://github.com/rushtanu14/ouija");
     expect(assets).toContain("ouija-walkthrough.webm");
     expect(`${copy}\n${assets}`).not.toMatch(/TODO|TBD|placeholder|use the repository URL|use the final recorded/i);
     expect(`${copy}\n${assets}`).not.toMatch(/upload the walkthrough video|finalize the video walkthrough URL/i);

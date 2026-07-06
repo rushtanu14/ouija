@@ -188,6 +188,7 @@ export function buildMcpIntegrationPlan({
         "Learning Exit Ticket prompts",
         "Google Forms readiness prompts",
         "Google Calendar next-trial reminder",
+        "Composio session ticket scope",
         "Student Reflection Drafts",
         "Integrity boundary"
       ],
@@ -195,7 +196,7 @@ export function buildMcpIntegrationPlan({
     },
     safeguards: buildSafeguards(status),
     judgeTakeaway:
-      "MCP Integration Coach connects Ouija to a real classroom handoff path with connector prerequisites, least-privilege scopes, server dry-runs, and consent gates visible to judges."
+      "MCP Integration Coach connects Ouija to a real classroom handoff path with connector prerequisites, least-privilege scopes, server dry-runs, scoped session tickets, and consent gates visible to judges."
   };
 }
 
@@ -229,6 +230,7 @@ function buildSafeguards(status: McpIntegrationPlan["status"]) {
     firstLine,
       "COMPOSIO_API_KEY must stay server-side and must never be bundled into the Vite client.",
       "Every export action requires student or teacher consent before a live connector runs.",
+      "Scoped Composio sessions are prepared server-side and raw MCP URLs are withheld from browser responses.",
       "Google Classroom handoff creates a teacher-review checkpoint, not an auto-submitted assignment.",
       "Google Forms handoff creates student prompts, not completed answers.",
       "Google Calendar handoff schedules a next-trial reminder, not a generated result.",

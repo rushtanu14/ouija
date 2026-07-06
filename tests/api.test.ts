@@ -7,11 +7,14 @@ import { join } from "node:path";
 import { analyzeExperiment } from "../src/lib/analysis";
 import { buildEvidencePacket } from "../src/lib/evidencePacket";
 import { MCP_CONNECTOR_CATALOG } from "../src/lib/mcpIntegrationPlan";
+import { createMcpSessionTicket } from "../server/mcpBridge";
 
 const originalKey = process.env.OPENAI_API_KEY;
 const composioEnvKeys = [
   "COMPOSIO_API_KEY",
   "COMPOSIO_LIVE_EXPORTS",
+  "COMPOSIO_SESSION_USER_ID",
+  "COMPOSIO_API_BASE_URL",
   ...MCP_CONNECTOR_CATALOG.flatMap((connector) => [
     `COMPOSIO_${connector.envSuffix}_AUTH_CONFIG_ID`,
     `COMPOSIO_${connector.envSuffix}_ALLOWED_TOOLS`
@@ -225,6 +228,107 @@ describe("Composio MCP bridge API", () => {
     expect(response.body.sanitizedPayload.rowCount).toBe(result.rows.length);
     expect(response.body.checks.find((check: { id: string }) => check.id === "consent")?.status).toBe("pass");
     expect(response.body.checks.find((check: { id: string }) => check.id === "credentials")?.status).toBe("review");
+  });
+
+  it("prepares a scoped Composio session ticket as a dry run without credentials", async () => {
+    clearComposioEnv();
+    const app = createApp();
+    const result = analyzeExperiment({
+      description: "Projectile launch angle and measured range."
+    });
+    const packet = buildEvidencePacket(result, result.rows, "Projectile launch angle and measured range.");
+
+    const response = await request(app)
+      .post("/api/mcp/session")
+      .send({
+        actionId: "google-calendar-next-trial-reminder",
+        consent: true,
+        payload: {
+          title: `Ouija Evidence Packet: ${result.classification.title}`,
+          description: "Projectile launch angle and measured range.",
+          evidencePacket: packet,
+          rows: result.rows,
+          sources: result.sources
+        }
+      })
+      .expect(200);
+
+    expect(response.body.status).toBe("dry_run");
+    expect(response.body.toolkit).toBe("Google Calendar");
+    expect(response.body.sessionPlan.enabledToolkit).toBe("googlecalendar");
+    expect(response.body.sessionPlan.enabledTools).toContain("GOOGLECALENDAR_CREATE_EVENT");
+    expect(response.body.sessionPlan.mcpUrlIssued).toBe(false);
+    expect(response.body.target.sessionUserEnv).toBe("COMPOSIO_SESSION_USER_ID");
+    expect(JSON.stringify(response.body)).not.toContain("ak_");
+  });
+
+  it("creates a live Composio session server-side when the selected toolkit is configured", async () => {
+    const result = analyzeExperiment({
+      description: "Projectile launch angle and measured range."
+    });
+    const packet = buildEvidencePacket(result, result.rows, "Projectile launch angle and measured range.");
+    const fetchCalls: Array<{ url: string; init?: RequestInit }> = [];
+    const fetchMock = async (url: string, init?: RequestInit) => {
+      fetchCalls.push({ url, init });
+      return {
+        ok: true,
+        json: async () => ({
+          session_id: "trs_abcdef123456",
+          mcp: {
+            url: "https://app.composio.dev/tool_router/v3/trs_abcdef123456/mcp"
+          }
+        })
+      } as Response;
+    };
+
+    const response = await createMcpSessionTicket(
+      {
+        actionId: "google-calendar-next-trial-reminder",
+        consent: true,
+        payload: {
+          title: `Ouija Evidence Packet: ${result.classification.title}`,
+          description: "Projectile launch angle and measured range.",
+          evidencePacket: packet,
+          rows: result.rows,
+          sources: result.sources
+        }
+      },
+      {
+        COMPOSIO_API_KEY: "ak_test_secret",
+        COMPOSIO_LIVE_EXPORTS: "true",
+        COMPOSIO_SESSION_USER_ID: "ouija-demo-student",
+        COMPOSIO_GOOGLE_CALENDAR_AUTH_CONFIG_ID: "ac_calendar_secret",
+        COMPOSIO_GOOGLE_CALENDAR_ALLOWED_TOOLS: "GOOGLECALENDAR_CREATE_EVENT"
+      },
+      fetchMock
+    );
+
+    expect(response.statusCode).toBe(200);
+    expect("sessionPlan" in response.body).toBe(true);
+    if (!("sessionPlan" in response.body)) {
+      throw new Error("Expected a Composio session response.");
+    }
+    expect(response.body.status).toBe("created");
+    expect(response.body.mode).toBe("server_mcp");
+    expect(response.body.sessionPlan.mcpUrlIssued).toBe(true);
+    expect(response.body.sessionPlan.sessionIdPreview).toBe("trs_ab...3456");
+    expect(response.body.checks.find((check) => check.id === "credentials")?.status).toBe("pass");
+    expect(JSON.stringify(response.body)).not.toContain("ak_test_secret");
+    expect(JSON.stringify(response.body)).not.toContain("ac_calendar_secret");
+    expect(JSON.stringify(response.body)).not.toContain("https://app.composio.dev/tool_router");
+    expect(fetchCalls).toHaveLength(1);
+    expect(fetchCalls[0].url).toBe("https://backend.composio.dev/api/v3.1/tool_router/session");
+    expect((fetchCalls[0].init?.headers as Record<string, string>)["x-api-key"]).toBe("ak_test_secret");
+    const body = JSON.parse(fetchCalls[0].init?.body as string) as {
+      user_id: string;
+      toolkits: { enable: string[] };
+      auth_configs: Record<string, string>;
+      tools: Record<string, { enable: string[] }>;
+    };
+    expect(body.user_id).toBe("ouija-demo-student");
+    expect(body.toolkits.enable).toEqual(["googlecalendar"]);
+    expect(body.auth_configs.googlecalendar).toBe("ac_calendar_secret");
+    expect(body.tools.googlecalendar.enable).toEqual(["GOOGLECALENDAR_CREATE_EVENT"]);
   });
 
   it("rejects MCP dry-runs without explicit consent", async () => {

@@ -3,6 +3,7 @@ import analyzeHandler from "../api/analyze";
 import evaluateHandler from "../api/evaluate";
 import healthHandler from "../api/health";
 import mcpExportHandler from "../api/mcp/export";
+import mcpSessionHandler from "../api/mcp/session";
 import mcpStatusHandler from "../api/mcp/status";
 import runtimeProofHandler from "../api/runtime-proof";
 import { analyzeExperiment } from "../src/lib/analysis";
@@ -13,6 +14,8 @@ const originalKey = process.env.OPENAI_API_KEY;
 const composioEnvKeys = [
   "COMPOSIO_API_KEY",
   "COMPOSIO_LIVE_EXPORTS",
+  "COMPOSIO_SESSION_USER_ID",
+  "COMPOSIO_API_BASE_URL",
   ...MCP_CONNECTOR_CATALOG.flatMap((connector) => [
     `COMPOSIO_${connector.envSuffix}_AUTH_CONFIG_ID`,
     `COMPOSIO_${connector.envSuffix}_ALLOWED_TOOLS`
@@ -166,6 +169,38 @@ describe("Vercel API functions", () => {
     expect(response.body.toolkit).toBe("Google Forms");
     expect(response.body.target.authConfigEnv).toBe("COMPOSIO_GOOGLE_FORMS_AUTH_CONFIG_ID");
     expect(response.body.checks.find((check: { id: string }) => check.id === "payload")?.status).toBe("pass");
+  });
+
+  it("prepares a Composio MCP session dry-run through the serverless function", async () => {
+    clearComposioEnv();
+    const result = analyzeExperiment({
+      description: "Temperature changes reaction rate for an effervescent tablet."
+    });
+    const response = createMockResponse();
+
+    await mcpSessionHandler(
+      {
+        method: "POST",
+        body: {
+          actionId: "google-forms-readiness-check",
+          consent: true,
+          payload: {
+            title: `Ouija Evidence Packet: ${result.classification.title}`,
+            description: "Temperature changes reaction rate for an effervescent tablet.",
+            evidencePacket: buildEvidencePacket(result, result.rows, "Temperature changes reaction rate for an effervescent tablet."),
+            rows: result.rows,
+            sources: result.sources
+          }
+        }
+      },
+      response.res
+    );
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body.status).toBe("dry_run");
+    expect(response.body.sessionPlan.enabledToolkit).toBe("googleforms");
+    expect(response.body.sessionPlan.mcpUrlIssued).toBe(false);
+    expect(response.body.target.sessionUserEnv).toBe("COMPOSIO_SESSION_USER_ID");
   });
 });
 

@@ -4,6 +4,7 @@ import type {
   EvaluationReport,
   McpBridgeExportRequest,
   McpBridgeExportResponse,
+  McpBridgeSessionResponse,
   McpBridgeStatus,
   RuntimeProof
 } from "./types";
@@ -66,4 +67,19 @@ export async function requestMcpExport(payload: McpBridgeExportRequest): Promise
   }
 
   return response.json() as Promise<McpBridgeExportResponse>;
+}
+
+export async function requestMcpSession(payload: McpBridgeExportRequest): Promise<McpBridgeSessionResponse> {
+  const response = await fetch("/api/mcp/session", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  });
+
+  if (!response.ok) {
+    const body = (await response.json().catch(() => ({}))) as { error?: string };
+    throw new Error(body.error ?? "Ouija could not prepare this MCP session ticket.");
+  }
+
+  return response.json() as Promise<McpBridgeSessionResponse>;
 }

@@ -71,13 +71,15 @@ describe("MCP integration plan", () => {
     expect(plan.payloadPreview.includedSections).toContain("Pre-Lab Design Coach");
     expect(plan.payloadPreview.includedSections).toContain("Google Forms readiness prompts");
     expect(plan.payloadPreview.includedSections).toContain("Google Calendar next-trial reminder");
+    expect(plan.payloadPreview.includedSections).toContain("Composio session ticket scope");
     expect(plan.payloadPreview.includedSections).toContain("Student Reflection Drafts");
     expect(plan.payloadPreview.markdownExcerpt).toContain("## Student Description");
     expect(plan.safeguards).toContain("Preview mode does not call Composio, Google Classroom, Google Workspace, or Notion APIs.");
+    expect(plan.safeguards).toContain("Scoped Composio sessions are prepared server-side and raw MCP URLs are withheld from browser responses.");
     expect(plan.safeguards).toContain("Google Calendar handoff schedules a next-trial reminder, not a generated result.");
     expect(plan.safeguards).toContain("Reflection drafts are exported only when the student typed them in the workspace.");
     expect(plan.privacyBoundary).toContain("Student chooses");
-    expect(plan.judgeTakeaway).toContain("real classroom handoff");
+    expect(plan.judgeTakeaway).toContain("scoped session tickets");
   });
 
   it("marks the same workflow ready only when a server-side MCP bridge is configured", () => {

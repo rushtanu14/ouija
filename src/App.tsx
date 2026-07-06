@@ -33,7 +33,7 @@ import {
   XAxis,
   YAxis
 } from "recharts";
-import { requestAnalysis, requestEvaluation, requestMcpExport, requestMcpStatus, requestRuntimeProof } from "./lib/api";
+import { requestAnalysis, requestEvaluation, requestMcpExport, requestMcpSession, requestMcpStatus, requestRuntimeProof } from "./lib/api";
 import { refreshResultForRows } from "./lib/analysis";
 import { buildPasteExample, parsePastedTable } from "./lib/dataImport";
 import { buildEvidencePacket } from "./lib/evidencePacket";
@@ -55,7 +55,9 @@ import type {
   LabBrief,
   LearningExitTicket,
   LearningImpactSnapshot,
+  McpBridgeExportRequest,
   McpBridgeExportResponse,
+  McpBridgeSessionResponse,
   McpBridgeStatus,
   McpIntegrationActionId,
   McpIntegrationPlan,
@@ -96,6 +98,7 @@ export function App() {
   const [runtimeProof, setRuntimeProof] = useState<RuntimeProof | null>(null);
   const [mcpBridgeStatus, setMcpBridgeStatus] = useState<McpBridgeStatus | null>(null);
   const [mcpExportResult, setMcpExportResult] = useState<McpBridgeExportResponse | null>(null);
+  const [mcpSessionResult, setMcpSessionResult] = useState<McpBridgeSessionResponse | null>(null);
   const [mcpExportStatus, setMcpExportStatus] = useState<"idle" | "loading" | "error">("idle");
   const [mcpExportError, setMcpExportError] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "error">("idle");
@@ -115,6 +118,7 @@ export function App() {
       setRows(analysis.rows);
       setReflectionAnswers({});
       setMcpExportResult(null);
+      setMcpSessionResult(null);
       setMcpExportError("");
       setStatus("idle");
     } catch (analysisError) {
@@ -214,9 +218,11 @@ export function App() {
 
     setMcpExportStatus("loading");
     setMcpExportError("");
+    setMcpExportResult(null);
+    setMcpSessionResult(null);
 
     try {
-      const response = await requestMcpExport({
+      const payload: McpBridgeExportRequest = {
         actionId,
         consent: true,
         payload: {
@@ -227,8 +233,10 @@ export function App() {
           sources: result.sources,
           reflectionAnswers
         }
-      });
-      setMcpExportResult(response);
+      };
+      const [exportResponse, sessionResponse] = await Promise.all([requestMcpExport(payload), requestMcpSession(payload)]);
+      setMcpExportResult(exportResponse);
+      setMcpSessionResult(sessionResponse);
       setMcpExportStatus("idle");
     } catch (exportError) {
       setMcpExportStatus("error");
@@ -440,6 +448,7 @@ export function App() {
           plan={mcpIntegrationPlan}
           bridgeStatus={mcpBridgeStatus}
           exportResult={mcpExportResult}
+          sessionResult={mcpSessionResult}
           exportStatus={mcpExportStatus}
           exportError={mcpExportError}
           onValidateAction={validateMcpAction}
@@ -931,7 +940,7 @@ function JudgeBriefPanel({ result }: { result: AnalyzeResult | null }) {
     "Data Handling Ledger shows privacy, retention, and student controls.",
     "Spreadsheet paste/import flows into data checks.",
     "Evidence Packet exports a student-owned reasoning handoff.",
-    "MCP Integration Coach validates Composio Docs, Sheets, Drive, Classroom, Forms, Calendar, and Notion handoffs through a server dry-run without exposing credentials.",
+    "MCP Integration Coach validates Composio Docs, Sheets, Drive, Classroom, Forms, Calendar, and Notion handoffs through a server dry-run and scoped session ticket without exposing credentials.",
     "MCP Readiness Matrix shows exact connector env vars, tools, scopes, data shared, dry-run checks, and consent gates.",
     "Next Trial Planner gives adaptive measurement guidance.",
     "Progress Portfolio shows learning over multiple saved runs.",
@@ -1020,7 +1029,7 @@ function ModelCardPanel({ result }: { result: AnalyzeResult | null }) {
     "Grounding Audit checks source agreement before students use the expected pattern.",
     "Data Handling Ledger makes student data flow, retention, and controls inspectable.",
     "Progress Portfolio turns saved labs into repeated learning evidence for judges.",
-    "MCP Integration Coach keeps Composio credentials server-side, validates packets with /api/mcp/export, and requires student consent before any export.",
+    "MCP Integration Coach keeps Composio credentials server-side, validates packets with /api/mcp/export, prepares session tickets with /api/mcp/session, and requires student consent before any export.",
     "MCP Readiness Matrix makes connector tools, scopes, dry-run checks, and least-privilege boundaries inspectable.",
     "Pattern Evidence Engine quantifies whether the dataset supports the expected science pattern.",
     "Reliability Coach checks repeated trials, averages, and spread before students trust a claim.",
@@ -1173,6 +1182,7 @@ function McpIntegrationCoachPanel({
   plan,
   bridgeStatus,
   exportResult,
+  sessionResult,
   exportStatus,
   exportError,
   onValidateAction
@@ -1180,6 +1190,7 @@ function McpIntegrationCoachPanel({
   plan: McpIntegrationPlan | null;
   bridgeStatus: McpBridgeStatus | null;
   exportResult: McpBridgeExportResponse | null;
+  sessionResult: McpBridgeSessionResponse | null;
   exportStatus: "idle" | "loading" | "error";
   exportError: string;
   onValidateAction: (actionId: McpIntegrationActionId) => void;
@@ -1357,6 +1368,28 @@ function McpIntegrationCoachPanel({
                 ))}
               </div>
               <em>{exportResult.nextStep}</em>
+            </div>
+          ) : null}
+          {sessionResult ? (
+            <div className={`mcp-export-result mcp-session-${sessionResult.status}`} aria-label="MCP session ticket result">
+              <div>
+                <p className="section-label">Session ticket</p>
+                <strong>{formatMcpSessionStatus(sessionResult.status)}</strong>
+              </div>
+              <span>{sessionResult.summary}</span>
+              <small>
+                {sessionResult.toolkit} session scope: {sessionResult.sessionPlan.enabledToolkit} with{" "}
+                {sessionResult.sessionPlan.enabledTools.join(", ")}
+              </small>
+              <small>
+                Endpoint: {sessionResult.sessionPlan.endpoint}; MCP URL issued:{" "}
+                {sessionResult.sessionPlan.mcpUrlIssued ? "yes, withheld from browser" : "no"}
+              </small>
+              <small>
+                User env: {sessionResult.target.sessionUserEnv}; base URL env: {sessionResult.target.apiBaseUrlEnv}
+              </small>
+              {sessionResult.sessionPlan.sessionIdPreview ? <small>Session id: {sessionResult.sessionPlan.sessionIdPreview}</small> : null}
+              <em>{sessionResult.nextStep}</em>
             </div>
           ) : null}
           {exportStatus === "error" ? <p className="error-text">{exportError}</p> : null}
@@ -2442,6 +2475,12 @@ function formatMcpExportStatus(status: McpBridgeExportResponse["status"]) {
   if (status === "ready") return "Ready";
   if (status === "blocked") return "Blocked";
   return "Dry-run passed";
+}
+
+function formatMcpSessionStatus(status: McpBridgeSessionResponse["status"]) {
+  if (status === "created") return "Session created";
+  if (status === "blocked") return "Blocked";
+  return "Session dry-run";
 }
 
 function formatMcpExportCheckStatus(status: McpBridgeExportResponse["checks"][number]["status"]) {
