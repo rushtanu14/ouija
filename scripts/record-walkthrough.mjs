@@ -63,6 +63,14 @@ await caption(
 await page.getByRole("heading", { name: "Guided Lab Flow" }).scrollIntoViewIfNeeded();
 await caption(page, "Guided Lab Flow", "Ouija gives the student one current next action across identify, prepare safely, understand, check data, plan, and claim stages.");
 
+await page.getByLabel("Learning level").getByRole("button", { name: "High" }).click();
+await page.getByRole("heading", { name: "Student Level Lens" }).scrollIntoViewIfNeeded();
+await caption(
+  page,
+  "Student Level Lens",
+  "The same lab switches from middle-school pattern reading to high-school quantitative evidence, controls, repeats, and uncertainty."
+);
+
 await page.getByRole("heading", { name: "Pre-Lab Design Coach" }).scrollIntoViewIfNeeded();
 await caption(
   page,

@@ -31,6 +31,14 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(page.getByLabel("Grounding Audit").getByText("Student source task")).toBeVisible();
   await expect(page.getByRole("heading", { name: "Guided Lab Flow" })).toBeVisible();
   await expect(page.getByLabel("Guided Lab Flow").getByText("Get the teacher safety check before starting or extending the lab.")).toBeVisible();
+  await expect(page.getByLabel("Learning level").getByRole("button", { name: "Middle" })).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByRole("heading", { name: "Student Level Lens" })).toBeVisible();
+  await expect(page.getByLabel("Student Level Lens").getByText("Middle school lens")).toBeVisible();
+  await expect(page.getByLabel("Student Level Lens").getByText(/goes up, goes down, peaks, or stays about the same/i)).toBeVisible();
+  await page.getByLabel("Learning level").getByRole("button", { name: "High" }).click();
+  await expect(page.getByLabel("Learning level").getByRole("button", { name: "High" })).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByLabel("Student Level Lens").getByText("High school lens")).toBeVisible();
+  await expect(page.getByLabel("Student Level Lens").getByText(/with uncertainty from/i)).toBeVisible();
   await expect(page.getByRole("heading", { name: "Model Strategy" })).toBeVisible();
   await expect(page.getByLabel("Model Strategy").getByText("Selected Reaction Rate vs Temperature")).toBeVisible();
   await expect(page.getByLabel("Model Strategy").getByText("Top candidates")).toBeVisible();
@@ -129,6 +137,8 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(page.getByLabel("Student evidence packet")).toHaveValue(/Student Reflection Drafts/);
   await expect(page.getByLabel("Student evidence packet")).toHaveValue(/Student draft: The independent variable was water temperature/);
   await expect(page.getByLabel("Student evidence packet")).toHaveValue(/Reflection status: ready for review/);
+  await expect(page.getByLabel("Student evidence packet")).toHaveValue(/Student Level Lens/);
+  await expect(page.getByLabel("Student evidence packet")).toHaveValue(/High school support: quantify the relationship/);
   await expect(page.getByLabel("Student evidence packet")).toHaveValue(/Pattern Evidence/);
   await expect(page.getByLabel("Student evidence packet")).toHaveValue(/Guided Lab Flow/);
   await expect(page.getByLabel("Student evidence packet")).toHaveValue(/Concept Coach/);
@@ -180,6 +190,7 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(page.getByLabel("AI Model Card").getByText("Pre-Lab Design Coach turns classification into variables, controls, repeats, source checks, and safety before data collection.")).toBeVisible();
   await expect(page.getByLabel("AI Model Card").getByText("Learning Exit Ticket converts the AI feedback into student reflection prompts judges can inspect.")).toBeVisible();
   await expect(page.getByLabel("AI Model Card").getByText("Student Reflection Workspace stores student-written drafts without generating answers.")).toBeVisible();
+  await expect(page.getByLabel("AI Model Card").getByText("Student Level Lens adapts the same analysis for middle school pattern reading or high school quantitative evidence and uncertainty.")).toBeVisible();
   await expect(page.getByLabel("AI Model Card").getByText("Grounding Audit checks source agreement before students use the expected pattern.")).toBeVisible();
   await expect(page.getByLabel("AI Model Card").getByText("Pattern Evidence Engine quantifies whether the dataset supports the expected science pattern.")).toBeVisible();
   await expect(page.getByLabel("AI Model Card").getByText("Reliability Coach checks repeated trials, averages, and spread before students trust a claim.")).toBeVisible();
@@ -286,6 +297,7 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(page.getByLabel("Judge Brief").getByText("Pre-Lab Design Coach helps students plan variables, controls, repeats, sources, and safety before collecting data.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Learning Exit Ticket proves students must explain variables, patterns, and next steps themselves.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Student Reflection Workspace captures student-authored exit-ticket drafts.")).toBeVisible();
+  await expect(page.getByLabel("Judge Brief").getByText("Student Level Lens switches the same lab guidance between middle-school plain language and high-school quantitative reasoning.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Grounding Audit makes citation trust and mixed evidence visible.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Pattern Evidence Engine scores the whole graph against the expected pattern.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Reliability Coach checks repeats, averages, and spread.")).toBeVisible();

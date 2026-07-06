@@ -30,9 +30,9 @@ Show Data Handling Ledger: privacy score, description flow, student data flow, b
 
 Show AIYES Rubric Fit: each run maps to Problem Definition and Real-World Relevance, AI Technical Design and Model Strategy, and User Experience and Design with concrete evidence from the app.
 
-## 2:14-2:30 - Pre-Lab, Learning Impact, Exit Ticket, And Reflection Workspace
+## 2:14-2:30 - Pre-Lab, Student Level Lens, Learning Impact, Exit Ticket, And Reflection Workspace
 
-Show Pre-Lab Design Coach: Ouija turns the match into variables, controls, repeats, source checks, table columns, and a safety gate before data collection. Then show Learning Impact Loop: Ouija scores whether the student is ready to reason, should review flags, or needs to fix the run, using outcome, data quality, concept learning, integrity, pattern evidence, repeat reliability, and next-trial metrics.
+Show Student Level Lens: the same run switches between middle-school pattern reading and high-school quantitative evidence, controls, repeats, and uncertainty. Then show Pre-Lab Design Coach: Ouija turns the match into variables, controls, repeats, source checks, table columns, and a safety gate before data collection. Then show Learning Impact Loop: Ouija scores whether the student is ready to reason, should review flags, or needs to fix the run, using outcome, data quality, concept learning, integrity, pattern evidence, repeat reliability, and next-trial metrics.
 
 Show Learning Exit Ticket: students must explain the independent/dependent variables, graph pattern, and next step themselves. Then show Student Reflection Workspace: students type their own exit-ticket drafts, Ouija marks empty or too-short answers for revision, and the final Evidence Packet carries only student-authored text.
 
@@ -46,7 +46,7 @@ Show Pattern Evidence Engine first: whole-graph support, trend checks, and the s
 
 ## 3:16-4:05 - Next Trial Planner, Claim Coach, And Evidence Packet
 
-Scroll to Next Trial Planner, Claim Coach, and Evidence Packet. Show that Ouija does not write the conclusion. It first tells the student whether to extend the pattern or repeat/fix a warning, then gives a claim starter with blanks, Judge Demo Path, Pre-Lab Design Coach, Learning Exit Ticket, Student Reflection Drafts, Data Handling Ledger, safety notes, an evidence checklist, source trail, copied table data, and a next question.
+Scroll to Next Trial Planner, Claim Coach, and Evidence Packet. Show that Ouija does not write the conclusion. It first tells the student whether to extend the pattern or repeat/fix a warning, then gives a claim starter with blanks, Judge Demo Path, Pre-Lab Design Coach, Student Level Lens, Learning Exit Ticket, Student Reflection Drafts, Data Handling Ledger, safety notes, an evidence checklist, source trail, copied table data, and a next question.
 
 ## 4:05-4:40 - Breadth
 
@@ -66,7 +66,7 @@ Show Evaluation Bench with 100/100 and 9/9 live checks: projectile, pendulum per
 
 ## 4:58-5:00 - Judge Brief
 
-Show Judge Brief so evaluators see Track 1 fit, Judge Demo Path, live app, hosted deck/video/source links, AIYES submission checklist, official rubric fit, learning impact, learning exit ticket, student reflection workspace, progress portfolio, grounding audit, AI evaluation harness, data-handling ethics, pattern evidence, model strategy, AI pipeline, evaluation, tests, and integrity constraints in one place.
+Show Judge Brief so evaluators see Track 1 fit, Judge Demo Path, live app, hosted deck/video/source links, AIYES submission checklist, official rubric fit, learning impact, learning exit ticket, student level lens, student reflection workspace, progress portfolio, grounding audit, AI evaluation harness, data-handling ethics, pattern evidence, model strategy, AI pipeline, evaluation, tests, and integrity constraints in one place.
 
 ## Closing Line
 

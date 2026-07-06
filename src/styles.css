@@ -120,6 +120,7 @@ a {
 .runtime-proof,
 .custom-lab-triage,
 .pre-lab-design-coach,
+.student-level-lens,
 .model-strategy,
 .technical-depth-proof,
 .ai-evaluation-harness,
@@ -227,6 +228,48 @@ a:focus-visible {
 .sample-grid button:hover {
   border-color: #2368ff;
   color: #2368ff;
+}
+
+.learning-level-control {
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.learning-level-control > span {
+  color: #607087;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.learning-level-control > div {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  border: 1px solid #cdd9e8;
+  border-radius: 8px;
+  padding: 4px;
+  background: #f7fbff;
+}
+
+.learning-level-control button {
+  min-width: 0;
+  min-height: 36px;
+  border: 0;
+  border-radius: 6px;
+  color: #526276;
+  background: transparent;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.learning-level-control button.active {
+  color: #173b74;
+  background: #ffffff;
+  box-shadow: 0 8px 20px rgba(22, 34, 51, 0.08);
 }
 
 .analyze-button {
@@ -3396,6 +3439,64 @@ td input {
   line-height: 1.35;
 }
 
+.student-level-lens {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+}
+
+.level-lens-summary {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  border-radius: 8px;
+  padding: 12px;
+  color: #173b74;
+  background: #eef5ff;
+}
+
+.student-level-middle .level-lens-summary {
+  color: #1f5b3d;
+  background: #edf8f1;
+}
+
+.level-lens-summary strong {
+  display: block;
+  color: inherit;
+  line-height: 1.25;
+}
+
+.level-lens-summary > span {
+  max-width: 520px;
+  color: #526276;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.45;
+}
+
+.level-lens-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.level-lens-grid article {
+  display: grid;
+  gap: 6px;
+  border: 1px solid #d9e5f2;
+  border-radius: 8px;
+  padding: 12px;
+  background: #fbfdff;
+}
+
+.level-lens-grid strong {
+  color: #172439;
+  font-size: 13px;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
 .mcp-integration-panel {
   align-content: start;
   grid-column: span 2;
@@ -4198,6 +4299,10 @@ td input {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .level-lens-grid {
+    grid-template-columns: 1fr;
+  }
+
   .mcp-action-grid,
   .mcp-readiness-grid,
   .mcp-export-check-grid,
@@ -4359,6 +4464,11 @@ td input {
 
   .technical-depth-grid {
     grid-template-columns: 1fr;
+  }
+
+  .level-lens-summary {
+    align-items: stretch;
+    flex-direction: column;
   }
 
   .mcp-header,

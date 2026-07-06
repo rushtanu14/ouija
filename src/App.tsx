@@ -89,8 +89,11 @@ interface SavedLab extends ProgressPortfolioSnapshot {
   rows: StudentDataRow[];
 }
 
+type LearningLevel = "middle" | "high";
+
 export function App() {
   const [description, setDescription] = useState(initialPrompt);
+  const [learningLevel, setLearningLevel] = useState<LearningLevel>("middle");
   const [result, setResult] = useState<AnalyzeResult | null>(null);
   const [rows, setRows] = useState<StudentDataRow[]>([]);
   const [reflectionAnswers, setReflectionAnswers] = useState<StudentReflectionAnswers>({});
@@ -300,6 +303,27 @@ export function App() {
               </button>
             ))}
           </div>
+          <div className="learning-level-control" aria-label="Learning level">
+            <span>Learning level</span>
+            <div>
+              <button
+                type="button"
+                className={learningLevel === "middle" ? "active" : ""}
+                onClick={() => setLearningLevel("middle")}
+                aria-pressed={learningLevel === "middle"}
+              >
+                Middle
+              </button>
+              <button
+                type="button"
+                className={learningLevel === "high" ? "active" : ""}
+                onClick={() => setLearningLevel("high")}
+                aria-pressed={learningLevel === "high"}
+              >
+                High
+              </button>
+            </div>
+          </div>
           <button className="analyze-button" type="button" onClick={() => void analyze()} disabled={status === "loading"}>
             <Search size={18} />
             {status === "loading" ? "Analyzing..." : "Analyze"}
@@ -346,6 +370,7 @@ export function App() {
               <RuntimeProofPanel proof={runtimeProof} result={result} />
               {result.customLabTriage.status === "needs_student_details" ? <CustomLabTriagePanel triage={result.customLabTriage} /> : null}
               <GuidedLabFlowPanel flow={result.guidedFlow} />
+              <StudentLevelLensPanel result={result} level={learningLevel} />
               <PreLabDesignCoachPanel coach={result.preLabDesignCoach} />
 
               <div className="graph-card">
@@ -957,6 +982,7 @@ function JudgeBriefPanel({ result }: { result: AnalyzeResult | null }) {
     "Pre-Lab Design Coach helps students plan variables, controls, repeats, sources, and safety before collecting data.",
     "Learning Exit Ticket proves students must explain variables, patterns, and next steps themselves.",
     "Student Reflection Workspace captures student-authored exit-ticket drafts.",
+    "Student Level Lens switches the same lab guidance between middle-school plain language and high-school quantitative reasoning.",
     "Graph overlays expected pattern values against student data.",
     "Grounding Audit makes citation trust and mixed evidence visible.",
     "Pattern Evidence Engine scores the whole graph against the expected pattern.",
@@ -1065,6 +1091,7 @@ function ModelCardPanel({ result }: { result: AnalyzeResult | null }) {
     "Pre-Lab Design Coach turns classification into variables, controls, repeats, source checks, and safety before data collection.",
     "Learning Exit Ticket converts the AI feedback into student reflection prompts judges can inspect.",
     "Student Reflection Workspace stores student-written drafts without generating answers.",
+    "Student Level Lens adapts the same analysis for middle school pattern reading or high school quantitative evidence and uncertainty.",
     "Expected overlay gives students a visual comparison between their data and the expected pattern.",
     "Grounding Audit checks source agreement before students use the expected pattern.",
     "Data Handling Ledger makes student data flow, retention, and controls inspectable.",
@@ -1114,6 +1141,7 @@ function ModelCardPanel({ result }: { result: AnalyzeResult | null }) {
         <li>Guide the student through the next action.</li>
         <li>Import or edit table rows.</li>
         <li>Build a student concept scaffold.</li>
+        <li>Adapt the scaffold for middle or high school reasoning.</li>
         <li>Check school-lab safety boundaries.</li>
         <li>Audit rows, controls, and assumptions.</li>
         <li>Score the whole data pattern.</li>
@@ -2062,6 +2090,57 @@ function GuidedLabFlowPanel({ flow }: { flow: GuidedLabFlow }) {
   );
 }
 
+function StudentLevelLensPanel({ result, level }: { result: AnalyzeResult; level: LearningLevel }) {
+  const independent = formatColumnLabel(result, result.expectedResult.xKey);
+  const dependent = formatColumnLabel(result, result.expectedResult.yKey);
+  const isHigh = level === "high";
+  const lens = isHigh
+    ? {
+        title: "High school lens",
+        focus: "Quantify the relationship, check controls and repeats, and explain whether the evidence supports the model.",
+        graphTask: `Use the ${independent} vs ${dependent} graph to describe slope, peak, ratio, or curve shape with numbers from the table.`,
+        sentenceStarter: `Because ${independent} changed while controls stayed consistent, the ${dependent} evidence supports ___, with uncertainty from ___.`,
+        teacherSignal: "Ready when the claim names evidence strength, limitations, and the next controlled measurement."
+      }
+    : {
+        title: "Middle school lens",
+        focus: "Name what changed, name what was measured, read the graph pattern, and choose one safe next step.",
+        graphTask: `Use the ${independent} vs ${dependent} graph to say whether the result goes up, goes down, peaks, or stays about the same.`,
+        sentenceStarter: `I changed ${independent}. I measured ${dependent}. The graph shows ___. My next step is ___.`,
+        teacherSignal: "Ready when the student can say the variables, pattern, and next step in their own words."
+      };
+
+  return (
+    <section className={`student-level-lens student-level-${level}`} aria-label="Student Level Lens">
+      <div className="panel-title">
+        <BookOpen size={18} />
+        <h3>Student Level Lens</h3>
+      </div>
+      <div className="level-lens-summary">
+        <div>
+          <p className="section-label">Selected support</p>
+          <strong>{lens.title}</strong>
+        </div>
+        <span>{lens.focus}</span>
+      </div>
+      <div className="level-lens-grid">
+        <article>
+          <p className="section-label">Graph task</p>
+          <strong>{lens.graphTask}</strong>
+        </article>
+        <article>
+          <p className="section-label">Student sentence starter</p>
+          <strong>{lens.sentenceStarter}</strong>
+        </article>
+        <article>
+          <p className="section-label">Teacher signal</p>
+          <strong>{lens.teacherSignal}</strong>
+        </article>
+      </div>
+    </section>
+  );
+}
+
 function ComparisonPanel({ issues, hints }: { issues: Issue[]; hints: string[] }) {
   return (
     <section className="comparison-panel" aria-label="Comparison insights">
@@ -2623,6 +2702,12 @@ function formatMcpPayloadPreview(plan: McpIntegrationPlan) {
     "Markdown excerpt:",
     plan.payloadPreview.markdownExcerpt
   ].join("\n");
+}
+
+function formatColumnLabel(result: AnalyzeResult, key: string) {
+  const column = result.columns.find((candidate) => candidate.key === key);
+  if (!column) return key;
+  return column.unit ? `${column.label} (${column.unit})` : column.label;
 }
 
 function formatProgressPortfolioStatus(status: ProgressPortfolio["status"]) {

@@ -47,6 +47,10 @@ describe("buildEvidencePacket", () => {
     expect(packet).toContain("Teacher signal:");
     expect(packet).toContain("## Student Reflection Drafts");
     expect(packet).toContain("No student reflection draft entered yet.");
+    expect(packet).toContain("## Student Level Lens");
+    expect(packet).toContain("Middle school support");
+    expect(packet).toContain("High school support");
+    expect(packet).toContain("Graph focus:");
     expect(packet).toContain("## Pattern Evidence");
     expect(packet).toContain("Pattern score:");
     expect(packet).toContain("## Guided Lab Flow");

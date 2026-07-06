@@ -11,6 +11,7 @@
 - Learning Impact Loop measures whether a run leaves the student ready to reason, watching flags, or needing fixes.
 - Pre-Lab Design Coach helps students plan variables, controls, repeats, source checks, table columns, and safety before collecting data.
 - Learning Exit Ticket asks the student to explain variables, graph pattern, and next step in their own words before writing.
+- Student Level Lens adapts the same run for middle-school pattern reading or high-school quantitative evidence, controls, repeats, and uncertainty.
 - Student Reflection Workspace proves those exit-ticket answers are student-authored drafts, not generated conclusions.
 - Progress Portfolio shows whether saved runs demonstrate learning trend, subject breadth, and a next portfolio action.
 - MCP Integration Coach shows how the same student-owned evidence could move into a Composio Search source audit and classroom tools, including a Google Classroom pre-lab checkpoint, Google Forms readiness check, and Google Calendar next-trial reminder, without sending data before consent.
@@ -37,6 +38,7 @@
 - Concept Coach turns each supported lab into vocabulary, explanation steps, source tasks, and misconception checks.
 - Learning Exit Ticket turns model feedback into inspectable student reflection prompts rather than generated conclusions.
 - Student Reflection Workspace scores empty, short, and ready student-authored drafts without filling them in.
+- Student Level Lens derives grade-band scaffolds from the same variables and expected pattern instead of requiring separate hand-written lesson copy.
 - Pre-Lab Design Coach turns the same classification and triage output into a before-data checklist instead of waiting until after rows exist.
 - Custom Lab Triage turns low-confidence descriptions into inferred focus, starter columns, variables, controls, repeat guidance, starter rows, source-search queries, clarifying questions, and a teacher-confirmation boundary.
 - Fallback mode keeps demos reliable without credentials.
@@ -69,6 +71,7 @@
 - Learning Impact Loop visibly scores outcome, data quality, concept learning, integrity, pattern evidence, repeat reliability, and next-trial readiness for every run.
 - Pre-Lab Design Coach visibly scores setup readiness before data collection.
 - Learning Exit Ticket visibly checks whether the student can explain variables, pattern evidence, and the next controlled step.
+- Student Level Lens visibly switches between middle-school and high-school support for the same experiment.
 - Student Reflection Workspace visibly captures the student's own variable, pattern, and next-step drafts.
 - Progress Portfolio visibly turns Saved Labs into repeated learning evidence instead of only storage.
 - Expected graph and editable table now appear before Model Strategy, AI Evaluation Harness, Data Handling Ledger, and AIYES Rubric Fit, so the practical student workflow is visible before the deeper judge evidence stack.
@@ -98,6 +101,7 @@
 - Learning Impact Loop appears in the app and Evidence Packet so the user's practical benefit is measurable inside the workflow.
 - Pre-Lab Design Coach appears in the app and Evidence Packet so students can use Ouija before collecting data, not only after a table exists.
 - Learning Exit Ticket appears in the app and Evidence Packet so judges can inspect student understanding prompts during the demo or exported handoff.
+- Student Level Lens appears in the app and Evidence Packet so judges can inspect differentiated middle/high school UX.
 - Student Reflection Workspace appears in the app and Evidence Packet so judges can inspect student-authored answers without Ouija writing the conclusion.
 - Progress Portfolio appears near Saved Labs so judges can inspect score trend, subject breadth, and strongest saved run.
 - MCP Integration Coach appears near Progress Portfolio so judges can inspect the exact source-audit/export payload, Composio Search route, Google Classroom pre-lab checkpoint route, Google Forms readiness route, Google Calendar next-trial reminder route, credential boundary, Composio route, and server dry-run readiness matrix before any live connector is enabled.
