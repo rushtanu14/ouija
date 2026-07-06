@@ -6,6 +6,25 @@ test("student can analyze a sample experiment, edit table data, and see citation
 
   await page.getByRole("button", { name: "Reaction Rate" }).click();
   await expect(page.getByRole("heading", { name: "Reaction Rate vs Temperature" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Run Snapshot" })).toBeVisible();
+  await expect(page.getByLabel("Run Snapshot").getByText("Rubric fit", { exact: true })).toBeVisible();
+  await expect(page.getByLabel("Run Snapshot").getByText("Evaluation", { exact: true })).toBeVisible();
+  await expect(page.getByLabel("Run Snapshot").getByText("Expected pattern", { exact: true })).toBeVisible();
+  await expect(page.getByLabel("Run Snapshot").getByText("Current action", { exact: true })).toBeVisible();
+  await expect(page.locator(".run-snapshot-header > span").getByText("Competitive", { exact: true })).toBeVisible();
+  const coreWorkflowBeforeJudgeMeta = await page.locator(".analysis-panel").evaluate((panel) => {
+    const children = Array.from(panel.children);
+    const indexOf = (className: string) => children.findIndex((child) => child.classList.contains(className));
+
+    return (
+      indexOf("graph-card") > -1 &&
+      indexOf("data-card") > -1 &&
+      indexOf("model-strategy") > -1 &&
+      indexOf("graph-card") < indexOf("model-strategy") &&
+      indexOf("data-card") < indexOf("model-strategy")
+    );
+  });
+  expect(coreWorkflowBeforeJudgeMeta).toBe(true);
   await expect(page.getByLabel("Sources and explanation").getByRole("link", { name: /Factors that affect reaction rates/i })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Grounding Audit" })).toBeVisible();
   await expect(page.getByLabel("Grounding Audit").getByText("Source trust")).toBeVisible();

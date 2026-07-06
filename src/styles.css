@@ -115,6 +115,7 @@ a {
 .input-rail,
 .source-rail,
 .analysis-panel > .classification,
+.run-snapshot,
 .judge-demo-path,
 .custom-lab-triage,
 .pre-lab-design-coach,
@@ -354,6 +355,7 @@ a:focus-visible {
 }
 
 .graph-card,
+.run-snapshot,
 .judge-demo-path,
 .custom-lab-triage,
 .pre-lab-design-coach,
@@ -380,6 +382,81 @@ a:focus-visible {
 
 .panel-title h3 {
   font-size: 17px;
+}
+
+.run-snapshot {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(244, 249, 255, 0.9));
+}
+
+.run-snapshot-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+}
+
+.run-snapshot-header > span {
+  flex: 0 0 auto;
+  border-radius: 8px;
+  padding: 7px 10px;
+  color: #1f5b3d;
+  background: #eaf8f0;
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.run-snapshot-submittable .run-snapshot-header > span {
+  color: #6e4a03;
+  background: #fff4d8;
+}
+
+.run-snapshot-needs_work .run-snapshot-header > span {
+  color: #8a1f12;
+  background: #ffe8e4;
+}
+
+.run-snapshot-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.run-snapshot-grid article,
+.run-snapshot-focus article {
+  min-width: 0;
+  border: 1px solid #d9e5f2;
+  border-radius: 8px;
+  padding: 11px;
+  background: #ffffff;
+}
+
+.run-snapshot-grid strong {
+  display: block;
+  color: #172439;
+  font-size: 20px;
+  line-height: 1;
+}
+
+.run-snapshot-grid small,
+.run-snapshot-focus strong {
+  color: #536478;
+  font-size: 12px;
+  font-weight: 720;
+  line-height: 1.4;
+}
+
+.run-snapshot-focus {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.run-snapshot-focus strong {
+  display: block;
+  color: #172439;
 }
 
 .judge-demo-path {
@@ -3896,6 +3973,14 @@ td input {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .run-snapshot-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .run-snapshot-focus {
+    grid-template-columns: 1fr;
+  }
+
   .strategy-signal-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -4033,6 +4118,15 @@ td input {
   }
 
   .judge-demo-steps {
+    grid-template-columns: 1fr;
+  }
+
+  .run-snapshot-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .run-snapshot-grid {
     grid-template-columns: 1fr;
   }
 

@@ -11,7 +11,7 @@ const recordingDir = mkdtempSync(join(tmpdir(), "ouija-walkthrough-"));
 const outputPath = resolve(assetDir, "ouija-walkthrough.webm");
 const captionDurationMs = Number(process.env.OUIJA_CAPTION_MS ?? 8500);
 let captionIndex = 0;
-const captionTotal = 34;
+const captionTotal = 36;
 
 mkdirSync(assetDir, { recursive: true });
 
@@ -39,6 +39,13 @@ await page.getByRole("button", { name: "Reaction Rate" }).click();
 await page.getByRole("heading", { name: "Reaction Rate vs Temperature" }).waitFor();
 await caption(page, "Input and classification", "A normal student description becomes a classified science experiment with concepts, variables, and confidence.");
 
+await page.getByRole("heading", { name: "Run Snapshot" }).scrollIntoViewIfNeeded();
+await caption(
+  page,
+  "Run Snapshot",
+  "Ouija now starts each run with rubric fit, evaluation status, learning impact, data flags, expected pattern, and the student's current action."
+);
+
 await page.getByRole("heading", { name: "Judge Demo Path" }).scrollIntoViewIfNeeded();
 await caption(
   page,
@@ -46,27 +53,21 @@ await caption(
   "Ouija gives judges a five-step route through problem fit, AI design, student workflow, evidence handoff, and submission proof."
 );
 
-await page.getByRole("heading", { name: "Model Strategy" }).scrollIntoViewIfNeeded();
-await caption(page, "Model Strategy", "Ouija exposes candidate ranking, matched signals, fallback behavior, validation layers, pattern evidence, repeat reliability, safety layer, and risk controls.");
-
-await page.getByRole("heading", { name: "AI Evaluation Harness" }).scrollIntoViewIfNeeded();
-await caption(page, "AI Evaluation Harness", "Ouija scores classifier confidence, coverage, source grounding, pattern validation, row validators, safety, and fallback boundaries in the live run.");
-
-await page.getByRole("heading", { name: "Data Handling Ledger" }).scrollIntoViewIfNeeded();
-await caption(page, "Data Handling Ledger", "Ouija makes privacy, retention, browser-local saved labs, student controls, and the server-only API-key boundary visible for judges.");
-
-await page.getByRole("heading", { name: "AIYES Rubric Fit" }).scrollIntoViewIfNeeded();
-await caption(
-  page,
-  "AIYES Rubric Fit",
-  "Ouija maps the same run to the official criteria: problem relevance, AI technical design and model strategy, and user experience."
-);
+await page.getByRole("heading", { name: "Guided Lab Flow" }).scrollIntoViewIfNeeded();
+await caption(page, "Guided Lab Flow", "Ouija gives the student one current next action across identify, prepare safely, understand, check data, plan, and claim stages.");
 
 await page.getByRole("heading", { name: "Pre-Lab Design Coach" }).scrollIntoViewIfNeeded();
 await caption(
   page,
   "Pre-Lab Design Coach",
   "Before data collection, Ouija plans variables, controls, repeats, table columns, source checks, and a safety gate without writing the student's hypothesis."
+);
+
+await page.locator(".graph-card").scrollIntoViewIfNeeded();
+await caption(
+  page,
+  "Student graph first",
+  "The practical workflow reaches the expected-pattern graph and editable table before the deeper judge evidence panels."
 );
 
 await page.getByRole("heading", { name: "Learning Impact Loop" }).scrollIntoViewIfNeeded();
@@ -99,9 +100,6 @@ await caption(
   "Student Reflection Workspace",
   "Students type their own exit-ticket drafts; Ouija marks readiness and exports only student-authored answers."
 );
-
-await page.getByRole("heading", { name: "Guided Lab Flow" }).scrollIntoViewIfNeeded();
-await caption(page, "Guided Lab Flow", "Ouija gives the student one current next action across identify, prepare safely, understand, check data, plan, and claim stages.");
 
 await page.getByRole("heading", { name: "Grounding Audit" }).scrollIntoViewIfNeeded();
 await caption(page, "Grounding Audit", "Ouija scores citation visibility and source agreement, then gives the student a source task before using the expected pattern.");
@@ -157,6 +155,22 @@ await caption(
   page,
   "Evidence Packet",
   "The output is a source-backed reasoning handoff with student reflection drafts, blanks, and questions, not a completed lab report."
+);
+
+await page.getByRole("heading", { name: "Model Strategy" }).scrollIntoViewIfNeeded();
+await caption(page, "Model Strategy", "Ouija exposes candidate ranking, matched signals, fallback behavior, validation layers, pattern evidence, repeat reliability, safety layer, and risk controls.");
+
+await page.getByRole("heading", { name: "AI Evaluation Harness" }).scrollIntoViewIfNeeded();
+await caption(page, "AI Evaluation Harness", "Ouija scores classifier confidence, coverage, source grounding, pattern validation, row validators, safety, and fallback boundaries in the live run.");
+
+await page.getByRole("heading", { name: "Data Handling Ledger" }).scrollIntoViewIfNeeded();
+await caption(page, "Data Handling Ledger", "Ouija makes privacy, retention, browser-local saved labs, student controls, and the server-only API-key boundary visible for judges.");
+
+await page.getByRole("heading", { name: "AIYES Rubric Fit" }).scrollIntoViewIfNeeded();
+await caption(
+  page,
+  "AIYES Rubric Fit",
+  "Ouija maps the same run to the official criteria: problem relevance, AI technical design and model strategy, and user experience."
 );
 
 for (const sample of ["Projectile Motion", "Pendulum", "Ohm's Law", "Reaction Rate", "Enzyme Activity", "Plant Light", "Density Layers", "Water Filtration"]) {

@@ -5,6 +5,7 @@
 - Primary user is students only.
 - Problem is common in middle and high school labs: students struggle to connect experiment setup, data quality, expected scientific patterns, and evidence-backed reasoning.
 - Impact is practical: faster debugging of lab data, better understanding, fewer report-writing shortcuts.
+- Run Snapshot gives a first-scroll readout of rubric fit, evaluation status, learning impact, data flags, expected pattern, and current action.
 - Practical science behavior is visible: students see whether the whole graph supports the expected pattern and whether repeated trials have enough count, average, and spread to support a claim.
 - AIYES Rubric Fit gives judges concrete problem/relevance evidence for each analyzed run.
 - Learning Impact Loop measures whether a run leaves the student ready to reason, watching flags, or needing fixes.
@@ -65,6 +66,7 @@
 - Learning Exit Ticket visibly checks whether the student can explain variables, pattern evidence, and the next controlled step.
 - Student Reflection Workspace visibly captures the student's own variable, pattern, and next-step drafts.
 - Progress Portfolio visibly turns Saved Labs into repeated learning evidence instead of only storage.
+- Expected graph and editable table now appear before Model Strategy, AI Evaluation Harness, Data Handling Ledger, and AIYES Rubric Fit, so the practical student workflow is visible before the deeper judge evidence stack.
 - MCP Integration Coach visibly turns the Evidence Packet, Pre-Lab Design Coach, Next Trial Planner, and Progress Portfolio into a consent-gated classroom handoff plan with a readiness matrix for env vars, allowed tools, scopes, dry-run checks, and data shared.
 - AI Model Card visibly summarizes architecture, grounding mode, evaluation method, privacy boundary, and risk controls.
 - Data Handling Ledger visibly summarizes privacy, retention, browser-local saves, and student controls.
@@ -80,6 +82,7 @@
 - Visible clickable citations.
 - Grounding Audit gives students a source-trust score and a concrete source task before they write.
 - Expected-pattern overlay makes the graph comparison visual, not just textual.
+- Run Snapshot reduces first-scroll cognitive load by putting run status, expected pattern, and next action above the deeper evidence panels.
 - Guided Lab Flow reduces cognitive load by showing identify, prepare, understand, check, plan, and claim stages.
 - Judge Demo Path reduces evaluator cognitive load by showing the intended five-step live walkthrough near the top of the analysis panel.
 - Claim Coach converts analysis into a student-owned reasoning checklist instead of a generated final paragraph.

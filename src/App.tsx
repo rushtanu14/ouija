@@ -328,22 +328,11 @@ export function App() {
                 ))}
               </div>
 
+              <RunSnapshotPanel result={result} evaluationReport={evaluationReport} />
               <JudgeDemoPathPanel path={result.judgeDemoPath} />
               {result.customLabTriage.status === "needs_student_details" ? <CustomLabTriagePanel triage={result.customLabTriage} /> : null}
-              <PreLabDesignCoachPanel coach={result.preLabDesignCoach} />
-              <ModelStrategyPanel strategy={result.modelStrategy} />
-              <AiEvaluationHarnessPanel harness={result.aiEvaluationHarness} />
-              <DataHandlingLedgerPanel ledger={result.dataHandlingLedger} />
-              <OfficialRubricPanel fit={result.officialRubricFit} />
-              <LearningImpactPanel snapshot={result.impactSnapshot} />
-              <LearningExitTicketPanel ticket={result.learningExitTicket} />
-              {studentReflectionWorkspace ? (
-                <StudentReflectionWorkspacePanel
-                  workspace={studentReflectionWorkspace}
-                  onAnswerChange={updateReflectionAnswer}
-                />
-              ) : null}
               <GuidedLabFlowPanel flow={result.guidedFlow} />
+              <PreLabDesignCoachPanel coach={result.preLabDesignCoach} />
 
               <div className="graph-card">
                 <div className="panel-title">
@@ -370,14 +359,26 @@ export function App() {
               </div>
 
               <PatternEvidencePanel evidence={result.patternEvidence} />
+              <ComparisonPanel issues={result.issues} hints={result.hints} />
               <MethodAuditPanel audit={result.methodAudit} />
               <ReliabilityCoachPanel coach={result.reliabilityCoach} />
               <SafetyCoachPanel coach={result.safetyCoach} />
               <ConceptCoachPanel coach={result.conceptCoach} />
-              <ComparisonPanel issues={result.issues} hints={result.hints} />
-              <LabBriefPanel brief={result.labBrief} />
               <NextTrialPanel plan={result.nextTrialPlan} />
+              <LearningImpactPanel snapshot={result.impactSnapshot} />
+              <LearningExitTicketPanel ticket={result.learningExitTicket} />
+              {studentReflectionWorkspace ? (
+                <StudentReflectionWorkspacePanel
+                  workspace={studentReflectionWorkspace}
+                  onAnswerChange={updateReflectionAnswer}
+                />
+              ) : null}
+              <LabBriefPanel brief={result.labBrief} />
               <EvidencePacketPanel packet={evidencePacket} />
+              <ModelStrategyPanel strategy={result.modelStrategy} />
+              <AiEvaluationHarnessPanel harness={result.aiEvaluationHarness} />
+              <DataHandlingLedgerPanel ledger={result.dataHandlingLedger} />
+              <OfficialRubricPanel fit={result.officialRubricFit} />
             </>
           ) : (
             <div className="empty-state">
@@ -449,6 +450,63 @@ export function App() {
         />
       </section>
     </main>
+  );
+}
+
+function RunSnapshotPanel({ result, evaluationReport }: { result: AnalyzeResult; evaluationReport: EvaluationReport | null }) {
+  const blockingIssueCount = result.issues.filter((issue) => issue.severity !== "info").length;
+  const snapshotItems = [
+    {
+      label: "Rubric fit",
+      value: `${result.officialRubricFit.score}/100`,
+      detail: formatReadiness(result.trackEvidence.readiness)
+    },
+    {
+      label: "Evaluation",
+      value: evaluationReport ? `${evaluationReport.passed}/${evaluationReport.total}` : "Loading",
+      detail: evaluationReport ? (evaluationReport.status === "pass" ? "Bench passed" : "Review needed") : "Bench loading"
+    },
+    {
+      label: "Impact",
+      value: `${result.impactSnapshot.score}/100`,
+      detail: result.impactSnapshot.studentOutcome
+    },
+    {
+      label: "Data flags",
+      value: String(blockingIssueCount),
+      detail: blockingIssueCount === 0 ? "No blocking flags" : "Check before claiming"
+    }
+  ];
+
+  return (
+    <section className={`run-snapshot run-snapshot-${result.trackEvidence.readiness}`} aria-label="Run Snapshot">
+      <div className="run-snapshot-header">
+        <div className="panel-title">
+          <Gauge size={18} />
+          <h3>Run Snapshot</h3>
+        </div>
+        <span>{formatReadiness(result.trackEvidence.readiness)}</span>
+      </div>
+      <div className="run-snapshot-grid">
+        {snapshotItems.map((item) => (
+          <article key={item.label}>
+            <p className="section-label">{item.label}</p>
+            <strong>{item.value}</strong>
+            <small>{item.detail}</small>
+          </article>
+        ))}
+      </div>
+      <div className="run-snapshot-focus">
+        <article>
+          <p className="section-label">Expected pattern</p>
+          <strong>{result.expectedResult.pattern}</strong>
+        </article>
+        <article>
+          <p className="section-label">Current action</p>
+          <strong>{result.guidedFlow.currentAction}</strong>
+        </article>
+      </div>
+    </section>
   );
 }
 
