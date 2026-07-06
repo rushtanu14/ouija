@@ -11,7 +11,7 @@ const recordingDir = mkdtempSync(join(tmpdir(), "ouija-walkthrough-"));
 const outputPath = resolve(assetDir, "ouija-walkthrough.webm");
 const captionDurationMs = Number(process.env.OUIJA_CAPTION_MS ?? 8500);
 let captionIndex = 0;
-const captionTotal = 33;
+const captionTotal = 34;
 
 mkdirSync(assetDir, { recursive: true });
 
@@ -188,7 +188,15 @@ await page.locator("#mcp-export").scrollIntoViewIfNeeded();
 await caption(
   page,
   "MCP Integration Coach",
-  "Ouija previews Composio handoffs to Docs, Sheets, Drive, Classroom, Forms, and Notion, then shows env vars, scopes, data shared, dry-run checks, and consent gates."
+  "Ouija validates Composio handoffs to Docs, Sheets, Drive, Classroom, Forms, Calendar, and Notion, then shows env vars, tools, scopes, data shared, dry-run checks, and consent gates."
+);
+await page.locator(".mcp-action-card").filter({ hasText: "Google Calendar" }).getByRole("button", { name: "Validate route" }).click();
+await page.getByLabel("MCP export dry-run result").getByText("Dry-run passed", { exact: true }).waitFor();
+await page.getByLabel("MCP export dry-run result").scrollIntoViewIfNeeded();
+await caption(
+  page,
+  "Server MCP dry-run",
+  "The public app calls /api/mcp/export, validates consent, payload, integrity blanks, and credential boundaries, then stops before any external Google or Composio write."
 );
 
 await page.locator("#evaluation").scrollIntoViewIfNeeded();
