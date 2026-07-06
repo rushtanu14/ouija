@@ -11,7 +11,7 @@ const recordingDir = mkdtempSync(join(tmpdir(), "ouija-walkthrough-"));
 const outputPath = resolve(assetDir, "ouija-walkthrough.webm");
 const captionDurationMs = Number(process.env.OUIJA_CAPTION_MS ?? 8500);
 let captionIndex = 0;
-const captionTotal = 36;
+const captionTotal = 37;
 
 mkdirSync(assetDir, { recursive: true });
 
@@ -51,6 +51,13 @@ await caption(
   page,
   "Judge Demo Path",
   "Ouija gives judges a five-step route through problem fit, AI design, student workflow, evidence handoff, and submission proof."
+);
+
+await page.getByRole("heading", { name: "AI Runtime Proof" }).scrollIntoViewIfNeeded();
+await caption(
+  page,
+  "AI Runtime Proof",
+  "Judges can verify the active AI path, fallback or web-search readiness, live evaluation coverage, server-only key boundary, and MCP bridge mode through the app and /api/runtime-proof."
 );
 
 await page.getByRole("heading", { name: "Guided Lab Flow" }).scrollIntoViewIfNeeded();

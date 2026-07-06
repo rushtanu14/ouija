@@ -1,4 +1,12 @@
-import type { AnalyzeRequest, AnalyzeResult, EvaluationReport, McpBridgeExportRequest, McpBridgeExportResponse, McpBridgeStatus } from "./types";
+import type {
+  AnalyzeRequest,
+  AnalyzeResult,
+  EvaluationReport,
+  McpBridgeExportRequest,
+  McpBridgeExportResponse,
+  McpBridgeStatus,
+  RuntimeProof
+} from "./types";
 
 export async function requestAnalysis(payload: AnalyzeRequest): Promise<AnalyzeResult> {
   const response = await fetch("/api/analyze", {
@@ -23,6 +31,16 @@ export async function requestEvaluation(): Promise<EvaluationReport> {
   }
 
   return response.json() as Promise<EvaluationReport>;
+}
+
+export async function requestRuntimeProof(): Promise<RuntimeProof> {
+  const response = await fetch("/api/runtime-proof");
+
+  if (!response.ok) {
+    throw new Error("Ouija could not load the AI runtime proof.");
+  }
+
+  return response.json() as Promise<RuntimeProof>;
 }
 
 export async function requestMcpStatus(): Promise<McpBridgeStatus> {

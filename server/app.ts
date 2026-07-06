@@ -3,6 +3,7 @@ import express from "express";
 import path from "node:path";
 import { analyzeExperiment, mergeEnrichment } from "../src/lib/analysis";
 import { runEvaluationSuite } from "../src/lib/evaluation";
+import { buildRuntimeProof } from "../src/lib/runtimeProof";
 import type { AnalyzeRequest } from "../src/lib/types";
 import { getMcpBridgeStatus, validateMcpExportRequest } from "./mcpBridge";
 import { enrichWithOpenAIWebSearch } from "./openaiGrounding";
@@ -23,6 +24,14 @@ export function createApp(options: AppOptions = {}) {
 
   app.get("/api/evaluate", (_req, res) => {
     res.json(runEvaluationSuite());
+  });
+
+  app.get("/api/runtime-proof", (_req, res) => {
+    res.json(
+      buildRuntimeProof({
+        mcpBridgeMode: getMcpBridgeStatus().mode
+      })
+    );
   });
 
   app.get("/api/mcp/status", (_req, res) => {

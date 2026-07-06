@@ -21,6 +21,7 @@
 
 - Hybrid design: deterministic science templates plus optional OpenAI Responses API `web_search`.
 - Server-side grounding keeps the API key out of the browser.
+- AI Runtime Proof shows fallback/web-search readiness, template count, evaluation coverage, server-only key boundary, and MCP bridge mode through the UI and `/api/runtime-proof`.
 - Model Strategy exposes candidate rankings, matched signals, confidence, fallback behavior, validation layers, safety layer, and risk controls.
 - AI Evaluation Harness scores classifier confidence, coverage, source grounding, pattern validation, repeat reliability, row validators, safety/integrity, and fallback boundaries.
 - Data Handling Ledger exposes what student data is used, where it is stored, retention, local snapshots, student controls, and the server-only API-key boundary.
@@ -46,6 +47,7 @@
 
 - Eight supported demo labs across physics, chemistry, biology, and earth science.
 - Model Strategy prevents the AI design from looking like a black-box chatbot or a simple prompt wrapper.
+- AI Runtime Proof gives judges a live endpoint for the deployed AI path instead of asking them to trust screenshots or prose.
 - AI Evaluation Harness turns model behavior and safeguards into visible pass/review/fail checks.
 - Judge Demo Path prevents the technical depth from becoming a maze during the live evaluation.
 - Guided Lab Flow makes the workflow scannable before students dive into detailed panels.
@@ -85,6 +87,7 @@
 - Run Snapshot reduces first-scroll cognitive load by putting run status, expected pattern, and next action above the deeper evidence panels.
 - Guided Lab Flow reduces cognitive load by showing identify, prepare, understand, check, plan, and claim stages.
 - Judge Demo Path reduces evaluator cognitive load by showing the intended five-step live walkthrough near the top of the analysis panel.
+- AI Runtime Proof sits near the top of the analysis panel so evaluators can verify the runtime, tests, secret boundary, and MCP mode before the deeper Model Card.
 - Claim Coach converts analysis into a student-owned reasoning checklist instead of a generated final paragraph.
 - Evidence Packet exports the same reasoning scaffold with Judge Demo Path, Custom Lab Triage, Grounding Audit, AI Evaluation Harness, sources, safety coach, concept coach, pattern evidence, reliability coach, data, checks, next-trial plan, and blanks, not a completed report.
 - Data Handling Ledger appears in the app and Evidence Packet so judges can inspect privacy and student-control claims during the demo or exported handoff.
@@ -102,5 +105,6 @@
 - Submit the hosted live demo, slide deck, and video walkthrough on Devpost.
 - Handle the live Devpost page's listed 2-5 member team requirement; the overview text also says participants may work individually, so verify the submission form behavior before final submit.
 - Optionally configure a real OpenAI API key for one web-search-enriched demo and live Composio credentials for classroom exports.
+- Use `/api/runtime-proof`, `/api/evaluate`, and `/api/mcp/status` as quick public smoke checks after each deploy.
 - Present or export `docs/aiyes-slide-deck.html`.
 - Paste `docs/devpost-submission-copy.md` into Devpost.

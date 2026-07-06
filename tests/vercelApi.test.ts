@@ -4,6 +4,7 @@ import evaluateHandler from "../api/evaluate";
 import healthHandler from "../api/health";
 import mcpExportHandler from "../api/mcp/export";
 import mcpStatusHandler from "../api/mcp/status";
+import runtimeProofHandler from "../api/runtime-proof";
 import { analyzeExperiment } from "../src/lib/analysis";
 import { buildEvidencePacket } from "../src/lib/evidencePacket";
 import { MCP_CONNECTOR_CATALOG } from "../src/lib/mcpIntegrationPlan";
@@ -104,6 +105,23 @@ describe("Vercel API functions", () => {
     expect(response.body.cases[0].evidence.some((item: string) => item.includes("custom planner rows"))).toBe(true);
     expect(response.body.cases[0].evidence.some((item: string) => item.includes("data handling ledger"))).toBe(true);
     expect(response.body.cases[0].evidence.some((item: string) => item.includes("learning exit ticket"))).toBe(true);
+  });
+
+  it("returns AI runtime proof from the serverless runtime function", () => {
+    delete process.env.OPENAI_API_KEY;
+    clearComposioEnv();
+    const response = createMockResponse();
+
+    runtimeProofHandler({ method: "GET" }, response.res);
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body.status).toBe("fallback_ready");
+    expect(response.body.webSearchConfigured).toBe(false);
+    expect(response.body.evaluationPassed).toBe(9);
+    expect(response.body.evaluationCaseCount).toBe(9);
+    expect(response.body.mcpBridgeMode).toBe("server_dry_run");
+    expect(response.body.signals.some((signal: { id: string; value: string }) => signal.id === "privacy" && signal.value === "Server-only key boundary")).toBe(true);
+    expect(JSON.stringify(response.body)).not.toContain("sk-");
   });
 
   it("returns Composio MCP dry-run status from the serverless status function", () => {

@@ -33,7 +33,7 @@ import {
   XAxis,
   YAxis
 } from "recharts";
-import { requestAnalysis, requestEvaluation, requestMcpExport, requestMcpStatus } from "./lib/api";
+import { requestAnalysis, requestEvaluation, requestMcpExport, requestMcpStatus, requestRuntimeProof } from "./lib/api";
 import { refreshResultForRows } from "./lib/analysis";
 import { buildPasteExample, parsePastedTable } from "./lib/dataImport";
 import { buildEvidencePacket } from "./lib/evidencePacket";
@@ -68,6 +68,7 @@ import type {
   ProgressPortfolio,
   ProgressPortfolioSnapshot,
   ReliabilityCoach,
+  RuntimeProof,
   SafetyCoach,
   StudentDataRow,
   StudentReflectionAnswers,
@@ -92,6 +93,7 @@ export function App() {
   const [reflectionAnswers, setReflectionAnswers] = useState<StudentReflectionAnswers>({});
   const [savedLabs, setSavedLabs] = useState<SavedLab[]>(loadSavedLabs);
   const [evaluationReport, setEvaluationReport] = useState<EvaluationReport | null>(null);
+  const [runtimeProof, setRuntimeProof] = useState<RuntimeProof | null>(null);
   const [mcpBridgeStatus, setMcpBridgeStatus] = useState<McpBridgeStatus | null>(null);
   const [mcpExportResult, setMcpExportResult] = useState<McpBridgeExportResponse | null>(null);
   const [mcpExportStatus, setMcpExportStatus] = useState<"idle" | "loading" | "error">("idle");
@@ -125,6 +127,7 @@ export function App() {
   useEffect(() => {
     void analyze(initialPrompt);
     void requestEvaluation().then(setEvaluationReport).catch(() => setEvaluationReport(null));
+    void requestRuntimeProof().then(setRuntimeProof).catch(() => setRuntimeProof(null));
     void requestMcpStatus().then(setMcpBridgeStatus).catch(() => setMcpBridgeStatus(null));
   }, []);
 
@@ -245,6 +248,7 @@ export function App() {
         <nav aria-label="Primary">
           <a href="#experiment">Experiment</a>
           <a href="#demo-path">Demo Path</a>
+          <a href="#runtime-proof">Runtime Proof</a>
           <a href="#sources">Sources</a>
           <a href="#rubric">Rubric Fit</a>
           <a href="#impact">Impact</a>
@@ -330,6 +334,7 @@ export function App() {
 
               <RunSnapshotPanel result={result} evaluationReport={evaluationReport} />
               <JudgeDemoPathPanel path={result.judgeDemoPath} />
+              <RuntimeProofPanel proof={runtimeProof} result={result} />
               {result.customLabTriage.status === "needs_student_details" ? <CustomLabTriagePanel triage={result.customLabTriage} /> : null}
               <GuidedLabFlowPanel flow={result.guidedFlow} />
               <PreLabDesignCoachPanel coach={result.preLabDesignCoach} />
@@ -542,6 +547,81 @@ function JudgeDemoPathPanel({ path }: { path: JudgeDemoPath }) {
             <small>{step.demoAction}</small>
           </article>
         ))}
+      </div>
+    </section>
+  );
+}
+
+function RuntimeProofPanel({ proof, result }: { proof: RuntimeProof | null; result: AnalyzeResult }) {
+  const fallbackSignals: RuntimeProof["signals"] = [
+    {
+      id: "classifier",
+      label: "Classifier",
+      status: "active",
+      value: `${result.modelStrategy.candidates.length} candidates ranked`,
+      detail: result.modelStrategy.decisionSummary
+    },
+    {
+      id: "grounding",
+      label: "Current run grounding",
+      status: result.groundingStatus.mode === "web_enriched" ? "configured" : "ready",
+      value: result.groundingStatus.mode === "web_enriched" ? "Web enriched" : "Trusted fallback",
+      detail: result.groundingStatus.note
+    },
+    {
+      id: "evaluation",
+      label: "Evaluation bench",
+      status: "review",
+      value: "Loading",
+      detail: "Runtime proof endpoint is loading."
+    }
+  ];
+  const signals = proof?.signals ?? fallbackSignals;
+
+  return (
+    <section
+      className={`runtime-proof runtime-proof-${proof?.status ?? "loading"}`}
+      id="runtime-proof"
+      aria-label="AI Runtime Proof"
+    >
+      <div className="runtime-proof-header">
+        <div className="panel-title">
+          <Workflow size={18} />
+          <h3>AI Runtime Proof</h3>
+        </div>
+        <span>{proof ? formatRuntimeProofStatus(proof.status) : "Loading"}</span>
+      </div>
+      <div className="runtime-proof-summary">
+        <div>
+          <p className="section-label">Active AI path</p>
+          <strong>{proof?.webSearchConfigured ? "OpenAI web search ready" : "Deterministic fallback ready"}</strong>
+          <small>{proof?.judgeTakeaway ?? "Checking server runtime, evaluation bench, and secret boundary."}</small>
+        </div>
+        <div>
+          <p className="section-label">Current run</p>
+          <strong>{result.groundingStatus.mode === "web_enriched" ? "Web-enriched citations" : "Built-in citations"}</strong>
+          <small>{result.sources.length} visible citation{result.sources.length === 1 ? "" : "s"}</small>
+        </div>
+      </div>
+      <div className="runtime-proof-grid">
+        {signals.map((signal) => (
+          <article className={`runtime-proof-signal runtime-proof-signal-${signal.status}`} key={signal.id}>
+            <p className="section-label">{signal.label}</p>
+            <strong>{signal.value}</strong>
+            <small>{signal.detail}</small>
+          </article>
+        ))}
+      </div>
+      <div className="runtime-proof-links" aria-label="Runtime proof endpoints">
+        <a href="/api/runtime-proof" target="_blank" rel="noreferrer">
+          /api/runtime-proof
+        </a>
+        <a href="/api/evaluate" target="_blank" rel="noreferrer">
+          /api/evaluate
+        </a>
+        <a href="/api/mcp/status" target="_blank" rel="noreferrer">
+          /api/mcp/status
+        </a>
       </div>
     </section>
   );
@@ -2344,6 +2424,10 @@ function formatMcpStatus(status: McpIntegrationPlan["status"]) {
   if (status === "ready") return "Server MCP ready";
   if (status === "server_dry_run") return "Server dry-run";
   return "Preview only";
+}
+
+function formatRuntimeProofStatus(status: RuntimeProof["status"]) {
+  return status === "web_enriched_ready" ? "Web search ready" : "Fallback ready";
 }
 
 function formatMcpConnectorStatus(status: McpIntegrationPlan["readinessMatrix"][number]["status"]) {

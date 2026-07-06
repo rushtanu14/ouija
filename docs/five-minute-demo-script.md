@@ -10,9 +10,11 @@ Students do not just need answers after a lab. They need help connecting the exp
 
 Open Ouija. Click `Reaction Rate`. Show that a normal student description becomes a classified experiment with subject, concepts, variables, confidence, and a Judge Demo Path.
 
-## 1:05-1:20 - Judge Demo Path
+## 1:05-1:20 - Judge Demo Path And Runtime Proof
 
 Show Judge Demo Path: problem fit, AI design, student workflow, evidence handoff, and submission proof. This keeps the live walkthrough easy for judges to follow before you scroll into the deeper panels.
+
+Show AI Runtime Proof: fallback/web-search readiness, live evaluation coverage, server-only secret boundary, and MCP bridge mode. Mention that `/api/runtime-proof`, `/api/evaluate`, and `/api/mcp/status` are public smoke checks.
 
 ## 1:20-1:38 - Model Strategy
 

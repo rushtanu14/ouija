@@ -660,6 +660,28 @@ export interface EvaluationReport {
   cases: EvaluationCaseResult[];
 }
 
+export interface RuntimeProofSignal {
+  id: "classifier" | "grounding" | "evaluation" | "privacy" | "integrity" | "mcp";
+  label: string;
+  status: "active" | "ready" | "configured" | "review";
+  value: string;
+  detail: string;
+}
+
+export interface RuntimeProof {
+  status: "fallback_ready" | "web_enriched_ready";
+  generatedAt: string;
+  model: string;
+  webSearchConfigured: boolean;
+  templateCount: number;
+  evaluationCaseCount: number;
+  evaluationPassed: number;
+  serverOnlyKeyBoundary: boolean;
+  mcpBridgeMode: McpBridgeStatus["mode"];
+  signals: RuntimeProofSignal[];
+  judgeTakeaway: string;
+}
+
 export interface AnalyzeRequest {
   description: string;
   rows?: StudentDataRow[];

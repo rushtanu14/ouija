@@ -79,6 +79,16 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(page.getByLabel("Judge Demo Path").getByText("Next best action")).toBeVisible();
   await expect(page.getByLabel("Judge Demo Path").getByText("Problem fit", { exact: true })).toBeVisible();
   await expect(page.getByLabel("Judge Demo Path").getByText("Submission proof", { exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "AI Runtime Proof" })).toBeVisible();
+  await expect(page.getByLabel("AI Runtime Proof").getByText("Deterministic fallback ready")).toBeVisible();
+  await expect(page.getByLabel("AI Runtime Proof").getByText("Trusted fallback active")).toBeVisible();
+  await expect(page.getByLabel("AI Runtime Proof").getByText("9/9 cases passed")).toBeVisible();
+  await expect(page.getByLabel("AI Runtime Proof").getByText("Server-only key boundary")).toBeVisible();
+  await expect(page.getByLabel("AI Runtime Proof").getByText("Server dry-run mode")).toBeVisible();
+  await expect(page.getByLabel("Runtime proof endpoints").getByRole("link", { name: "/api/runtime-proof" })).toHaveAttribute(
+    "href",
+    "/api/runtime-proof"
+  );
   await expect(page.getByRole("heading", { name: "Student data table" })).toBeVisible();
   await expect(page.getByLabel("Expected overlay summary").getByText("Dashed expected overlay")).toBeVisible();
   await expect(page.getByRole("heading", { name: "Method Audit" })).toBeVisible();

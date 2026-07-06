@@ -16,26 +16,29 @@ Ouija is a student-facing AI experiment interpreter for middle and high school s
 1. Describe or choose a middle/high school experiment.
 2. Review Ouija's classification, Run Snapshot, variables, expected pattern, expected-overlay graph, and citations.
 3. Use Judge Demo Path to walk evaluators through problem fit, AI design, student workflow, evidence handoff, and submission proof.
-4. Use Guided Lab Flow and Pre-Lab Design Coach to see the current next action, variables, controls, repeats, source task, table plan, and safety gate.
-5. Paste spreadsheet rows or edit table data near the top of the workflow.
-6. Use Grounding Audit, the expected overlay, Pattern Evidence Engine, Method Audit, Reliability Coach, Safety Coach, Concept Coach, Comparison Insights, Custom Lab Triage, and Claim Coach to find source-trust gaps, visual pattern mismatches, whole-graph support, control-variable issues, repeat-trial gaps, safety boundaries, data problems, vocabulary gaps, evidence gaps, unsupported-lab next questions, and the next reasoning question.
-7. Use Pattern Evidence Engine, Reliability Coach, and Next Trial Planner to decide what to repeat, average, tighten, or measure next before writing the claim.
-8. Review Learning Impact Loop, Learning Exit Ticket, and Student Reflection Workspace to see whether the student is ready to plan, reason, and explain answers themselves before writing.
-9. Copy the Evidence Packet as a student-owned reasoning handoff with judge demo path, Custom Lab Triage, Pre-Lab Design Coach, AIYES rubric fit, learning impact, Learning Exit Ticket, student reflection drafts, guided flow, Grounding Audit, AI Evaluation Harness, Data Handling Ledger, sources, checks, safety notes, concept vocabulary, pattern evidence, repeat reliability, data table, next-trial plan, blanks, and next question.
-10. Inspect Model Strategy, AI Evaluation Harness, Data Handling Ledger, and AIYES Rubric Fit to show candidate ranking, matched signals, fallback logic, validators, model-behavior checks, privacy flow, retention, student controls, risk controls, and official criteria mapping.
-11. Use Reasoning Trail to show how Ouija classified the experiment, exposed model strategy, ran the AI evaluation harness, guided the judge demo, planned the pre-lab setup, audited source grounding, guided the student path, built the concept scaffold, checked the learning exit ticket, checked the safety boundary, audited student-data handling, audited the table data, scored whole-pattern evidence, checked repeat reliability, planned the next trial, and maps the run to AIYES Track 1 evidence.
-12. Open Evaluation Bench to see nine live checks: eight supported lab demos plus the unsupported-lab boundary.
-13. Save lab snapshots locally so a student can return to a checked run without sending data to an account system.
-14. Use Progress Portfolio to show saved-run count, score trend, subject breadth, strongest run, and next portfolio action.
-15. Use MCP Integration Coach to validate Composio-powered Google Docs, Google Sheets, Google Drive, Google Classroom, Google Forms, Google Calendar, and Notion handoffs through the server dry-run bridge, plus the readiness matrix, without exposing credentials or sending student data.
-16. Open AI Model Card for the architecture, grounding, evaluation, privacy, MCP-export boundary, and guardrail summary.
-17. Open Judge Brief for a compact Track 1 proof surface: live app, hosted deck/video, judge demo path, official rubric fit, learning impact, student reflection drafts, progress portfolio, MCP readiness plan, AI pipeline, model strategy, evaluation, data-handling ethics, tests, and integrity constraints.
+4. Use AI Runtime Proof to verify the active AI path, fallback/web-search readiness, live evaluation coverage, server-only key boundary, and MCP bridge mode.
+5. Use Guided Lab Flow and Pre-Lab Design Coach to see the current next action, variables, controls, repeats, source task, table plan, and safety gate.
+6. Paste spreadsheet rows or edit table data near the top of the workflow.
+7. Use Grounding Audit, the expected overlay, Pattern Evidence Engine, Method Audit, Reliability Coach, Safety Coach, Concept Coach, Comparison Insights, Custom Lab Triage, and Claim Coach to find source-trust gaps, visual pattern mismatches, whole-graph support, control-variable issues, repeat-trial gaps, safety boundaries, data problems, vocabulary gaps, evidence gaps, unsupported-lab next questions, and the next reasoning question.
+8. Use Pattern Evidence Engine, Reliability Coach, and Next Trial Planner to decide what to repeat, average, tighten, or measure next before writing the claim.
+9. Review Learning Impact Loop, Learning Exit Ticket, and Student Reflection Workspace to see whether the student is ready to plan, reason, and explain answers themselves before writing.
+10. Copy the Evidence Packet as a student-owned reasoning handoff with judge demo path, Custom Lab Triage, Pre-Lab Design Coach, AIYES rubric fit, learning impact, Learning Exit Ticket, student reflection drafts, guided flow, Grounding Audit, AI Evaluation Harness, Data Handling Ledger, sources, checks, safety notes, concept vocabulary, pattern evidence, repeat reliability, data table, next-trial plan, blanks, and next question.
+11. Inspect Model Strategy, AI Evaluation Harness, Data Handling Ledger, and AIYES Rubric Fit to show candidate ranking, matched signals, fallback logic, validators, model-behavior checks, privacy flow, retention, student controls, risk controls, and official criteria mapping.
+12. Use Reasoning Trail to show how Ouija classified the experiment, exposed model strategy, ran the AI evaluation harness, guided the judge demo, planned the pre-lab setup, audited source grounding, guided the student path, built the concept scaffold, checked the learning exit ticket, checked the safety boundary, audited student-data handling, audited the table data, scored whole-pattern evidence, checked repeat reliability, planned the next trial, and maps the run to AIYES Track 1 evidence.
+13. Open Evaluation Bench to see nine live checks: eight supported lab demos plus the unsupported-lab boundary.
+14. Save lab snapshots locally so a student can return to a checked run without sending data to an account system.
+15. Use Progress Portfolio to show saved-run count, score trend, subject breadth, strongest run, and next portfolio action.
+16. Use MCP Integration Coach to validate Composio-powered Google Docs, Google Sheets, Google Drive, Google Classroom, Google Forms, Google Calendar, and Notion handoffs through the server dry-run bridge, plus the readiness matrix, without exposing credentials or sending student data.
+17. Open AI Model Card for the architecture, grounding, evaluation, privacy, MCP-export boundary, and guardrail summary.
+18. Open Judge Brief for a compact Track 1 proof surface: live app, hosted deck/video, judge demo path, official rubric fit, learning impact, student reflection drafts, progress portfolio, MCP readiness plan, AI pipeline, model strategy, evaluation, data-handling ethics, tests, and integrity constraints.
 
 Guided Lab Flow gives students one current next action and six stable stages so the interface feels like a lab workflow rather than separate AI outputs.
 
 Run Snapshot gives students and judges a compact first-read of rubric fit, Evaluation Bench status, learning impact, data flags, expected pattern, and the current action before the deeper evidence panels.
 
 Judge Demo Path gives evaluators a five-step route through the live app: problem fit, AI design, student workflow, evidence handoff, and submission proof.
+
+AI Runtime Proof exposes the live deployment's AI mode through the UI and `/api/runtime-proof`: template count, fallback or OpenAI web-search readiness, evaluation coverage, server-only key boundary, and MCP bridge mode without leaking secrets.
 
 Claim Coach intentionally keeps blanks in the claim starter so students must write their own conclusion.
 
@@ -117,13 +120,13 @@ PORT=8799 HOST=127.0.0.1 npm start
 
 ## Deployment
 
-The repo includes `vercel.json` and serverless API adapters under `api/` so Vercel can host the Vite app and the same-origin `/api/health`, `/api/evaluate`, `/api/analyze`, `/api/mcp/status`, and `/api/mcp/export` endpoints.
+The repo includes `vercel.json` and serverless API adapters under `api/` so Vercel can host the Vite app and the same-origin `/api/health`, `/api/evaluate`, `/api/runtime-proof`, `/api/analyze`, `/api/mcp/status`, and `/api/mcp/export` endpoints.
 
 Production deployment: https://ouija-olive.vercel.app
 
 ## AI Grounding
 
-Ouija works without credentials through deterministic built-in experiment templates and trusted citations. When `OPENAI_API_KEY` is present in the environment, the server attempts OpenAI Responses API web-search enrichment and falls back safely if enrichment is unavailable.
+Ouija works without credentials through deterministic built-in experiment templates and trusted citations. `GET /api/runtime-proof` reports whether the live deployment is using fallback or web-search-ready mode without exposing secret values. When `OPENAI_API_KEY` is present in the environment, the server attempts OpenAI Responses API web-search enrichment and falls back safely if enrichment is unavailable.
 
 ## Composio MCP Bridge
 

@@ -156,6 +156,27 @@ describe("GET /api/evaluate", () => {
   });
 });
 
+describe("GET /api/runtime-proof", () => {
+  it("returns runtime proof without exposing OpenAI or Composio credentials", async () => {
+    delete process.env.OPENAI_API_KEY;
+    clearComposioEnv();
+    const app = createApp();
+    const response = await request(app).get("/api/runtime-proof").expect(200);
+
+    expect(response.body.status).toBe("fallback_ready");
+    expect(response.body.webSearchConfigured).toBe(false);
+    expect(response.body.templateCount).toBe(8);
+    expect(response.body.evaluationPassed).toBe(9);
+    expect(response.body.evaluationCaseCount).toBe(9);
+    expect(response.body.serverOnlyKeyBoundary).toBe(true);
+    expect(response.body.mcpBridgeMode).toBe("server_dry_run");
+    expect(response.body.signals.some((signal: { id: string; value: string }) => signal.id === "grounding" && signal.value === "Trusted fallback active")).toBe(true);
+    expect(response.body.judgeTakeaway).toContain("judge-demoable without credentials");
+    expect(JSON.stringify(response.body)).not.toContain("sk-");
+    expect(JSON.stringify(response.body)).not.toContain("COMPOSIO_API_KEY=");
+  });
+});
+
 describe("Composio MCP bridge API", () => {
   it("reports server dry-run readiness without exposing Composio credentials", async () => {
     clearComposioEnv();

@@ -117,6 +117,7 @@ a {
 .analysis-panel > .classification,
 .run-snapshot,
 .judge-demo-path,
+.runtime-proof,
 .custom-lab-triage,
 .pre-lab-design-coach,
 .model-strategy,
@@ -357,6 +358,7 @@ a:focus-visible {
 .graph-card,
 .run-snapshot,
 .judge-demo-path,
+.runtime-proof,
 .custom-lab-triage,
 .pre-lab-design-coach,
 .model-strategy,
@@ -606,6 +608,108 @@ a:focus-visible {
   color: #536478;
   font-size: 12px;
   line-height: 1.4;
+}
+
+.runtime-proof {
+  display: grid;
+  gap: 12px;
+  background: linear-gradient(180deg, #ffffff, #f6fbff);
+}
+
+.runtime-proof-header,
+.runtime-proof-summary {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+}
+
+.runtime-proof-header > span {
+  flex: 0 0 auto;
+  border-radius: 8px;
+  padding: 7px 10px;
+  color: #173b74;
+  background: #eef5ff;
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.runtime-proof-web_enriched_ready .runtime-proof-header > span {
+  color: #1f5b3d;
+  background: #edf8f1;
+}
+
+.runtime-proof-summary {
+  align-items: stretch;
+}
+
+.runtime-proof-summary > div {
+  display: grid;
+  gap: 4px;
+  flex: 1 1 0;
+  min-width: 0;
+  border-radius: 8px;
+  padding: 12px;
+  color: #173b74;
+  background: #eef5ff;
+}
+
+.runtime-proof-summary strong,
+.runtime-proof-signal strong {
+  color: #172439;
+  line-height: 1.25;
+}
+
+.runtime-proof-summary small,
+.runtime-proof-signal small {
+  color: #526276;
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.4;
+}
+
+.runtime-proof-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.runtime-proof-signal {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+  border: 1px solid #d9e5f2;
+  border-left: 4px solid #2368ff;
+  border-radius: 8px;
+  padding: 11px;
+  background: #fbfdff;
+}
+
+.runtime-proof-signal-configured,
+.runtime-proof-signal-active {
+  border-left-color: #2e9f65;
+}
+
+.runtime-proof-signal-review {
+  border-left-color: #d89100;
+  background: #fffaf0;
+}
+
+.runtime-proof-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.runtime-proof-links a {
+  border: 1px solid #c9dcff;
+  border-radius: 8px;
+  padding: 8px 10px;
+  color: #2368ff;
+  background: #f7fbff;
+  font-size: 12px;
+  font-weight: 850;
+  text-decoration: none;
 }
 
 .custom-lab-triage {
@@ -3981,6 +4085,10 @@ td input {
     grid-template-columns: 1fr;
   }
 
+  .runtime-proof-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .strategy-signal-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -4127,6 +4235,16 @@ td input {
   }
 
   .run-snapshot-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .runtime-proof-header,
+  .runtime-proof-summary {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .runtime-proof-grid {
     grid-template-columns: 1fr;
   }
 

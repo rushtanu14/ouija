@@ -7,6 +7,7 @@ Generated from `server/app.ts` and `api/*.ts`.
 | --- | --- | --- | --- | --- |
 | `/api/health` | `GET`, `OPTIONS` | Health check for the Ouija API. | `{ "ok": true, "service": "ouija-api" }` | `405` with `Use GET /api/health to check the Ouija API.` |
 | `/api/evaluate` | `GET`, `OPTIONS` | Runs the deterministic Ouija evaluation bench: eight supported demos plus the unsupported-boundary case. | `EvaluationReport` with `score`, `passed`, `total`, `status`, `verdict`, and `cases`. | `405` with `Use GET /api/evaluate to run the Ouija evaluation bench.` |
+| `/api/runtime-proof` | `GET`, `OPTIONS` | Reports the active AI runtime path, fallback/web-search readiness, evaluation coverage, server-only key boundary, and MCP bridge mode without exposing secret values. | `RuntimeProof` from `src/lib/types.ts`. | `405` with `Use GET /api/runtime-proof to inspect Ouija runtime proof.` |
 | `/api/analyze` | `POST`, `OPTIONS` | Analyzes a student experiment description and optional rows. Returns classification, citations, pre-lab design checks, expected overlay, checks, Data Handling Ledger, Learning Exit Ticket, Student Reflection Workspace prompts, Evidence Packet inputs, and Track 1 evidence. | `AnalyzeResult` from `src/lib/types.ts`. | `400` when `description` is empty; `405` with `Use POST /api/analyze to analyze a student experiment.` |
 | `/api/mcp/status` | `GET`, `OPTIONS` | Reports the Composio MCP bridge mode, missing server env vars, connector readiness, docs links, and allowed-tool plan without exposing secret values. | `McpBridgeStatus` from `src/lib/types.ts`. | `405` with `Use GET /api/mcp/status to inspect Composio MCP readiness.` |
 | `/api/mcp/export` | `POST`, `OPTIONS` | Validates a consent-gated Composio packet for Google Docs, Sheets, Drive, Classroom, Forms, Calendar, or Notion. The public mode is server dry-run and stops before external writes. | `McpBridgeExportResponse` from `src/lib/types.ts`. | `400` for missing action, missing payload, or missing consent; `405` with `Use POST /api/mcp/export to dry-run a consent-gated Composio MCP packet.` |
@@ -47,6 +48,8 @@ Generated from `server/app.ts` and `api/*.ts`.
   }
 }
 ```
+
+`GET /api/runtime-proof` is intended for judges and deployment smoke checks. It returns booleans and counts only: no `OPENAI_API_KEY`, no `COMPOSIO_API_KEY`, and no connector auth values.
 
 The Vercel serverless API handlers set CORS headers and `Cache-Control: no-store`. The local Express app uses CORS and serves the built frontend when `dist/` exists.
 <!-- AUTO-GENERATED:API:END -->
