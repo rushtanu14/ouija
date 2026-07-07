@@ -35,6 +35,8 @@ import {
 } from "recharts";
 import { requestAnalysis, requestEvaluation, requestMcpExport, requestMcpSession, requestMcpStatus, requestRuntimeProof } from "./lib/api";
 import { refreshResultForRows } from "./lib/analysis";
+import { buildConceptMasteryCheck } from "./lib/conceptMasteryCheck";
+import type { ConceptMasteryAnswerMap, ConceptMasteryCheck } from "./lib/conceptMasteryCheck";
 import { buildPasteExample, parsePastedTable } from "./lib/dataImport";
 import { buildEvidencePacket } from "./lib/evidencePacket";
 import { buildMcpIntegrationPlan } from "./lib/mcpIntegrationPlan";
@@ -97,6 +99,7 @@ export function App() {
   const [result, setResult] = useState<AnalyzeResult | null>(null);
   const [rows, setRows] = useState<StudentDataRow[]>([]);
   const [reflectionAnswers, setReflectionAnswers] = useState<StudentReflectionAnswers>({});
+  const [masteryAnswers, setMasteryAnswers] = useState<ConceptMasteryAnswerMap>({});
   const [savedLabs, setSavedLabs] = useState<SavedLab[]>(loadSavedLabs);
   const [evaluationReport, setEvaluationReport] = useState<EvaluationReport | null>(null);
   const [runtimeProof, setRuntimeProof] = useState<RuntimeProof | null>(null);
@@ -121,6 +124,7 @@ export function App() {
       setResult(analysis);
       setRows(analysis.rows);
       setReflectionAnswers({});
+      setMasteryAnswers({});
       setMcpExportResult(null);
       setMcpSessionResult(null);
       setMcpExportError("");
@@ -185,6 +189,13 @@ export function App() {
     }));
   }
 
+  function updateMasteryAnswer(questionId: keyof ConceptMasteryAnswerMap, optionId: string) {
+    setMasteryAnswers((current) => ({
+      ...current,
+      [questionId]: optionId
+    }));
+  }
+
   const chartData = useMemo(() => {
     if (!result) return [];
     const comparisonByRow = new Map(result.expectedComparison.points.map((point) => [point.rowId, point]));
@@ -200,6 +211,10 @@ export function App() {
     if (!result) return null;
     return buildStudentReflectionWorkspace(result.learningExitTicket, reflectionAnswers);
   }, [reflectionAnswers, result]);
+  const conceptMasteryCheck = useMemo(() => {
+    if (!result) return null;
+    return buildConceptMasteryCheck(result, masteryAnswers);
+  }, [masteryAnswers, result]);
   const evidencePacket = useMemo(() => {
     if (!result) return "";
     return buildEvidencePacket(result, rows, description, reflectionAnswers);
@@ -371,6 +386,9 @@ export function App() {
               {result.customLabTriage.status === "needs_student_details" ? <CustomLabTriagePanel triage={result.customLabTriage} /> : null}
               <GuidedLabFlowPanel flow={result.guidedFlow} />
               <StudentLevelLensPanel result={result} level={learningLevel} />
+              {conceptMasteryCheck ? (
+                <ConceptMasteryCheckPanel check={conceptMasteryCheck} onAnswerChange={updateMasteryAnswer} />
+              ) : null}
               <PreLabDesignCoachPanel coach={result.preLabDesignCoach} />
 
               <div className="graph-card">
@@ -983,6 +1001,7 @@ function JudgeBriefPanel({ result }: { result: AnalyzeResult | null }) {
     "Learning Exit Ticket proves students must explain variables, patterns, and next steps themselves.",
     "Student Reflection Workspace captures student-authored exit-ticket drafts.",
     "Student Level Lens switches the same lab guidance between middle-school plain language and high-school quantitative reasoning.",
+    "Concept Mastery Check measures whether students understand variables, evidence patterns, and integrity boundaries.",
     "Graph overlays expected pattern values against student data.",
     "Grounding Audit makes citation trust and mixed evidence visible.",
     "Pattern Evidence Engine scores the whole graph against the expected pattern.",
@@ -1092,6 +1111,7 @@ function ModelCardPanel({ result }: { result: AnalyzeResult | null }) {
     "Learning Exit Ticket converts the AI feedback into student reflection prompts judges can inspect.",
     "Student Reflection Workspace stores student-written drafts without generating answers.",
     "Student Level Lens adapts the same analysis for middle school pattern reading or high school quantitative evidence and uncertainty.",
+    "Concept Mastery Check scores variable, pattern, and integrity understanding before students copy evidence forward.",
     "Expected overlay gives students a visual comparison between their data and the expected pattern.",
     "Grounding Audit checks source agreement before students use the expected pattern.",
     "Data Handling Ledger makes student data flow, retention, and controls inspectable.",
@@ -1142,6 +1162,7 @@ function ModelCardPanel({ result }: { result: AnalyzeResult | null }) {
         <li>Import or edit table rows.</li>
         <li>Build a student concept scaffold.</li>
         <li>Adapt the scaffold for middle or high school reasoning.</li>
+        <li>Check concept mastery before evidence export.</li>
         <li>Check school-lab safety boundaries.</li>
         <li>Audit rows, controls, and assumptions.</li>
         <li>Score the whole data pattern.</li>
@@ -2141,6 +2162,60 @@ function StudentLevelLensPanel({ result, level }: { result: AnalyzeResult; level
   );
 }
 
+function ConceptMasteryCheckPanel({
+  check,
+  onAnswerChange
+}: {
+  check: ConceptMasteryCheck;
+  onAnswerChange: (questionId: ConceptMasteryCheck["questions"][number]["id"], optionId: string) => void;
+}) {
+  return (
+    <section className={`concept-mastery-check concept-mastery-${check.status}`} aria-label="Concept Mastery Check">
+      <div className="mastery-header">
+        <div className="panel-title">
+          <CheckCircle2 size={18} />
+          <h3>Concept Mastery Check</h3>
+        </div>
+        <span>{check.score}/100</span>
+      </div>
+      <div className="mastery-summary">
+        <div>
+          <p className="section-label">Understanding proof</p>
+          <strong>
+            {check.readyCount}/{check.totalCount} passed
+          </strong>
+        </div>
+        <span>{check.summary}</span>
+      </div>
+      <div className="mastery-question-grid">
+        {check.questions.map((question) => (
+          <article className={`mastery-question mastery-question-${question.status}`} key={question.id}>
+            <div className="mastery-question-header">
+              <strong>{question.label}</strong>
+              <span>{formatMasteryQuestionStatus(question.status)}</span>
+            </div>
+            <p>{question.prompt}</p>
+            <div className="mastery-option-list">
+              {question.options.map((option) => (
+                <button
+                  type="button"
+                  className={question.selectedOptionId === option.id ? "active" : ""}
+                  aria-pressed={question.selectedOptionId === option.id}
+                  onClick={() => onAnswerChange(question.id, option.id)}
+                  key={option.id}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+            <small>{question.feedback}</small>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 function ComparisonPanel({ issues, hints }: { issues: Issue[]; hints: string[] }) {
   return (
     <section className="comparison-panel" aria-label="Comparison insights">
@@ -2628,6 +2703,12 @@ function formatFlowStatus(status: GuidedLabFlow["steps"][number]["status"]) {
   if (status === "blocked") return "Blocked";
   if (status === "review") return "Review";
   return "Next";
+}
+
+function formatMasteryQuestionStatus(status: ConceptMasteryCheck["questions"][number]["status"]) {
+  if (status === "correct") return "Passed";
+  if (status === "review") return "Review";
+  return "Choose";
 }
 
 function formatReadiness(readiness: AnalyzeResult["trackEvidence"]["readiness"]) {

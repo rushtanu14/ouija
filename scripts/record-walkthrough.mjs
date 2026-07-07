@@ -11,7 +11,7 @@ const recordingDir = mkdtempSync(join(tmpdir(), "ouija-walkthrough-"));
 const outputPath = resolve(assetDir, "ouija-walkthrough.webm");
 const captionDurationMs = Number(process.env.OUIJA_CAPTION_MS ?? 8500);
 let captionIndex = 0;
-const captionTotal = 38;
+const captionTotal = 39;
 
 mkdirSync(assetDir, { recursive: true });
 
@@ -69,6 +69,33 @@ await caption(
   page,
   "Student Level Lens",
   "The same lab switches from middle-school pattern reading to high-school quantitative evidence, controls, repeats, and uncertainty."
+);
+
+await page.getByRole("heading", { name: "Concept Mastery Check" }).scrollIntoViewIfNeeded();
+await page
+  .getByLabel("Concept Mastery Check")
+  .locator(".mastery-question")
+  .filter({ hasText: "Variable check" })
+  .getByRole("button", { name: "Temperature (C)" })
+  .click();
+await page
+  .getByLabel("Concept Mastery Check")
+  .locator(".mastery-question")
+  .filter({ hasText: "Pattern check" })
+  .getByRole("button")
+  .first()
+  .click();
+await page
+  .getByLabel("Concept Mastery Check")
+  .locator(".mastery-question")
+  .filter({ hasText: "Integrity check" })
+  .getByRole("button", { name: /final claim/i })
+  .click();
+await page.getByLabel("Concept Mastery Check").getByText("3/3 passed").waitFor();
+await caption(
+  page,
+  "Concept Mastery Check",
+  "Ouija makes learning measurable: students answer variable, pattern, and integrity checks before evidence export."
 );
 
 await page.getByRole("heading", { name: "Pre-Lab Design Coach" }).scrollIntoViewIfNeeded();
@@ -156,7 +183,7 @@ await page.getByLabel("Comparison insights").getByText("Rate trend does not matc
 await caption(
   page,
   "Spreadsheet data handling",
-  "A pasted table becomes graph data with an expected overlay, then warnings update in Guided Lab Flow, Comparison Insights, Pattern Evidence, Method Audit, Reliability Coach, Safety Coach, Learning Exit Ticket, Student Reflection Workspace, Next Trial Planner, Claim Coach, and Reasoning Trail."
+  "A pasted table becomes graph data with an expected overlay, then warnings update in Guided Lab Flow, Comparison Insights, Pattern Evidence, Method Audit, Reliability Coach, Safety Coach, Concept Mastery Check, Learning Exit Ticket, Student Reflection Workspace, Next Trial Planner, Claim Coach, and Reasoning Trail."
 );
 
 await page.getByRole("heading", { name: "Next Trial Planner" }).scrollIntoViewIfNeeded();
@@ -169,7 +196,7 @@ await page.getByRole("heading", { name: "Evidence Packet" }).scrollIntoViewIfNee
 await caption(
   page,
   "Evidence Packet",
-  "The output is a source-backed reasoning handoff with student reflection drafts, blanks, and questions, not a completed lab report."
+  "The output is a source-backed reasoning handoff with concept mastery prompts, student reflection drafts, blanks, and questions, not a completed lab report."
 );
 
 await page.getByRole("heading", { name: "Model Strategy" }).scrollIntoViewIfNeeded();
@@ -247,7 +274,7 @@ await page.getByLabel("Judge Brief").getByText("AIYES Track 1").waitFor();
 await caption(
   page,
   "Judge Brief",
-  "The live app includes Track 1 fit, judge demo path, hosted source, deck, and video links, the AIYES submission checklist, official rubric fit, learning impact, progress portfolio, evaluation, and integrity constraints."
+  "The live app includes Track 1 fit, judge demo path, hosted source, deck, and video links, the AIYES submission checklist, official rubric fit, learning impact, concept mastery proof, progress portfolio, evaluation, and integrity constraints."
 );
 
 await page.getByRole("heading", { name: "Reasoning trail" }).scrollIntoViewIfNeeded();

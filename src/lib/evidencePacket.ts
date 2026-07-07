@@ -1,4 +1,5 @@
 import { buildStudentReflectionWorkspace } from "./studentReflectionWorkspace";
+import { buildConceptMasteryCheck } from "./conceptMasteryCheck";
 import type { AnalyzeResult, StudentDataRow, StudentReflectionAnswers } from "./types";
 
 export function buildEvidencePacket(
@@ -11,6 +12,7 @@ export function buildEvidencePacket(
   const dataTable = formatDataTable(result, rows);
   const sourceList = result.sources.map((source) => `- ${source.publisher}: ${source.title} (${source.url})`).join("\n");
   const reflectionWorkspace = buildStudentReflectionWorkspace(result.learningExitTicket, reflectionAnswers);
+  const conceptMasteryCheck = buildConceptMasteryCheck(result, {});
   const issueList =
     warnings.length > 0
       ? warnings.map((issue) => `- ${issue.title}: ${issue.detail}`).join("\n")
@@ -198,6 +200,12 @@ export function buildEvidencePacket(
     "- High school support: quantify the relationship, check controls and repeats, and explain uncertainty from the data.",
     `- Graph focus: ${formatColumnLabel(result, result.expectedResult.xKey)} vs ${formatColumnLabel(result, result.expectedResult.yKey)}`,
     "- Integrity boundary: sentence starters keep blanks so the student writes the actual claim.",
+    "",
+    "## Concept Mastery Check",
+    `- Purpose: ${conceptMasteryCheck.summary}`,
+    "- Checks:",
+    ...conceptMasteryCheck.questions.map((question) => `  - ${question.label}: ${question.prompt}`),
+    "- Boundary: students answer these checks themselves before copying evidence into a final claim.",
     "",
     "## Pattern Evidence",
     `- Pattern score: ${result.patternEvidence.score}/100 (${formatPatternEvidenceStatus(result.patternEvidence.status)})`,
