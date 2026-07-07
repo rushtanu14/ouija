@@ -410,6 +410,7 @@ test("saved labs build a visible progress portfolio for judges", async ({ page }
   await expect(page.getByRole("heading", { name: "Progress Portfolio" })).toBeVisible();
   await expect(page.getByLabel("Progress Portfolio").getByText("1 saved run")).toBeVisible();
   await expect(page.getByLabel("Progress Portfolio").getByText("Portfolio building")).toBeVisible();
+  await expect(page.getByLabel("Portfolio Story Builder").getByText("Needs saved evidence")).toBeVisible();
 
   await page.getByRole("button", { name: "Water Filtration" }).click();
   await expect(page.getByRole("heading", { name: "Water Filtration and Turbidity" })).toBeVisible();
@@ -419,6 +420,9 @@ test("saved labs build a visible progress portfolio for judges", async ({ page }
   await expect(page.getByLabel("Progress Portfolio").getByText("2 saved runs")).toBeVisible();
   await expect(page.locator(".progress-metric").filter({ hasText: "Score trend" }).getByText("+19", { exact: true })).toBeVisible();
   await expect(page.locator(".progress-metric").filter({ hasText: "Subject breadth" }).getByText("2 subjects", { exact: true })).toBeVisible();
+  await expect(page.getByLabel("Portfolio Story Builder").getByText("Story ready")).toBeVisible();
+  await expect(page.getByLabel("Portfolio Story Builder").getByText("Across my saved labs, my evidence changed from 75/100 to 94/100")).toBeVisible();
+  await expect(page.getByLabel("Portfolio Story Builder").getByText("student writes the progress story")).toBeVisible();
   await expect(page.getByLabel("Progress Portfolio").getByText("repeated learning evidence")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Progress Portfolio shows learning over multiple saved runs.")).toBeVisible();
 });

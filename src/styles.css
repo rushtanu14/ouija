@@ -3426,6 +3426,88 @@ td input {
   line-height: 1.4;
 }
 
+.portfolio-story-builder {
+  display: grid;
+  gap: 11px;
+  border: 1px solid #cfe2f5;
+  border-radius: 8px;
+  padding: 12px;
+  background: #f7fbff;
+}
+
+.portfolio-story-ready {
+  border-color: #ccebd8;
+  background: #f4fbf6;
+}
+
+.portfolio-story-header {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+}
+
+.portfolio-story-header strong,
+.portfolio-story-draft strong {
+  display: block;
+  color: #172439;
+  line-height: 1.3;
+}
+
+.portfolio-story-header > span,
+.portfolio-story-builder > p,
+.portfolio-story-builder > em,
+.portfolio-story-prompt small {
+  color: #607087;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.portfolio-story-draft {
+  border-radius: 8px;
+  padding: 10px;
+  background: #ffffff;
+}
+
+.portfolio-story-prompts {
+  display: grid;
+  gap: 8px;
+}
+
+.portfolio-story-prompt {
+  display: grid;
+  gap: 4px;
+  border-left: 3px solid #f1c36d;
+  padding-left: 10px;
+}
+
+.portfolio-story-prompt-ready {
+  border-left-color: #44a36f;
+}
+
+.portfolio-story-prompt span {
+  color: #536478;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.portfolio-story-prompt strong {
+  color: #172439;
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.portfolio-story-builder > p,
+.portfolio-story-builder > em {
+  margin: 0;
+}
+
+.portfolio-story-builder > em {
+  color: #1f5b3d;
+  font-weight: 760;
+  font-style: normal;
+}
+
 .progress-next-action {
   display: grid;
   gap: 7px;

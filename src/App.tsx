@@ -1016,6 +1016,7 @@ function JudgeBriefPanel({ result }: { result: AnalyzeResult | null }) {
     "MCP Readiness Matrix shows exact connector env vars, tools, scopes, data shared, dry-run checks, and consent gates.",
     "Next Trial Planner gives adaptive measurement guidance.",
     "Progress Portfolio shows learning over multiple saved runs.",
+    "Portfolio Story Builder turns saved runs into student-written progress evidence.",
     "AIYES submission checklist makes deck, video, source/deploy link, and team requirement status visible.",
     "Evaluation Bench runs nine live cases.",
     "Custom Lab Triage keeps unsupported labs useful without pretending full coverage.",
@@ -1116,6 +1117,7 @@ function ModelCardPanel({ result }: { result: AnalyzeResult | null }) {
     "Grounding Audit checks source agreement before students use the expected pattern.",
     "Data Handling Ledger makes student data flow, retention, and controls inspectable.",
     "Progress Portfolio turns saved labs into repeated learning evidence for judges.",
+    "Portfolio Story Builder gives prompts and blanks for a student-authored progress story.",
     "MCP Integration Coach keeps Composio credentials server-side, validates packets with /api/mcp/export, prepares session tickets with /api/mcp/session, and requires student consent before any source audit or export.",
     "MCP Readiness Matrix makes connector tools, scopes, dry-run checks, and least-privilege boundaries inspectable.",
     "Pattern Evidence Engine quantifies whether the dataset supports the expected science pattern.",
@@ -1257,6 +1259,30 @@ function ProgressPortfolioPanel({ portfolio }: { portfolio: ProgressPortfolio })
             <small>{milestone.detail}</small>
           </article>
         ))}
+      </div>
+      <div className={`portfolio-story-builder portfolio-story-${portfolio.story.status}`} aria-label="Portfolio Story Builder">
+        <div className="portfolio-story-header">
+          <div>
+            <p className="section-label">Portfolio story builder</p>
+            <strong>{formatPortfolioStoryStatus(portfolio.story.status)}</strong>
+          </div>
+          <span>{portfolio.story.headline}</span>
+        </div>
+        <div className="portfolio-story-draft">
+          <p className="section-label">Student draft starter</p>
+          <strong>{portfolio.story.draftStarter}</strong>
+        </div>
+        <div className="portfolio-story-prompts">
+          {portfolio.story.prompts.map((prompt) => (
+            <article className={`portfolio-story-prompt portfolio-story-prompt-${prompt.status}`} key={prompt.id}>
+              <span>{prompt.label}</span>
+              <strong>{prompt.prompt}</strong>
+              <small>{prompt.evidenceToUse}</small>
+            </article>
+          ))}
+        </div>
+        <p>{portfolio.story.integrityBoundary}</p>
+        <em>{portfolio.story.judgeTakeaway}</em>
       </div>
       <div className="progress-next-action">
         <p className="section-label">Next portfolio action</p>
@@ -2795,6 +2821,11 @@ function formatProgressPortfolioStatus(status: ProgressPortfolio["status"]) {
   if (status === "evidence_ready") return "Evidence ready";
   if (status === "building") return "Portfolio building";
   return "Start portfolio";
+}
+
+function formatPortfolioStoryStatus(status: ProgressPortfolio["story"]["status"]) {
+  if (status === "ready") return "Story ready";
+  return "Needs saved evidence";
 }
 
 function formatRubricStatus(status: OfficialRubricFit["criteria"][number]["status"]) {

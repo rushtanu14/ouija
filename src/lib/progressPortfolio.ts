@@ -9,6 +9,7 @@ export function buildProgressPortfolio(snapshots: ProgressPortfolioSnapshot[]): 
   const strongest = [...orderedSnapshots].sort((left, right) => right.score - left.score)[0];
   const scoreDelta = first && latest ? latest.score - first.score : 0;
   const bestReadiness = strongest ? formatReadiness(strongest.readiness) : "No saved runs";
+  const subjectNames = Array.from(subjects);
 
   return {
     status: savedCount === 0 ? "empty" : savedCount === 1 ? "building" : "evidence_ready",
@@ -55,6 +56,7 @@ export function buildProgressPortfolio(snapshots: ProgressPortfolioSnapshot[]): 
       }
     ],
     milestones: buildMilestones(orderedSnapshots, strongest),
+    story: buildPortfolioStory(orderedSnapshots, subjectNames, scoreDelta, strongest),
     nextAction: buildNextAction(savedCount, subjects.size, scoreDelta),
     judgeTakeaway:
       savedCount >= 2
@@ -106,6 +108,67 @@ function buildMilestones(
         : "Save a current analysis to start the portfolio."
     }
   ];
+}
+
+function buildPortfolioStory(
+  orderedSnapshots: ProgressPortfolioSnapshot[],
+  subjectNames: string[],
+  scoreDelta: number,
+  strongest: ProgressPortfolioSnapshot | undefined
+): ProgressPortfolio["story"] {
+  const savedCount = orderedSnapshots.length;
+  const first = orderedSnapshots[0];
+  const latest = orderedSnapshots.at(-1);
+  const status = savedCount >= 2 ? "ready" : "not_ready";
+  const subjectSummary = subjectNames.length ? subjectNames.join(", ") : "no saved subjects yet";
+
+  return {
+    status,
+    headline:
+      status === "ready"
+        ? "Use the saved-run evidence to write a short progress story in your own words."
+        : "Save two checked labs before writing a progress story.",
+    draftStarter:
+      status === "ready"
+        ? `Across my saved labs, my evidence changed from ${first?.score ?? "__"}/100 to ${latest?.score ?? "__"}/100. The strongest run was ${strongest?.title ?? "__"} because ___. My next controlled step is ___.`
+        : "After I save two checked labs, I will compare ___ with ___ and explain what improved because ___.",
+    prompts: [
+      {
+        id: "progress-claim",
+        label: "Progress claim",
+        prompt: "What changed between your first saved run and your latest saved run?",
+        evidenceToUse:
+          first && latest
+            ? `${first.title}: ${first.score}/100; ${latest.title}: ${latest.score}/100; score trend ${formatScoreDelta(scoreDelta)}.`
+            : "Save two checked runs so Ouija can show a first-to-latest score trend.",
+        status: savedCount >= 2 ? "ready" : "needs_more_evidence"
+      },
+      {
+        id: "best-evidence",
+        label: "Best evidence",
+        prompt: "Which saved run best shows that you can reason from data, and what evidence makes it strongest?",
+        evidenceToUse: strongest
+          ? `${strongest.title}: ${formatReadiness(strongest.readiness)} at ${strongest.score}/100 with ${strongest.issueCount} flag${strongest.issueCount === 1 ? "" : "s"}.`
+          : "Save a checked run so Ouija can identify the strongest evidence.",
+        status: strongest ? "ready" : "needs_more_evidence"
+      },
+      {
+        id: "transfer-reflection",
+        label: "Transfer reflection",
+        prompt: "How did the workflow transfer across experiments or science subjects?",
+        evidenceToUse:
+          subjectNames.length >= 2
+            ? `Saved subjects: ${subjectSummary}.`
+            : "Save a run from a second subject to prove the workflow transfers beyond one lab type.",
+        status: subjectNames.length >= 2 ? "ready" : "needs_more_evidence"
+      }
+    ],
+    integrityBoundary: "Ouija gives prompts and evidence, but the student writes the progress story.",
+    judgeTakeaway:
+      status === "ready"
+        ? "Portfolio Story Builder turns saved runs into student-authored impact evidence for judges."
+        : "Portfolio Story Builder waits for enough saved evidence before asking the student to write a progress story."
+  };
 }
 
 function buildNextAction(savedCount: number, subjectCount: number, scoreDelta: number) {

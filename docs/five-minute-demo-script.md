@@ -58,9 +58,9 @@ Click Projectile Motion, Pendulum, Ohm's Law, Enzyme Activity, Density Layers, a
 
 Type an unsupported paper towel absorbency lab. Show that Ouija labels it as a low-confidence closest supported match instead of pretending full coverage, then scroll to Custom Lab Triage: inferred focus, suggested columns, source searches, clarifying questions, and teacher-confirmation boundary.
 
-## 4:50-4:56 - Saved Lab Snapshot, Progress Portfolio, And MCP Export
+## 4:50-4:56 - Saved Lab Snapshot, Progress Portfolio, Portfolio Story, And MCP Export
 
-Save the current run and show Saved Labs plus Progress Portfolio so judges see the workflow continues after one analysis and can measure saved-run trend, subject breadth, and the next portfolio action. Then show MCP Integration Coach: Ouija validates a Composio Search source audit plus Google Docs, Google Sheets, Google Drive, Google Classroom, Google Forms, Google Calendar, and Notion handoffs through a server dry-run, shows connector env vars/tools/scopes/data/checks, keeps Composio credentials server-side, and requires consent before source audit or export.
+Save two runs and show Saved Labs plus Progress Portfolio so judges see the workflow continues after one analysis and can measure saved-run trend, subject breadth, and the next portfolio action. Then show Portfolio Story Builder: saved-run evidence becomes prompts and blanks for a student-written progress story, not a generated essay. Then show MCP Integration Coach: Ouija validates a Composio Search source audit plus Google Docs, Google Sheets, Google Drive, Google Classroom, Google Forms, Google Calendar, and Notion handoffs through a server dry-run, shows connector env vars/tools/scopes/data/checks, keeps Composio credentials server-side, and requires consent before source audit or export.
 
 ## 4:56-4:58 - Evaluation Bench
 

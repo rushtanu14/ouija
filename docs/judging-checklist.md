@@ -15,6 +15,7 @@
 - Concept Mastery Check turns variable, expected-pattern, and integrity understanding into a visible score before evidence export.
 - Student Reflection Workspace proves those exit-ticket answers are student-authored drafts, not generated conclusions.
 - Progress Portfolio shows whether saved runs demonstrate learning trend, subject breadth, and a next portfolio action.
+- Portfolio Story Builder turns saved-run evidence into prompts for a student-written progress story.
 - MCP Integration Coach shows how the same student-owned evidence could move into a Composio Search source audit and classroom tools, including a Google Classroom pre-lab checkpoint, Google Forms readiness check, and Google Calendar next-trial reminder, without sending data before consent.
 - Judge Demo Path gives evaluators a direct route through problem fit, AI design, student workflow, evidence handoff, and submission proof.
 - Custom Lab Triage keeps unsupported student experiments useful without claiming full V1 coverage, because it gives students a concrete investigation planner instead of a fake expected result.
@@ -77,6 +78,7 @@
 - Concept Mastery Check visibly scores whether the student knows the independent variable, expected evidence pattern, and claim boundary.
 - Student Reflection Workspace visibly captures the student's own variable, pattern, and next-step drafts.
 - Progress Portfolio visibly turns Saved Labs into repeated learning evidence instead of only storage.
+- Portfolio Story Builder visibly keeps the progress narrative student-owned through prompts, evidence references, and blanks.
 - Expected graph and editable table now appear before Model Strategy, AI Evaluation Harness, Data Handling Ledger, and AIYES Rubric Fit, so the practical student workflow is visible before the deeper judge evidence stack.
 - MCP Integration Coach visibly turns the Evidence Packet, Pre-Lab Design Coach, Next Trial Planner, and Progress Portfolio into a consent-gated source-audit and classroom handoff plan with a readiness matrix for env vars, allowed tools, scopes, dry-run checks, and data shared.
 - AI Model Card visibly summarizes architecture, grounding mode, evaluation method, privacy boundary, and risk controls.
@@ -108,6 +110,7 @@
 - Concept Mastery Check appears in the app and Evidence Packet so judges can inspect measured understanding before export.
 - Student Reflection Workspace appears in the app and Evidence Packet so judges can inspect student-authored answers without Ouija writing the conclusion.
 - Progress Portfolio appears near Saved Labs so judges can inspect score trend, subject breadth, and strongest saved run.
+- Portfolio Story Builder appears inside Progress Portfolio so judges can inspect student-authored impact prompts before any classroom export.
 - MCP Integration Coach appears near Progress Portfolio so judges can inspect the exact source-audit/export payload, Composio Search route, Google Classroom pre-lab checkpoint route, Google Forms readiness route, Google Calendar next-trial reminder route, credential boundary, Composio route, and server dry-run readiness matrix before any live connector is enabled.
 - Desktop and mobile E2E checks verify no horizontal overflow.
 

@@ -207,6 +207,7 @@ export function buildMcpIntegrationPlan({
         "Google Calendar next-trial reminder",
         "Composio session ticket scope",
         "Student Reflection Drafts",
+        "Portfolio Story Builder prompts",
         "Integrity boundary"
       ],
       markdownExcerpt: buildMarkdownExcerpt(description, evidencePacket)

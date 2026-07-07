@@ -31,6 +31,9 @@ describe("progress portfolio", () => {
     ]);
     expect(portfolio.metrics.find((metric) => metric.id === "saved-runs")?.value).toBe("1 saved run");
     expect(portfolio.nextAction).toContain("Save one more");
+    expect(portfolio.story.status).toBe("not_ready");
+    expect(portfolio.story.draftStarter).toContain("After I save two checked labs");
+    expect(portfolio.story.prompts.find((prompt) => prompt.id === "progress-claim")?.status).toBe("needs_more_evidence");
   });
 
   it("summarizes score trend, subject breadth, and judge takeaway across saved labs", () => {
@@ -65,6 +68,15 @@ describe("progress portfolio", () => {
       "strongest-run",
       "latest-next-step"
     ]);
+    expect(portfolio.story.status).toBe("ready");
+    expect(portfolio.story.draftStarter).toContain("my evidence changed from 75/100 to 94/100");
+    expect(portfolio.story.prompts.map((prompt) => prompt.id)).toEqual([
+      "progress-claim",
+      "best-evidence",
+      "transfer-reflection"
+    ]);
+    expect(portfolio.story.prompts.find((prompt) => prompt.id === "transfer-reflection")?.evidenceToUse).toContain("Biology, Chemistry");
+    expect(portfolio.story.integrityBoundary).toContain("student writes the progress story");
     expect(portfolio.judgeTakeaway).toContain("repeated learning evidence");
   });
 });

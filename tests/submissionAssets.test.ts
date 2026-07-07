@@ -39,6 +39,7 @@ describe("AIYES submission assets", () => {
     expect(copy).toContain("Ouija");
     expect(copy).toContain("Built With");
     expect(copy).toContain("Progress Portfolio");
+    expect(copy).toContain("Portfolio Story Builder");
     expect(copy).toContain("Student Reflection Workspace");
     expect(copy).toContain("Concept Mastery Check");
     expect(copy).toContain("Pre-Lab Design Coach");
@@ -48,6 +49,7 @@ describe("AIYES submission assets", () => {
     expect(copy).toContain("Technical Depth Proof");
     expect(copy).toContain("Google Classroom");
     expect(assets).toContain("Progress Portfolio");
+    expect(assets).toContain("Portfolio Story Builder");
     expect(assets).toContain("Concept Mastery Check");
     expect(assets).toContain("npm run capture:submission");
     expect(assets).toContain("npm run record:walkthrough");

@@ -457,11 +457,29 @@ export interface ProgressPortfolioMilestone {
   detail: string;
 }
 
+export interface ProgressPortfolioStoryPrompt {
+  id: "progress-claim" | "best-evidence" | "transfer-reflection";
+  label: string;
+  prompt: string;
+  evidenceToUse: string;
+  status: "ready" | "needs_more_evidence";
+}
+
+export interface ProgressPortfolioStory {
+  status: "not_ready" | "ready";
+  headline: string;
+  draftStarter: string;
+  prompts: ProgressPortfolioStoryPrompt[];
+  integrityBoundary: string;
+  judgeTakeaway: string;
+}
+
 export interface ProgressPortfolio {
   status: "empty" | "building" | "evidence_ready";
   summary: string;
   metrics: ProgressPortfolioMetric[];
   milestones: ProgressPortfolioMilestone[];
+  story: ProgressPortfolioStory;
   nextAction: string;
   judgeTakeaway: string;
 }

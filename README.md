@@ -27,7 +27,7 @@ Ouija is a student-facing AI experiment interpreter for middle and high school s
 12. Use Reasoning Trail to show how Ouija classified the experiment, exposed model strategy, ran the AI evaluation harness, guided the judge demo, planned the pre-lab setup, audited source grounding, guided the student path, built the concept scaffold, checked the learning exit ticket, checked the safety boundary, audited student-data handling, audited the table data, scored whole-pattern evidence, checked repeat reliability, planned the next trial, and maps the run to AIYES Track 1 evidence.
 13. Open Evaluation Bench to see nine live checks: eight supported lab demos plus the unsupported-lab boundary.
 14. Save lab snapshots locally so a student can return to a checked run without sending data to an account system.
-15. Use Progress Portfolio to show saved-run count, score trend, subject breadth, strongest run, and next portfolio action.
+15. Use Progress Portfolio and Portfolio Story Builder to show saved-run count, score trend, subject breadth, strongest run, student-authored progress prompts, and next portfolio action.
 16. Use MCP Integration Coach to validate a Composio Search source-audit route plus Google Docs, Google Sheets, Google Drive, Google Classroom, Google Forms, Google Calendar, and Notion handoffs through the server dry-run bridge, plus the readiness matrix, without exposing credentials or sending student data.
 17. Open AI Model Card for the architecture, grounding, evaluation, privacy, MCP-export boundary, and guardrail summary.
 18. Open Judge Brief for a compact Track 1 proof surface: live app, hosted deck/video/source links, AIYES submission checklist, judge demo path, official rubric fit, learning impact, student reflection drafts, progress portfolio, MCP readiness plan, AI pipeline, model strategy, evaluation, data-handling ethics, tests, and integrity constraints.
@@ -93,6 +93,8 @@ Spreadsheet paste import turns copied lab-table rows into graph/check inputs wit
 Saved Labs stores up to six browser-local lab snapshots with the experiment, table rows, readiness score, and data flags.
 
 Progress Portfolio turns those saved labs into repeated learning evidence: saved-run count, score trend, subject breadth, strongest run, milestones, and the next portfolio action.
+
+Portfolio Story Builder turns saved-run evidence into prompts, evidence references, and blanks for a student-written progress story. It waits for enough saved evidence instead of generating an essay.
 
 MCP Integration Coach validates a practical Composio path for the same student-owned evidence: run a source-audit search through Composio Search, create a Google Docs evidence packet, append table rows to Google Sheets, save a portfolio archive to Google Drive, draft a Google Classroom pre-lab checkpoint, create a Google Forms readiness check, schedule a Google Calendar next-trial reminder, or create a Notion learning record with student-authored reflection drafts. The readiness matrix shows required auth config env vars where needed, allowed tools, least-privilege scopes, data shared, consent gates, dry-run checks, and a scoped Composio session ticket path. The public app now includes `/api/mcp/status`, `/api/mcp/export`, and `/api/mcp/session` for server-side validation; live connector execution still requires `COMPOSIO_API_KEY`, `COMPOSIO_SESSION_USER_ID`, allowed tools, `COMPOSIO_LIVE_EXPORTS=true`, connector auth config IDs where the toolkit requires them, and student or teacher consent before source audit or export.
 
