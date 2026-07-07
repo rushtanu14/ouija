@@ -488,6 +488,7 @@ export type McpIntegrationStatus = "preview_only" | "server_dry_run" | "ready";
 
 export type McpIntegrationActionId =
   | "composio-search-source-audit"
+  | "composio-scholar-claim-check"
   | "google-docs-evidence-packet"
   | "google-sheets-data-log"
   | "google-drive-portfolio-archive"

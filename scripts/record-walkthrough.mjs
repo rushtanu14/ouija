@@ -254,15 +254,15 @@ await page.locator("#mcp-export").scrollIntoViewIfNeeded();
 await caption(
   page,
   "MCP Integration Coach",
-  "Ouija validates a Composio Search source-audit route plus handoffs to Docs, Sheets, Drive, Classroom, Forms, Calendar, and Notion, then shows env vars, tools, scopes, data shared, dry-run checks, and consent gates."
+  "Ouija validates Composio Search source-audit and Scholar claim-check routes plus handoffs to Docs, Sheets, Drive, Classroom, Forms, Calendar, and Notion, then shows env vars, tools, scopes, data shared, dry-run checks, and consent gates."
 );
-await page.locator(".mcp-action-card").filter({ hasText: "Google Calendar" }).getByRole("button", { name: "Validate route" }).click();
+await page.locator(".mcp-action-card").filter({ hasText: "Run Scholar claim check" }).getByRole("button", { name: "Validate route" }).click();
 await page.getByLabel("MCP export dry-run result").getByText("Dry-run passed", { exact: true }).waitFor();
 await page.getByLabel("MCP export dry-run result").scrollIntoViewIfNeeded();
 await caption(
   page,
-  "Server MCP dry-run",
-  "The public app calls /api/mcp/export, validates consent, payload, integrity blanks, and credential boundaries, then stops before any external source search, Google action, or Composio write."
+  "Scholar MCP dry-run",
+  "The public app calls /api/mcp/export, validates the Scholar claim-check route, consent, payload, integrity blanks, and credential boundaries, then stops before any external source search or Composio write."
 );
 await page.getByLabel("MCP session ticket result").getByText("Session dry-run", { exact: true }).waitFor();
 await page.getByLabel("MCP session ticket result").scrollIntoViewIfNeeded();

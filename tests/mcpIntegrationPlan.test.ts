@@ -37,6 +37,7 @@ describe("MCP integration plan", () => {
     expect(plan.setupHint).toContain("server-side");
     expect(plan.actions.map((action) => action.id)).toEqual([
       "composio-search-source-audit",
+      "composio-scholar-claim-check",
       "google-docs-evidence-packet",
       "google-sheets-data-log",
       "google-drive-portfolio-archive",
@@ -47,6 +48,8 @@ describe("MCP integration plan", () => {
     ]);
     expect(plan.actions.find((action) => action.id === "composio-search-source-audit")?.toolkit).toBe("Composio Search");
     expect(plan.actions.find((action) => action.id === "composio-search-source-audit")?.payloadSummary).toContain("Source audit query");
+    expect(plan.actions.find((action) => action.id === "composio-scholar-claim-check")?.recommendedTools).toEqual(["COMPOSIO_SEARCH_SCHOLAR"]);
+    expect(plan.actions.find((action) => action.id === "composio-scholar-claim-check")?.payloadSummary).toContain("Scholar query");
     expect(plan.actions.find((action) => action.id === "google-docs-evidence-packet")?.toolkit).toBe("Google Docs");
     expect(plan.actions.find((action) => action.id === "google-sheets-data-log")?.payloadSummary).toContain("4 rows");
     expect(plan.actions.find((action) => action.id === "google-classroom-prelab-checkpoint")?.toolkit).toBe("Google Classroom");
@@ -56,10 +59,13 @@ describe("MCP integration plan", () => {
     expect(plan.actions.find((action) => action.id === "google-calendar-next-trial-reminder")?.toolkit).toBe("Google Calendar");
     expect(plan.actions.find((action) => action.id === "google-calendar-next-trial-reminder")?.payloadSummary).toContain("Next trial reminder");
     expect(plan.actions.every((action) => action.requiresConsent)).toBe(true);
-    expect(plan.readinessMatrix).toHaveLength(8);
+    expect(plan.readinessMatrix).toHaveLength(9);
     expect(plan.readinessMatrix.every((connector) => connector.status === "needs_server_setup")).toBe(true);
     expect(plan.readinessMatrix.find((connector) => connector.toolkit === "Composio Search")?.requiredEnv).toEqual(["COMPOSIO_SEARCH_ALLOWED_TOOLS"]);
     expect(plan.readinessMatrix.find((connector) => connector.toolkit === "Composio Search")?.recommendedTools).toContain("COMPOSIO_SEARCH_SCHOLAR");
+    expect(plan.readinessMatrix.find((connector) => connector.actionId === "composio-scholar-claim-check")?.requiredEnv).toEqual([
+      "COMPOSIO_SEARCH_ALLOWED_TOOLS"
+    ]);
     expect(plan.readinessMatrix.find((connector) => connector.toolkit === "Google Forms")?.requiredEnv).toContain("COMPOSIO_GOOGLE_FORMS_AUTH_CONFIG_ID");
     expect(plan.readinessMatrix.find((connector) => connector.toolkit === "Google Calendar")?.recommendedTools).toContain("GOOGLECALENDAR_CREATE_EVENT");
     expect(plan.readinessMatrix.find((connector) => connector.toolkit === "Google Classroom")?.consentGate).toContain("class/course draft");
@@ -74,6 +80,7 @@ describe("MCP integration plan", () => {
     expect(plan.payloadPreview.savedRunCount).toBe(1);
     expect(plan.payloadPreview.includedSections).toContain("Evidence Packet markdown");
     expect(plan.payloadPreview.includedSections).toContain("Pre-Lab Design Coach");
+    expect(plan.payloadPreview.includedSections).toContain("Composio Scholar claim-check query");
     expect(plan.payloadPreview.includedSections).toContain("Google Forms readiness prompts");
     expect(plan.payloadPreview.includedSections).toContain("Google Calendar next-trial reminder");
     expect(plan.payloadPreview.includedSections).toContain("Composio session ticket scope");
@@ -83,6 +90,7 @@ describe("MCP integration plan", () => {
     expect(plan.safeguards).toContain("Preview mode does not call Composio Search, Google Classroom, Google Workspace, or Notion APIs.");
     expect(plan.safeguards).toContain("Scoped Composio sessions are prepared server-side and raw MCP URLs are withheld from browser responses.");
     expect(plan.safeguards).toContain("Composio Search source audits use topic and variable terms only; students review the query before live lookup.");
+    expect(plan.safeguards).toContain("Composio Scholar claim checks compare the expected pattern against scholarly snippets without writing the student's final claim.");
     expect(plan.safeguards).toContain("Google Calendar handoff schedules a next-trial reminder, not a generated result.");
     expect(plan.safeguards).toContain("Reflection drafts are exported only when the student typed them in the workspace.");
     expect(plan.privacyBoundary).toContain("Student chooses");
@@ -110,6 +118,7 @@ describe("MCP integration plan", () => {
     expect(plan.executionBoundary).toContain("Express API");
     expect(plan.actions.find((action) => action.toolkit === "Google Sheets")?.composioCapability).toContain("append");
     expect(plan.actions.find((action) => action.toolkit === "Composio Search")?.composioCapability).toContain("scholar");
+    expect(plan.actions.find((action) => action.id === "composio-scholar-claim-check")?.composioCapability).toContain("Composio Search Scholar");
     expect(plan.actions.find((action) => action.toolkit === "Google Classroom")?.composioCapability).toContain("create coursework draft");
     expect(plan.actions.find((action) => action.toolkit === "Google Forms")?.composioCapability).toContain("Forms draft");
     expect(plan.actions.find((action) => action.toolkit === "Google Calendar")?.composioCapability).toContain("calendar event");

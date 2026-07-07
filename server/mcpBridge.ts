@@ -119,7 +119,7 @@ export function validateMcpExportRequest(rawBody: unknown, env: EnvMap = process
         toolkitSlug: connector.toolkitSlug,
         authConfigEnv: toolkit.authConfigEnv,
         allowedToolsEnv: toolkit.allowedToolsEnv,
-        recommendedTools: toolkit.allowedTools.length > 0 ? toolkit.allowedTools : connector.recommendedTools,
+        recommendedTools: selectEnabledTools(connector, toolkit),
         docsUrl: connector.docsUrl
       },
       sanitizedPayload: {
@@ -256,7 +256,7 @@ function buildToolkitStatus(connector: McpConnectorCatalogItem, apiKeyConfigured
   const allowedToolsRequired = connector.requiresAllowedToolsEnv !== false;
   const allowedTools = parseAllowedTools(env[allowedToolsEnv]);
   const authConfigConfigured = hasValue(env[authConfigEnv]);
-  const allowedToolsConfigured = allowedTools.length > 0;
+  const allowedToolsConfigured = !allowedToolsRequired || connector.recommendedTools.some((tool) => allowedTools.includes(tool));
   const missingEnv = [
     !authConfigRequired || authConfigConfigured ? "" : authConfigEnv,
     !allowedToolsRequired || allowedToolsConfigured ? "" : allowedToolsEnv
@@ -291,7 +291,7 @@ function buildMissingEnv(
     liveExportsEnabled ? "" : "COMPOSIO_LIVE_EXPORTS=true",
     sessionUserConfigured ? "" : composioSessionUserEnv,
     ...toolkits.flatMap((toolkit) => toolkit.missingEnv)
-  ].filter(Boolean);
+  ].filter(Boolean).filter((value, index, values) => values.indexOf(value) === index);
 }
 
 function buildExportChecks({
@@ -467,7 +467,7 @@ function buildSessionResponse({
       toolkitSlug: connector.toolkitSlug,
       authConfigEnv: toolkit.authConfigEnv,
       allowedToolsEnv: toolkit.allowedToolsEnv,
-      recommendedTools: toolkit.allowedTools.length > 0 ? toolkit.allowedTools : connector.recommendedTools,
+      recommendedTools: selectEnabledTools(connector, toolkit),
       docsUrl: connector.docsUrl,
       sessionUserEnv: composioSessionUserEnv,
       apiBaseUrlEnv: composioApiBaseUrlEnv
@@ -478,7 +478,7 @@ function buildSessionResponse({
       authConfigConfigured: toolkit.authConfigConfigured,
       allowedToolsConfigured: toolkit.allowedToolsConfigured,
       enabledToolkit: connector.toolkitSlug,
-      enabledTools: toolkit.allowedTools.length > 0 ? toolkit.allowedTools : connector.recommendedTools,
+      enabledTools: selectEnabledTools(connector, toolkit),
       mcpUrlIssued: sessionCreated,
       sessionIdPreview: sessionId ? previewIdentifier(sessionId) : undefined
     },
@@ -523,11 +523,11 @@ async function createComposioSession({
     },
     tools: {
       [connector.toolkitSlug]: {
-        enable: toolkit.allowedTools.length > 0 ? toolkit.allowedTools : connector.recommendedTools
+        enable: selectEnabledTools(connector, toolkit)
       }
     },
     preload: {
-      tools: toolkit.allowedTools.length > 0 ? toolkit.allowedTools : connector.recommendedTools
+      tools: selectEnabledTools(connector, toolkit)
     },
     manage_connections: {
       enable: true,
@@ -568,4 +568,10 @@ async function createComposioSession({
 function previewIdentifier(value: string) {
   if (value.length <= 10) return value;
   return `${value.slice(0, 6)}...${value.slice(-4)}`;
+}
+
+function selectEnabledTools(connector: McpConnectorCatalogItem, toolkit: McpBridgeToolkitStatus) {
+  if (toolkit.allowedTools.length === 0) return connector.recommendedTools;
+  const scopedTools = connector.recommendedTools.filter((tool) => toolkit.allowedTools.includes(tool));
+  return scopedTools.length > 0 ? scopedTools : connector.recommendedTools;
 }

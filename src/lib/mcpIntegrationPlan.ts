@@ -27,6 +27,22 @@ export const MCP_CONNECTOR_CATALOG: McpConnectorCatalogItem[] = [
     recommendedTools: ["COMPOSIO_SEARCH_WEB", "COMPOSIO_SEARCH_SCHOLAR", "COMPOSIO_SEARCH_FETCH_URL_CONTENT"]
   },
   {
+    id: "composio-scholar-claim-check",
+    toolkit: "Composio Search",
+    toolkitSlug: "composio_search",
+    envSuffix: "SEARCH",
+    requiresAuthConfig: false,
+    label: "Run Scholar claim check",
+    studentValue: "Checks whether the student's expected pattern matches classroom-safe scholarly science before evidence export.",
+    composioCapability: "query Google Scholar-style results through Composio Search Scholar and compare snippets against the expected pattern",
+    safetyNote: "Scholar check should surface agreement, disagreement, and source questions; it must not write the student's claim or conclusion.",
+    requiredScopes: ["scholar search", "citation snippet review"],
+    dataShared: "Experiment title, variables, expected pattern summary, and a student-reviewed scholar query.",
+    consentGate: "Student reviews the scholar query and citation terms before any live lookup.",
+    docsUrl: "https://docs.composio.dev/toolkits/composio_search",
+    recommendedTools: ["COMPOSIO_SEARCH_SCHOLAR"]
+  },
+  {
     id: "google-docs-evidence-packet",
     toolkit: "Google Docs",
     toolkitSlug: "googledocs",
@@ -200,6 +216,7 @@ export function buildMcpIntegrationPlan({
         "Student data table",
         "Trusted citation links",
         "Composio Search source-audit query",
+        "Composio Scholar claim-check query",
         "Progress Portfolio summary",
         "Pre-Lab Design Coach",
         "Learning Exit Ticket prompts",
@@ -250,6 +267,7 @@ function buildSafeguards(status: McpIntegrationPlan["status"]) {
       "Every export action requires student or teacher consent before a live connector runs.",
       "Scoped Composio sessions are prepared server-side and raw MCP URLs are withheld from browser responses.",
       "Composio Search source audits use topic and variable terms only; students review the query before live lookup.",
+      "Composio Scholar claim checks compare the expected pattern against scholarly snippets without writing the student's final claim.",
       "Google Classroom handoff creates a teacher-review checkpoint, not an auto-submitted assignment.",
       "Google Forms handoff creates student prompts, not completed answers.",
       "Google Calendar handoff schedules a next-trial reminder, not a generated result.",
@@ -362,6 +380,9 @@ function buildPayloadSummary(
 ) {
   if (connector.id === "composio-search-source-audit") {
     return `Source audit query for ${title} with ${sourceCount} citation${sourceCount === 1 ? "" : "s"} and variables: ${formatColumnList(result)}`;
+  }
+  if (connector.id === "composio-scholar-claim-check") {
+    return `Scholar query for ${result.classification.title}: ${result.expectedResult.pattern}`;
   }
   if (connector.id === "google-docs-evidence-packet") return `${title} with source trail, checks, and integrity boundary`;
   if (connector.id === "google-sheets-data-log") return `${rowCount} rows across ${result.columns.length} columns: ${formatColumnList(result)}`;
