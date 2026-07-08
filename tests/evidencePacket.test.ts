@@ -39,6 +39,10 @@ describe("buildEvidencePacket", () => {
     expect(packet).toContain("Democracy");
     expect(packet).toContain("Ethics and inclusion");
     expect(packet).toContain("Student action:");
+    expect(packet).toContain("## AIYES Development Journey");
+    expect(packet).toContain("Slide cue:");
+    expect(packet).toContain("Video cue:");
+    expect(packet).toContain("Testing and evaluation");
     expect(packet).toContain("## Grounding Audit");
     expect(packet).toContain("Student source task:");
     expect(packet).toContain("## Expected Overlay");

@@ -11,7 +11,7 @@ const recordingDir = mkdtempSync(join(tmpdir(), "ouija-walkthrough-"));
 const outputPath = resolve(assetDir, "ouija-walkthrough.webm");
 const captionDurationMs = Number(process.env.OUIJA_CAPTION_MS ?? 6000);
 let captionIndex = 0;
-const captionTotal = 41;
+const captionTotal = 42;
 
 mkdirSync(assetDir, { recursive: true });
 
@@ -223,6 +223,13 @@ await caption(
   page,
   "AIYES Values Fit",
   "Ouija also maps the run to AIYES values: democracy, diversity, connectivity, innovation, and ethical inclusion."
+);
+
+await page.getByRole("heading", { name: "AIYES Development Journey" }).scrollIntoViewIfNeeded();
+await caption(
+  page,
+  "AIYES Development Journey",
+  "The required Track 1 story is visible too: problem, data, model strategy, testing, UX, ethics, impact, constraints, and submission proof."
 );
 
 for (const sample of ["Projectile Motion", "Pendulum", "Ohm's Law", "Reaction Rate", "Enzyme Activity", "Plant Light", "Density Layers", "Water Filtration"]) {

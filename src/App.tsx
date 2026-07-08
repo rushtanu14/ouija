@@ -50,6 +50,7 @@ import type {
   ConceptCoach,
   CustomLabTriage,
   DataHandlingLedger,
+  DevelopmentJourney,
   EvaluationReport,
   GroundingAudit,
   GuidedLabFlow,
@@ -280,6 +281,7 @@ export function App() {
           <a href="#sources">Sources</a>
           <a href="#rubric">Rubric Fit</a>
           <a href="#values">Values Fit</a>
+          <a href="#journey">Journey</a>
           <a href="#impact">Impact</a>
           <a href="#evaluation">Eval Bench</a>
           <a href="#saved">Saved Labs</a>
@@ -440,6 +442,7 @@ export function App() {
               <DataHandlingLedgerPanel ledger={result.dataHandlingLedger} />
               <OfficialRubricPanel fit={result.officialRubricFit} />
               <AiyesValuesFitPanel fit={result.aiyesValuesFit} />
+              <DevelopmentJourneyPanel journey={result.developmentJourney} />
             </>
           ) : (
             <div className="empty-state">
@@ -1000,6 +1003,7 @@ function JudgeBriefPanel({ result }: { result: AnalyzeResult | null }) {
     "AI Evaluation Harness scores model behavior and safeguards.",
     "Official Rubric Fit maps all three visible AIYES criteria.",
     "AIYES Values Fit maps democracy, diversity, connectivity, innovation, and ethical inclusion to concrete product evidence.",
+    "AIYES Development Journey maps problem, data, model, build, testing, UX, ethics, impact, constraints, and submission proof.",
     "Learning Impact Loop measures the student's outcome for each run.",
     "Pre-Lab Design Coach helps students plan variables, controls, repeats, sources, and safety before collecting data.",
     "Learning Exit Ticket proves students must explain variables, patterns, and next steps themselves.",
@@ -1112,6 +1116,7 @@ function ModelCardPanel({ result }: { result: AnalyzeResult | null }) {
     "Judge Demo Path reduces the live demo to problem fit, AI design, student workflow, evidence handoff, and submission proof.",
     "Official Rubric Fit maps problem relevance, AI design, and UX to concrete app evidence.",
     "AIYES Values Fit ties the app to AIYES values without changing the student's work into a generated report.",
+    "AIYES Development Journey turns the required slide and video story into inspectable run evidence.",
     "Learning Impact Loop turns analysis into measurable student readiness and next-trial evidence.",
     "Pre-Lab Design Coach turns classification into variables, controls, repeats, source checks, and safety before data collection.",
     "Learning Exit Ticket converts the AI feedback into student reflection prompts judges can inspect.",
@@ -2140,6 +2145,47 @@ function AiyesValuesFitPanel({ fit }: { fit: AiyesValuesFit }) {
             </div>
             <p>{value.evidence}</p>
             <small>{value.studentAction}</small>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function DevelopmentJourneyPanel({ journey }: { journey: DevelopmentJourney }) {
+  return (
+    <section className="development-journey" id="journey" aria-label="AIYES Development Journey">
+      <div className="panel-title">
+        <Workflow size={18} />
+        <h3>AIYES Development Journey</h3>
+      </div>
+      <div className={`journey-summary journey-summary-${journey.status}`}>
+        <div>
+          <p className="section-label">Submission journey</p>
+          <strong>{journey.score}/100</strong>
+        </div>
+        <span>{journey.summary}</span>
+      </div>
+      <div className="journey-cues">
+        <article>
+          <p className="section-label">Slide spine</p>
+          <span>{journey.slideCue}</span>
+        </article>
+        <article>
+          <p className="section-label">Video spine</p>
+          <span>{journey.videoCue}</span>
+        </article>
+      </div>
+      <div className="journey-stage-grid">
+        {journey.stages.map((stage, index) => (
+          <article className={`journey-stage journey-stage-${stage.status}`} key={stage.id}>
+            <div>
+              <span>{index + 1}</span>
+              <strong>{stage.label}</strong>
+              <small>{formatRubricStatus(stage.status)}</small>
+            </div>
+            <p>{stage.evidence}</p>
+            <em>{stage.judgeCue}</em>
           </article>
         ))}
       </div>

@@ -708,6 +708,33 @@ export interface AiyesValuesFit {
   values: AiyesValueSignal[];
 }
 
+export type DevelopmentJourneyStageId =
+  | "problem"
+  | "data-handling"
+  | "model-strategy"
+  | "app-build"
+  | "testing-evaluation"
+  | "ux-design"
+  | "ethics-impact"
+  | "constraints-submission";
+
+export interface DevelopmentJourneyStage {
+  id: DevelopmentJourneyStageId;
+  label: string;
+  status: RubricStatus;
+  evidence: string;
+  judgeCue: string;
+}
+
+export interface DevelopmentJourney {
+  score: number;
+  status: RubricStatus;
+  summary: string;
+  slideCue: string;
+  videoCue: string;
+  stages: DevelopmentJourneyStage[];
+}
+
 export interface EvaluationCaseResult {
   id: string;
   label: string;
@@ -792,6 +819,7 @@ export interface AnalyzeResult {
   learningExitTicket: LearningExitTicket;
   officialRubricFit: OfficialRubricFit;
   aiyesValuesFit: AiyesValuesFit;
+  developmentJourney: DevelopmentJourney;
   trackEvidence: TrackEvidence;
   explanation: string;
   integrityNotice: string;

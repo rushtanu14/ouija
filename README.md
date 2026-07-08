@@ -23,7 +23,7 @@ Ouija is a student-facing AI experiment interpreter for middle and high school s
 8. Use Pattern Evidence Engine, Reliability Coach, and Next Trial Planner to decide what to repeat, average, tighten, or measure next before writing the claim.
 9. Review Learning Impact Loop, Learning Exit Ticket, Student Level Lens, Concept Mastery Check, and Student Reflection Workspace to see whether the student is ready to plan, reason, check understanding, and explain answers themselves before writing.
 10. Copy the Evidence Packet as a student-owned reasoning handoff with judge demo path, Custom Lab Triage, Pre-Lab Design Coach, AIYES rubric fit, AIYES values fit, learning impact, Learning Exit Ticket, student-level lens, Concept Mastery Check prompts, student reflection drafts, guided flow, Grounding Audit, AI Evaluation Harness, Data Handling Ledger, sources, checks, safety notes, concept vocabulary, pattern evidence, repeat reliability, data table, next-trial plan, blanks, and next question.
-11. Inspect Model Strategy, Technical Depth Proof, AI Evaluation Harness, Data Handling Ledger, AIYES Rubric Fit, and AIYES Values Fit to show candidate ranking, matched signals, fallback logic, validators, model-behavior checks, privacy flow, retention, student controls, risk controls, official criteria mapping, and mission-values evidence.
+11. Inspect Model Strategy, Technical Depth Proof, AI Evaluation Harness, Data Handling Ledger, AIYES Rubric Fit, AIYES Values Fit, and AIYES Development Journey to show candidate ranking, matched signals, fallback logic, validators, model-behavior checks, privacy flow, retention, student controls, risk controls, official criteria mapping, mission-values evidence, and the required problem/data/model/testing/UX/ethics/submission journey.
 12. Use Reasoning Trail to show how Ouija classified the experiment, exposed model strategy, ran the AI evaluation harness, guided the judge demo, planned the pre-lab setup, audited source grounding, guided the student path, built the concept scaffold, checked the learning exit ticket, checked the safety boundary, audited student-data handling, audited the table data, scored whole-pattern evidence, checked repeat reliability, planned the next trial, and maps the run to AIYES Track 1 evidence.
 13. Open Evaluation Bench to see nine live checks: eight supported lab demos plus the unsupported-lab boundary.
 14. Save lab snapshots locally so a student can return to a checked run without sending data to an account system.
@@ -79,6 +79,8 @@ Technical Depth Proof makes the "beyond simple API use" argument visible in the 
 AIYES Rubric Fit maps each run to the three visible official judging criteria using concrete app evidence, so judges see problem relevance, AI design/model strategy, and UX/design without guessing.
 
 AIYES Values Fit maps each run to democracy, diversity, connectivity, innovation, and ethical inclusion using concrete product evidence, so judges can see how the app matches AIYES's stated mission beyond the scoring rubric.
+
+AIYES Development Journey maps each run to the required Track 1 story: problem identification, data handling, model integration, app build, testing, UX, ethics, impact, constraints, and hosted submission proof.
 
 Learning Impact Loop measures student readiness for each run through outcome, data quality, concept learning, integrity, whole-pattern evidence, repeat reliability, and next-trial metrics.
 

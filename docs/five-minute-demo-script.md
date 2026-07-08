@@ -34,7 +34,11 @@ Show AIYES Rubric Fit: each run maps to Problem Definition and Real-World Releva
 
 Show AIYES Values Fit: the same run maps to democracy, diversity, connectivity, innovation, and ethical inclusion using concrete product evidence, not abstract promises.
 
-## 2:24-2:40 - Pre-Lab, Student Level Lens, Concept Mastery, Learning Impact, Exit Ticket, And Reflection Workspace
+## 2:24-2:34 - AIYES Development Journey
+
+Show AIYES Development Journey: the run maps the required development story from problem and data handling through model strategy, testing, UX, ethics, impact, constraints, and submission proof.
+
+## 2:34-2:50 - Pre-Lab, Student Level Lens, Concept Mastery, Learning Impact, Exit Ticket, And Reflection Workspace
 
 Show Student Level Lens: the same run switches between middle-school pattern reading and high-school quantitative evidence, controls, repeats, and uncertainty. Then show Pre-Lab Design Coach: Ouija turns the match into variables, controls, repeats, source checks, table columns, and a safety gate before data collection. Then show Learning Impact Loop: Ouija scores whether the student is ready to reason, should review flags, or needs to fix the run, using outcome, data quality, concept learning, integrity, pattern evidence, repeat reliability, and next-trial metrics.
 

@@ -54,6 +54,9 @@ describe("POST /api/analyze", () => {
     expect(response.body.aiyesValuesFit.values).toHaveLength(5);
     expect(response.body.aiyesValuesFit.values.map((value: { id: string }) => value.id)).toContain("democracy");
     expect(response.body.aiyesValuesFit.values.map((value: { id: string }) => value.id)).toContain("innovation");
+    expect(response.body.developmentJourney.score).toBeGreaterThanOrEqual(90);
+    expect(response.body.developmentJourney.stages).toHaveLength(8);
+    expect(response.body.developmentJourney.stages.map((stage: { id: string }) => stage.id)).toContain("testing-evaluation");
     expect(response.body.impactSnapshot.metrics).toHaveLength(7);
     expect(response.body.impactSnapshot.evidenceLoop).toHaveLength(5);
     expect(response.body.learningExitTicket.status).toBe("ready");

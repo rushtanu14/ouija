@@ -144,6 +144,20 @@ describe("fallback analysis", () => {
     ]);
     expect(result.aiyesValuesFit.values.some((value) => value.label === "Innovation" && value.evidence.includes("AI Evaluation Harness"))).toBe(true);
     expect(result.aiyesValuesFit.values.some((value) => value.label === "Ethics and inclusion" && value.studentAction.includes("own words"))).toBe(true);
+    expect(result.developmentJourney.score).toBeGreaterThanOrEqual(90);
+    expect(result.developmentJourney.stages.map((stage) => stage.id)).toEqual([
+      "problem",
+      "data-handling",
+      "model-strategy",
+      "app-build",
+      "testing-evaluation",
+      "ux-design",
+      "ethics-impact",
+      "constraints-submission"
+    ]);
+    expect(result.developmentJourney.slideCue).toContain("slide-deck spine");
+    expect(result.developmentJourney.videoCue).toContain("walkthrough spine");
+    expect(result.developmentJourney.stages.some((stage) => stage.label === "Testing and evaluation" && stage.evidence.includes("Evaluation Bench"))).toBe(true);
     expect(result.trackEvidence.score).toBeGreaterThanOrEqual(90);
     expect(result.trackEvidence.readiness).toBe("competitive");
     expect(result.trackEvidence.pipeline.map((step) => step.id)).toContain("ground");
@@ -214,6 +228,8 @@ describe("fallback analysis", () => {
     expect(result.aiyesValuesFit.status).toBe("ready");
     expect(result.aiyesValuesFit.values.some((value) => value.id === "diversity" && value.status === "ready")).toBe(true);
     expect(result.aiyesValuesFit.values.some((value) => value.id === "innovation" && value.status === "review")).toBe(true);
+    expect(result.developmentJourney.stages.some((stage) => stage.id === "problem" && stage.status === "review")).toBe(true);
+    expect(result.developmentJourney.stages.some((stage) => stage.id === "constraints-submission" && stage.evidence.includes("Devpost"))).toBe(true);
     expect(result.guidedFlow.steps.some((step) => step.id === "identify" && step.status === "review")).toBe(true);
     expect(result.trackEvidence.readiness).toBe("needs_work");
     expect(result.trackEvidence.pipeline.some((step) => step.id === "classify" && step.status === "review")).toBe(true);

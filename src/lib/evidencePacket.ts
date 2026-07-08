@@ -170,6 +170,17 @@ export function buildEvidencePacket(
       `    - Student action: ${value.studentAction}`
     ]),
     "",
+    "## AIYES Development Journey",
+    `- Score: ${result.developmentJourney.score}/100 (${formatAiyesValueStatus(result.developmentJourney.status)})`,
+    `- Summary: ${result.developmentJourney.summary}`,
+    `- Slide cue: ${result.developmentJourney.slideCue}`,
+    `- Video cue: ${result.developmentJourney.videoCue}`,
+    "- Stages:",
+    ...result.developmentJourney.stages.flatMap((stage) => [
+      `  - ${stage.label} (${formatAiyesValueStatus(stage.status)}): ${stage.evidence}`,
+      `    - Judge cue: ${stage.judgeCue}`
+    ]),
+    "",
     "## Learning Impact Loop",
     `- Score: ${result.impactSnapshot.score}/100`,
     `- Headline: ${result.impactSnapshot.headline}`,

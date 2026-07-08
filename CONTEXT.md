@@ -46,6 +46,10 @@ The technical-depth layer for experiment quality. Ouija evaluates independent/de
 
 The mission-alignment layer for AIYES. Ouija maps each run to democracy, diversity, connectivity, innovation, and ethics/inclusion using concrete evidence from the analysis result, not generic submission copy. It should recompute when grounding, classification confidence, or table-derived evidence changes.
 
+### AIYES Development Journey
+
+The Track 1 submission-story layer. Ouija maps each run to problem identification, data handling, model selection/integration, application development, testing/evaluation, UX/design, ethics/impact, constraints, and hosted submission proof so judges can inspect the required development journey inside the app, not only in the slide deck or video.
+
 ## Product Boundaries
 
 - Ouija should not become a teacher grading dashboard.
@@ -687,3 +691,14 @@ The mission-alignment layer for AIYES. Ouija maps each run to democracy, diversi
 - Deployed to `https://ouija-olive.vercel.app`; latest verified Vercel deployment ID is `dpl_7oNLvN1oHq5WXwjGgP2AHaYkFqmT`.
 - Fresh verification passed: `npm run test` (66 passed), `npm run build`, `npm run test:e2e` (8 passed), `npm audit --json` (0 vulnerabilities), `npm run capture:submission`, `npm run record:walkthrough`, `npm run sync:public-submission`, public `/api/evaluate` (`100/100`, `9/9`), public `/api/analyze` with `aiyesValuesFit.score: 96`, hosted deck/video HTTP 200, and desktop/mobile public smoke with no horizontal overflow.
 - Remaining external loops: actual Devpost submission, Devpost team requirement ambiguity if enforced, and optional real OpenAI/Composio credentials only with explicit credential approval and consent/server setup.
+
+## AIYES Development Journey Checkpoint - 2026-07-08
+
+- Council verdict: Ouija works and remains submittable for AIYES Track 1. First place still cannot be guaranteed because judging, Devpost submission, and the team roster are external. The best practical hardening was not another fake live connector; it was making the required Track 1 development journey visible and inspectable in-app.
+- Added typed `developmentJourney` to `AnalyzeResult`, with eight stages: problem identification, data handling, model selection/integration, application development, testing/evaluation, UX/design, ethics/impact, and constraints/submission. It recomputes for fallback analysis, OpenAI web-search enrichment, and table-row refresh.
+- Added the live `AIYES Development Journey` panel, top-nav `Journey` anchor, Evidence Packet section, Model Card safeguard, Judge Brief proof item, updated docs/deck/copy/script/tests, and refreshed submission screenshots/video/public assets.
+- Composio/MCP status after this pass: Ouija already has nine consent-gated Composio/MCP routes including Composio Search source audit and Scholar claim check, `/api/mcp/status`, `/api/mcp/export`, and scoped `/api/mcp/session`. Public mode remains credentials-safe server dry-run; live Composio should wait for explicit credentials and consent/server setup.
+- Refreshed walkthrough proof: `docs/assets/ouija-walkthrough.webm`, 4:34.96 / 274.96 seconds, 24,966,897 bytes, SHA-256 `65c8bf2260b04b7d30139aac1ad7087d17a4921695e0c3cf0aaad122646a44e0`, synced to `public/submission/assets/ouija-walkthrough.webm`.
+- Production: `dpl_7RBuYLSFNTMnYQjutM8H77EGCM3Z`, aliased at `https://ouija-olive.vercel.app`. Public proof: `/api/evaluate` returned `100/100` and `9/9`; public projectile `/api/analyze` returned `developmentJourney.score: 96` and 8 stages; `/api/mcp/status` returned `server_dry_run` with 9 routes; hosted slide deck returned HTTP 200 content length `18555`; hosted walkthrough returned HTTP 200 `video/webm` content length `24966897`; desktop/mobile public smoke confirmed all 8 journey stages and no horizontal overflow.
+- Verification passed: `npm run test` (66 passed), `npm run build`, `npm run test:e2e` (8 passed), `npm audit --json` (0 vulnerabilities), `git diff --check`, `npm run capture:submission`, `npm run record:walkthrough`, `npm run sync:public-submission`, production deploy, public endpoint/asset checks, and public desktop/mobile Playwright smoke.
+- Remaining external loops: actual Devpost submission, Devpost 2-5 student team roster ambiguity, optional real OpenAI web-search enrichment only with explicit API-key approval, and optional live Composio credentials only after consent/server setup.

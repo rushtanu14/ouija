@@ -8,6 +8,7 @@ import type {
   CustomLabPlanner,
   CustomLabTriage,
   DataHandlingLedger,
+  DevelopmentJourney,
   ExpectedComparison,
   ExperimentTemplate,
   GroundingAudit,
@@ -192,6 +193,27 @@ export function analyzeExperiment(request: AnalyzeRequest): AnalyzeResult {
     impactSnapshot,
     officialRubricFit
   );
+  const developmentJourney = buildDevelopmentJourney(
+    template,
+    confidence,
+    rows,
+    allIssues,
+    template.fallbackSources,
+    groundingStatus.mode,
+    matchQuality,
+    modelStrategy,
+    guidedFlow,
+    expectedComparison,
+    groundingAudit,
+    aiEvaluationHarness,
+    dataHandlingLedger,
+    officialRubricFit,
+    aiyesValuesFit,
+    impactSnapshot,
+    learningExitTicket,
+    preLabDesignCoach,
+    judgeDemoPath
+  );
 
   return {
     templateId: template.id,
@@ -233,6 +255,7 @@ export function analyzeExperiment(request: AnalyzeRequest): AnalyzeResult {
     learningExitTicket,
     officialRubricFit,
     aiyesValuesFit,
+    developmentJourney,
     trackEvidence: buildTrackEvidence(
       template,
       confidence,
@@ -709,6 +732,29 @@ export function mergeEnrichment(base: AnalyzeResult, enrichment: Partial<Analyze
         officialRubricFit
       )
     : base.aiyesValuesFit;
+  const developmentJourney = template
+    ? buildDevelopmentJourney(
+        template,
+        base.classification.confidence,
+        base.rows,
+        issues,
+        sources,
+        groundingStatus.mode,
+        base.classification.matchQuality,
+        modelStrategy,
+        guidedFlow,
+        expectedComparison,
+        groundingAudit,
+        aiEvaluationHarness,
+        dataHandlingLedger,
+        officialRubricFit,
+        aiyesValuesFit,
+        impactSnapshot,
+        learningExitTicket,
+        preLabDesignCoach,
+        judgeDemoPath
+      )
+    : base.developmentJourney;
 
   return {
     ...base,
@@ -737,6 +783,7 @@ export function mergeEnrichment(base: AnalyzeResult, enrichment: Partial<Analyze
     learningExitTicket,
     officialRubricFit,
     aiyesValuesFit,
+    developmentJourney,
     trackEvidence: template
       ? buildTrackEvidence(
           template,
@@ -893,6 +940,27 @@ export function refreshResultForRows(result: AnalyzeResult, rows: StudentDataRow
     impactSnapshot,
     officialRubricFit
   );
+  const developmentJourney = buildDevelopmentJourney(
+    template,
+    result.classification.confidence,
+    rows,
+    issues,
+    result.sources,
+    result.groundingStatus.mode,
+    result.classification.matchQuality,
+    modelStrategy,
+    guidedFlow,
+    expectedComparison,
+    groundingAudit,
+    aiEvaluationHarness,
+    dataHandlingLedger,
+    officialRubricFit,
+    aiyesValuesFit,
+    impactSnapshot,
+    learningExitTicket,
+    preLabDesignCoach,
+    judgeDemoPath
+  );
 
   return {
     ...result,
@@ -919,6 +987,7 @@ export function refreshResultForRows(result: AnalyzeResult, rows: StudentDataRow
     learningExitTicket,
     officialRubricFit,
     aiyesValuesFit,
+    developmentJourney,
     trackEvidence: buildTrackEvidence(
       template,
       result.classification.confidence,
@@ -2838,6 +2907,113 @@ function buildAiyesValuesFit(
           ? `Ready AIYES values fit with review notes: ${preLabDesignCoach.studentNextAction}`
           : `Review AIYES values fit before demo: ${customLabTriage.studentNextAction}`,
     values
+  };
+}
+
+function buildDevelopmentJourney(
+  template: ExperimentTemplate,
+  confidence: number,
+  rows: StudentDataRow[],
+  issues: Issue[],
+  sources: SourceCard[],
+  groundingMode: AnalyzeResult["groundingStatus"]["mode"],
+  matchQuality: AnalyzeResult["classification"]["matchQuality"],
+  modelStrategy: ModelStrategy,
+  guidedFlow: GuidedLabFlow,
+  expectedComparison: ExpectedComparison,
+  groundingAudit: GroundingAudit,
+  aiEvaluationHarness: AiEvaluationHarness,
+  dataHandlingLedger: DataHandlingLedger,
+  officialRubricFit: OfficialRubricFit,
+  aiyesValuesFit: AiyesValuesFit,
+  impactSnapshot: LearningImpactSnapshot,
+  learningExitTicket: LearningExitTicket,
+  preLabDesignCoach: PreLabDesignCoach,
+  judgeDemoPath: JudgeDemoPath
+): DevelopmentJourney {
+  const errorCount = issues.filter((issue) => issue.severity === "error").length;
+  const warningCount = issues.filter((issue) => issue.severity === "warning").length;
+  const lowConfidence = matchQuality === "closest_supported" || confidence < 0.6;
+  const completeRows = rows.filter((row) => template.columns.every((column) => row[column.key] !== "")).length;
+  const uxCriterion = officialRubricFit.criteria.find((criterion) => criterion.id === "ux-design");
+
+  const stages: DevelopmentJourney["stages"] = [
+    {
+      id: "problem",
+      label: "Problem identification",
+      status: lowConfidence ? "review" : "strong",
+      evidence: `Middle/high school students need help turning ${template.title} data into source-backed reasoning without a generated lab report.`,
+      judgeCue: "Start with Run Snapshot, classification, variables, and Claim Coach blanks."
+    },
+    {
+      id: "data-handling",
+      label: "Data handling",
+      status: errorCount > 0 ? "review" : warningCount > 0 ? "ready" : "strong",
+      evidence: `${completeRows}/${rows.length} rows are complete; expected overlay covers ${expectedComparison.points.length} row${expectedComparison.points.length === 1 ? "" : "s"} and Data Handling Ledger scores ${dataHandlingLedger.score}/100.`,
+      judgeCue: "Show spreadsheet paste, editable cells, expected overlay, Method Audit, and privacy flows."
+    },
+    {
+      id: "model-strategy",
+      label: "Model selection and integration",
+      status: modelStrategy.candidates.length >= 3 && confidence >= 0.6 ? "strong" : "ready",
+      evidence: `${modelStrategy.candidates.length} templates are ranked before selecting ${template.title}; grounding is ${groundingMode === "web_enriched" ? "web enriched" : "trusted fallback"} with ${sources.length} visible source${sources.length === 1 ? "" : "s"}.`,
+      judgeCue: "Open Model Strategy, Grounding Audit, and AI Runtime Proof."
+    },
+    {
+      id: "app-build",
+      label: "Application development",
+      status: guidedFlow.steps.length >= 6 && preLabDesignCoach.setupChecks.length >= 5 ? "strong" : "ready",
+      evidence: `The app combines guided workflow, pre-lab setup, graph/table editing, source cards, evidence packet, saved labs, portfolio, and MCP handoff planning.`,
+      judgeCue: "Walk through Guided Lab Flow, Pre-Lab Design Coach, graph/table, Evidence Packet, and Progress Portfolio."
+    },
+    {
+      id: "testing-evaluation",
+      label: "Testing and evaluation",
+      status: aiEvaluationHarness.score >= 90 ? "strong" : aiEvaluationHarness.score >= 80 ? "ready" : "review",
+      evidence: `AI Evaluation Harness scores this run ${aiEvaluationHarness.score}/100 and the public Evaluation Bench covers eight supported labs plus the unsupported-lab boundary.`,
+      judgeCue: "Use AI Evaluation Harness and `/api/evaluate` proof."
+    },
+    {
+      id: "ux-design",
+      label: "User experience and design",
+      status: uxCriterion?.status ?? "ready",
+      evidence: `Current student action is "${guidedFlow.currentAction}" and the official UX criterion is ${uxCriterion?.status ?? "ready"}.`,
+      judgeCue: "Show the three-region workspace, level lens, mastery check, reflection workspace, and no-overflow mobile behavior."
+    },
+    {
+      id: "ethics-impact",
+      label: "Ethics and impact",
+      status: dataHandlingLedger.score >= 90 && aiyesValuesFit.score >= 90 ? "strong" : "ready",
+      evidence: `Data Handling Ledger is ${dataHandlingLedger.score}/100, AIYES Values Fit is ${aiyesValuesFit.score}/100, and Learning Impact is ${impactSnapshot.score}/100.`,
+      judgeCue: "Show Data Handling Ledger, AIYES Values Fit, Learning Impact Loop, and blank student-owned conclusion prompts."
+    },
+    {
+      id: "constraints-submission",
+      label: "Constraints and submission",
+      status: judgeDemoPath.status === "ready" && learningExitTicket.status === "ready" ? "strong" : "ready",
+      evidence: `Hosted app, source, slide deck, and sub-5-minute walkthrough are prepared; Devpost team roster remains an external submission step.`,
+      judgeCue: "End at Judge Brief with hosted links, AIYES Submission Checklist, and the team-requirement note."
+    }
+  ];
+
+  const statusScores: Record<DevelopmentJourney["status"], number> = {
+    strong: 96,
+    ready: 86,
+    review: 72
+  };
+  const score = Math.round(stages.reduce((total, stage) => total + statusScores[stage.status], 0) / stages.length);
+  const status: DevelopmentJourney["status"] = score >= 92 ? "strong" : score >= 84 ? "ready" : "review";
+
+  return {
+    score,
+    status,
+    summary:
+      "Ouija maps the AIYES Track 1 development journey from problem and data handling through model strategy, testing, UX, ethics, impact, constraints, and submission proof.",
+    slideCue:
+      "Use this sequence as the slide-deck spine: problem, data, model, app build, testing, UX, ethics/impact, constraints, and final submission links.",
+    videoCue:
+      "Use this sequence as the walkthrough spine: classify a lab, inspect AI strategy, edit data, compare the graph, check learning/ethics, then open Judge Brief.",
+    stages
   };
 }
 
