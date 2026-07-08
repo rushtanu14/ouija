@@ -26,6 +26,7 @@ describe("AIYES submission assets", () => {
     expect(deck).toContain("/api/mcp/session");
     expect(deck).toContain("Composio Search source-audit");
     expect(deck).toContain("Scholar claim-check");
+    expect(deck).toContain("AIYES Values Fit");
     expect(deck).toContain("Technical Depth Proof");
     expect(deck).toContain("Concept Mastery Check");
     expect(deck).toContain("plant growth vs light color");
@@ -48,6 +49,7 @@ describe("AIYES submission assets", () => {
     expect(copy).toContain("/api/mcp/session");
     expect(copy).toContain("Composio Search source audit");
     expect(copy).toContain("Composio Scholar claim check");
+    expect(copy).toContain("AIYES Values Fit");
     expect(copy).toContain("Technical Depth Proof");
     expect(copy).toContain("Google Classroom");
     expect(assets).toContain("Progress Portfolio");

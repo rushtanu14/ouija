@@ -42,6 +42,10 @@ The judge-visible student reasoning layer. Ouija turns classification, expected 
 
 The technical-depth layer for experiment quality. Ouija evaluates independent/dependent variables, controlled variables, assumptions, likely confounds, safety/interpretation limits, and a reproducibility score. It should recompute when table data changes.
 
+### AIYES Values Fit
+
+The mission-alignment layer for AIYES. Ouija maps each run to democracy, diversity, connectivity, innovation, and ethics/inclusion using concrete evidence from the analysis result, not generic submission copy. It should recompute when grounding, classification confidence, or table-derived evidence changes.
+
 ## Product Boundaries
 
 - Ouija should not become a teacher grading dashboard.
@@ -674,3 +678,12 @@ The technical-depth layer for experiment quality. Ouija evaluates independent/de
 - Public desktop/mobile Playwright smoke confirmed `Run Scholar claim check`, `9 connector routes checked`, Scholar dry-run validation, `COMPOSIO_SEARCH_SCHOLAR`, no console errors, and no horizontal overflow.
 - Fresh verification passed: focused Vitest (`31 passed`), `npm run test` (`66 passed`), `npm run build`, `npm run test:e2e` (`8 passed`), `npm audit --json` (`0 vulnerabilities`), `git diff --check`, `OUIJA_URL=http://127.0.0.1:5188 npm run capture:submission`, `OUIJA_URL=http://127.0.0.1:5188 OUIJA_CAPTION_MS=3000 npm run record:walkthrough`, `npm run sync:public-submission`, `ffprobe`, `shasum -a 256`, production deploy, public endpoint checks, hosted asset checks, local screenshot review, and public desktop/mobile Playwright smoke.
 - Remaining external loops: Devpost submission, 2-5 member team roster on Devpost, optional live Composio/OpenAI credentials only after explicit approval and consent.
+
+## AIYES Values Fit Checkpoint - 2026-07-08
+
+- Added typed `aiyesValuesFit` to `AnalyzeResult` for democracy, diversity, connectivity, innovation, and ethics/inclusion signals with scores, evidence, and student actions.
+- Added the live `AIYES Values Fit` panel, top-nav anchor, Evidence Packet export section, Model Card safeguard, Judge Brief proof item, updated docs, slide deck, and walkthrough script.
+- Refreshed screenshots, regenerated the hosted walkthrough at 4:29.88 / 269.88 seconds, 24,177,369 bytes, SHA-256 `16d7c6b4df8d739e31381c89f0b8ab17358d54b12a39b7a41dea8f637ad8ed3b`, and synced public submission assets.
+- Deployed to `https://ouija-olive.vercel.app`; latest verified Vercel deployment ID is `dpl_7oNLvN1oHq5WXwjGgP2AHaYkFqmT`.
+- Fresh verification passed: `npm run test` (66 passed), `npm run build`, `npm run test:e2e` (8 passed), `npm audit --json` (0 vulnerabilities), `npm run capture:submission`, `npm run record:walkthrough`, `npm run sync:public-submission`, public `/api/evaluate` (`100/100`, `9/9`), public `/api/analyze` with `aiyesValuesFit.score: 96`, hosted deck/video HTTP 200, and desktop/mobile public smoke with no horizontal overflow.
+- Remaining external loops: actual Devpost submission, Devpost team requirement ambiguity if enforced, and optional real OpenAI/Composio credentials only with explicit credential approval and consent/server setup.

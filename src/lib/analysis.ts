@@ -1,5 +1,6 @@
 import { EXPERIMENT_TEMPLATES } from "./templates.js";
 import type {
+  AiyesValuesFit,
   AnalyzeRequest,
   AnalyzeResult,
   AiEvaluationHarness,
@@ -174,6 +175,23 @@ export function analyzeExperiment(request: AnalyzeRequest): AnalyzeResult {
     learningExitTicket,
     preLabDesignCoach
   );
+  const aiyesValuesFit = buildAiyesValuesFit(
+    template,
+    confidence,
+    allIssues,
+    template.fallbackSources,
+    groundingStatus.mode,
+    matchQuality,
+    guidedFlow,
+    groundingAudit,
+    dataHandlingLedger,
+    aiEvaluationHarness,
+    learningExitTicket,
+    preLabDesignCoach,
+    customLabTriage,
+    impactSnapshot,
+    officialRubricFit
+  );
 
   return {
     templateId: template.id,
@@ -214,6 +232,7 @@ export function analyzeExperiment(request: AnalyzeRequest): AnalyzeResult {
     impactSnapshot,
     learningExitTicket,
     officialRubricFit,
+    aiyesValuesFit,
     trackEvidence: buildTrackEvidence(
       template,
       confidence,
@@ -671,6 +690,25 @@ export function mergeEnrichment(base: AnalyzeResult, enrichment: Partial<Analyze
         preLabDesignCoach
       )
     : base.officialRubricFit;
+  const aiyesValuesFit = template
+    ? buildAiyesValuesFit(
+        template,
+        base.classification.confidence,
+        issues,
+        sources,
+        groundingStatus.mode,
+        base.classification.matchQuality,
+        guidedFlow,
+        groundingAudit,
+        dataHandlingLedger,
+        aiEvaluationHarness,
+        learningExitTicket,
+        preLabDesignCoach,
+        base.customLabTriage,
+        impactSnapshot,
+        officialRubricFit
+      )
+    : base.aiyesValuesFit;
 
   return {
     ...base,
@@ -698,6 +736,7 @@ export function mergeEnrichment(base: AnalyzeResult, enrichment: Partial<Analyze
     impactSnapshot,
     learningExitTicket,
     officialRubricFit,
+    aiyesValuesFit,
     trackEvidence: template
       ? buildTrackEvidence(
           template,
@@ -837,6 +876,23 @@ export function refreshResultForRows(result: AnalyzeResult, rows: StudentDataRow
     learningExitTicket,
     preLabDesignCoach
   );
+  const aiyesValuesFit = buildAiyesValuesFit(
+    template,
+    result.classification.confidence,
+    issues,
+    result.sources,
+    result.groundingStatus.mode,
+    result.classification.matchQuality,
+    guidedFlow,
+    groundingAudit,
+    dataHandlingLedger,
+    aiEvaluationHarness,
+    learningExitTicket,
+    preLabDesignCoach,
+    result.customLabTriage,
+    impactSnapshot,
+    officialRubricFit
+  );
 
   return {
     ...result,
@@ -862,6 +918,7 @@ export function refreshResultForRows(result: AnalyzeResult, rows: StudentDataRow
     impactSnapshot,
     learningExitTicket,
     officialRubricFit,
+    aiyesValuesFit,
     trackEvidence: buildTrackEvidence(
       template,
       result.classification.confidence,
@@ -2692,6 +2749,95 @@ function buildOfficialRubricFit(
         judgeTakeaway: "The workflow is built around a student's next action: classify, understand, check data, plan another measurement, then write their own claim."
       }
     ]
+  };
+}
+
+function buildAiyesValuesFit(
+  template: ExperimentTemplate,
+  confidence: number,
+  issues: Issue[],
+  sources: SourceCard[],
+  groundingMode: AnalyzeResult["groundingStatus"]["mode"],
+  matchQuality: AnalyzeResult["classification"]["matchQuality"],
+  guidedFlow: GuidedLabFlow,
+  groundingAudit: GroundingAudit,
+  dataHandlingLedger: DataHandlingLedger,
+  aiEvaluationHarness: AiEvaluationHarness,
+  learningExitTicket: LearningExitTicket,
+  preLabDesignCoach: PreLabDesignCoach,
+  customLabTriage: CustomLabTriage,
+  impactSnapshot: LearningImpactSnapshot,
+  officialRubricFit: OfficialRubricFit
+): AiyesValuesFit {
+  const errorCount = issues.filter((issue) => issue.severity === "error").length;
+  const warningCount = issues.filter((issue) => issue.severity === "warning").length;
+  const lowConfidence = matchQuality === "closest_supported" || confidence < 0.6;
+  const sourceStatus: AiyesValuesFit["status"] = sources.length > 0 && groundingAudit.score >= 88 ? "strong" : "ready";
+  const ethicsStatus: AiyesValuesFit["status"] =
+    dataHandlingLedger.score >= 90 && errorCount === 0 ? "strong" : dataHandlingLedger.score >= 80 ? "ready" : "review";
+  const inclusionStatus: AiyesValuesFit["status"] = lowConfidence ? "ready" : warningCount > 0 ? "ready" : "strong";
+  const innovationStatus: AiyesValuesFit["status"] =
+    officialRubricFit.score >= 90 && aiEvaluationHarness.score >= 85 ? "strong" : officialRubricFit.score >= 80 ? "ready" : "review";
+  const agencyStatus: AiyesValuesFit["status"] = errorCount === 0 && learningExitTicket.status !== "blocked" ? "strong" : "ready";
+
+  const values: AiyesValuesFit["values"] = [
+    {
+      id: "democracy",
+      label: "Democracy",
+      status: agencyStatus,
+      evidence: `Students control the description, rows, saved labs, Evidence Packet, MCP export consent, and final claim; current action is "${guidedFlow.currentAction}".`,
+      studentAction: "Review the packet, keep the claim starter blank, and decide what evidence to share."
+    },
+    {
+      id: "diversity",
+      label: "Diversity",
+      status: inclusionStatus,
+      evidence: `Ouija supports middle/high school learners across ${template.subject.toLowerCase()} plus Custom Lab Triage; this run is ${matchQuality.replaceAll("_", " ")} with ${Math.round(confidence * 100)}% confidence.`,
+      studentAction: lowConfidence ? "Confirm the experiment focus with a teacher before treating the template as a match." : "Choose the middle or high school lens that fits the class level."
+    },
+    {
+      id: "connectivity",
+      label: "Connectivity",
+      status: sourceStatus,
+      evidence: `${sources.length} visible source${sources.length === 1 ? "" : "s"}, Grounding Audit score ${groundingAudit.score}/100, ${groundingMode === "web_enriched" ? "server-side web search" : "trusted fallback"} grounding, and Composio handoff planning connect lab evidence to outside systems.`,
+      studentAction: "Open the citations and only enable the export route that your teacher actually needs."
+    },
+    {
+      id: "innovation",
+      label: "Innovation",
+      status: innovationStatus,
+      evidence: `Candidate ranking, expected overlay, pattern evidence, repeat reliability, pre-lab planning, and the AI Evaluation Harness (${aiEvaluationHarness.score}/100) go beyond a simple chat answer.`,
+      studentAction: `Compare your observed data to the expected ${formatColumnName(template, template.expectedResult.xKey)} to ${formatColumnName(template, template.expectedResult.yKey)} pattern before writing.`
+    },
+    {
+      id: "ethics-inclusion",
+      label: "Ethics and inclusion",
+      status: ethicsStatus,
+      evidence: `Data Handling Ledger ${dataHandlingLedger.score}/100, server-only keys, local saved labs, safety checks, reflection prompts, and blank claim starters keep the work student-owned.`,
+      studentAction: "Use the exit-ticket prompts as notes, then write the conclusion in your own words."
+    }
+  ];
+
+  const statusScores: Record<AiyesValuesFit["status"], number> = {
+    strong: 96,
+    ready: 86,
+    review: 72
+  };
+  const score = Math.round(values.reduce((total, value) => total + statusScores[value.status], 0) / values.length);
+  const status: AiyesValuesFit["status"] = score >= 92 ? "strong" : score >= 84 ? "ready" : "review";
+
+  return {
+    score,
+    status,
+    summary:
+      "Ouija maps this run to AIYES values: student agency, broad classroom access, connected evidence, practical innovation, and ethical inclusion.",
+    judgeTakeaway:
+      status === "strong"
+        ? `Strong AIYES values fit: ${impactSnapshot.studentOutcome}`
+        : status === "ready"
+          ? `Ready AIYES values fit with review notes: ${preLabDesignCoach.studentNextAction}`
+          : `Review AIYES values fit before demo: ${customLabTriage.studentNextAction}`,
+    values
   };
 }
 

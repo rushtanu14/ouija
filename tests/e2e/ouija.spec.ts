@@ -83,6 +83,12 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(page.getByLabel("AIYES Rubric Fit").getByText("Problem Definition and Real-World Relevance")).toBeVisible();
   await expect(page.getByLabel("AIYES Rubric Fit").getByText("AI Technical Design and Model Strategy")).toBeVisible();
   await expect(page.getByLabel("AIYES Rubric Fit").getByText("User Experience and Design")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "AIYES Values Fit" })).toBeVisible();
+  await expect(page.getByLabel("AIYES Values Fit").getByText("Democracy", { exact: true })).toBeVisible();
+  await expect(page.getByLabel("AIYES Values Fit").getByText("Diversity", { exact: true })).toBeVisible();
+  await expect(page.getByLabel("AIYES Values Fit").getByText("Connectivity", { exact: true })).toBeVisible();
+  await expect(page.getByLabel("AIYES Values Fit").getByText("Innovation", { exact: true })).toBeVisible();
+  await expect(page.getByLabel("AIYES Values Fit").getByText("Ethics and inclusion", { exact: true })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Learning Impact Loop" })).toBeVisible();
   await expect(page.getByLabel("Learning Impact Loop").getByText("Student outcome")).toBeVisible();
   await expect(page.getByLabel("Learning Impact Loop").getByText("Data quality")).toBeVisible();
@@ -152,6 +158,7 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(page.getByLabel("Student evidence packet")).toHaveValue(/Judge Demo Path/);
   await expect(page.getByLabel("Student evidence packet")).toHaveValue(/Next best action/);
   await expect(page.getByLabel("Student evidence packet")).toHaveValue(/AIYES Rubric Fit/);
+  await expect(page.getByLabel("Student evidence packet")).toHaveValue(/AIYES Values Fit/);
   await expect(page.getByLabel("Student evidence packet")).toHaveValue(/Grounding Audit/);
   await expect(page.getByLabel("Student evidence packet")).toHaveValue(/Expected Overlay/);
   await expect(page.getByLabel("Student evidence packet")).toHaveValue(/Learning Impact Loop/);
@@ -211,6 +218,7 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(page.getByLabel("AI Model Card").getByText("AI Evaluation Harness scores classifier confidence, coverage, grounding, validators, safety, and fallback boundaries.")).toBeVisible();
   await expect(page.getByLabel("AI Model Card").getByText("Judge Demo Path reduces the live demo to problem fit, AI design, student workflow, evidence handoff, and submission proof.")).toBeVisible();
   await expect(page.getByLabel("AI Model Card").getByText("Official Rubric Fit maps problem relevance, AI design, and UX to concrete app evidence.")).toBeVisible();
+  await expect(page.getByLabel("AI Model Card").getByText("AIYES Values Fit ties the app to AIYES values without changing the student's work into a generated report.")).toBeVisible();
   await expect(page.getByLabel("AI Model Card").getByText("Learning Impact Loop turns analysis into measurable student readiness and next-trial evidence.")).toBeVisible();
   await expect(page.getByLabel("AI Model Card").getByText("Pre-Lab Design Coach turns classification into variables, controls, repeats, source checks, and safety before data collection.")).toBeVisible();
   await expect(page.getByLabel("AI Model Card").getByText("Learning Exit Ticket converts the AI feedback into student reflection prompts judges can inspect.")).toBeVisible();
@@ -328,6 +336,7 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(page.getByLabel("Judge Brief").getByText("Technical Depth Proof makes beyond-simple-API architecture evidence visible.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("AI Evaluation Harness scores model behavior and safeguards.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Official Rubric Fit maps all three visible AIYES criteria.")).toBeVisible();
+  await expect(page.getByLabel("Judge Brief").getByText("AIYES Values Fit maps democracy, diversity, connectivity, innovation, and ethical inclusion to concrete product evidence.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Learning Impact Loop measures the student's outcome for each run.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Pre-Lab Design Coach helps students plan variables, controls, repeats, sources, and safety before collecting data.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Learning Exit Ticket proves students must explain variables, patterns, and next steps themselves.")).toBeVisible();

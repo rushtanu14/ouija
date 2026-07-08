@@ -50,6 +50,10 @@ describe("POST /api/analyze", () => {
     expect(response.body.modelStrategy.signals.some((signal: { label: string }) => signal.label === "Classifier confidence")).toBe(true);
     expect(response.body.officialRubricFit.criteria).toHaveLength(3);
     expect(response.body.officialRubricFit.criteria.some((criterion: { label: string }) => criterion.label === "Problem Definition and Real-World Relevance")).toBe(true);
+    expect(response.body.aiyesValuesFit.score).toBeGreaterThanOrEqual(90);
+    expect(response.body.aiyesValuesFit.values).toHaveLength(5);
+    expect(response.body.aiyesValuesFit.values.map((value: { id: string }) => value.id)).toContain("democracy");
+    expect(response.body.aiyesValuesFit.values.map((value: { id: string }) => value.id)).toContain("innovation");
     expect(response.body.impactSnapshot.metrics).toHaveLength(7);
     expect(response.body.impactSnapshot.evidenceLoop).toHaveLength(5);
     expect(response.body.learningExitTicket.status).toBe("ready");

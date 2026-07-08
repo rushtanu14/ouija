@@ -8,6 +8,7 @@
 - Run Snapshot gives a first-scroll readout of rubric fit, evaluation status, learning impact, data flags, expected pattern, and current action.
 - Practical science behavior is visible: students see whether the whole graph supports the expected pattern and whether repeated trials have enough count, average, and spread to support a claim.
 - AIYES Rubric Fit gives judges concrete problem/relevance evidence for each analyzed run.
+- AIYES Values Fit gives judges concrete mission evidence for student agency, access, connected evidence, practical innovation, and ethical inclusion.
 - Learning Impact Loop measures whether a run leaves the student ready to reason, watching flags, or needing fixes.
 - Pre-Lab Design Coach helps students plan variables, controls, repeats, source checks, table columns, and safety before collecting data.
 - Learning Exit Ticket asks the student to explain variables, graph pattern, and next step in their own words before writing.
@@ -47,6 +48,7 @@
 - Fallback mode keeps demos reliable without credentials.
 - Guided Lab Flow turns the result schema into a student-facing next-action workflow.
 - AIYES Rubric Fit connects model strategy, grounding mode, validators, and fallback behavior to the official AI technical design/model strategy criterion.
+- AIYES Values Fit connects the same model, grounding, privacy, and student-control signals to AIYES's democracy, diversity, connectivity, innovation, and ethical-inclusion values.
 - Learning Impact Loop derives measurable student-readiness output from the same analysis engine, not from manual copy.
 
 ## Technical Depth Beyond Simple API Use
@@ -70,6 +72,7 @@
 - Spreadsheet/CSV paste import and editable table rows recompute graph comparison and Claim Coach state live.
 - Reasoning Trail visibly maps the run to AIYES Track 1 evidence: problem/impact, AI technical design, testing/evaluation, and ethics/constraints.
 - AIYES Rubric Fit visibly maps the run to the three official criteria: Problem Definition and Real-World Relevance, AI Technical Design and Model Strategy, and User Experience and Design.
+- AIYES Values Fit visibly maps the run to democracy, diversity, connectivity, innovation, and ethical inclusion.
 - Technical Depth Proof visibly answers the AI technical design criterion with concrete run metrics before judges read the deeper model cards.
 - Learning Impact Loop visibly scores outcome, data quality, concept learning, integrity, pattern evidence, repeat reliability, and next-trial readiness for every run.
 - Pre-Lab Design Coach visibly scores setup readiness before data collection.
@@ -103,6 +106,7 @@
 - Evidence Packet exports the same reasoning scaffold with Judge Demo Path, Custom Lab Triage, Grounding Audit, AI Evaluation Harness, sources, safety coach, concept coach, pattern evidence, reliability coach, data, checks, next-trial plan, and blanks, not a completed report.
 - Data Handling Ledger appears in the app and Evidence Packet so judges can inspect privacy and student-control claims during the demo or exported handoff.
 - AIYES Rubric Fit appears in the app and Evidence Packet so judges can inspect the official UX/design fit during the live demo or exported handoff.
+- AIYES Values Fit appears in the app and Evidence Packet so judges can inspect the values fit during the live demo or exported handoff.
 - Learning Impact Loop appears in the app and Evidence Packet so the user's practical benefit is measurable inside the workflow.
 - Pre-Lab Design Coach appears in the app and Evidence Packet so students can use Ouija before collecting data, not only after a table exists.
 - Learning Exit Ticket appears in the app and Evidence Packet so judges can inspect student understanding prompts during the demo or exported handoff.

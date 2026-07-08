@@ -690,6 +690,24 @@ export interface OfficialRubricFit {
   criteria: RubricCriterionFit[];
 }
 
+export type AiyesValueId = "democracy" | "diversity" | "connectivity" | "innovation" | "ethics-inclusion";
+
+export interface AiyesValueSignal {
+  id: AiyesValueId;
+  label: string;
+  status: RubricStatus;
+  evidence: string;
+  studentAction: string;
+}
+
+export interface AiyesValuesFit {
+  score: number;
+  status: RubricStatus;
+  summary: string;
+  judgeTakeaway: string;
+  values: AiyesValueSignal[];
+}
+
 export interface EvaluationCaseResult {
   id: string;
   label: string;
@@ -773,6 +791,7 @@ export interface AnalyzeResult {
   impactSnapshot: LearningImpactSnapshot;
   learningExitTicket: LearningExitTicket;
   officialRubricFit: OfficialRubricFit;
+  aiyesValuesFit: AiyesValuesFit;
   trackEvidence: TrackEvidence;
   explanation: string;
   integrityNotice: string;

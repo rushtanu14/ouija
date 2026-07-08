@@ -44,6 +44,7 @@ import { buildProgressPortfolio } from "./lib/progressPortfolio";
 import { SAMPLE_PROMPTS } from "./lib/samples";
 import { buildStudentReflectionWorkspace } from "./lib/studentReflectionWorkspace";
 import type {
+  AiyesValuesFit,
   AnalyzeResult,
   AiEvaluationHarness,
   ConceptCoach,
@@ -278,6 +279,7 @@ export function App() {
           <a href="#runtime-proof">Runtime Proof</a>
           <a href="#sources">Sources</a>
           <a href="#rubric">Rubric Fit</a>
+          <a href="#values">Values Fit</a>
           <a href="#impact">Impact</a>
           <a href="#evaluation">Eval Bench</a>
           <a href="#saved">Saved Labs</a>
@@ -437,6 +439,7 @@ export function App() {
               <AiEvaluationHarnessPanel harness={result.aiEvaluationHarness} />
               <DataHandlingLedgerPanel ledger={result.dataHandlingLedger} />
               <OfficialRubricPanel fit={result.officialRubricFit} />
+              <AiyesValuesFitPanel fit={result.aiyesValuesFit} />
             </>
           ) : (
             <div className="empty-state">
@@ -996,6 +999,7 @@ function JudgeBriefPanel({ result }: { result: AnalyzeResult | null }) {
     "Technical Depth Proof makes beyond-simple-API architecture evidence visible.",
     "AI Evaluation Harness scores model behavior and safeguards.",
     "Official Rubric Fit maps all three visible AIYES criteria.",
+    "AIYES Values Fit maps democracy, diversity, connectivity, innovation, and ethical inclusion to concrete product evidence.",
     "Learning Impact Loop measures the student's outcome for each run.",
     "Pre-Lab Design Coach helps students plan variables, controls, repeats, sources, and safety before collecting data.",
     "Learning Exit Ticket proves students must explain variables, patterns, and next steps themselves.",
@@ -1107,6 +1111,7 @@ function ModelCardPanel({ result }: { result: AnalyzeResult | null }) {
     "AI Evaluation Harness scores classifier confidence, coverage, grounding, validators, safety, and fallback boundaries.",
     "Judge Demo Path reduces the live demo to problem fit, AI design, student workflow, evidence handoff, and submission proof.",
     "Official Rubric Fit maps problem relevance, AI design, and UX to concrete app evidence.",
+    "AIYES Values Fit ties the app to AIYES values without changing the student's work into a generated report.",
     "Learning Impact Loop turns analysis into measurable student readiness and next-trial evidence.",
     "Pre-Lab Design Coach turns classification into variables, controls, repeats, source checks, and safety before data collection.",
     "Learning Exit Ticket converts the AI feedback into student reflection prompts judges can inspect.",
@@ -2104,6 +2109,37 @@ function OfficialRubricPanel({ fit }: { fit: OfficialRubricFit }) {
                 <li key={evidence}>{evidence}</li>
               ))}
             </ul>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function AiyesValuesFitPanel({ fit }: { fit: AiyesValuesFit }) {
+  return (
+    <section className="values-fit" id="values" aria-label="AIYES Values Fit">
+      <div className="panel-title">
+        <Trophy size={18} />
+        <h3>AIYES Values Fit</h3>
+      </div>
+      <div className={`values-summary values-summary-${fit.status}`}>
+        <div>
+          <p className="section-label">Mission values</p>
+          <strong>{fit.score}/100</strong>
+        </div>
+        <span>{fit.summary}</span>
+      </div>
+      <p className="values-takeaway">{fit.judgeTakeaway}</p>
+      <div className="values-grid">
+        {fit.values.map((value) => (
+          <article className={`value-signal value-signal-${value.status}`} key={value.id}>
+            <div>
+              <strong>{value.label}</strong>
+              <span>{formatRubricStatus(value.status)}</span>
+            </div>
+            <p>{value.evidence}</p>
+            <small>{value.studentAction}</small>
           </article>
         ))}
       </div>

@@ -35,6 +35,10 @@ describe("buildEvidencePacket", () => {
     expect(packet).toContain("## AIYES Rubric Fit");
     expect(packet).toContain("Problem Definition and Real-World Relevance");
     expect(packet).toContain("AI Technical Design and Model Strategy");
+    expect(packet).toContain("## AIYES Values Fit");
+    expect(packet).toContain("Democracy");
+    expect(packet).toContain("Ethics and inclusion");
+    expect(packet).toContain("Student action:");
     expect(packet).toContain("## Grounding Audit");
     expect(packet).toContain("Student source task:");
     expect(packet).toContain("## Expected Overlay");

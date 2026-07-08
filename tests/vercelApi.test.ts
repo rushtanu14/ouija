@@ -63,6 +63,9 @@ describe("Vercel API functions", () => {
     expect(response.body.modelStrategy.decisionSummary).toContain("Selected Projectile Motion");
     expect(response.body.officialRubricFit.score).toBeGreaterThanOrEqual(90);
     expect(response.body.officialRubricFit.criteria).toHaveLength(3);
+    expect(response.body.aiyesValuesFit.score).toBeGreaterThanOrEqual(90);
+    expect(response.body.aiyesValuesFit.values).toHaveLength(5);
+    expect(response.body.aiyesValuesFit.values.some((value: { id: string }) => value.id === "connectivity")).toBe(true);
     expect(response.body.impactSnapshot.score).toBeGreaterThanOrEqual(90);
     expect(response.body.impactSnapshot.metrics).toHaveLength(7);
     expect(response.body.learningExitTicket.status).toBe("ready");

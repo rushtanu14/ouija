@@ -160,6 +160,16 @@ export function buildEvidencePacket(
       ...criterion.evidence.slice(0, 3).map((evidence) => `  - ${evidence}`)
     ]),
     "",
+    "## AIYES Values Fit",
+    `- Score: ${result.aiyesValuesFit.score}/100 (${formatAiyesValueStatus(result.aiyesValuesFit.status)})`,
+    `- Summary: ${result.aiyesValuesFit.summary}`,
+    `- Judge takeaway: ${result.aiyesValuesFit.judgeTakeaway}`,
+    "- Values:",
+    ...result.aiyesValuesFit.values.flatMap((value) => [
+      `  - ${value.label} (${formatAiyesValueStatus(value.status)}): ${value.evidence}`,
+      `    - Student action: ${value.studentAction}`
+    ]),
+    "",
     "## Learning Impact Loop",
     `- Score: ${result.impactSnapshot.score}/100`,
     `- Headline: ${result.impactSnapshot.headline}`,
@@ -349,6 +359,12 @@ function formatAiEvaluationStatus(status: AnalyzeResult["aiEvaluationHarness"]["
 
 function formatDataHandlingStatus(status: AnalyzeResult["dataHandlingLedger"]["status"]): string {
   return status === "privacy_preserving" ? "privacy preserving" : "review";
+}
+
+function formatAiyesValueStatus(status: AnalyzeResult["aiyesValuesFit"]["status"]): string {
+  if (status === "strong") return "strong";
+  if (status === "ready") return "ready";
+  return "review";
 }
 
 function formatLearningExitTicketStatus(status: AnalyzeResult["learningExitTicket"]["status"]): string {

@@ -9,9 +9,9 @@ const assetDir = resolve(repoRoot, "docs", "assets");
 const baseUrl = process.env.OUIJA_URL ?? "https://ouija-olive.vercel.app";
 const recordingDir = mkdtempSync(join(tmpdir(), "ouija-walkthrough-"));
 const outputPath = resolve(assetDir, "ouija-walkthrough.webm");
-const captionDurationMs = Number(process.env.OUIJA_CAPTION_MS ?? 8500);
+const captionDurationMs = Number(process.env.OUIJA_CAPTION_MS ?? 6000);
 let captionIndex = 0;
-const captionTotal = 40;
+const captionTotal = 41;
 
 mkdirSync(assetDir, { recursive: true });
 
@@ -216,6 +216,13 @@ await caption(
   page,
   "AIYES Rubric Fit",
   "Ouija maps the same run to the official criteria: problem relevance, AI technical design and model strategy, and user experience."
+);
+
+await page.getByRole("heading", { name: "AIYES Values Fit" }).scrollIntoViewIfNeeded();
+await caption(
+  page,
+  "AIYES Values Fit",
+  "Ouija also maps the run to AIYES values: democracy, diversity, connectivity, innovation, and ethical inclusion."
 );
 
 for (const sample of ["Projectile Motion", "Pendulum", "Ohm's Law", "Reaction Rate", "Enzyme Activity", "Plant Light", "Density Layers", "Water Filtration"]) {
