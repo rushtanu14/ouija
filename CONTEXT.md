@@ -50,6 +50,14 @@ The mission-alignment layer for AIYES. Ouija maps each run to democracy, diversi
 
 The Track 1 submission-story layer. Ouija maps each run to problem identification, data handling, model selection/integration, application development, testing/evaluation, UX/design, ethics/impact, constraints, and hosted submission proof so judges can inspect the required development journey inside the app, not only in the slide deck or video.
 
+### Student/Judge Views
+
+The UX split that keeps Ouija practical for students while preserving judge proof. The default app opens in Student mode with Student Focus, core lab workflow, graph/table comparison, and student-owned evidence. `?judge=1` opens Judge mode with the full proof stack, including model strategy, runtime proof, evaluation/data/rubric/development journey panels, MCP Integration Coach, and Judge Brief.
+
+### Composio Browser Source Capture
+
+The newest MCP route in the server dry-run bridge. It adds `composio-browser-source-capture` for public source-page context capture through Composio Browser Tool (`BROWSER_TOOL_CREATE_TASK`, `BROWSER_TOOL_WATCH_TASK`). It is source-context support only; it must not browse private accounts, write the student's final claim, or run live without server-side credentials, allowed tools, and explicit consent.
+
 ## Product Boundaries
 
 - Ouija should not become a teacher grading dashboard.
@@ -60,6 +68,17 @@ The Track 1 submission-story layer. Ouija maps each run to problem identificatio
 - Ouija's first supported set should balance physics, chemistry, biology, and earth science instead of overfitting to physics.
 - Ouija should support table input first before adding CSV upload or photo/OCR input.
 - Ouija's internet search should ground expected results and explanations in referenced content instead of inventing them from the model alone.
+
+## Student/Judge + Composio Browser MCP Checkpoint - 2026-07-08
+
+- Added default Student mode with Student Focus: next move, evidence check, repeat check, and before-claim guidance near the top while judge-only proof panels stay hidden.
+- Added Judge mode plus `?judge=1` so evaluators can open the full proof stack without making the student default view feel bloated.
+- Added a bounded Composio Browser source-capture MCP route to the existing server dry-run bridge. `/api/mcp/status` now reports 10 routes including `composio-browser-source-capture`, `browser_tool`, `BROWSER_TOOL_CREATE_TASK`, `BROWSER_TOOL_WATCH_TASK`, and `COMPOSIO_BROWSER_ALLOWED_TOOLS`.
+- Refreshed submission assets: `docs/assets/ouija-walkthrough.webm` is 1440x900, 280.16s, 26,688,733 bytes, SHA-256 `28b118f6f2c60e2ca80152a4dfc0c7bb6a68db204fd9dac6f2f283239239bc34`; synced to `public/submission/assets/ouija-walkthrough.webm`.
+- Redeployed production: `https://ouija-olive.vercel.app`, deployment `dpl_B2nJ7CMszMUskwQHXzW4wigJU6P6`; judge view is `https://ouija-olive.vercel.app/?judge=1`.
+- Public proof: `/api/evaluate` returned `100/100` and `9/9`; `/api/mcp/status` returned server dry-run with 10 routes; hosted deck content length `18766`; hosted walkthrough content length `26688733`; hosted browser smoke confirmed Student mode hides judge proof, Judge mode shows Browser source capture, and desktop/mobile had no horizontal overflow.
+- Fresh verification passed: `npm run test` (68 passed), `npm run build`, `npm run test:e2e` (9 passed), `npm audit --json` (0 vulnerabilities), `git diff --check`, `npm run capture:submission`, `npm run record:walkthrough`, and `npm run sync:public-submission`.
+- Remaining external loops: actual Devpost submission, resolving the live page's 2-5 member team requirement, optional live Composio credentials only after server-side allowed tools/auth config/consent setup, and optional real OpenAI web-search demo only with explicit API-key approval.
 
 ## Build Checkpoint - 2026-06-25
 

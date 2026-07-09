@@ -85,6 +85,7 @@ const initialPrompt = SAMPLE_PROMPTS[0].text;
 const savedLabsKey = "ouija:saved-labs";
 const sourceCodeUrl = "https://github.com/rushtanu14/ouija";
 const liveDemoUrl = "https://ouija-olive.vercel.app";
+const judgeDemoUrl = "https://ouija-olive.vercel.app/?judge=1";
 const slideDeckUrl = "https://ouija-olive.vercel.app/submission/slide-deck.html";
 const walkthroughVideoUrl = "https://ouija-olive.vercel.app/submission/assets/ouija-walkthrough.webm";
 
@@ -94,10 +95,44 @@ interface SavedLab extends ProgressPortfolioSnapshot {
 }
 
 type LearningLevel = "middle" | "high";
+type ViewMode = "student" | "judge";
+
+const studentNavLinks = [
+  { href: "#experiment", label: "Experiment" },
+  { href: "#sources", label: "Sources" },
+  { href: "#impact", label: "Impact" },
+  { href: "#saved", label: "Saved Labs" },
+  { href: "#progress", label: "Progress" },
+  { href: "#settings", label: "Settings" }
+];
+
+const judgeNavLinks = [
+  { href: "#experiment", label: "Experiment" },
+  { href: "#demo-path", label: "Demo Path" },
+  { href: "#runtime-proof", label: "Runtime Proof" },
+  { href: "#sources", label: "Sources" },
+  { href: "#rubric", label: "Rubric Fit" },
+  { href: "#values", label: "Values Fit" },
+  { href: "#journey", label: "Journey" },
+  { href: "#impact", label: "Impact" },
+  { href: "#evaluation", label: "Eval Bench" },
+  { href: "#saved", label: "Saved Labs" },
+  { href: "#progress", label: "Progress" },
+  { href: "#mcp-export", label: "MCP Export" },
+  { href: "#model-card", label: "Model Card" },
+  { href: "#judge", label: "Judge Brief" },
+  { href: "#settings", label: "Settings" }
+];
+
+function getInitialViewMode(): ViewMode {
+  if (typeof window === "undefined") return "student";
+  return new URLSearchParams(window.location.search).get("judge") === "1" ? "judge" : "student";
+}
 
 export function App() {
   const [description, setDescription] = useState(initialPrompt);
   const [learningLevel, setLearningLevel] = useState<LearningLevel>("middle");
+  const [viewMode, setViewMode] = useState<ViewMode>(getInitialViewMode);
   const [result, setResult] = useState<AnalyzeResult | null>(null);
   const [rows, setRows] = useState<StudentDataRow[]>([]);
   const [reflectionAnswers, setReflectionAnswers] = useState<StudentReflectionAnswers>({});
@@ -233,6 +268,22 @@ export function App() {
       serverBridgeAvailable: Boolean(mcpBridgeStatus)
     });
   }, [description, evidencePacket, mcpBridgeStatus, progressPortfolio, result, rows]);
+  const isJudgeMode = viewMode === "judge";
+  const navLinks = isJudgeMode ? judgeNavLinks : studentNavLinks;
+
+  function changeViewMode(nextMode: ViewMode) {
+    setViewMode(nextMode);
+
+    if (typeof window === "undefined") return;
+
+    const url = new URL(window.location.href);
+    if (nextMode === "judge") {
+      url.searchParams.set("judge", "1");
+    } else {
+      url.searchParams.delete("judge");
+    }
+    window.history.replaceState({}, "", `${url.pathname}${url.search}${url.hash}`);
+  }
 
   async function validateMcpAction(actionId: McpIntegrationActionId) {
     if (!result || !mcpIntegrationPlan) return;
@@ -275,25 +326,35 @@ export function App() {
           <span>Ouija</span>
         </div>
         <nav aria-label="Primary">
-          <a href="#experiment">Experiment</a>
-          <a href="#demo-path">Demo Path</a>
-          <a href="#runtime-proof">Runtime Proof</a>
-          <a href="#sources">Sources</a>
-          <a href="#rubric">Rubric Fit</a>
-          <a href="#values">Values Fit</a>
-          <a href="#journey">Journey</a>
-          <a href="#impact">Impact</a>
-          <a href="#evaluation">Eval Bench</a>
-          <a href="#saved">Saved Labs</a>
-          <a href="#progress">Progress</a>
-          <a href="#mcp-export">MCP Export</a>
-          <a href="#model-card">Model Card</a>
-          <a href="#judge">Judge Brief</a>
-          <a href="#settings">Settings</a>
+          {navLinks.map((link) => (
+            <a href={link.href} key={link.href}>
+              {link.label}
+            </a>
+          ))}
         </nav>
-        <div className="integrity-chip">
-          <ShieldCheck size={16} />
-          <span>Hints, checks, and explanations — not full lab reports.</span>
+        <div className="topbar-actions">
+          <div className="view-mode-control" aria-label="View mode">
+            <button
+              type="button"
+              className={viewMode === "student" ? "active" : ""}
+              aria-pressed={viewMode === "student"}
+              onClick={() => changeViewMode("student")}
+            >
+              Student
+            </button>
+            <button
+              type="button"
+              className={viewMode === "judge" ? "active" : ""}
+              aria-pressed={viewMode === "judge"}
+              onClick={() => changeViewMode("judge")}
+            >
+              Judge
+            </button>
+          </div>
+          <div className="integrity-chip">
+            <ShieldCheck size={16} />
+            <span>Hints, checks, and explanations — not full lab reports.</span>
+          </div>
         </div>
       </header>
 
@@ -385,8 +446,8 @@ export function App() {
               </div>
 
               <RunSnapshotPanel result={result} evaluationReport={evaluationReport} />
-              <JudgeDemoPathPanel path={result.judgeDemoPath} />
-              <RuntimeProofPanel proof={runtimeProof} result={result} />
+              {isJudgeMode ? <JudgeDemoPathPanel path={result.judgeDemoPath} /> : <StudentFocusPanel result={result} />}
+              {isJudgeMode ? <RuntimeProofPanel proof={runtimeProof} result={result} /> : null}
               {result.customLabTriage.status === "needs_student_details" ? <CustomLabTriagePanel triage={result.customLabTriage} /> : null}
               <GuidedLabFlowPanel flow={result.guidedFlow} />
               <StudentLevelLensPanel result={result} level={learningLevel} />
@@ -436,13 +497,17 @@ export function App() {
               ) : null}
               <LabBriefPanel brief={result.labBrief} />
               <EvidencePacketPanel packet={evidencePacket} />
-              <ModelStrategyPanel strategy={result.modelStrategy} />
-              <TechnicalDepthProofPanel result={result} />
-              <AiEvaluationHarnessPanel harness={result.aiEvaluationHarness} />
-              <DataHandlingLedgerPanel ledger={result.dataHandlingLedger} />
-              <OfficialRubricPanel fit={result.officialRubricFit} />
-              <AiyesValuesFitPanel fit={result.aiyesValuesFit} />
-              <DevelopmentJourneyPanel journey={result.developmentJourney} />
+              {isJudgeMode ? (
+                <>
+                  <ModelStrategyPanel strategy={result.modelStrategy} />
+                  <TechnicalDepthProofPanel result={result} />
+                  <AiEvaluationHarnessPanel harness={result.aiEvaluationHarness} />
+                  <DataHandlingLedgerPanel ledger={result.dataHandlingLedger} />
+                  <OfficialRubricPanel fit={result.officialRubricFit} />
+                  <AiyesValuesFitPanel fit={result.aiyesValuesFit} />
+                  <DevelopmentJourneyPanel journey={result.developmentJourney} />
+                </>
+              ) : null}
             </>
           ) : (
             <div className="empty-state">
@@ -471,7 +536,7 @@ export function App() {
                   </div>
                 ) : null}
               </section>
-              <ReasoningTrailPanel result={result} />
+              {isJudgeMode ? <ReasoningTrailPanel result={result} /> : null}
               <GroundingAuditPanel audit={result.groundingAudit} />
               <section className="sources-list">
                 <p className="section-label">Trusted citations</p>
@@ -495,23 +560,28 @@ export function App() {
       <section className="lower-workspace" aria-label="Saved labs and settings">
         <SavedLabsPanel savedLabs={savedLabs} onLoad={loadSavedLab} onDelete={deleteSavedLab} />
         <ProgressPortfolioPanel portfolio={progressPortfolio} />
-        <McpIntegrationCoachPanel
-          plan={mcpIntegrationPlan}
-          bridgeStatus={mcpBridgeStatus}
-          exportResult={mcpExportResult}
-          sessionResult={mcpSessionResult}
-          exportStatus={mcpExportStatus}
-          exportError={mcpExportError}
-          onValidateAction={validateMcpAction}
-        />
-        <EvaluationBenchPanel report={evaluationReport} />
-        <ModelCardPanel result={result} />
-        <JudgeBriefPanel result={result} />
+        {isJudgeMode ? (
+          <>
+            <McpIntegrationCoachPanel
+              plan={mcpIntegrationPlan}
+              bridgeStatus={mcpBridgeStatus}
+              exportResult={mcpExportResult}
+              sessionResult={mcpSessionResult}
+              exportStatus={mcpExportStatus}
+              exportError={mcpExportError}
+              onValidateAction={validateMcpAction}
+            />
+            <EvaluationBenchPanel report={evaluationReport} />
+            <ModelCardPanel result={result} />
+            <JudgeBriefPanel result={result} />
+          </>
+        ) : null}
         <SettingsPanel
           result={result}
           savedLabCount={savedLabs.length}
           reflectionWorkspace={studentReflectionWorkspace}
           mcpStatus={mcpIntegrationPlan?.status ?? "preview_only"}
+          viewMode={viewMode}
         />
       </section>
     </main>
@@ -570,6 +640,57 @@ function RunSnapshotPanel({ result, evaluationReport }: { result: AnalyzeResult;
           <p className="section-label">Current action</p>
           <strong>{result.guidedFlow.currentAction}</strong>
         </article>
+      </div>
+    </section>
+  );
+}
+
+function StudentFocusPanel({ result }: { result: AnalyzeResult }) {
+  const blockingIssueCount = result.issues.filter((issue) => issue.severity !== "info").length;
+  const focusItems = [
+    {
+      label: "Next move",
+      value: result.guidedFlow.currentAction,
+      detail: result.nextTrialPlan.priority
+    },
+    {
+      label: "Evidence check",
+      value: result.patternEvidence.summary,
+      detail: `${result.patternEvidence.score}/100 pattern evidence`
+    },
+    {
+      label: "Repeat check",
+      value: result.reliabilityCoach.recommendation,
+      detail: `${result.reliabilityCoach.score}/100 reliability`
+    },
+    {
+      label: "Before claim",
+      value: blockingIssueCount === 0 ? result.labBrief.nextQuestion : "Resolve the visible data or method flags first.",
+      detail: blockingIssueCount === 0 ? "Ready to reason" : `${blockingIssueCount} flag${blockingIssueCount === 1 ? "" : "s"} to review`
+    }
+  ];
+
+  return (
+    <section className="student-focus" aria-label="Student Focus">
+      <div className="panel-title">
+        <BookOpen size={18} />
+        <h3>Student Focus</h3>
+      </div>
+      <div className="student-focus-summary">
+        <div>
+          <p className="section-label">Focused lab workflow</p>
+          <strong>{result.impactSnapshot.studentOutcome}</strong>
+        </div>
+        <span>{result.learningExitTicket.summary}</span>
+      </div>
+      <div className="student-focus-grid">
+        {focusItems.map((item) => (
+          <article key={item.label}>
+            <p className="section-label">{item.label}</p>
+            <strong>{item.value}</strong>
+            <small>{item.detail}</small>
+          </article>
+        ))}
       </div>
     </section>
   );
@@ -969,6 +1090,7 @@ function JudgeBriefPanel({ result }: { result: AnalyzeResult | null }) {
   const submissionLinks = [
     { label: "Source code", href: sourceCodeUrl },
     { label: "Live demo", href: liveDemoUrl },
+    { label: "Judge view", href: judgeDemoUrl },
     { label: "Slide deck", href: slideDeckUrl },
     { label: "Video walkthrough", href: walkthroughVideoUrl }
   ];
@@ -1020,7 +1142,7 @@ function JudgeBriefPanel({ result }: { result: AnalyzeResult | null }) {
     "Data Handling Ledger shows privacy, retention, and student controls.",
     "Spreadsheet paste/import flows into data checks.",
     "Evidence Packet exports a student-owned reasoning handoff.",
-    "MCP Integration Coach validates Composio Search source audits, Scholar claim checks, plus Docs, Sheets, Drive, Classroom, Forms, Calendar, and Notion handoffs through a server dry-run and scoped session ticket without exposing credentials.",
+    "MCP Integration Coach validates Composio Search source audits, Scholar claim checks, Browser source capture, plus Docs, Sheets, Drive, Classroom, Forms, Calendar, and Notion handoffs through a server dry-run and scoped session ticket without exposing credentials.",
     "MCP Readiness Matrix shows exact connector env vars, tools, scopes, data shared, dry-run checks, and consent gates.",
     "Next Trial Planner gives adaptive measurement guidance.",
     "Progress Portfolio shows learning over multiple saved runs.",
@@ -1128,7 +1250,7 @@ function ModelCardPanel({ result }: { result: AnalyzeResult | null }) {
     "Data Handling Ledger makes student data flow, retention, and controls inspectable.",
     "Progress Portfolio turns saved labs into repeated learning evidence for judges.",
     "Portfolio Story Builder gives prompts and blanks for a student-authored progress story.",
-    "MCP Integration Coach keeps Composio credentials server-side, validates packets with /api/mcp/export, prepares session tickets with /api/mcp/session, and requires student consent before any source audit, Scholar claim check, or export.",
+    "MCP Integration Coach keeps Composio credentials server-side, validates packets with /api/mcp/export, prepares session tickets with /api/mcp/session, and requires student consent before any source audit, Scholar claim check, Browser source capture, or export.",
     "MCP Readiness Matrix makes connector tools, scopes, dry-run checks, and least-privilege boundaries inspectable.",
     "Pattern Evidence Engine quantifies whether the dataset supports the expected science pattern.",
     "Reliability Coach checks repeated trials, averages, and spread before students trust a claim.",
@@ -1536,14 +1658,20 @@ function SettingsPanel({
   result,
   savedLabCount,
   reflectionWorkspace,
-  mcpStatus
+  mcpStatus,
+  viewMode
 }: {
   result: AnalyzeResult | null;
   savedLabCount: number;
   reflectionWorkspace: StudentReflectionWorkspace | null;
   mcpStatus: McpIntegrationPlan["status"];
+  viewMode: ViewMode;
 }) {
   const settings = [
+    {
+      label: "View",
+      value: viewMode === "judge" ? "Judge" : "Student"
+    },
     {
       label: "Grounding",
       value: result?.groundingStatus.mode === "web_enriched" ? "Web enriched" : "Built-in references"

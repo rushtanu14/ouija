@@ -489,6 +489,7 @@ export type McpIntegrationStatus = "preview_only" | "server_dry_run" | "ready";
 export type McpIntegrationActionId =
   | "composio-search-source-audit"
   | "composio-scholar-claim-check"
+  | "composio-browser-source-capture"
   | "google-docs-evidence-packet"
   | "google-sheets-data-log"
   | "google-drive-portfolio-archive"
@@ -499,7 +500,16 @@ export type McpIntegrationActionId =
 
 export interface McpIntegrationAction {
   id: McpIntegrationActionId;
-  toolkit: "Composio Search" | "Google Docs" | "Google Sheets" | "Google Drive" | "Google Classroom" | "Google Forms" | "Google Calendar" | "Notion";
+  toolkit:
+    | "Composio Search"
+    | "Composio Browser"
+    | "Google Docs"
+    | "Google Sheets"
+    | "Google Drive"
+    | "Google Classroom"
+    | "Google Forms"
+    | "Google Calendar"
+    | "Notion";
   label: string;
   studentValue: string;
   composioCapability: string;

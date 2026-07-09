@@ -6,6 +6,7 @@
 - Problem is common in middle and high school labs: students struggle to connect experiment setup, data quality, expected scientific patterns, and evidence-backed reasoning.
 - Impact is practical: faster debugging of lab data, better understanding, fewer report-writing shortcuts.
 - Run Snapshot gives a first-scroll readout of rubric fit, evaluation status, learning impact, data flags, expected pattern, and current action.
+- Student/Judge views keep the default app practical for students while `?judge=1` exposes the full judge proof stack.
 - Practical science behavior is visible: students see whether the whole graph supports the expected pattern and whether repeated trials have enough count, average, and spread to support a claim.
 - AIYES Rubric Fit gives judges concrete problem/relevance evidence for each analyzed run.
 - AIYES Values Fit gives judges concrete mission evidence for student agency, access, connected evidence, practical innovation, and ethical inclusion.
@@ -18,7 +19,7 @@
 - Student Reflection Workspace proves those exit-ticket answers are student-authored drafts, not generated conclusions.
 - Progress Portfolio shows whether saved runs demonstrate learning trend, subject breadth, and a next portfolio action.
 - Portfolio Story Builder turns saved-run evidence into prompts for a student-written progress story.
-- MCP Integration Coach shows how the same student-owned evidence could move into a Composio Search source audit, Composio Scholar claim check, and classroom tools, including a Google Classroom pre-lab checkpoint, Google Forms readiness check, and Google Calendar next-trial reminder, without sending data before consent.
+- MCP Integration Coach shows how the same student-owned evidence could move into a Composio Search source audit, Composio Scholar claim check, Composio Browser source capture, and classroom tools, including a Google Classroom pre-lab checkpoint, Google Forms readiness check, and Google Calendar next-trial reminder, without sending data before consent.
 - Judge Demo Path gives evaluators a direct route through problem fit, AI design, student workflow, evidence handoff, and submission proof.
 - Custom Lab Triage keeps unsupported student experiments useful without claiming full V1 coverage, because it gives students a concrete investigation planner instead of a fake expected result.
 
@@ -31,7 +32,7 @@
 - Technical Depth Proof gives judges a compact beyond-simple-API scorecard for decision trace, evaluation harness, grounding quality, expected-pattern engine, privacy, and integrity.
 - AI Evaluation Harness scores classifier confidence, coverage, source grounding, pattern validation, repeat reliability, row validators, safety/integrity, and fallback boundaries.
 - Data Handling Ledger exposes what student data is used, where it is stored, retention, local snapshots, student controls, and the server-only API-key boundary.
-- MCP Integration Coach validates Composio-powered Search, Scholar claim checks, Google Docs, Google Sheets, Google Drive, Google Classroom, Google Forms, Google Calendar, and Notion routes through `/api/mcp/export`, then prepares a scoped `/api/mcp/session` ticket while keeping `COMPOSIO_API_KEY`, auth config IDs where required, and raw MCP URLs server-side.
+- MCP Integration Coach validates Composio-powered Search, Scholar claim checks, Browser source capture, Google Docs, Google Sheets, Google Drive, Google Classroom, Google Forms, Google Calendar, and Notion routes through `/api/mcp/export`, then prepares a scoped `/api/mcp/session` ticket while keeping `COMPOSIO_API_KEY`, auth config IDs where required, and raw MCP URLs server-side.
 - Grounding Audit scores citation visibility, source agreement, mixed-evidence boundaries, and student source use.
 - Result schema separates classification, expected result, citations, row checks, hints, and Claim Coach.
 - Method Audit adds deterministic experiment-quality evaluation beyond plain text generation.
@@ -86,7 +87,7 @@
 - Progress Portfolio visibly turns Saved Labs into repeated learning evidence instead of only storage.
 - Portfolio Story Builder visibly keeps the progress narrative student-owned through prompts, evidence references, and blanks.
 - Expected graph and editable table now appear before Model Strategy, AI Evaluation Harness, Data Handling Ledger, and AIYES Rubric Fit, so the practical student workflow is visible before the deeper judge evidence stack.
-- MCP Integration Coach visibly turns the Evidence Packet, Pre-Lab Design Coach, Next Trial Planner, and Progress Portfolio into a consent-gated source-audit, Scholar claim-check, and classroom handoff plan with a readiness matrix for env vars, allowed tools, scopes, dry-run checks, and data shared.
+- MCP Integration Coach visibly turns the Evidence Packet, Pre-Lab Design Coach, Next Trial Planner, and Progress Portfolio into a consent-gated source-audit, Scholar claim-check, Browser source-capture, and classroom handoff plan with a readiness matrix for env vars, allowed tools, scopes, dry-run checks, and data shared.
 - AI Model Card visibly summarizes architecture, grounding mode, evaluation method, privacy boundary, and risk controls.
 - Data Handling Ledger visibly summarizes privacy, retention, browser-local saves, and student controls.
 - Evaluation Bench exposes nine live checks through the app and `/api/evaluate`.
@@ -102,6 +103,7 @@
 - Grounding Audit gives students a source-trust score and a concrete source task before they write.
 - Expected-pattern overlay makes the graph comparison visual, not just textual.
 - Run Snapshot reduces first-scroll cognitive load by putting run status, expected pattern, and next action above the deeper evidence panels.
+- Student Focus reduces overload in the default view by keeping next move, evidence check, repeat check, and before-claim guidance near the top while hiding judge-only proof panels.
 - Guided Lab Flow reduces cognitive load by showing identify, prepare, understand, check, plan, and claim stages.
 - Judge Demo Path reduces evaluator cognitive load by showing the intended five-step live walkthrough near the top of the analysis panel.
 - AI Runtime Proof sits near the top of the analysis panel so evaluators can verify the runtime, tests, secret boundary, and MCP mode before the deeper Model Card.
@@ -119,12 +121,13 @@
 - Student Reflection Workspace appears in the app and Evidence Packet so judges can inspect student-authored answers without Ouija writing the conclusion.
 - Progress Portfolio appears near Saved Labs so judges can inspect score trend, subject breadth, and strongest saved run.
 - Portfolio Story Builder appears inside Progress Portfolio so judges can inspect student-authored impact prompts before any classroom export.
-- MCP Integration Coach appears near Progress Portfolio so judges can inspect the exact source-audit/export payload, Composio Search route, Scholar claim-check route, Google Classroom pre-lab checkpoint route, Google Forms readiness route, Google Calendar next-trial reminder route, credential boundary, Composio route, and server dry-run readiness matrix before any live connector is enabled.
+- MCP Integration Coach appears near Progress Portfolio so judges can inspect the exact source-audit/export payload, Composio Search route, Scholar claim-check route, Browser source-capture route, Google Classroom pre-lab checkpoint route, Google Forms readiness route, Google Calendar next-trial reminder route, credential boundary, Composio route, and server dry-run readiness matrix before any live connector is enabled.
 - Desktop and mobile E2E checks verify no horizontal overflow.
 
 ## Remaining Submission Work
 
 - Submit the hosted live demo, slide deck, and video walkthrough on Devpost.
+- Use `https://ouija-olive.vercel.app/?judge=1` for judge walkthroughs and `https://ouija-olive.vercel.app` for the student default view.
 - Handle the live Devpost page's listed 2-5 member team requirement; the overview text also says participants may work individually, so verify the submission form behavior before final submit.
 - Optionally configure a real OpenAI API key for one web-search-enriched demo and live Composio credentials for classroom exports.
 - Use `/api/runtime-proof`, `/api/evaluate`, `/api/mcp/status`, and a consent-gated `/api/mcp/session` dry-run as quick public smoke checks after each deploy.

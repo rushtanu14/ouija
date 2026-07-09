@@ -24,8 +24,12 @@ describe("AIYES submission assets", () => {
 
     expect(deck).toContain("/api/runtime-proof");
     expect(deck).toContain("/api/mcp/session");
+    expect(deck).toContain("Student/Judge views");
+    expect(deck).toContain("?judge=1");
+    expect(deck).toContain("Student Focus");
     expect(deck).toContain("Composio Search source-audit");
     expect(deck).toContain("Scholar claim-check");
+    expect(deck).toContain("Composio Browser source-capture");
     expect(deck).toContain("AIYES Values Fit");
     expect(deck).toContain("AIYES Development Journey");
     expect(deck).toContain("Technical Depth Proof");
@@ -44,12 +48,16 @@ describe("AIYES submission assets", () => {
     expect(copy).toContain("Progress Portfolio");
     expect(copy).toContain("Portfolio Story Builder");
     expect(copy).toContain("Student Reflection Workspace");
+    expect(copy).toContain("Student/Judge views");
+    expect(copy).toContain("?judge=1");
+    expect(copy).toContain("Student Focus");
     expect(copy).toContain("Concept Mastery Check");
     expect(copy).toContain("Pre-Lab Design Coach");
     expect(copy).toContain("MCP Integration Coach");
     expect(copy).toContain("/api/mcp/session");
     expect(copy).toContain("Composio Search source audit");
     expect(copy).toContain("Composio Scholar claim check");
+    expect(copy).toContain("Composio Browser source capture");
     expect(copy).toContain("AIYES Values Fit");
     expect(copy).toContain("AIYES Development Journey");
     expect(copy).toContain("Technical Depth Proof");

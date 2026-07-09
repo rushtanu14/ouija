@@ -38,7 +38,7 @@ a {
 
 .topbar {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-columns: auto minmax(0, 1fr) auto;
   gap: 18px;
   align-items: center;
   min-height: 72px;
@@ -86,6 +86,43 @@ a {
   color: #142033;
 }
 
+.topbar-actions {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  min-width: 0;
+}
+
+.view-mode-control {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  min-width: 154px;
+  border: 1px solid #cdd9e8;
+  border-radius: 8px;
+  padding: 4px;
+  background: #f7fbff;
+}
+
+.view-mode-control button {
+  min-width: 0;
+  min-height: 34px;
+  border: 0;
+  border-radius: 6px;
+  color: #526276;
+  background: transparent;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.view-mode-control button.active {
+  color: #173b74;
+  background: #ffffff;
+  box-shadow: 0 8px 20px rgba(22, 34, 51, 0.08);
+}
+
 .integrity-chip {
   display: inline-flex;
   align-items: center;
@@ -118,6 +155,7 @@ a {
 .source-rail,
 .analysis-panel > .classification,
 .run-snapshot,
+.student-focus,
 .judge-demo-path,
 .runtime-proof,
 .custom-lab-triage,
@@ -406,6 +444,7 @@ a:focus-visible {
 
 .graph-card,
 .run-snapshot,
+.student-focus,
 .judge-demo-path,
 .runtime-proof,
 .custom-lab-triage,
@@ -442,6 +481,68 @@ a:focus-visible {
   gap: 12px;
   padding: 16px;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(244, 249, 255, 0.9));
+}
+
+.student-focus {
+  display: grid;
+  gap: 12px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(240, 249, 246, 0.9)),
+    #ffffff;
+}
+
+.student-focus-summary {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: flex-start;
+  padding: 13px;
+  border: 1px solid #cbe9dc;
+  border-radius: 8px;
+  background: #effaf5;
+}
+
+.student-focus-summary strong {
+  display: block;
+  margin-top: 3px;
+  color: #1f5b40;
+  font-size: 18px;
+}
+
+.student-focus-summary span {
+  max-width: 55%;
+  color: #3e664f;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.student-focus-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.student-focus-grid article {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  padding: 13px;
+  border: 1px solid #dce8f4;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.student-focus-grid strong {
+  color: #203047;
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+.student-focus-grid small {
+  color: #607087;
+  font-weight: 700;
+  line-height: 1.35;
 }
 
 .run-snapshot-header {
@@ -4733,6 +4834,11 @@ td input {
     overflow-x: auto;
   }
 
+  .topbar-actions {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+
   .workspace {
     grid-template-columns: 1fr;
     width: min(760px, calc(100vw - 28px));
@@ -4761,6 +4867,18 @@ td input {
 
   .judge-demo-steps {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .student-focus-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .student-focus-summary {
+    display: grid;
+  }
+
+  .student-focus-summary span {
+    max-width: none;
   }
 
   .run-snapshot-grid {

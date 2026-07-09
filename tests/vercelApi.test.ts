@@ -140,11 +140,16 @@ describe("Vercel API functions", () => {
 
     expect(response.statusCode).toBe(200);
     expect(response.body.status).toBe("server_dry_run");
-    expect(response.body.toolkits).toHaveLength(9);
+    expect(response.body.toolkits).toHaveLength(10);
     expect(response.body.toolkits.find((toolkit: { actionId: string }) => toolkit.actionId === "composio-search-source-audit")?.toolkitSlug).toBe("composio_search");
     expect(response.body.toolkits.find((toolkit: { actionId: string }) => toolkit.actionId === "composio-scholar-claim-check")?.toolkitSlug).toBe("composio_search");
     expect(response.body.toolkits.find((toolkit: { actionId: string }) => toolkit.actionId === "composio-scholar-claim-check")?.recommendedTools).toEqual([
       "COMPOSIO_SEARCH_SCHOLAR"
+    ]);
+    expect(response.body.toolkits.find((toolkit: { actionId: string }) => toolkit.actionId === "composio-browser-source-capture")?.toolkitSlug).toBe("browser_tool");
+    expect(response.body.toolkits.find((toolkit: { actionId: string }) => toolkit.actionId === "composio-browser-source-capture")?.recommendedTools).toEqual([
+      "BROWSER_TOOL_CREATE_TASK",
+      "BROWSER_TOOL_WATCH_TASK"
     ]);
     expect(response.body.toolkits.find((toolkit: { toolkit: string }) => toolkit.toolkit === "Google Calendar")?.toolkitSlug).toBe("googlecalendar");
   });
@@ -243,6 +248,38 @@ describe("Vercel API functions", () => {
     expect(response.body.toolkit).toBe("Composio Search");
     expect(response.body.target.recommendedTools).toEqual(["COMPOSIO_SEARCH_SCHOLAR"]);
     expect(response.body.target.authConfigEnv).toBe("COMPOSIO_SEARCH_AUTH_CONFIG_ID");
+  });
+
+  it("validates a Browser source-capture route through the serverless export function", () => {
+    clearComposioEnv();
+    const result = analyzeExperiment({
+      description: "Projectile launch angle and measured range."
+    });
+    const response = createMockResponse();
+
+    mcpExportHandler(
+      {
+        method: "POST",
+        body: {
+          actionId: "composio-browser-source-capture",
+          consent: true,
+          payload: {
+            title: `Ouija Evidence Packet: ${result.classification.title}`,
+            description: "Projectile launch angle and measured range.",
+            evidencePacket: buildEvidencePacket(result, result.rows, "Projectile launch angle and measured range."),
+            rows: result.rows,
+            sources: result.sources
+          }
+        }
+      },
+      response.res
+    );
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body.status).toBe("dry_run");
+    expect(response.body.toolkit).toBe("Composio Browser");
+    expect(response.body.target.recommendedTools).toEqual(["BROWSER_TOOL_CREATE_TASK", "BROWSER_TOOL_WATCH_TASK"]);
+    expect(response.body.target.authConfigEnv).toBe("COMPOSIO_BROWSER_AUTH_CONFIG_ID");
   });
 });
 

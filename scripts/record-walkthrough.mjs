@@ -11,7 +11,7 @@ const recordingDir = mkdtempSync(join(tmpdir(), "ouija-walkthrough-"));
 const outputPath = resolve(assetDir, "ouija-walkthrough.webm");
 const captionDurationMs = Number(process.env.OUIJA_CAPTION_MS ?? 6000);
 let captionIndex = 0;
-const captionTotal = 42;
+const captionTotal = 43;
 
 mkdirSync(assetDir, { recursive: true });
 
@@ -26,7 +26,7 @@ const context = await browser.newContext({
 const page = await context.newPage();
 page.setDefaultTimeout(10000);
 
-await page.goto(baseUrl, { waitUntil: "networkidle" });
+await page.goto(withJudgeMode(baseUrl), { waitUntil: "networkidle" });
 await installCaptionOverlay(page);
 
 await caption(
@@ -38,6 +38,13 @@ await caption(
 await page.getByRole("button", { name: "Reaction Rate" }).click();
 await page.getByRole("heading", { name: "Reaction Rate vs Temperature" }).waitFor();
 await caption(page, "Input and classification", "A normal student description becomes a classified science experiment with concepts, variables, and confidence.");
+
+await page.getByLabel("View mode").getByRole("button", { name: "Judge" }).waitFor();
+await caption(
+  page,
+  "Student and Judge views",
+  "The default app stays focused for students; the judge link opens the full proof stack for rubric, runtime, MCP, and submission evidence."
+);
 
 await page.getByRole("heading", { name: "Run Snapshot" }).scrollIntoViewIfNeeded();
 await caption(
@@ -268,7 +275,7 @@ await page.locator("#mcp-export").scrollIntoViewIfNeeded();
 await caption(
   page,
   "MCP Integration Coach",
-  "Ouija validates Composio Search source-audit and Scholar claim-check routes plus handoffs to Docs, Sheets, Drive, Classroom, Forms, Calendar, and Notion, then shows env vars, tools, scopes, data shared, dry-run checks, and consent gates."
+  "Ouija validates Composio Search source-audit, Scholar claim-check, and Browser source-capture routes plus handoffs to Docs, Sheets, Drive, Classroom, Forms, Calendar, and Notion, then shows env vars, tools, scopes, data shared, dry-run checks, and consent gates."
 );
 await page.locator(".mcp-action-card").filter({ hasText: "Run Scholar claim check" }).getByRole("button", { name: "Validate route" }).click();
 await page.getByLabel("MCP export dry-run result").getByText("Dry-run passed", { exact: true }).waitFor();
@@ -394,4 +401,14 @@ async function caption(targetPage, title, body) {
     { title, body, captionIndex, captionTotal }
   );
   await targetPage.waitForTimeout(captionDurationMs);
+}
+
+function withJudgeMode(url) {
+  try {
+    const parsed = new URL(url);
+    parsed.searchParams.set("judge", "1");
+    return parsed.toString();
+  } catch {
+    return url.includes("?") ? `${url}&judge=1` : `${url}?judge=1`;
+  }
 }

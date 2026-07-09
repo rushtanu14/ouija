@@ -2,10 +2,11 @@ import { expect, test } from "@playwright/test";
 
 test("student can analyze a sample experiment, edit table data, and see citations", async ({ page }) => {
   await page.addInitScript(() => window.localStorage.clear());
-  await page.goto("/");
+  await page.goto("/?judge=1");
 
   await page.getByRole("button", { name: "Reaction Rate" }).click();
   await expect(page.getByRole("heading", { name: "Reaction Rate vs Temperature" })).toBeVisible();
+  await expect(page.getByLabel("View mode").getByRole("button", { name: "Judge" })).toHaveAttribute("aria-pressed", "true");
   await expect(page.getByRole("heading", { name: "Run Snapshot" })).toBeVisible();
   await expect(page.getByLabel("Run Snapshot").getByText("Rubric fit", { exact: true })).toBeVisible();
   await expect(page.getByLabel("Run Snapshot").getByText("Evaluation", { exact: true })).toBeVisible();
@@ -237,7 +238,7 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(
     page
       .getByLabel("AI Model Card")
-      .getByText("MCP Integration Coach keeps Composio credentials server-side, validates packets with /api/mcp/export, prepares session tickets with /api/mcp/session, and requires student consent before any source audit, Scholar claim check, or export.")
+      .getByText("MCP Integration Coach keeps Composio credentials server-side, validates packets with /api/mcp/export, prepares session tickets with /api/mcp/session, and requires student consent before any source audit, Scholar claim check, Browser source capture, or export.")
   ).toBeVisible();
   await expect(page.getByLabel("AI Model Card").getByText("MCP Readiness Matrix makes connector tools, scopes, dry-run checks, and least-privilege boundaries inspectable.")).toBeVisible();
   await expect(page.getByLabel("AI Model Card").getByText("Safety Coach forces adult-review language when a lab match is uncertain.")).toBeVisible();
@@ -264,6 +265,14 @@ test("student can analyze a sample experiment, edit table data, and see citation
       .filter({ hasText: "Run Scholar claim check" })
       .getByText("query Google Scholar-style results through Composio Search Scholar and compare snippets against the expected pattern")
   ).toBeVisible();
+  await expect(page.locator(".mcp-action-card").filter({ hasText: "Capture source page context" }).getByText("Composio Browser", { exact: true })).toBeVisible();
+  await expect(page.getByLabel("MCP Integration Coach").getByText("Capture source page context")).toBeVisible();
+  await expect(
+    page
+      .locator(".mcp-action-card")
+      .filter({ hasText: "Capture source page context" })
+      .getByText("create and watch a browser task that extracts student-reviewed source-page context through Composio Browser Tool")
+  ).toBeVisible();
   await expect(page.locator(".mcp-action-card").filter({ hasText: "Google Docs" }).getByText("Google Docs", { exact: true })).toBeVisible();
   await expect(page.getByLabel("MCP Integration Coach").getByText("Create evidence packet doc")).toBeVisible();
   await expect(page.locator(".mcp-action-card").filter({ hasText: "Google Sheets" }).getByText("Google Sheets", { exact: true })).toBeVisible();
@@ -280,8 +289,9 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(page.locator(".mcp-action-card").filter({ hasText: "Google Calendar" }).getByText("Google Calendar", { exact: true })).toBeVisible();
   await expect(page.getByLabel("MCP Integration Coach").getByText("Schedule next trial reminder")).toBeVisible();
   await expect(page.locator(".mcp-action-card").filter({ hasText: "Notion" }).getByText("Notion", { exact: true })).toBeVisible();
-  await expect(page.getByLabel("MCP Readiness Matrix").getByText("9 connector routes checked")).toBeVisible();
+  await expect(page.getByLabel("MCP Readiness Matrix").getByText("10 connector routes checked")).toBeVisible();
   await expect(page.getByLabel("MCP Readiness Matrix").getByText("COMPOSIO_SEARCH_ALLOWED_TOOLS")).toHaveCount(2);
+  await expect(page.getByLabel("MCP Readiness Matrix").getByText("COMPOSIO_BROWSER_ALLOWED_TOOLS")).toBeVisible();
   await expect(page.getByLabel("MCP Readiness Matrix").getByText("COMPOSIO_GOOGLE_FORMS_AUTH_CONFIG_ID")).toBeVisible();
   await expect(page.getByLabel("MCP dry-run checks").getByText("Payload completeness")).toBeVisible();
   await expect(page.getByLabel("MCP dry-run checks").getByText("Least privilege")).toBeVisible();
@@ -292,6 +302,7 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(page.getByLabel("MCP payload preview")).toHaveValue(/# Ouija Evidence Packet: Reaction Rate vs Temperature/);
   await expect(page.getByLabel("MCP payload preview")).toHaveValue(/Composio Search: search public web/);
   await expect(page.getByLabel("MCP payload preview")).toHaveValue(/Composio Search: query Google Scholar-style results/);
+  await expect(page.getByLabel("MCP payload preview")).toHaveValue(/Composio Browser: create and watch a browser task/);
   await expect(page.getByLabel("MCP payload preview")).toHaveValue(/Google Sheets: append spreadsheet rows/);
   await expect(page.getByLabel("MCP payload preview")).toHaveValue(/Google Classroom: create coursework draft/);
   await expect(page.getByLabel("MCP payload preview")).toHaveValue(/Google Forms: create Google Forms draft/);
@@ -362,7 +373,7 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(
     page
       .getByLabel("Judge Brief")
-      .getByText("MCP Integration Coach validates Composio Search source audits, Scholar claim checks, plus Docs, Sheets, Drive, Classroom, Forms, Calendar, and Notion handoffs through a server dry-run and scoped session ticket without exposing credentials.")
+      .getByText("MCP Integration Coach validates Composio Search source audits, Scholar claim checks, Browser source capture, plus Docs, Sheets, Drive, Classroom, Forms, Calendar, and Notion handoffs through a server dry-run and scoped session ticket without exposing credentials.")
   ).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("MCP Readiness Matrix shows exact connector env vars, tools, scopes, data shared, dry-run checks, and consent gates.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Next Trial Planner gives adaptive measurement guidance.")).toBeVisible();
@@ -385,8 +396,36 @@ test("student can analyze a sample experiment, edit table data, and see citation
   expect(overflow).toBe(false);
 });
 
-test("unsupported experiment descriptions show a low-confidence boundary", async ({ page }) => {
+test("student mode keeps the core lab workflow focused before judge proof", async ({ page }) => {
+  await page.addInitScript(() => window.localStorage.clear());
   await page.goto("/");
+
+  await page.getByRole("button", { name: "Reaction Rate" }).click();
+  await expect(page.getByRole("heading", { name: "Reaction Rate vs Temperature" })).toBeVisible();
+  await expect(page.getByLabel("View mode").getByRole("button", { name: "Student" })).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByRole("heading", { name: "Student Focus" })).toBeVisible();
+  await expect(page.getByLabel("Student Focus").getByText("Next move")).toBeVisible();
+  await expect(page.getByLabel("Student Focus").getByText("Evidence check")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Student data table" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Evidence Packet" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Model Strategy" })).toHaveCount(0);
+  await expect(page.getByRole("heading", { name: "Judge Brief" })).toHaveCount(0);
+  await expect(page.getByRole("link", { name: "MCP Export" })).toHaveCount(0);
+
+  await page.getByLabel("View mode").getByRole("button", { name: "Judge" }).click();
+  await expect(page).toHaveURL(/judge=1/);
+  await expect(page.getByRole("heading", { name: "Judge Demo Path" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Model Strategy" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "AIYES Development Journey" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "MCP Export" })).toBeVisible();
+
+  await page.getByLabel("View mode").getByRole("button", { name: "Student" }).click();
+  await expect(page.getByLabel("View mode").getByRole("button", { name: "Student" })).toHaveAttribute("aria-pressed", "true");
+  expect(new URL(page.url()).searchParams.has("judge")).toBe(false);
+});
+
+test("unsupported experiment descriptions show a low-confidence boundary", async ({ page }) => {
+  await page.goto("/?judge=1");
   await page.getByLabel("Describe your experiment").fill("We compared paper towel brands by measuring how much water each towel absorbed.");
   await page.getByRole("button", { name: "Analyze" }).click();
 
@@ -408,7 +447,7 @@ test("unsupported experiment descriptions show a low-confidence boundary", async
 });
 
 test("student can paste spreadsheet data into the active table", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/?judge=1");
   await page.getByRole("button", { name: "Reaction Rate" }).click();
 
   await page
@@ -425,7 +464,7 @@ test("student can paste spreadsheet data into the active table", async ({ page }
 
 test("saved labs build a visible progress portfolio for judges", async ({ page }) => {
   await page.addInitScript(() => window.localStorage.clear());
-  await page.goto("/");
+  await page.goto("/?judge=1");
 
   await page.getByLabel("Describe your experiment").fill("We compared paper towel brands by measuring how much water each towel absorbed.");
   await page.getByRole("button", { name: "Analyze" }).click();

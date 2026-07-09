@@ -22,7 +22,8 @@ async function capture({ name, width, height, afterOpen }) {
   }
   await page.screenshot({
     path: resolve(assetDir, name),
-    fullPage: true
+    fullPage: true,
+    timeout: 120_000
   });
   await page.close();
 }

@@ -43,6 +43,22 @@ export const MCP_CONNECTOR_CATALOG: McpConnectorCatalogItem[] = [
     recommendedTools: ["COMPOSIO_SEARCH_SCHOLAR"]
   },
   {
+    id: "composio-browser-source-capture",
+    toolkit: "Composio Browser",
+    toolkitSlug: "browser_tool",
+    envSuffix: "BROWSER",
+    requiresAuthConfig: false,
+    label: "Capture source page context",
+    studentValue: "Falls back to a browser-based source capture when a citation page is dynamic, incomplete, or hard to read from normal fetch text.",
+    composioCapability: "create and watch a browser task that extracts student-reviewed source-page context through Composio Browser Tool",
+    safetyNote: "Browser capture should collect source context and citation-quality notes only; it must not browse private accounts or write the student's claim.",
+    requiredScopes: ["public browser task", "page text extraction", "source context review"],
+    dataShared: "Student-reviewed citation URL, experiment title, variable names, and a short source-quality question.",
+    consentGate: "Student reviews the public URL and task prompt before any browser capture starts.",
+    docsUrl: "https://docs.composio.dev/toolkits/browser_tool",
+    recommendedTools: ["BROWSER_TOOL_CREATE_TASK", "BROWSER_TOOL_WATCH_TASK"]
+  },
+  {
     id: "google-docs-evidence-packet",
     toolkit: "Google Docs",
     toolkitSlug: "googledocs",
@@ -217,6 +233,7 @@ export function buildMcpIntegrationPlan({
         "Trusted citation links",
         "Composio Search source-audit query",
         "Composio Scholar claim-check query",
+        "Composio Browser source-page capture task",
         "Progress Portfolio summary",
         "Pre-Lab Design Coach",
         "Learning Exit Ticket prompts",
@@ -258,8 +275,8 @@ function buildSafeguards(status: McpIntegrationPlan["status"]) {
     status === "ready"
       ? "Live MCP mode keeps Composio, Google Workspace, Notion, and Calendar execution on the server after consent."
       : status === "server_dry_run"
-      ? "Server dry-run mode validates Composio packets but does not call Composio Search, Google Classroom, Google Workspace, Notion, or Calendar APIs."
-      : "Preview mode does not call Composio Search, Google Classroom, Google Workspace, or Notion APIs.";
+      ? "Server dry-run mode validates Composio packets but does not call Composio Search, Composio Browser, Google Classroom, Google Workspace, Notion, or Calendar APIs."
+      : "Preview mode does not call Composio Search, Composio Browser, Google Classroom, Google Workspace, or Notion APIs.";
 
   return [
     firstLine,
@@ -268,6 +285,7 @@ function buildSafeguards(status: McpIntegrationPlan["status"]) {
       "Scoped Composio sessions are prepared server-side and raw MCP URLs are withheld from browser responses.",
       "Composio Search source audits use topic and variable terms only; students review the query before live lookup.",
       "Composio Scholar claim checks compare the expected pattern against scholarly snippets without writing the student's final claim.",
+      "Composio Browser captures public source-page context only after the student reviews the URL and task prompt.",
       "Google Classroom handoff creates a teacher-review checkpoint, not an auto-submitted assignment.",
       "Google Forms handoff creates student prompts, not completed answers.",
       "Google Calendar handoff schedules a next-trial reminder, not a generated result.",
@@ -383,6 +401,10 @@ function buildPayloadSummary(
   }
   if (connector.id === "composio-scholar-claim-check") {
     return `Scholar query for ${result.classification.title}: ${result.expectedResult.pattern}`;
+  }
+  if (connector.id === "composio-browser-source-capture") {
+    const sourceLabel = result.sources[0]?.title ?? "student-reviewed source";
+    return `Browser source-capture task for ${sourceLabel}: verify page context before trusting the expected pattern.`;
   }
   if (connector.id === "google-docs-evidence-packet") return `${title} with source trail, checks, and integrity boundary`;
   if (connector.id === "google-sheets-data-log") return `${rowCount} rows across ${result.columns.length} columns: ${formatColumnList(result)}`;
