@@ -122,6 +122,9 @@ describe("POST /api/analyze", () => {
       "Brand B",
       "Brand C"
     ]);
+    expect(response.body.customLabTriage.patternArchetype.id).toBe("comparison");
+    expect(response.body.customLabTriage.patternArchetype.graphSuggestion).toContain("Bar chart");
+    expect(response.body.customLabTriage.patternArchetype.expectedPattern).toContain("should not assume a winner");
   });
 
   it("serves the built frontend for production deployments", async () => {

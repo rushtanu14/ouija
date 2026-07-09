@@ -78,6 +78,7 @@ describe("Vercel API functions", () => {
     expect(response.body.customLabTriage.status).toBe("supported_template");
     expect(response.body.customLabTriage.suggestedColumns.length).toBeGreaterThan(1);
     expect(response.body.customLabTriage.planner.starterRows.length).toBeGreaterThan(0);
+    expect(response.body.customLabTriage.patternArchetype.id).toBe("supported_template");
     expect(response.body.patternEvidence.status).toBe("supports_expected");
     expect(response.body.reliabilityCoach.recommendation).toContain("repeat");
     expect(response.body.conceptCoach.explanationSteps[0]).toContain("Watch");

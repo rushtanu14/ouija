@@ -860,6 +860,36 @@ function CustomLabTriagePanel({ triage }: { triage: CustomLabTriage }) {
             ))}
           </div>
         </div>
+        <div className={`triage-pattern triage-pattern-${triage.patternArchetype.id}`} aria-label="Pattern Archetype Coach">
+          <div className="triage-pattern-heading">
+            <div>
+              <p className="section-label">Pattern archetype</p>
+              <strong>{triage.patternArchetype.label}</strong>
+            </div>
+            <span>{formatPatternConfidence(triage.patternArchetype.confidence)}</span>
+          </div>
+          <p>{triage.patternArchetype.expectedPattern}</p>
+          <div className="triage-pattern-grid">
+            <article>
+              <p className="section-label">Graph suggestion</p>
+              <strong>{triage.patternArchetype.graphSuggestion}</strong>
+            </article>
+            <article>
+              <p className="section-label">Axes</p>
+              <strong>
+                {triage.patternArchetype.xAxis} to {triage.patternArchetype.yAxis}
+              </strong>
+            </article>
+            <article>
+              <p className="section-label">Student check</p>
+              <strong>{triage.patternArchetype.studentCheck}</strong>
+            </article>
+            <article>
+              <p className="section-label">Source question</p>
+              <strong>{triage.patternArchetype.sourceQuestion}</strong>
+            </article>
+          </div>
+        </div>
         <div className="triage-starter-table">
           <p className="section-label">Starter worksheet</p>
           <table>
@@ -925,6 +955,12 @@ function CustomLabTriagePanel({ triage }: { triage: CustomLabTriage }) {
       </div>
     </section>
   );
+}
+
+function formatPatternConfidence(confidence: CustomLabTriage["patternArchetype"]["confidence"]) {
+  if (confidence === "high") return "High confidence";
+  if (confidence === "medium") return "Medium confidence";
+  return "Low confidence";
 }
 
 function PreLabDesignCoachPanel({ coach }: { coach: PreLabDesignCoach }) {

@@ -21,7 +21,7 @@
 - Portfolio Story Builder turns saved-run evidence into prompts for a student-written progress story.
 - MCP Integration Coach shows how the same student-owned evidence could move into a Composio Search source audit, Composio Scholar claim check, Composio Browser source capture, and classroom tools, including a Google Classroom pre-lab checkpoint, Google Forms readiness check, and Google Calendar next-trial reminder, without sending data before consent.
 - Judge Demo Path gives evaluators a direct route through problem fit, AI design, student workflow, evidence handoff, and submission proof.
-- Custom Lab Triage keeps unsupported student experiments useful without claiming full V1 coverage, because it gives students a concrete investigation planner instead of a fake expected result.
+- Custom Lab Triage and Pattern Archetype Coach keep unsupported student experiments useful without claiming full V1 coverage, because they give students a concrete investigation planner plus comparison/trend/optimum/time-series graph guidance instead of a fake expected result.
 
 ## AI Technical Design And Model Strategy
 
@@ -46,7 +46,7 @@
 - Student Level Lens derives grade-band scaffolds from the same variables and expected pattern instead of requiring separate hand-written lesson copy.
 - Concept Mastery Check derives scored questions from the current analysis result, so understanding proof changes with the classified lab.
 - Pre-Lab Design Coach turns the same classification and triage output into a before-data checklist instead of waiting until after rows exist.
-- Custom Lab Triage turns low-confidence descriptions into inferred focus, starter columns, variables, controls, repeat guidance, starter rows, source-search queries, clarifying questions, and a teacher-confirmation boundary.
+- Custom Lab Triage turns low-confidence descriptions into inferred focus, starter columns, variables, controls, repeat guidance, starter rows, source-search queries, clarifying questions, and a teacher-confirmation boundary; Pattern Archetype Coach adds graph type, axes, expected pattern language, source question, and a student repeat-check.
 - Fallback mode keeps demos reliable without credentials.
 - Guided Lab Flow turns the result schema into a student-facing next-action workflow.
 - AIYES Rubric Fit connects model strategy, grounding mode, validators, and fallback behavior to the official AI technical design/model strategy criterion.
@@ -91,7 +91,7 @@
 - AI Model Card visibly summarizes architecture, grounding mode, evaluation method, privacy boundary, and risk controls.
 - Data Handling Ledger visibly summarizes privacy, retention, browser-local saves, and student controls.
 - Evaluation Bench exposes nine live checks through the app and `/api/evaluate`.
-- Unsupported-boundary evaluation now proves Custom Lab Triage and custom planner rows appear when a student asks about an off-template paper towel absorbency experiment.
+- Unsupported-boundary evaluation now proves Custom Lab Triage, Pattern Archetype Coach, and custom planner rows appear when a student asks about an off-template paper towel absorbency experiment.
 - Saved Labs and Settings nav items render real workflow sections; no dead top-nav placeholders.
 - Academic-integrity guard is implemented in both data model and UI.
 - Production start path serves the built frontend and API from one Express server.
@@ -108,7 +108,7 @@
 - Judge Demo Path reduces evaluator cognitive load by showing the intended five-step live walkthrough near the top of the analysis panel.
 - AI Runtime Proof sits near the top of the analysis panel so evaluators can verify the runtime, tests, secret boundary, and MCP mode before the deeper Model Card.
 - Claim Coach converts analysis into a student-owned reasoning checklist instead of a generated final paragraph.
-- Evidence Packet exports the same reasoning scaffold with Judge Demo Path, Custom Lab Triage, Grounding Audit, AI Evaluation Harness, sources, safety coach, concept coach, pattern evidence, reliability coach, data, checks, next-trial plan, and blanks, not a completed report.
+- Evidence Packet exports the same reasoning scaffold with Judge Demo Path, Custom Lab Triage, Pattern Archetype Coach, Grounding Audit, AI Evaluation Harness, sources, safety coach, concept coach, pattern evidence, reliability coach, data, checks, next-trial plan, and blanks, not a completed report.
 - Data Handling Ledger appears in the app and Evidence Packet so judges can inspect privacy and student-control claims during the demo or exported handoff.
 - AIYES Rubric Fit appears in the app and Evidence Packet so judges can inspect the official UX/design fit during the live demo or exported handoff.
 - AIYES Values Fit appears in the app and Evidence Packet so judges can inspect the values fit during the live demo or exported handoff.

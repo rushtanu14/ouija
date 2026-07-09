@@ -81,6 +81,8 @@ describe("fallback analysis", () => {
     ]);
     expect(result.judgeDemoPath.nextBestAction).toContain("Model Strategy");
     expect(result.classification.matchQuality).toBe("supported_template");
+    expect(result.customLabTriage.patternArchetype.id).toBe("supported_template");
+    expect(result.customLabTriage.patternArchetype.graphSuggestion).toContain("Angle");
     expect(result.labBrief.claimStarter).toContain("___");
     expect(result.labBrief.evidenceChecklist.some((item) => item.id === "source-grounding" && item.complete)).toBe(true);
     expect(result.methodAudit.score).toBeGreaterThan(80);
@@ -260,6 +262,12 @@ describe("fallback analysis", () => {
       "Brand C"
     ]);
     expect((result as any).customLabTriage.planner.hypothesisStarter).toContain("___");
+    expect((result as any).customLabTriage.patternArchetype.id).toBe("comparison");
+    expect((result as any).customLabTriage.patternArchetype.label).toBe("Comparison experiment");
+    expect((result as any).customLabTriage.patternArchetype.graphSuggestion).toContain("Bar chart");
+    expect((result as any).customLabTriage.patternArchetype.expectedPattern).toContain("should not assume a winner");
+    expect((result as any).customLabTriage.patternArchetype.sourceQuestion).toContain("paper towel absorbency");
+    expect((result as any).customLabTriage.patternArchetype.studentCheck).toContain("repeat trials");
     expect(result.trackEvidence.criteria.some((criterion) => criterion.id === "custom-lab-triage" && criterion.status === "review")).toBe(true);
   });
 

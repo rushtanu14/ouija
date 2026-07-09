@@ -250,10 +250,12 @@ await page.getByRole("button", { name: "Analyze" }).click();
 await page.locator(".classification").getByText("Closest supported match", { exact: true }).waitFor();
 await caption(page, "Honest coverage boundary", "Unsupported labs are marked as low confidence instead of being passed off as solved.");
 await page.getByRole("heading", { name: "Custom Lab Triage" }).scrollIntoViewIfNeeded();
+await page.getByLabel("Pattern Archetype Coach").getByText("Comparison experiment", { exact: true }).waitFor();
+await page.getByLabel("Pattern Archetype Coach").scrollIntoViewIfNeeded();
 await caption(
   page,
   "Custom Lab Triage",
-  "Ouija still helps off-template labs with variable planning, repeat guidance, starter rows, source searches, clarifying questions, and teacher confirmation."
+  "Ouija still helps off-template labs with variable planning, repeat guidance, starter rows, and a Pattern Archetype Coach for comparison, bar-chart axes, source questions, and teacher confirmation."
 );
 await page.getByRole("button", { name: "Save current lab" }).click();
 

@@ -148,6 +148,7 @@ function runEvaluationCase(testCase: EvaluationCase): EvaluationCaseResult {
       `${result.expectedComparison.points.filter((point) => point.expectedY !== null).length} expected overlay points`,
       `${result.patternEvidence.score}/100 pattern evidence`,
       `${result.reliabilityCoach.score}/100 repeat reliability`,
+      `${result.customLabTriage.patternArchetype.label} custom pattern archetype`,
       `${result.conceptCoach.vocabulary.length} concept terms`,
       `${result.safetyCoach.status.replaceAll("_", " ")} safety coach`,
       `${result.customLabTriage.status.replaceAll("_", " ")} custom lab triage`,

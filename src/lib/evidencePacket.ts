@@ -116,6 +116,13 @@ export function buildEvidencePacket(
     `  - Controls: ${result.customLabTriage.planner.controlVariables.join(", ")}`,
     `  - Repeat plan: ${result.customLabTriage.planner.repeatPlan}`,
     `  - Hypothesis starter: ${result.customLabTriage.planner.hypothesisStarter}`,
+    "- Pattern Archetype Coach:",
+    `  - Archetype: ${result.customLabTriage.patternArchetype.label} (${result.customLabTriage.patternArchetype.confidence} confidence)`,
+    `  - Expected pattern: ${result.customLabTriage.patternArchetype.expectedPattern}`,
+    `  - Graph suggestion: ${result.customLabTriage.patternArchetype.graphSuggestion}`,
+    `  - Axes: ${result.customLabTriage.patternArchetype.xAxis} to ${result.customLabTriage.patternArchetype.yAxis}`,
+    `  - Source question: ${result.customLabTriage.patternArchetype.sourceQuestion}`,
+    `  - Student check: ${result.customLabTriage.patternArchetype.studentCheck}`,
     "- Suggested columns:",
     ...result.customLabTriage.suggestedColumns.map(
       (column) => `  - ${column.label}${column.unit ? ` (${column.unit})` : ""}: ${column.numeric ? "number" : "text"}`

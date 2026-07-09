@@ -49,6 +49,7 @@ describe("MCP integration plan", () => {
     ]);
     expect(plan.actions.find((action) => action.id === "composio-search-source-audit")?.toolkit).toBe("Composio Search");
     expect(plan.actions.find((action) => action.id === "composio-search-source-audit")?.payloadSummary).toContain("Source audit query");
+    expect(plan.actions.find((action) => action.id === "composio-search-source-audit")?.payloadSummary).toContain("supported template pattern");
     expect(plan.actions.find((action) => action.id === "composio-scholar-claim-check")?.recommendedTools).toEqual(["COMPOSIO_SEARCH_SCHOLAR"]);
     expect(plan.actions.find((action) => action.id === "composio-scholar-claim-check")?.payloadSummary).toContain("Scholar query");
     expect(plan.actions.find((action) => action.id === "composio-browser-source-capture")?.toolkit).toBe("Composio Browser");
@@ -91,6 +92,7 @@ describe("MCP integration plan", () => {
     expect(plan.payloadPreview.includedSections).toContain("Pre-Lab Design Coach");
     expect(plan.payloadPreview.includedSections).toContain("Composio Scholar claim-check query");
     expect(plan.payloadPreview.includedSections).toContain("Composio Browser source-page capture task");
+    expect(plan.payloadPreview.includedSections).toContain("Pattern Archetype Coach source question");
     expect(plan.payloadPreview.includedSections).toContain("Google Forms readiness prompts");
     expect(plan.payloadPreview.includedSections).toContain("Google Calendar next-trial reminder");
     expect(plan.payloadPreview.includedSections).toContain("Composio session ticket scope");

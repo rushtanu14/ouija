@@ -439,6 +439,10 @@ test("unsupported experiment descriptions show a low-confidence boundary", async
   await expect(page.locator(".triage-variable-grid article").filter({ hasText: "Dependent variable" }).getByText("Water absorbed", { exact: true })).toBeVisible();
   await expect(page.locator(".triage-starter-table").getByText("Brand A", { exact: true })).toBeVisible();
   await expect(page.locator(".triage-variable-grid article").filter({ hasText: "Repeat plan" }).getByText("Use at least 3 towel pieces")).toBeVisible();
+  await expect(page.getByLabel("Pattern Archetype Coach").getByText("Comparison experiment", { exact: true })).toBeVisible();
+  await expect(page.getByLabel("Pattern Archetype Coach").getByText("Bar chart by paper towel brand or type")).toBeVisible();
+  await expect(page.getByLabel("Pattern Archetype Coach").getByText("should not assume a winner")).toBeVisible();
+  await expect(page.getByLabel("Pattern Archetype Coach").getByText("Do the repeat trials for each group")).toBeVisible();
   await expect(page.getByLabel("Custom Lab Triage").getByText("What exact condition did you change on purpose?")).toBeVisible();
   await expect(page.getByLabel("Model Strategy").getByText("Closest supported match is")).toBeVisible();
   await expect(page.getByLabel("Guided Lab Flow").getByText("Confirm this is the right experiment before using the guidance.")).toBeVisible();

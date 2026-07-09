@@ -60,6 +60,8 @@ await capture({
     await page.getByRole("button", { name: "Analyze" }).click();
     await page.getByRole("heading", { name: "Custom Lab Triage" }).waitFor();
     await page.getByRole("heading", { name: "Custom Lab Triage" }).scrollIntoViewIfNeeded();
+    await page.getByLabel("Pattern Archetype Coach").getByText("Comparison experiment", { exact: true }).waitFor();
+    await page.getByLabel("Pattern Archetype Coach").scrollIntoViewIfNeeded();
     await page.getByLabel("Custom Lab Triage").getByText("What exact condition did you change on purpose?").waitFor();
     await page.getByLabel("Custom Lab Triage").getByText("Brand A").waitFor();
   }

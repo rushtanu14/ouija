@@ -6,6 +6,7 @@ import type {
   AiEvaluationHarness,
   ConceptCoach,
   CustomLabPlanner,
+  CustomPatternArchetype,
   CustomLabTriage,
   DataHandlingLedger,
   DevelopmentJourney,
@@ -332,6 +333,7 @@ function buildCustomLabTriage(
   matchQuality: AnalyzeResult["classification"]["matchQuality"]
 ): CustomLabTriage {
   if (matchQuality === "supported_template") {
+    const planner = buildSupportedLabPlanner(template);
     return {
       status: "supported_template",
       summary: `${template.title} is covered by Ouija's deterministic V1 template library.`,
@@ -346,7 +348,8 @@ function buildCustomLabTriage(
         `Which measurement best shows the ${template.shortName} pattern?`,
         "How many repeat trials did you run for each condition?"
       ],
-      planner: buildSupportedLabPlanner(template),
+      planner,
+      patternArchetype: buildSupportedPatternArchetype(template, planner),
       safetyBoundary: "Use the matched template safety checks before running or extending the lab.",
       studentNextAction: "Use the supported template analysis, then edit or paste your table data."
     };
@@ -354,6 +357,7 @@ function buildCustomLabTriage(
 
   const inferredFocus = inferCustomLabFocus(description);
   const planner = buildUnsupportedLabPlanner(inferredFocus);
+  const patternArchetype = buildUnsupportedPatternArchetype(description, inferredFocus, planner);
 
   return {
     status: "needs_student_details",
@@ -376,6 +380,7 @@ function buildCustomLabTriage(
       "What controls stayed the same for every trial?"
     ],
     planner,
+    patternArchetype,
     safetyBoundary: "Ask a teacher to confirm materials, controls, and safety before treating this as a runnable procedure.",
     studentNextAction: "Fill the planner worksheet, run the suggested source searches, and get teacher confirmation before collecting data."
   };
@@ -437,6 +442,25 @@ function controlsForSupportedTemplate(templateId: string) {
     return ["liquid volume", "container size", "pouring method", "temperature"];
   }
   return ["materials", "amounts", "timing", "measurement method"];
+}
+
+function buildSupportedPatternArchetype(template: ExperimentTemplate, planner: CustomLabPlanner): CustomPatternArchetype {
+  const xColumn = template.columns.find((column) => column.key === template.expectedResult.xKey);
+  const yColumn = template.columns.find((column) => column.key === template.expectedResult.yKey);
+  const graphKindLabel = template.expectedResult.graphKind === "stage" ? "stage chart" : `${template.expectedResult.graphKind} graph`;
+
+  return {
+    id: "supported_template",
+    label: "Supported template pattern",
+    confidence: "high",
+    graphSuggestion: `${toTitleCase(graphKindLabel)} using ${xColumn?.label ?? template.expectedResult.xKey} on x and ${yColumn?.label ?? template.expectedResult.yKey} on y.`,
+    expectedPattern: template.expectedResult.pattern,
+    xAxis: xColumn?.label ?? planner.independentVariable,
+    yAxis: yColumn?.label ?? planner.dependentVariable,
+    repeatAdvice: planner.repeatPlan,
+    sourceQuestion: `Which cited source best supports the ${template.shortName} graph shape?`,
+    studentCheck: "Compare the full graph shape to the expected pattern before writing a claim."
+  };
 }
 
 function toTitleCase(value: string) {
@@ -506,6 +530,87 @@ function buildUnsupportedLabPlanner(inferredFocus: string): CustomLabPlanner {
       "Run repeats before writing a claim."
     ],
     hypothesisStarter: "If ___ changes, then ___ may change because ___."
+  };
+}
+
+function buildUnsupportedPatternArchetype(
+  description: string,
+  inferredFocus: string,
+  planner: CustomLabPlanner
+): CustomPatternArchetype {
+  const normalized = `${description} ${inferredFocus} ${planner.independentVariable} ${planner.dependentVariable}`.toLowerCase();
+
+  if (/(brand|type|material|which|compare|compared|versus|\bvs\b|color|paper towel|absorbency)/.test(normalized)) {
+    return {
+      id: "comparison",
+      label: "Comparison experiment",
+      confidence: inferredFocus === "paper towel absorbency" ? "high" : "medium",
+      graphSuggestion: `Bar chart by ${planner.independentVariable.toLowerCase()} with average ${planner.dependentVariable.toLowerCase()} on the y-axis.`,
+      expectedPattern: "One condition may average higher or lower than another, but Ouija should not assume a winner until repeated trials agree.",
+      xAxis: planner.independentVariable,
+      yAxis: `Average ${planner.dependentVariable.toLowerCase()}`,
+      repeatAdvice: planner.repeatPlan,
+      sourceQuestion: `Search whether ${inferredFocus} labs usually compare group averages, then note what controls the source says to keep constant.`,
+      studentCheck: "Do the repeat trials for each group point in the same direction, or is the apparent difference just one noisy trial?"
+    };
+  }
+
+  if (/(optimal|optimum|best|peak|enzyme|temperature|ph|pH|germination|sprout)/.test(normalized)) {
+    return {
+      id: "optimum",
+      label: "Optimum-finding experiment",
+      confidence: "medium",
+      graphSuggestion: `Line or scatter plot with ${planner.independentVariable.toLowerCase()} on x and ${planner.dependentVariable.toLowerCase()} on y.`,
+      expectedPattern: "The graph may rise toward a best condition and fall after conditions become too low, too high, or stressful.",
+      xAxis: planner.independentVariable,
+      yAxis: planner.dependentVariable,
+      repeatAdvice: planner.repeatPlan,
+      sourceQuestion: `Look for a classroom source that explains whether ${inferredFocus} has an optimum range instead of a simple increase.`,
+      studentCheck: "Can you point to the highest average and also explain why nearby conditions were lower?"
+    };
+  }
+
+  if (/(over time|each day|daily|minutes|hours|days|week|growth|cooling|heating|rate over)/.test(normalized)) {
+    return {
+      id: "time_series",
+      label: "Time-series experiment",
+      confidence: "medium",
+      graphSuggestion: `Line graph with time on x and ${planner.dependentVariable.toLowerCase()} on y.`,
+      expectedPattern: "The main evidence is the direction and steepness of change over time, not a single endpoint.",
+      xAxis: "Time",
+      yAxis: planner.dependentVariable,
+      repeatAdvice: "Measure on the same schedule for every condition and repeat the full run if materials allow.",
+      sourceQuestion: `Search for the expected time trend in ${inferredFocus}, then compare source timing to your classroom timing.`,
+      studentCheck: "Does the trend stay consistent across the run, or does one time point need a repeat measurement?"
+    };
+  }
+
+  if (/(increase|decrease|more|less|effect|changes|as .* increases|amount|concentration|distance|height|length|angle|voltage|light intensity)/.test(normalized)) {
+    return {
+      id: "trend",
+      label: "Trend experiment",
+      confidence: "medium",
+      graphSuggestion: `Scatter or line graph with ${planner.independentVariable.toLowerCase()} on x and ${planner.dependentVariable.toLowerCase()} on y.`,
+      expectedPattern: "The graph should show whether the measurement generally increases, decreases, levels off, or curves as the changed condition moves.",
+      xAxis: planner.independentVariable,
+      yAxis: planner.dependentVariable,
+      repeatAdvice: planner.repeatPlan,
+      sourceQuestion: `Search for how ${inferredFocus} should change as the independent variable changes, then compare direction rather than exact numbers.`,
+      studentCheck: "Does the whole graph show one direction or shape, or are there points that need a controlled repeat?"
+    };
+  }
+
+  return {
+    id: "unknown",
+    label: "Teacher-review pattern",
+    confidence: "low",
+    graphSuggestion: `Start with a simple plot of ${planner.independentVariable.toLowerCase()} versus ${planner.dependentVariable.toLowerCase()} after your teacher confirms the variables.`,
+    expectedPattern: "Ouija needs more student details before it can safely name an expected graph shape.",
+    xAxis: planner.independentVariable,
+    yAxis: planner.dependentVariable,
+    repeatAdvice: planner.repeatPlan,
+    sourceQuestion: `Search ${inferredFocus} with independent variable, dependent variable, and expected results, then bring the source to a teacher.`,
+    studentCheck: "Can you name exactly one variable changed on purpose and one number measured?"
   };
 }
 
@@ -2773,6 +2878,7 @@ function buildOfficialRubricFit(
           `Learning Exit Ticket: ${learningExitTicket.summary}`,
           `Judge Demo Path: ${judgeDemoPath.summary}`,
           `Custom Lab Triage: ${customLabTriage.summary}`,
+          `Pattern Archetype Coach: ${customLabTriage.patternArchetype.label} with ${customLabTriage.patternArchetype.graphSuggestion}`,
           `Grounding Audit: ${groundingAudit.summary}`,
           `AI Evaluation Harness: ${aiEvaluationHarness.summary}`,
           `Pattern Evidence Engine: ${patternEvidence.summary}`,
@@ -2794,6 +2900,7 @@ function buildOfficialRubricFit(
           `Data Handling Ledger scores privacy, retention, server-key boundaries, and student controls at ${dataHandlingLedger.score}/100.`,
           `${modelStrategy.signals.length} strategy signals are shown alongside deterministic table validators, Grounding Audit, Method Audit, Pattern Evidence Engine, Reliability Coach, Safety Coach, and Next Trial Planner.`,
           `Pre-lab planning status is ${preLabDesignCoach.status.replaceAll("_", " ")} with ${preLabDesignCoach.setupChecks.length} setup checks before data collection.`,
+          `Custom Pattern Archetype is ${customLabTriage.patternArchetype.label}: ${customLabTriage.patternArchetype.expectedPattern}`,
           modelStrategy.fallbackStrategy
         ],
         judgeTakeaway: "The AI is inspectable: classification, grounding, validation, fallback behavior, and risk controls are visible instead of hidden behind a chat answer."
@@ -2806,6 +2913,7 @@ function buildOfficialRubricFit(
           `Guided Lab Flow current action: ${guidedFlow.currentAction}`,
           `Judge Demo Path next action: ${judgeDemoPath.nextBestAction}`,
           `Custom Lab Triage next action: ${customLabTriage.studentNextAction}`,
+          `Pattern archetype next check: ${customLabTriage.patternArchetype.studentCheck}`,
           `Pre-Lab Design Coach next action: ${preLabDesignCoach.studentNextAction}`,
           `Students can paste or edit table data; the graph overlays student data with expected values for ${expectedComparison.points.length} row${expectedComparison.points.length === 1 ? "" : "s"}.`,
           `Current Method Audit score is ${methodAudit.score}/100.`,
@@ -2861,7 +2969,7 @@ function buildAiyesValuesFit(
       id: "diversity",
       label: "Diversity",
       status: inclusionStatus,
-      evidence: `Ouija supports middle/high school learners across ${template.subject.toLowerCase()} plus Custom Lab Triage; this run is ${matchQuality.replaceAll("_", " ")} with ${Math.round(confidence * 100)}% confidence.`,
+      evidence: `Ouija supports middle/high school learners across ${template.subject.toLowerCase()} plus Custom Lab Triage and Pattern Archetype Coach; this run is ${matchQuality.replaceAll("_", " ")} with ${Math.round(confidence * 100)}% confidence.`,
       studentAction: lowConfidence ? "Confirm the experiment focus with a teacher before treating the template as a match." : "Choose the middle or high school lens that fits the class level."
     },
     {
@@ -2875,7 +2983,7 @@ function buildAiyesValuesFit(
       id: "innovation",
       label: "Innovation",
       status: innovationStatus,
-      evidence: `Candidate ranking, expected overlay, pattern evidence, repeat reliability, pre-lab planning, and the AI Evaluation Harness (${aiEvaluationHarness.score}/100) go beyond a simple chat answer.`,
+      evidence: `Candidate ranking, expected overlay, pattern archetypes, pattern evidence, repeat reliability, pre-lab planning, and the AI Evaluation Harness (${aiEvaluationHarness.score}/100) go beyond a simple chat answer.`,
       studentAction: `Compare your observed data to the expected ${formatColumnName(template, template.expectedResult.xKey)} to ${formatColumnName(template, template.expectedResult.yKey)} pattern before writing.`
     },
     {
@@ -3115,8 +3223,8 @@ function buildTrackEvidence(
         status: customLabTriage.status === "supported_template" ? "checked" : "review",
         detail:
           customLabTriage.status === "supported_template"
-            ? "Matched labs still expose variables, searches, and template-specific next steps."
-            : `Unsupported lab support stays useful: ${customLabTriage.studentNextAction}`
+            ? `Matched labs still expose variables, searches, template-specific next steps, and a ${customLabTriage.patternArchetype.label.toLowerCase()}.`
+            : `Unsupported lab support stays useful with ${customLabTriage.patternArchetype.label.toLowerCase()}: ${customLabTriage.studentNextAction}`
       },
       {
         id: "pre-lab-design",

@@ -30,6 +30,7 @@ describe("buildEvidencePacket", () => {
     expect(packet).toContain("Next best action:");
     expect(packet).toContain("## Pre-Lab Design Coach");
     expect(packet).toContain("Hypothesis starter:");
+    expect(packet).toContain("Pattern Archetype Coach:");
     expect(packet).toContain("Safety gate:");
     expect(packet).toContain("Setup checks:");
     expect(packet).toContain("## AIYES Rubric Fit");
@@ -112,6 +113,9 @@ describe("buildEvidencePacket", () => {
     expect(packet).toContain("paper towel absorbency");
     expect(packet).toContain("Variable plan:");
     expect(packet).toContain("Independent variable: Paper towel brand or type");
+    expect(packet).toContain("Archetype: Comparison experiment");
+    expect(packet).toContain("Graph suggestion: Bar chart");
+    expect(packet).toContain("should not assume a winner");
     expect(packet).toContain("Starter worksheet:");
     expect(packet).toContain("## Pre-Lab Design Coach");
     expect(packet).toContain("Status: needs teacher review");

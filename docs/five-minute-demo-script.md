@@ -64,7 +64,7 @@ Click Projectile Motion, Pendulum, Ohm's Law, Enzyme Activity, Density Layers, a
 
 ## 4:40-4:50 - Honest Boundary And Custom Lab Triage
 
-Type an unsupported paper towel absorbency lab. Show that Ouija labels it as a low-confidence closest supported match instead of pretending full coverage, then scroll to Custom Lab Triage: inferred focus, suggested columns, source searches, clarifying questions, and teacher-confirmation boundary.
+Type an unsupported paper towel absorbency lab. Show that Ouija labels it as a low-confidence closest supported match instead of pretending full coverage, then scroll to Custom Lab Triage and Pattern Archetype Coach: inferred focus, comparison experiment, bar chart by brand/type, average water absorbed, source question, suggested columns, clarifying questions, and teacher-confirmation boundary.
 
 ## 4:50-4:56 - Saved Lab Snapshot, Progress Portfolio, Portfolio Story, And MCP Export
 

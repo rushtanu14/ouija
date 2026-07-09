@@ -234,6 +234,7 @@ export function buildMcpIntegrationPlan({
         "Composio Search source-audit query",
         "Composio Scholar claim-check query",
         "Composio Browser source-page capture task",
+        "Pattern Archetype Coach source question",
         "Progress Portfolio summary",
         "Pre-Lab Design Coach",
         "Learning Exit Ticket prompts",
@@ -397,7 +398,7 @@ function buildPayloadSummary(
   title: string
 ) {
   if (connector.id === "composio-search-source-audit") {
-    return `Source audit query for ${title} with ${sourceCount} citation${sourceCount === 1 ? "" : "s"} and variables: ${formatColumnList(result)}`;
+    return `Source audit query for ${title} with ${sourceCount} citation${sourceCount === 1 ? "" : "s"}, ${result.customLabTriage.patternArchetype.label.toLowerCase()}, and variables: ${formatColumnList(result)}`;
   }
   if (connector.id === "composio-scholar-claim-check") {
     return `Scholar query for ${result.classification.title}: ${result.expectedResult.pattern}`;

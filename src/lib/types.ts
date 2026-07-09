@@ -360,6 +360,21 @@ export interface CustomLabPlanner {
   hypothesisStarter: string;
 }
 
+export type CustomPatternArchetypeId = "supported_template" | "comparison" | "trend" | "optimum" | "time_series" | "unknown";
+
+export interface CustomPatternArchetype {
+  id: CustomPatternArchetypeId;
+  label: string;
+  confidence: "high" | "medium" | "low";
+  graphSuggestion: string;
+  expectedPattern: string;
+  xAxis: string;
+  yAxis: string;
+  repeatAdvice: string;
+  sourceQuestion: string;
+  studentCheck: string;
+}
+
 export interface CustomLabTriage {
   status: "supported_template" | "needs_student_details";
   summary: string;
@@ -368,6 +383,7 @@ export interface CustomLabTriage {
   sourceSearches: string[];
   clarifyingQuestions: string[];
   planner: CustomLabPlanner;
+  patternArchetype: CustomPatternArchetype;
   safetyBoundary: string;
   studentNextAction: string;
 }
