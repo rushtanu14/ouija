@@ -197,6 +197,27 @@ export function buildEvidencePacket(
     "- Evidence loop:",
     ...result.impactSnapshot.evidenceLoop.map((step) => `  - ${step}`),
     "",
+    "## Student Pilot Study Kit",
+    `- Status: ${result.studentPilotStudyKit.status.replaceAll("_", " ")}`,
+    `- Summary: ${result.studentPilotStudyKit.summary}`,
+    `- Target student: ${result.studentPilotStudyKit.targetStudent}`,
+    `- Consent boundary: ${result.studentPilotStudyKit.consentBoundary}`,
+    `- Pre prompt: ${result.studentPilotStudyKit.prePrompt}`,
+    `- Post prompt: ${result.studentPilotStudyKit.postPrompt}`,
+    "- Pilot tasks:",
+    ...result.studentPilotStudyKit.tasks.map(
+      (task) => `  - ${task.label}: ${task.instruction} Success signal: ${task.successSignal}`
+    ),
+    "- Pilot metrics:",
+    ...result.studentPilotStudyKit.metrics.map(
+      (metric) => `  - ${metric.label}: ${metric.target} (${metric.status.replaceAll("_", " ")}) - ${metric.detail}`
+    ),
+    "- Observer checklist:",
+    ...result.studentPilotStudyKit.observerChecklist.map((item) => `  - ${item}`),
+    "- Evidence to collect:",
+    ...result.studentPilotStudyKit.evidenceToCollect.map((item) => `  - ${item}`),
+    `- Judge takeaway: ${result.studentPilotStudyKit.judgeTakeaway}`,
+    "",
     "## Learning Exit Ticket",
     `- Status: ${formatLearningExitTicketStatus(result.learningExitTicket.status)}`,
     `- Summary: ${result.learningExitTicket.summary}`,

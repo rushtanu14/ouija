@@ -70,6 +70,8 @@ describe("Vercel API functions", () => {
     expect(response.body.developmentJourney.stages).toHaveLength(8);
     expect(response.body.impactSnapshot.score).toBeGreaterThanOrEqual(90);
     expect(response.body.impactSnapshot.metrics).toHaveLength(7);
+    expect(response.body.studentPilotStudyKit.status).toBe("ready_to_pilot");
+    expect(response.body.studentPilotStudyKit.evidenceToCollect).toContain("Time to first graph");
     expect(response.body.learningExitTicket.status).toBe("ready");
     expect(response.body.learningExitTicket.prompts).toHaveLength(3);
     expect(response.body.expectedComparison.points.length).toBeGreaterThan(0);
@@ -114,6 +116,7 @@ describe("Vercel API functions", () => {
     expect(response.body.cases[0].evidence.some((item: string) => item.includes("custom planner rows"))).toBe(true);
     expect(response.body.cases[0].evidence.some((item: string) => item.includes("data handling ledger"))).toBe(true);
     expect(response.body.cases[0].evidence.some((item: string) => item.includes("learning exit ticket"))).toBe(true);
+    expect(response.body.cases[0].evidence.some((item: string) => item.includes("pilot metrics"))).toBe(true);
   });
 
   it("returns AI runtime proof from the serverless runtime function", () => {

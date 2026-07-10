@@ -164,6 +164,35 @@ export interface LearningImpactSnapshot {
   evidenceLoop: string[];
 }
 
+export interface StudentPilotTask {
+  id: "classify" | "graph-check" | "reflect";
+  label: string;
+  instruction: string;
+  successSignal: string;
+}
+
+export interface StudentPilotMetric {
+  id: "time-to-graph" | "data-fix" | "reflection-readiness" | "integrity-boundary";
+  label: string;
+  target: string;
+  status: "ready" | "watch" | "needs_review";
+  detail: string;
+}
+
+export interface StudentPilotStudyKit {
+  status: "ready_to_pilot" | "needs_review";
+  summary: string;
+  targetStudent: string;
+  consentBoundary: string;
+  prePrompt: string;
+  postPrompt: string;
+  tasks: StudentPilotTask[];
+  metrics: StudentPilotMetric[];
+  observerChecklist: string[];
+  evidenceToCollect: string[];
+  judgeTakeaway: string;
+}
+
 export interface LearningExitTicketPrompt {
   id: "variable-check" | "pattern-check" | "next-step-check";
   label: string;
@@ -842,6 +871,7 @@ export interface AnalyzeResult {
   preLabDesignCoach: PreLabDesignCoach;
   nextTrialPlan: NextTrialPlan;
   impactSnapshot: LearningImpactSnapshot;
+  studentPilotStudyKit: StudentPilotStudyKit;
   learningExitTicket: LearningExitTicket;
   officialRubricFit: OfficialRubricFit;
   aiyesValuesFit: AiyesValuesFit;

@@ -77,6 +77,7 @@ import type {
   RuntimeProof,
   SafetyCoach,
   StudentDataRow,
+  StudentPilotStudyKit,
   StudentReflectionAnswers,
   StudentReflectionWorkspace
 } from "./lib/types";
@@ -101,6 +102,7 @@ const studentNavLinks = [
   { href: "#experiment", label: "Experiment" },
   { href: "#sources", label: "Sources" },
   { href: "#impact", label: "Impact" },
+  { href: "#pilot", label: "Pilot" },
   { href: "#saved", label: "Saved Labs" },
   { href: "#progress", label: "Progress" },
   { href: "#settings", label: "Settings" }
@@ -115,6 +117,7 @@ const judgeNavLinks = [
   { href: "#values", label: "Values Fit" },
   { href: "#journey", label: "Journey" },
   { href: "#impact", label: "Impact" },
+  { href: "#pilot", label: "Pilot" },
   { href: "#evaluation", label: "Eval Bench" },
   { href: "#saved", label: "Saved Labs" },
   { href: "#progress", label: "Progress" },
@@ -488,6 +491,7 @@ export function App() {
               <ConceptCoachPanel coach={result.conceptCoach} />
               <NextTrialPanel plan={result.nextTrialPlan} />
               <LearningImpactPanel snapshot={result.impactSnapshot} />
+              <StudentPilotStudyKitPanel kit={result.studentPilotStudyKit} />
               <LearningExitTicketPanel ticket={result.learningExitTicket} />
               {studentReflectionWorkspace ? (
                 <StudentReflectionWorkspacePanel
@@ -1163,6 +1167,7 @@ function JudgeBriefPanel({ result }: { result: AnalyzeResult | null }) {
     "AIYES Values Fit maps democracy, diversity, connectivity, innovation, and ethical inclusion to concrete product evidence.",
     "AIYES Development Journey maps problem, data, model, build, testing, UX, ethics, impact, constraints, and submission proof.",
     "Learning Impact Loop measures the student's outcome for each run.",
+    "Student Pilot Study Kit prepares a consent-safe 10-minute protocol for collecting UX and impact evidence.",
     "Pre-Lab Design Coach helps students plan variables, controls, repeats, sources, and safety before collecting data.",
     "Learning Exit Ticket proves students must explain variables, patterns, and next steps themselves.",
     "Student Reflection Workspace captures student-authored exit-ticket drafts.",
@@ -1276,6 +1281,7 @@ function ModelCardPanel({ result }: { result: AnalyzeResult | null }) {
     "AIYES Values Fit ties the app to AIYES values without changing the student's work into a generated report.",
     "AIYES Development Journey turns the required slide and video story into inspectable run evidence.",
     "Learning Impact Loop turns analysis into measurable student readiness and next-trial evidence.",
+    "Student Pilot Study Kit defines anonymous student-testing tasks, metrics, observer notes, and evidence to collect.",
     "Pre-Lab Design Coach turns classification into variables, controls, repeats, source checks, and safety before data collection.",
     "Learning Exit Ticket converts the AI feedback into student reflection prompts judges can inspect.",
     "Student Reflection Workspace stores student-written drafts without generating answers.",
@@ -2157,6 +2163,79 @@ function LearningImpactPanel({ snapshot }: { snapshot: LearningImpactSnapshot })
           <li key={step}>{step}</li>
         ))}
       </ol>
+    </section>
+  );
+}
+
+function StudentPilotStudyKitPanel({ kit }: { kit: StudentPilotStudyKit }) {
+  return (
+    <section className={`student-pilot-kit student-pilot-kit-${kit.status}`} id="pilot" aria-label="Student Pilot Study Kit">
+      <div className="panel-title">
+        <ListChecks size={18} />
+        <h3>Student Pilot Study Kit</h3>
+      </div>
+      <div className="pilot-summary">
+        <div>
+          <p className="section-label">10-minute pilot</p>
+          <strong>{kit.status === "ready_to_pilot" ? "Ready to pilot" : "Review first"}</strong>
+        </div>
+        <span>{kit.summary}</span>
+      </div>
+      <div className="pilot-prompt-grid">
+        <article>
+          <p className="section-label">Target student</p>
+          <strong>{kit.targetStudent}</strong>
+        </article>
+        <article>
+          <p className="section-label">Consent boundary</p>
+          <strong>{kit.consentBoundary}</strong>
+        </article>
+        <article>
+          <p className="section-label">Pre prompt</p>
+          <strong>{kit.prePrompt}</strong>
+        </article>
+        <article>
+          <p className="section-label">Post prompt</p>
+          <strong>{kit.postPrompt}</strong>
+        </article>
+      </div>
+      <div className="pilot-task-list" aria-label="Pilot tasks">
+        {kit.tasks.map((task) => (
+          <article key={task.id}>
+            <p className="section-label">{task.label}</p>
+            <strong>{task.instruction}</strong>
+            <span>{task.successSignal}</span>
+          </article>
+        ))}
+      </div>
+      <div className="pilot-metric-grid" aria-label="Pilot metrics">
+        {kit.metrics.map((metric) => (
+          <article className={`pilot-metric pilot-metric-${metric.status}`} key={metric.id}>
+            <p className="section-label">{metric.label}</p>
+            <strong>{metric.target}</strong>
+            <span>{metric.detail}</span>
+          </article>
+        ))}
+      </div>
+      <div className="pilot-evidence-grid">
+        <article>
+          <p className="section-label">Observer checklist</p>
+          <ul>
+            {kit.observerChecklist.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
+        </article>
+        <article>
+          <p className="section-label">Evidence to collect</p>
+          <ul>
+            {kit.evidenceToCollect.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
+        </article>
+      </div>
+      <p className="pilot-takeaway">{kit.judgeTakeaway}</p>
     </section>
   );
 }

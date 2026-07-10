@@ -29,6 +29,7 @@ import type {
   SafetyCoach,
   SourceCard,
   StudentDataRow,
+  StudentPilotStudyKit,
   TrackEvidence
 } from "./types.js";
 
@@ -108,6 +109,16 @@ export function analyzeExperiment(request: AnalyzeRequest): AnalyzeResult {
     nextTrialPlan,
     customLabTriage
   );
+  const studentPilotStudyKit = buildStudentPilotStudyKit(
+    template,
+    confidence,
+    allIssues,
+    impactSnapshot,
+    learningExitTicket,
+    customLabTriage,
+    preLabDesignCoach,
+    nextTrialPlan
+  );
   const groundingStatus = {
     mode: "fallback" as const,
     note: "Using built-in middle/high school science references."
@@ -175,7 +186,8 @@ export function analyzeExperiment(request: AnalyzeRequest): AnalyzeResult {
     impactSnapshot,
     dataHandlingLedger,
     learningExitTicket,
-    preLabDesignCoach
+    preLabDesignCoach,
+    studentPilotStudyKit
   );
   const aiyesValuesFit = buildAiyesValuesFit(
     template,
@@ -192,7 +204,8 @@ export function analyzeExperiment(request: AnalyzeRequest): AnalyzeResult {
     preLabDesignCoach,
     customLabTriage,
     impactSnapshot,
-    officialRubricFit
+    officialRubricFit,
+    studentPilotStudyKit
   );
   const developmentJourney = buildDevelopmentJourney(
     template,
@@ -213,7 +226,8 @@ export function analyzeExperiment(request: AnalyzeRequest): AnalyzeResult {
     impactSnapshot,
     learningExitTicket,
     preLabDesignCoach,
-    judgeDemoPath
+    judgeDemoPath,
+    studentPilotStudyKit
   );
 
   return {
@@ -253,6 +267,7 @@ export function analyzeExperiment(request: AnalyzeRequest): AnalyzeResult {
     preLabDesignCoach,
     nextTrialPlan,
     impactSnapshot,
+    studentPilotStudyKit,
     learningExitTicket,
     officialRubricFit,
     aiyesValuesFit,
@@ -277,7 +292,8 @@ export function analyzeExperiment(request: AnalyzeRequest): AnalyzeResult {
       customLabTriage,
       dataHandlingLedger,
       learningExitTicket,
-      preLabDesignCoach
+      preLabDesignCoach,
+      studentPilotStudyKit
     ),
     explanation: template.explanation,
     integrityNotice: INTEGRITY_NOTICE,
@@ -791,6 +807,18 @@ export function mergeEnrichment(base: AnalyzeResult, enrichment: Partial<Analyze
         base.customLabTriage
       )
     : base.learningExitTicket;
+  const studentPilotStudyKit = template
+    ? buildStudentPilotStudyKit(
+        template,
+        base.classification.confidence,
+        issues,
+        impactSnapshot,
+        learningExitTicket,
+        base.customLabTriage,
+        preLabDesignCoach,
+        nextTrialPlan
+      )
+    : base.studentPilotStudyKit;
   const officialRubricFit = template
     ? buildOfficialRubricFit(
         template,
@@ -815,7 +843,8 @@ export function mergeEnrichment(base: AnalyzeResult, enrichment: Partial<Analyze
         impactSnapshot,
         dataHandlingLedger,
         learningExitTicket,
-        preLabDesignCoach
+        preLabDesignCoach,
+        studentPilotStudyKit
       )
     : base.officialRubricFit;
   const aiyesValuesFit = template
@@ -834,7 +863,8 @@ export function mergeEnrichment(base: AnalyzeResult, enrichment: Partial<Analyze
         preLabDesignCoach,
         base.customLabTriage,
         impactSnapshot,
-        officialRubricFit
+        officialRubricFit,
+        studentPilotStudyKit
       )
     : base.aiyesValuesFit;
   const developmentJourney = template
@@ -857,7 +887,8 @@ export function mergeEnrichment(base: AnalyzeResult, enrichment: Partial<Analyze
         impactSnapshot,
         learningExitTicket,
         preLabDesignCoach,
-        judgeDemoPath
+        judgeDemoPath,
+        studentPilotStudyKit
       )
     : base.developmentJourney;
 
@@ -885,6 +916,7 @@ export function mergeEnrichment(base: AnalyzeResult, enrichment: Partial<Analyze
     preLabDesignCoach,
     nextTrialPlan,
     impactSnapshot,
+    studentPilotStudyKit,
     learningExitTicket,
     officialRubricFit,
     aiyesValuesFit,
@@ -910,7 +942,8 @@ export function mergeEnrichment(base: AnalyzeResult, enrichment: Partial<Analyze
           base.customLabTriage,
           dataHandlingLedger,
           learningExitTicket,
-          preLabDesignCoach
+          preLabDesignCoach,
+          studentPilotStudyKit
         )
       : base.trackEvidence,
     labBrief
@@ -1003,6 +1036,16 @@ export function refreshResultForRows(result: AnalyzeResult, rows: StudentDataRow
     nextTrialPlan,
     result.customLabTriage
   );
+  const studentPilotStudyKit = buildStudentPilotStudyKit(
+    template,
+    result.classification.confidence,
+    issues,
+    impactSnapshot,
+    learningExitTicket,
+    result.customLabTriage,
+    preLabDesignCoach,
+    nextTrialPlan
+  );
   const officialRubricFit = buildOfficialRubricFit(
     template,
     result.classification.confidence,
@@ -1026,7 +1069,8 @@ export function refreshResultForRows(result: AnalyzeResult, rows: StudentDataRow
     impactSnapshot,
     dataHandlingLedger,
     learningExitTicket,
-    preLabDesignCoach
+    preLabDesignCoach,
+    studentPilotStudyKit
   );
   const aiyesValuesFit = buildAiyesValuesFit(
     template,
@@ -1043,7 +1087,8 @@ export function refreshResultForRows(result: AnalyzeResult, rows: StudentDataRow
     preLabDesignCoach,
     result.customLabTriage,
     impactSnapshot,
-    officialRubricFit
+    officialRubricFit,
+    studentPilotStudyKit
   );
   const developmentJourney = buildDevelopmentJourney(
     template,
@@ -1064,7 +1109,8 @@ export function refreshResultForRows(result: AnalyzeResult, rows: StudentDataRow
     impactSnapshot,
     learningExitTicket,
     preLabDesignCoach,
-    judgeDemoPath
+    judgeDemoPath,
+    studentPilotStudyKit
   );
 
   return {
@@ -1089,6 +1135,7 @@ export function refreshResultForRows(result: AnalyzeResult, rows: StudentDataRow
     preLabDesignCoach,
     nextTrialPlan,
     impactSnapshot,
+    studentPilotStudyKit,
     learningExitTicket,
     officialRubricFit,
     aiyesValuesFit,
@@ -1113,7 +1160,8 @@ export function refreshResultForRows(result: AnalyzeResult, rows: StudentDataRow
       result.customLabTriage,
       dataHandlingLedger,
       learningExitTicket,
-      preLabDesignCoach
+      preLabDesignCoach,
+      studentPilotStudyKit
     )
   };
 }
@@ -2634,6 +2682,123 @@ function buildLearningExitTicket(
   };
 }
 
+function buildStudentPilotStudyKit(
+  template: ExperimentTemplate,
+  confidence: number,
+  issues: Issue[],
+  impactSnapshot: LearningImpactSnapshot,
+  learningExitTicket: LearningExitTicket,
+  customLabTriage: CustomLabTriage,
+  preLabDesignCoach: PreLabDesignCoach,
+  nextTrialPlan: NextTrialPlan
+): StudentPilotStudyKit {
+  const warningCount = issues.filter((issue) => issue.severity === "warning").length;
+  const errorCount = issues.filter((issue) => issue.severity === "error").length;
+  const lowConfidence = confidence < 0.6 || customLabTriage.status === "needs_student_details";
+  const needsReview = lowConfidence || errorCount > 0 || learningExitTicket.status === "blocked" || preLabDesignCoach.status === "blocked";
+  const status: StudentPilotStudyKit["status"] = needsReview ? "needs_review" : "ready_to_pilot";
+  const xLabel = formatColumnName(template, template.expectedResult.xKey);
+  const yLabel = formatColumnName(template, template.expectedResult.yKey);
+  const targetStudent = lowConfidence
+    ? "One middle or high school student who can compare Ouija's closest-supported match against their real experiment."
+    : `One middle or high school student running or reviewing a ${template.shortName.toLowerCase()} lab.`;
+
+  return {
+    status,
+    summary:
+      status === "ready_to_pilot"
+        ? "Run a 10-minute student pilot with this exact lab to collect honest UX and impact evidence before submission."
+        : "Pilot-ready with a review gate: confirm the lab match or blocking checks before using this run as evidence.",
+    targetStudent,
+    consentBoundary:
+      "No names, contact info, grades, faces, or private classroom data. Use anonymous counts and only quote a student with permission.",
+    prePrompt: `Before using Ouija, ask the student: What do you expect to happen between ${xLabel} and ${yLabel}, and why?`,
+    postPrompt:
+      "After using Ouija, ask the student to explain the variable, graph pattern, and next measurement in their own words without copying a conclusion.",
+    tasks: [
+      {
+        id: "classify",
+        label: "Confirm the lab match",
+        instruction: `Describe the experiment, run Analyze, and decide whether Ouija's ${template.title} classification matches the actual setup.`,
+        successSignal: lowConfidence
+          ? "Student catches the closest-supported boundary and asks for teacher confirmation."
+          : "Student can name the independent and dependent variables without help."
+      },
+      {
+        id: "graph-check",
+        label: "Use the graph and table",
+        instruction: "Edit or paste one table row, then compare the observed point with the dashed expected overlay.",
+        successSignal:
+          errorCount + warningCount === 0
+            ? "Student reaches the graph without horizontal scrolling and can explain what the overlay means."
+            : "Student notices a visible data or method flag before writing a claim."
+      },
+      {
+        id: "reflect",
+        label: "Answer the exit ticket",
+        instruction: "Complete the variable, pattern, and next-step prompts in original words.",
+        successSignal:
+          learningExitTicket.status === "ready"
+            ? "Student can answer all three prompts before opening the Evidence Packet."
+            : "Student knows which uncertainty or warning must be resolved first."
+      }
+    ],
+    metrics: [
+      {
+        id: "time-to-graph",
+        label: "Time to first graph",
+        target: "Under 2 minutes from description to visible graph/table.",
+        status: lowConfidence ? "watch" : "ready",
+        detail: lowConfidence
+          ? "Record whether the low-confidence banner stops the student from trusting the wrong graph."
+          : "Record elapsed time from Analyze click to the student pointing at the expected overlay."
+      },
+      {
+        id: "data-fix",
+        label: "Data fix signal",
+        target: "Student can identify one clean signal or one warning without adult explanation.",
+        status: errorCount > 0 ? "needs_review" : warningCount > 0 ? "watch" : "ready",
+        detail:
+          errorCount + warningCount === 0
+            ? "Default sample data is clean; ask the student what would make the data less trustworthy."
+            : `${errorCount} error${errorCount === 1 ? "" : "s"} and ${warningCount} warning${warningCount === 1 ? "" : "s"} are visible for the pilot.`
+      },
+      {
+        id: "reflection-readiness",
+        label: "Reflection readiness",
+        target: "Student gives original answers for variable, pattern, and next step.",
+        status: learningExitTicket.status === "ready" ? "ready" : learningExitTicket.status === "review" ? "watch" : "needs_review",
+        detail: learningExitTicket.summary
+      },
+      {
+        id: "integrity-boundary",
+        label: "Integrity boundary",
+        target: "Student understands Ouija gives hints and blanks, not a finished conclusion.",
+        status: impactSnapshot.metrics.some((metric) => metric.id === "integrity" && metric.status === "strong") ? "ready" : "watch",
+        detail: "Ask the student what part they still have to write themselves before exporting evidence."
+      }
+    ],
+    observerChecklist: [
+      "Record time from Analyze to first useful graph.",
+      "Watch whether the student opens a source or uses the Grounding Audit before trusting the expected pattern.",
+      "Mark whether the student can explain one data flag or clean signal.",
+      "Check whether the student keeps the final claim in their own words.",
+      `Record whether the next action is clear: ${nextTrialPlan.priority}`
+    ],
+    evidenceToCollect: [
+      "Time to first graph",
+      "Number of visible flags the student resolves or explains",
+      "Exit-ticket readiness count out of 3 prompts",
+      "One anonymous student quote about what became clearer",
+      "One observer note about where the workflow caused confusion"
+    ],
+    judgeTakeaway:
+      status === "ready_to_pilot"
+        ? "Ouija has a concrete student pilot protocol judges can inspect for UX and impact evidence."
+        : "Ouija labels the pilot boundary honestly before collecting any user-testing evidence."
+  };
+}
+
 function buildPreLabDesignCoach(
   template: ExperimentTemplate,
   confidence: number,
@@ -2820,7 +2985,8 @@ function buildOfficialRubricFit(
   impactSnapshot: LearningImpactSnapshot,
   dataHandlingLedger: DataHandlingLedger,
   learningExitTicket: LearningExitTicket,
-  preLabDesignCoach: PreLabDesignCoach
+  preLabDesignCoach: PreLabDesignCoach,
+  studentPilotStudyKit: StudentPilotStudyKit
 ): OfficialRubricFit {
   const warningCount = issues.filter((issue) => issue.severity === "warning").length;
   const errorCount = issues.filter((issue) => issue.severity === "error").length;
@@ -2874,6 +3040,7 @@ function buildOfficialRubricFit(
           `Targets the real classroom bottleneck: students compare their own table against the expected ${formatColumnName(template, template.expectedResult.xKey)} to ${formatColumnName(template, template.expectedResult.yKey)} pattern.`,
           `Expected overlay: ${expectedComparison.summary}`,
           `Learning impact loop score: ${impactSnapshot.score}/100; ${impactSnapshot.headline}`,
+          `Student Pilot Study Kit: ${studentPilotStudyKit.summary}`,
           `Pre-Lab Design Coach: ${preLabDesignCoach.summary}`,
           `Learning Exit Ticket: ${learningExitTicket.summary}`,
           `Judge Demo Path: ${judgeDemoPath.summary}`,
@@ -2919,6 +3086,7 @@ function buildOfficialRubricFit(
           `Current Method Audit score is ${methodAudit.score}/100.`,
           `Pattern Evidence question: ${patternEvidence.studentQuestion}`,
           `Learning Exit Ticket asks students to explain variables, graph pattern, and the next repeat or measurement before writing.`,
+          `Student Pilot Study Kit tracks ${studentPilotStudyKit.metrics.length} UX and impact metrics: ${studentPilotStudyKit.evidenceToCollect.slice(0, 3).join("; ")}.`,
           `Reliability Coach recommendation: ${reliabilityCoach.recommendation}`,
           `Evidence Packet and Claim Coach keep the conclusion student-owned: ${labBrief.claimStarter}`,
           `Next Trial Planner priority: ${nextTrialPlan.priority}`
@@ -2944,7 +3112,8 @@ function buildAiyesValuesFit(
   preLabDesignCoach: PreLabDesignCoach,
   customLabTriage: CustomLabTriage,
   impactSnapshot: LearningImpactSnapshot,
-  officialRubricFit: OfficialRubricFit
+  officialRubricFit: OfficialRubricFit,
+  studentPilotStudyKit: StudentPilotStudyKit
 ): AiyesValuesFit {
   const errorCount = issues.filter((issue) => issue.severity === "error").length;
   const warningCount = issues.filter((issue) => issue.severity === "warning").length;
@@ -2962,7 +3131,7 @@ function buildAiyesValuesFit(
       id: "democracy",
       label: "Democracy",
       status: agencyStatus,
-      evidence: `Students control the description, rows, saved labs, Evidence Packet, MCP export consent, and final claim; current action is "${guidedFlow.currentAction}".`,
+      evidence: `Students control the description, rows, saved labs, Evidence Packet, MCP export consent, pilot evidence consent, and final claim; current action is "${guidedFlow.currentAction}".`,
       studentAction: "Review the packet, keep the claim starter blank, and decide what evidence to share."
     },
     {
@@ -2983,14 +3152,14 @@ function buildAiyesValuesFit(
       id: "innovation",
       label: "Innovation",
       status: innovationStatus,
-      evidence: `Candidate ranking, expected overlay, pattern archetypes, pattern evidence, repeat reliability, pre-lab planning, and the AI Evaluation Harness (${aiEvaluationHarness.score}/100) go beyond a simple chat answer.`,
+      evidence: `Candidate ranking, expected overlay, pattern archetypes, pattern evidence, repeat reliability, pre-lab planning, Student Pilot Study Kit, and the AI Evaluation Harness (${aiEvaluationHarness.score}/100) go beyond a simple chat answer.`,
       studentAction: `Compare your observed data to the expected ${formatColumnName(template, template.expectedResult.xKey)} to ${formatColumnName(template, template.expectedResult.yKey)} pattern before writing.`
     },
     {
       id: "ethics-inclusion",
       label: "Ethics and inclusion",
       status: ethicsStatus,
-      evidence: `Data Handling Ledger ${dataHandlingLedger.score}/100, server-only keys, local saved labs, safety checks, reflection prompts, and blank claim starters keep the work student-owned.`,
+      evidence: `Data Handling Ledger ${dataHandlingLedger.score}/100, server-only keys, local saved labs, safety checks, reflection prompts, anonymous ${studentPilotStudyKit.status.replaceAll("_", " ")} pilot evidence, and blank claim starters keep the work student-owned.`,
       studentAction: "Use the exit-ticket prompts as notes, then write the conclusion in your own words."
     }
   ];
@@ -3037,7 +3206,8 @@ function buildDevelopmentJourney(
   impactSnapshot: LearningImpactSnapshot,
   learningExitTicket: LearningExitTicket,
   preLabDesignCoach: PreLabDesignCoach,
-  judgeDemoPath: JudgeDemoPath
+  judgeDemoPath: JudgeDemoPath,
+  studentPilotStudyKit: StudentPilotStudyKit
 ): DevelopmentJourney {
   const errorCount = issues.filter((issue) => issue.severity === "error").length;
   const warningCount = issues.filter((issue) => issue.severity === "warning").length;
@@ -3078,15 +3248,15 @@ function buildDevelopmentJourney(
       id: "testing-evaluation",
       label: "Testing and evaluation",
       status: aiEvaluationHarness.score >= 90 ? "strong" : aiEvaluationHarness.score >= 80 ? "ready" : "review",
-      evidence: `AI Evaluation Harness scores this run ${aiEvaluationHarness.score}/100 and the public Evaluation Bench covers eight supported labs plus the unsupported-lab boundary.`,
-      judgeCue: "Use AI Evaluation Harness and `/api/evaluate` proof."
+      evidence: `AI Evaluation Harness scores this run ${aiEvaluationHarness.score}/100, the public Evaluation Bench covers eight supported labs plus the unsupported-lab boundary, and the Student Pilot Study Kit is ${studentPilotStudyKit.status.replaceAll("_", " ")} with ${studentPilotStudyKit.metrics.length} student-centered metrics.`,
+      judgeCue: "Use AI Evaluation Harness, `/api/evaluate` proof, and the Student Pilot Study Kit."
     },
     {
       id: "ux-design",
       label: "User experience and design",
       status: uxCriterion?.status ?? "ready",
-      evidence: `Current student action is "${guidedFlow.currentAction}" and the official UX criterion is ${uxCriterion?.status ?? "ready"}.`,
-      judgeCue: "Show the three-region workspace, level lens, mastery check, reflection workspace, and no-overflow mobile behavior."
+      evidence: `Current student action is "${guidedFlow.currentAction}", the official UX criterion is ${uxCriterion?.status ?? "ready"}, and pilot evidence collection targets ${studentPilotStudyKit.evidenceToCollect.slice(0, 3).join(", ")}.`,
+      judgeCue: "Show the three-region workspace, level lens, mastery check, reflection workspace, pilot kit, and no-overflow mobile behavior."
     },
     {
       id: "ethics-impact",
@@ -3145,7 +3315,8 @@ function buildTrackEvidence(
   customLabTriage: CustomLabTriage,
   dataHandlingLedger: DataHandlingLedger,
   learningExitTicket: LearningExitTicket,
-  preLabDesignCoach: PreLabDesignCoach
+  preLabDesignCoach: PreLabDesignCoach,
+  studentPilotStudyKit: StudentPilotStudyKit
 ): TrackEvidence {
   const errorCount = issues.filter((issue) => issue.severity === "error").length;
   const warningCount = issues.filter((issue) => issue.severity === "warning").length;
@@ -3295,6 +3466,12 @@ function buildTrackEvidence(
         detail: learningExitTicket.judgeTakeaway
       },
       {
+        id: "student-pilot-study",
+        label: "Student pilot study",
+        status: studentPilotStudyKit.status === "ready_to_pilot" ? "checked" : "review",
+        detail: studentPilotStudyKit.judgeTakeaway
+      },
+      {
         id: "safety-responsibility",
         label: "Safety and responsibility",
         status: safetyCoach.status === "do_not_run" ? "blocked" : safetyCoach.status === "adult_review" ? "review" : "checked",
@@ -3375,6 +3552,12 @@ function buildTrackEvidence(
         label: "Check learning exit ticket",
         status: learningExitTicket.status === "blocked" ? "blocked" : learningExitTicket.status === "review" ? "review" : "checked",
         detail: learningExitTicket.summary
+      },
+      {
+        id: "pilot",
+        label: "Prepare student pilot",
+        status: studentPilotStudyKit.status === "ready_to_pilot" ? "checked" : "review",
+        detail: studentPilotStudyKit.summary
       },
       {
         id: "safety",

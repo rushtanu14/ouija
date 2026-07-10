@@ -113,6 +113,17 @@ describe("fallback analysis", () => {
     ]);
     expect(result.impactSnapshot.evidenceLoop).toHaveLength(5);
     expect(result.impactSnapshot.studentOutcome).toContain("student");
+    expect(result.studentPilotStudyKit.status).toBe("ready_to_pilot");
+    expect(result.studentPilotStudyKit.summary).toContain("10-minute student pilot");
+    expect(result.studentPilotStudyKit.consentBoundary).toContain("No names");
+    expect(result.studentPilotStudyKit.tasks.map((task) => task.id)).toEqual(["classify", "graph-check", "reflect"]);
+    expect(result.studentPilotStudyKit.metrics.map((metric) => metric.id)).toEqual([
+      "time-to-graph",
+      "data-fix",
+      "reflection-readiness",
+      "integrity-boundary"
+    ]);
+    expect(result.studentPilotStudyKit.evidenceToCollect).toContain("Time to first graph");
     expect((result as any).learningExitTicket.status).toBe("ready");
     expect((result as any).learningExitTicket.summary).toContain("exit ticket");
     expect((result as any).learningExitTicket.prompts).toHaveLength(3);
@@ -184,6 +195,7 @@ describe("fallback analysis", () => {
     expect(result.trackEvidence.criteria.some((criterion) => criterion.id === "repeat-reliability" && criterion.status === "review")).toBe(true);
     expect(result.trackEvidence.criteria.some((criterion) => criterion.id === "learning-scaffold" && criterion.status === "checked")).toBe(true);
     expect(result.trackEvidence.criteria.some((criterion) => criterion.id === "learning-exit-ticket" && criterion.status === "checked")).toBe(true);
+    expect(result.trackEvidence.criteria.some((criterion) => criterion.id === "student-pilot-study" && criterion.status === "checked")).toBe(true);
     expect(result.trackEvidence.criteria.some((criterion) => criterion.id === "safety-responsibility" && criterion.status === "checked")).toBe(true);
     expect(result.trackEvidence.criteria.some((criterion) => criterion.id === "data-ethics" && criterion.status === "checked")).toBe(true);
   });
@@ -222,6 +234,10 @@ describe("fallback analysis", () => {
     expect(result.guidedFlow.currentAction).toContain("Confirm this is the right experiment");
     expect(result.modelStrategy.decisionSummary).toContain("Closest supported match");
     expect(result.impactSnapshot.score).toBeLessThan(80);
+    expect(result.studentPilotStudyKit.status).toBe("needs_review");
+    expect(result.studentPilotStudyKit.summary).toContain("review gate");
+    expect(result.studentPilotStudyKit.metrics.some((metric) => metric.id === "time-to-graph" && metric.status === "watch")).toBe(true);
+    expect(result.studentPilotStudyKit.tasks[0].successSignal).toContain("closest-supported boundary");
     expect((result as any).learningExitTicket.status).toBe("review");
     expect((result as any).learningExitTicket.prompts[0].studentPrompt).toContain("closest supported");
     expect(result.impactSnapshot.metrics.some((metric) => metric.id === "student-outcome" && metric.status === "needs_action")).toBe(true);
@@ -236,6 +252,7 @@ describe("fallback analysis", () => {
     expect(result.trackEvidence.readiness).toBe("needs_work");
     expect(result.trackEvidence.pipeline.some((step) => step.id === "classify" && step.status === "review")).toBe(true);
     expect(result.trackEvidence.pipeline.some((step) => step.id === "demo" && step.status === "review")).toBe(true);
+    expect(result.trackEvidence.pipeline.some((step) => step.id === "pilot" && step.status === "review")).toBe(true);
     expect(result.trackEvidence.pipeline.some((step) => step.id === "safety" && step.status === "review")).toBe(true);
     expect(result.dataHandlingLedger.status).toBe("privacy_preserving");
     expect(result.dataHandlingLedger.flows.some((flow) => flow.id === "table-data" && flow.studentControl.includes("edit"))).toBe(true);
@@ -374,6 +391,7 @@ describe("data checks", () => {
     expect(result.patternEvidence.observations.some((observation) => observation.status === "contradicts")).toBe(true);
     expect(result.impactSnapshot.metrics.some((metric) => metric.id === "data-quality" && metric.status === "watch")).toBe(true);
     expect(result.impactSnapshot.metrics.some((metric) => metric.id === "pattern-evidence" && metric.status === "needs_action")).toBe(true);
+    expect(result.studentPilotStudyKit.metrics.some((metric) => metric.id === "data-fix" && metric.status === "watch")).toBe(true);
     expect(result.officialRubricFit.criteria.some((criterion) => criterion.id === "ux-design" && criterion.status === "ready")).toBe(true);
     expect(result.trackEvidence.criteria.some((criterion) => criterion.id === "testing-evaluation" && criterion.status === "review")).toBe(true);
     expect(result.aiEvaluationHarness.status).toBe("review");
@@ -429,6 +447,7 @@ describe("data checks", () => {
     expect(refreshed.trackEvidence.pipeline.some((step) => step.id === "pattern" && step.status === "blocked")).toBe(true);
     expect(refreshed.nextTrialPlan.status).toBe("fix_first");
     expect(refreshed.impactSnapshot.score).toBeLessThan(result.impactSnapshot.score);
+    expect(refreshed.studentPilotStudyKit.metrics.some((metric) => metric.id === "data-fix" && metric.status === "watch")).toBe(true);
     expect(refreshed.officialRubricFit.score).toBeLessThan(result.officialRubricFit.score);
     expect(refreshed.trackEvidence.pipeline.some((step) => step.id === "audit" && step.status === "review")).toBe(true);
   });

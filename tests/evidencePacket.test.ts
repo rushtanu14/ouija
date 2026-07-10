@@ -51,6 +51,10 @@ describe("buildEvidencePacket", () => {
     expect(packet).toContain("## Learning Impact Loop");
     expect(packet).toContain("Student outcome:");
     expect(packet).toContain("Evidence loop:");
+    expect(packet).toContain("## Student Pilot Study Kit");
+    expect(packet).toContain("Pilot tasks:");
+    expect(packet).toContain("Time to first graph");
+    expect(packet).toContain("No names");
     expect(packet).toContain("## Learning Exit Ticket");
     expect(packet).toContain("Exit ticket prompt:");
     expect(packet).toContain("Teacher signal:");

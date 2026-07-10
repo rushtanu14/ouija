@@ -59,6 +59,9 @@ describe("POST /api/analyze", () => {
     expect(response.body.developmentJourney.stages.map((stage: { id: string }) => stage.id)).toContain("testing-evaluation");
     expect(response.body.impactSnapshot.metrics).toHaveLength(7);
     expect(response.body.impactSnapshot.evidenceLoop).toHaveLength(5);
+    expect(response.body.studentPilotStudyKit.status).toBe("ready_to_pilot");
+    expect(response.body.studentPilotStudyKit.metrics).toHaveLength(4);
+    expect(response.body.studentPilotStudyKit.consentBoundary).toContain("No names");
     expect(response.body.learningExitTicket.status).toBe("ready");
     expect(response.body.learningExitTicket.prompts).toHaveLength(3);
     expect(response.body.learningExitTicket.prompts[0].studentPrompt).toContain("independent variable");
@@ -125,6 +128,7 @@ describe("POST /api/analyze", () => {
     expect(response.body.customLabTriage.patternArchetype.id).toBe("comparison");
     expect(response.body.customLabTriage.patternArchetype.graphSuggestion).toContain("Bar chart");
     expect(response.body.customLabTriage.patternArchetype.expectedPattern).toContain("should not assume a winner");
+    expect(response.body.studentPilotStudyKit.status).toBe("needs_review");
   });
 
   it("serves the built frontend for production deployments", async () => {

@@ -64,6 +64,7 @@ describe("MCP integration plan", () => {
     expect(plan.actions.find((action) => action.id === "google-classroom-prelab-checkpoint")?.payloadSummary).toContain("Pre-lab");
     expect(plan.actions.find((action) => action.id === "google-forms-readiness-check")?.toolkit).toBe("Google Forms");
     expect(plan.actions.find((action) => action.id === "google-forms-readiness-check")?.payloadSummary).toContain("student reflection prompts");
+    expect(plan.actions.find((action) => action.id === "google-forms-readiness-check")?.payloadSummary).toContain("pilot-study metrics");
     expect(plan.actions.find((action) => action.id === "google-calendar-next-trial-reminder")?.toolkit).toBe("Google Calendar");
     expect(plan.actions.find((action) => action.id === "google-calendar-next-trial-reminder")?.payloadSummary).toContain("Next trial reminder");
     expect(plan.actions.every((action) => action.requiresConsent)).toBe(true);
@@ -90,6 +91,7 @@ describe("MCP integration plan", () => {
     expect(plan.payloadPreview.savedRunCount).toBe(1);
     expect(plan.payloadPreview.includedSections).toContain("Evidence Packet markdown");
     expect(plan.payloadPreview.includedSections).toContain("Pre-Lab Design Coach");
+    expect(plan.payloadPreview.includedSections).toContain("Student Pilot Study Kit");
     expect(plan.payloadPreview.includedSections).toContain("Composio Scholar claim-check query");
     expect(plan.payloadPreview.includedSections).toContain("Composio Browser source-page capture task");
     expect(plan.payloadPreview.includedSections).toContain("Pattern Archetype Coach source question");

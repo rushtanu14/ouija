@@ -100,6 +100,12 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(page.getByLabel("Learning Impact Loop").getByText("Pattern evidence", { exact: true })).toBeVisible();
   await expect(page.getByLabel("Learning Impact Loop").getByText("Repeat reliability")).toBeVisible();
   await expect(page.locator(".impact-metric").filter({ hasText: "Student outcome" }).getByText("Ready to reason", { exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Student Pilot Study Kit" })).toBeVisible();
+  await expect(page.getByLabel("Student Pilot Study Kit").getByText("10-minute pilot")).toBeVisible();
+  await expect(page.getByLabel("Student Pilot Study Kit").getByText("Ready to pilot")).toBeVisible();
+  await expect(page.getByLabel("Student Pilot Study Kit").getByText("No names")).toBeVisible();
+  await expect(page.getByLabel("Pilot tasks").getByText("Confirm the lab match")).toBeVisible();
+  await expect(page.getByLabel("Pilot metrics").getByText("Time to first graph")).toBeVisible();
   await expect(page.getByRole("heading", { name: "Learning Exit Ticket" })).toBeVisible();
   await expect(page.getByLabel("Learning Exit Ticket").getByText("Exit ticket prompts")).toBeVisible();
   await expect(page.getByLabel("Learning Exit Ticket").getByText(/Which part of your setup was the independent variable/i)).toBeVisible();
@@ -227,6 +233,7 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(page.getByLabel("AI Model Card").getByText("AIYES Values Fit ties the app to AIYES values without changing the student's work into a generated report.")).toBeVisible();
   await expect(page.getByLabel("AI Model Card").getByText("AIYES Development Journey turns the required slide and video story into inspectable run evidence.")).toBeVisible();
   await expect(page.getByLabel("AI Model Card").getByText("Learning Impact Loop turns analysis into measurable student readiness and next-trial evidence.")).toBeVisible();
+  await expect(page.getByLabel("AI Model Card").getByText("Student Pilot Study Kit defines anonymous student-testing tasks, metrics, observer notes, and evidence to collect.")).toBeVisible();
   await expect(page.getByLabel("AI Model Card").getByText("Pre-Lab Design Coach turns classification into variables, controls, repeats, source checks, and safety before data collection.")).toBeVisible();
   await expect(page.getByLabel("AI Model Card").getByText("Learning Exit Ticket converts the AI feedback into student reflection prompts judges can inspect.")).toBeVisible();
   await expect(page.getByLabel("AI Model Card").getByText("Student Reflection Workspace stores student-written drafts without generating answers.")).toBeVisible();

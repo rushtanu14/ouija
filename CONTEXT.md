@@ -69,6 +69,17 @@ The newest MCP route in the server dry-run bridge. It adds `composio-browser-sou
 - Ouija should support table input first before adding CSV upload or photo/OCR input.
 - Ouija's internet search should ground expected results and explanations in referenced content instead of inventing them from the model alone.
 
+## Student Pilot Study Kit Checkpoint - 2026-07-09
+
+- Added `studentPilotStudyKit` to `AnalyzeResult` with ready/review status, consent boundary, pre/post prompts, three pilot tasks, four UX/impact metrics, observer checklist, evidence-to-collect list, and judge takeaway.
+- Added a Student Pilot Study Kit panel after Learning Impact Loop in both Student and Judge flows, plus Pilot top-nav links, AI Model Card safeguard copy, and Judge Brief proof copy.
+- Threaded the pilot kit through fallback analysis, web-enrichment merge, row-edit recomputation, Official Rubric Fit, AIYES Values Fit, Development Journey, Track Evidence, Evaluation Bench evidence, Evidence Packet, and MCP Integration Coach payload previews. Google Forms readiness preview now includes pilot-study metrics.
+- Updated docs and submission materials to describe the feature as a pilot-ready protocol, not completed user testing.
+- Refreshed public submission assets. Walkthrough is 1440x900, 147.76s, 15,333,631 bytes, SHA-256 `f130cebc72c4ac784a7d78ad0b8082d4175892c173ab5e9edcb803c5d34640f3`; public slide deck size is 19,380 bytes.
+- Redeployed production: `https://ouija-olive.vercel.app`, deployment `dpl_D6wK3nuMkazB8sJeMZvnAYtuUDCv`.
+- Fresh verification passed: `npm run test` (12 files, 68 tests), `npm run build`, `npm run test:e2e` (9 passed), `npm audit --json` (0 vulnerabilities), `git diff --check`, `npm run capture:submission`, `npm run record:walkthrough`, `npm run sync:public-submission`, public `/api/evaluate`, public `/api/runtime-proof`, public `/api/mcp/status`, public `/api/analyze`, hosted deck/video HEAD checks, and hosted desktop/mobile Playwright smoke for Student Pilot Study Kit/no overflow/no console errors.
+- Remaining external loops: update CSB, commit, push, actual Devpost submission, 2-5 member team roster, optional live Composio credentials only after server-side allowed tools/auth config/consent setup, and optional OpenAI web-search demo only with explicit API-key approval.
+
 ## Student/Judge + Composio Browser MCP Checkpoint - 2026-07-08
 
 - Added default Student mode with Student Focus: next move, evidence check, repeat check, and before-claim guidance near the top while judge-only proof panels stay hidden.

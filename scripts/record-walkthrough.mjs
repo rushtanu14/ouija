@@ -11,7 +11,7 @@ const recordingDir = mkdtempSync(join(tmpdir(), "ouija-walkthrough-"));
 const outputPath = resolve(assetDir, "ouija-walkthrough.webm");
 const captionDurationMs = Number(process.env.OUIJA_CAPTION_MS ?? 6000);
 let captionIndex = 0;
-const captionTotal = 43;
+const captionTotal = 44;
 
 mkdirSync(assetDir, { recursive: true });
 
@@ -126,6 +126,13 @@ await caption(
   "Ouija measures whether the student is ready to reason, should review flags, or needs to fix the run before writing."
 );
 
+await page.getByRole("heading", { name: "Student Pilot Study Kit" }).scrollIntoViewIfNeeded();
+await caption(
+  page,
+  "Student Pilot Study Kit",
+  "Ouija gives a consent-safe 10-minute pilot protocol with anonymous tasks, metrics, observer notes, and evidence to collect before claiming student impact."
+);
+
 await page.getByRole("heading", { name: "Learning Exit Ticket" }).scrollIntoViewIfNeeded();
 await caption(
   page,
@@ -190,7 +197,7 @@ await page.getByLabel("Comparison insights").getByText("Rate trend does not matc
 await caption(
   page,
   "Spreadsheet data handling",
-  "A pasted table becomes graph data with an expected overlay, then warnings update in Guided Lab Flow, Comparison Insights, Pattern Evidence, Method Audit, Reliability Coach, Safety Coach, Concept Mastery Check, Learning Exit Ticket, Student Reflection Workspace, Next Trial Planner, Claim Coach, and Reasoning Trail."
+  "A pasted table becomes graph data with an expected overlay, then warnings update in Guided Lab Flow, Comparison Insights, Pattern Evidence, Method Audit, Reliability Coach, Safety Coach, Concept Mastery Check, Student Pilot Study Kit, Learning Exit Ticket, Student Reflection Workspace, Next Trial Planner, Claim Coach, and Reasoning Trail."
 );
 
 await page.getByRole("heading", { name: "Next Trial Planner" }).scrollIntoViewIfNeeded();
@@ -304,7 +311,7 @@ await page.getByLabel("Judge Brief").getByText("AIYES Track 1").waitFor();
 await caption(
   page,
   "Judge Brief",
-  "The live app includes Track 1 fit, judge demo path, hosted source, deck, and video links, the AIYES submission checklist, official rubric fit, learning impact, concept mastery proof, progress portfolio, evaluation, and integrity constraints."
+  "The live app includes Track 1 fit, judge demo path, hosted source, deck, and video links, the AIYES submission checklist, official rubric fit, learning impact, student pilot protocol, concept mastery proof, progress portfolio, evaluation, and integrity constraints."
 );
 
 await page.getByRole("heading", { name: "Reasoning trail" }).scrollIntoViewIfNeeded();

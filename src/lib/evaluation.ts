@@ -138,6 +138,7 @@ function runEvaluationCase(testCase: EvaluationCase): EvaluationCaseResult {
       `${result.modelStrategy.candidates.length} model candidates ranked`,
       `${result.officialRubricFit.criteria.length} official rubric criteria mapped`,
       `${result.impactSnapshot.score}/100 learning impact score`,
+      `${result.studentPilotStudyKit.metrics.length} pilot metrics (${result.studentPilotStudyKit.status.replaceAll("_", " ")})`,
       `${result.learningExitTicket.prompts.length} learning exit ticket prompts (${result.learningExitTicket.status})`,
       `${result.groundingAudit.score}/100 grounding audit`,
       `${result.aiEvaluationHarness.score}/100 AI evaluation harness`,

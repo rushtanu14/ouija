@@ -237,6 +237,7 @@ export function buildMcpIntegrationPlan({
         "Pattern Archetype Coach source question",
         "Progress Portfolio summary",
         "Pre-Lab Design Coach",
+        "Student Pilot Study Kit",
         "Learning Exit Ticket prompts",
         "Google Forms readiness prompts",
         "Google Calendar next-trial reminder",
@@ -416,7 +417,7 @@ function buildPayloadSummary(
     return `Pre-lab ${result.preLabDesignCoach.status.replaceAll("_", " ")}: ${result.preLabDesignCoach.setupChecks.length} setup checks, ${result.preLabDesignCoach.variablePlan.independentVariable} to ${result.preLabDesignCoach.variablePlan.dependentVariable}`;
   }
   if (connector.id === "google-forms-readiness-check") {
-    return `${result.preLabDesignCoach.setupChecks.length} setup checks plus ${result.learningExitTicket.prompts.length} student reflection prompts`;
+    return `${result.preLabDesignCoach.setupChecks.length} setup checks, ${result.learningExitTicket.prompts.length} student reflection prompts, and ${result.studentPilotStudyKit.metrics.length} pilot-study metrics`;
   }
   if (connector.id === "google-calendar-next-trial-reminder") {
     return `Next trial reminder: ${result.nextTrialPlan.nextMeasurement}`;
