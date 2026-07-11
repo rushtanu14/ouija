@@ -119,7 +119,7 @@ const judgeNavLinks = [
   { href: "#journey", label: "Journey" },
   { href: "#impact", label: "Impact" },
   { href: "#pilot", label: "Pilot" },
-  { href: "#evaluation", label: "Eval Bench" },
+  { href: "#evaluation", label: "Regression" },
   { href: "#saved", label: "Saved Labs" },
   { href: "#progress", label: "Progress" },
   { href: "#mcp-export", label: "MCP Export" },
@@ -602,9 +602,9 @@ function RunSnapshotPanel({ result, evaluationReport }: { result: AnalyzeResult;
       detail: formatReadiness(result.trackEvidence.readiness)
     },
     {
-      label: "Evaluation",
+      label: "Regression",
       value: evaluationReport ? `${evaluationReport.passed}/${evaluationReport.total}` : "Loading",
-      detail: evaluationReport ? (evaluationReport.status === "pass" ? "Bench passed" : "Review needed") : "Bench loading"
+      detail: evaluationReport ? (evaluationReport.status === "pass" ? "Checks passed" : "Review needed") : "Checks loading"
     },
     {
       label: "Impact",
@@ -756,7 +756,7 @@ function RuntimeProofPanel({ proof, result }: { proof: RuntimeProof | null; resu
     },
     {
       id: "evaluation",
-      label: "Evaluation bench",
+      label: "Regression suite",
       status: "review",
       value: "Loading",
       detail: "Runtime proof endpoint is loading."
@@ -1146,7 +1146,7 @@ function JudgeBriefPanel({ result }: { result: AnalyzeResult | null }) {
     {
       label: "Video walkthrough",
       status: "Ready",
-      detail: "Hosted 2:02.88 walkthrough stays under the 5-minute cap and shows live workflow plus session-ticket proof."
+      detail: "Hosted walkthrough stays under the 5-minute cap and shows live workflow plus session-ticket proof."
     },
     {
       label: "Source or deployment",
@@ -1268,7 +1268,7 @@ function ModelCardPanel({ result }: { result: AnalyzeResult | null }) {
     },
     {
       label: "Evaluation",
-      value: "9 live cases"
+      value: "9 checks"
     },
     {
       label: "Privacy",

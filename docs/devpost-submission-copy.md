@@ -81,7 +81,7 @@ React, Vite, TypeScript, Express, OpenAI Responses API, Composio Tool Router/MCP
 - Added Judge Brief so evaluators can immediately see Track 1 fit, live readiness, hosted deck/video/source links, AIYES submission checklist, and remaining external submission loops.
 - Added low-confidence boundary handling for unsupported experiment descriptions.
 - Added plant growth vs light color as a supported middle/high school biology lab.
-- Added Deterministic Regression Suite with nine live cases for supported coverage and boundary behavior.
+- Added Deterministic Regression Suite with nine deterministic checks for supported coverage and boundary behavior.
 - Added density layering as a supported middle/high school chemistry lab instead of leaving it as an unsupported boundary example.
 - Added a paced captioned walkthrough showing the problem, architecture, live app workflow, concept coaching, next-trial planning, evaluation, hosted submission links, and submission-readiness status.
 - Verified unit/API tests, production build, E2E, audit, production start, and desktop/mobile browser QA.

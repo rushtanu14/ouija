@@ -73,6 +73,16 @@ The one-click judge packet at `https://ouija-olive.vercel.app/submission/`. It g
 - Ouija should support table input first before adding CSV upload or photo/OCR input.
 - Ouija's internet search should ground expected results and explanations in referenced content instead of inventing them from the model alone.
 
+## Regression Wording Polish Checkpoint - 2026-07-11
+
+- Council verdict: Ouija works and is submittable for AIYES Track 1. A literal first-place guarantee is still impossible; AIYES currently awards Gold/Silver/Bronze/Honorable Mention certificates, and final judging plus Devpost submission/team roster are external.
+- Polished the remaining judge-visible wording from `Eval Bench`, `Evaluation bench`, `Bench passed`, and `9 live cases` to `Regression`, `Regression suite`, `Checks passed`, and `9 checks`.
+- Removed the stale exact walkthrough duration from the Judge Brief and kept the claim to the official under-5-minute cap.
+- Updated the hosted Submission Hub proof card and active Devpost copy to say deterministic checks instead of live cases.
+- Deployment: `dpl_AWkD725mAuHVfhFRzrb8jiLv5Hp2`, aliased to `https://ouija-olive.vercel.app`.
+- Verification: `npm run test` (14 files, 82 tests), `npm run build`, `npm run test:e2e` (36 passed across Chromium, Firefox, WebKit, and mobile Safari), `npm audit --json` (0 vulnerabilities), `git diff --check`, production deploy, public `/api/evaluate`, public `/api/runtime-proof`, hosted Submission Hub wording check, and judge-view smoke with no horizontal overflow and zero console issues.
+- Remaining loops: commit/push, actual Devpost submission, 2-5 member team roster, optional live OpenAI/Composio credentials only with explicit approval.
+
 ## API Security + Composio Session Checkpoint - 2026-07-11
 
 - Council verdict: Ouija is stronger with a real consent-gated Composio/MCP bridge than with more superficial integrations. First place still cannot be guaranteed because judging, Devpost submission, and team roster handling are external.

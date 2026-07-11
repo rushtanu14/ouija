@@ -9,7 +9,7 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(page.getByLabel("View mode").getByRole("button", { name: "Judge" })).toHaveAttribute("aria-pressed", "true");
   await expect(page.getByRole("heading", { name: "Run Snapshot" })).toBeVisible();
   await expect(page.getByLabel("Run Snapshot").getByText("Rubric fit", { exact: true })).toBeVisible();
-  await expect(page.getByLabel("Run Snapshot").getByText("Evaluation", { exact: true })).toBeVisible();
+  await expect(page.getByLabel("Run Snapshot").getByText("Regression", { exact: true })).toBeVisible();
   await expect(page.getByLabel("Run Snapshot").getByText("Expected pattern", { exact: true })).toBeVisible();
   await expect(page.getByLabel("Run Snapshot").getByText("Current action", { exact: true })).toBeVisible();
   await expect(page.locator(".run-snapshot-header > span").getByText("Competitive", { exact: true })).toBeVisible();
@@ -211,7 +211,7 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(page.getByLabel("Pre-Lab Design Coach").getByText("Independent variable", { exact: true })).toBeVisible();
   await expect(page.getByLabel("Pre-Lab Design Coach").locator(".section-label").filter({ hasText: "Repeat plan" })).toBeVisible();
   await expect(page.getByLabel("Pre-Lab Design Coach").getByText("Source task", { exact: true })).toBeVisible();
-  await page.getByRole("link", { name: "Eval Bench" }).click();
+  await page.getByRole("link", { name: "Regression" }).click();
   await expect(page.getByLabel("Deterministic Regression Suite").getByText("9/9")).toBeVisible();
   await expect(page.getByLabel("Deterministic Regression Suite").getByText("checks passed")).toBeVisible();
   await expect(page.getByLabel("Deterministic Regression Suite").getByText("Pendulum coverage")).toBeVisible();
@@ -222,7 +222,7 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await page.getByRole("link", { name: "Model Card" }).click();
   await expect(page.getByLabel("AI Model Card").getByText("Hybrid and inspectable")).toBeVisible();
   await expect(page.getByLabel("AI Model Card").getByText("Trusted fallback")).toBeVisible();
-  await expect(page.getByLabel("AI Model Card").getByText("9 live cases")).toBeVisible();
+  await expect(page.getByLabel("AI Model Card").getByText("9 checks")).toBeVisible();
   await expect(page.getByLabel("AI Model Card").getByText("Server keeps API keys out of the browser.")).toBeVisible();
   await expect(page.getByLabel("AI Model Card").getByText("Model Strategy exposes candidate ranking, signals, fallback behavior, and risk controls.")).toBeVisible();
   await expect(page.getByLabel("AI Model Card").getByText("Technical Depth Proof summarizes decision trace, evaluation harness, grounding quality, pattern engine, privacy, and integrity signals.")).toBeVisible();
