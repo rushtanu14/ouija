@@ -28,6 +28,7 @@ Ouija connects four pieces in one workflow:
 - AIYES Rubric Fit that maps every run to the official problem/relevance, AI technical design/model strategy, and UX/design criteria.
 - AIYES Values Fit that maps every run to democracy, diversity, connectivity, innovation, and ethical inclusion using concrete product evidence.
 - AIYES Development Journey that maps every run to the required Track 1 story: problem, data, model, app build, testing, UX, ethics, impact, constraints, and submission proof.
+- Submission Hub that gives judges one hosted URL for the live app, judge view, deck, walkthrough, source, screenshots, and live proof endpoints.
 - Pre-Lab Design Coach that turns the match into variables, controls, repeats, table columns, a source task, safety gate, and blank hypothesis starter before data collection.
 - Learning Impact Loop that scores student readiness and shows outcome, data-quality, concept-learning, integrity, pattern-evidence, repeat-reliability, and next-trial metrics.
 - Student Pilot Study Kit that prepares anonymous 10-minute student-testing tasks, UX/impact metrics, observer notes, and evidence to collect before submission.
@@ -52,7 +53,7 @@ Ouija connects four pieces in one workflow:
 - AI Model Card that summarizes architecture, grounding, evaluation, privacy, and safeguards.
 - Saved Labs plus Progress Portfolio for browser-local snapshots and repeated learning evidence across runs.
 - Evidence Packet for a copyable source-backed handoff that keeps the final conclusion student-written.
-- Judge Brief for a compact Track 1 proof surface during live evaluation, including hosted deck/video/source links and an AIYES submission checklist.
+- Judge Brief for a compact Track 1 proof surface during live evaluation, including the Submission Hub, hosted deck/video/source links, and an AIYES submission checklist.
 - Low-confidence boundary handling for unsupported experiment descriptions.
 - Custom Lab Triage plus Pattern Archetype Coach for unsupported experiments: inferred focus, starter table columns, variables, controls, repeat guidance, starter rows, hypothesis blanks, comparison/trend/optimum/time-series graph-shape guidance, source questions, clarifying questions, and a teacher-confirmation boundary.
 - Claim Coach output that shows evidence gaps and Socratic next questions without writing the conclusion.
@@ -86,6 +87,7 @@ AI Model Card makes the build strategy immediately inspectable for judges: templ
 
 - Slide presentation: https://ouija-olive.vercel.app/submission/slide-deck.html
 - Video walkthrough: https://ouija-olive.vercel.app/submission/assets/ouija-walkthrough.webm
+- Submission hub: https://ouija-olive.vercel.app/submission/
 - Live demo: https://ouija-olive.vercel.app
 - Judge view: https://ouija-olive.vercel.app/?judge=1
 - Devpost copy: use `docs/devpost-submission-copy.md`.

@@ -41,6 +41,7 @@ describe("AIYES submission assets", () => {
   it("includes Devpost-ready copy and asset instructions", () => {
     const copy = read("docs/devpost-submission-copy.md");
     const assets = read("docs/submission-assets.md");
+    const hub = read("docs/submission-hub.html");
 
     expect(copy).toContain("Project Title");
     expect(copy).toContain("Ouija");
@@ -51,6 +52,7 @@ describe("AIYES submission assets", () => {
     expect(copy).toContain("Student/Judge views");
     expect(copy).toContain("?judge=1");
     expect(copy).toContain("Student Focus");
+    expect(copy).toContain("Submission Hub");
     expect(copy).toContain("Concept Mastery Check");
     expect(copy).toContain("Pre-Lab Design Coach");
     expect(copy).toContain("MCP Integration Coach");
@@ -64,22 +66,35 @@ describe("AIYES submission assets", () => {
     expect(copy).toContain("Google Classroom");
     expect(assets).toContain("Progress Portfolio");
     expect(assets).toContain("Portfolio Story Builder");
+    expect(assets).toContain("Submission hub");
     expect(assets).toContain("Concept Mastery Check");
     expect(assets).toContain("npm run capture:submission");
     expect(assets).toContain("npm run record:walkthrough");
     expect(assets).toContain("npm run sync:public-submission");
     expect(copy).toContain("https://ouija-olive.vercel.app/submission/slide-deck.html");
+    expect(copy).toContain("https://ouija-olive.vercel.app/submission/");
     expect(copy).toContain("https://ouija-olive.vercel.app/submission/assets/ouija-walkthrough.webm");
     expect(copy).toContain("https://github.com/rushtanu14/ouija");
     expect(assets).toContain("https://github.com/rushtanu14/ouija");
+    expect(assets).toContain("https://ouija-olive.vercel.app/submission/");
     expect(assets).toContain("ouija-walkthrough.webm");
-    expect(`${copy}\n${assets}`).not.toMatch(/TODO|TBD|placeholder|use the repository URL|use the final recorded/i);
-    expect(`${copy}\n${assets}`).not.toMatch(/upload the walkthrough video|finalize the video walkthrough URL/i);
+    expect(hub).toContain("AIYES Track 1 Submission Hub");
+    expect(hub).toContain("https://ouija-olive.vercel.app/?judge=1");
+    expect(hub).toContain("/submission/slide-deck.html");
+    expect(hub).toContain("/submission/assets/ouija-walkthrough.webm");
+    expect(hub).toContain("https://github.com/rushtanu14/ouija");
+    expect(hub).toContain("/api/evaluate");
+    expect(hub).toContain("/api/runtime-proof");
+    expect(hub).toContain("/api/mcp/status");
+    expect(`${copy}\n${assets}\n${hub}`).not.toMatch(/TODO|TBD|placeholder|use the repository URL|use the final recorded/i);
+    expect(`${copy}\n${assets}\n${hub}`).not.toMatch(/upload the walkthrough video|finalize the video walkthrough URL/i);
   });
 
   it("syncs public submission links for hosted Devpost materials", () => {
+    expect(existsSync("public/submission/index.html")).toBe(true);
     expect(existsSync("public/submission/slide-deck.html")).toBe(true);
     expect(existsSync("public/submission/assets/ouija-walkthrough.webm")).toBe(true);
+    expect(read("public/submission/index.html")).toContain("AIYES Track 1 Submission Hub");
     expect(statSync("public/submission/assets/ouija-walkthrough.webm").size).toBeGreaterThan(100_000);
   });
 });

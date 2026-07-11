@@ -76,7 +76,7 @@ Show Evaluation Bench with 100/100 and 9/9 live checks: projectile, pendulum per
 
 ## 4:58-5:00 - Judge Brief
 
-Show Judge Brief so evaluators see Track 1 fit, Judge Demo Path, live app, hosted deck/video/source links, AIYES submission checklist, official rubric fit, learning impact, student pilot protocol, learning exit ticket, student level lens, Concept Mastery Check, student reflection workspace, progress portfolio, grounding audit, AI evaluation harness, data-handling ethics, pattern evidence, model strategy, AI pipeline, evaluation, tests, and integrity constraints in one place.
+Show Judge Brief so evaluators see Track 1 fit, Judge Demo Path, Submission Hub, live app, hosted deck/video/source links, AIYES submission checklist, official rubric fit, learning impact, student pilot protocol, learning exit ticket, student level lens, Concept Mastery Check, student reflection workspace, progress portfolio, grounding audit, AI evaluation harness, data-handling ethics, pattern evidence, model strategy, AI pipeline, evaluation, tests, and integrity constraints in one place.
 
 ## Closing Line
 

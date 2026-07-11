@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Ouija AIYES Submission Hub</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #17201b;
+        --muted: #66756d;
+        --line: #d9e2dc;
+        --panel: #ffffff;
+        --soft: #f4f8f5;
+        --accent: #1f7a5a;
+        --accent-2: #315f9f;
+        --warn: #9b5b1f;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background: var(--soft);
+        color: var(--ink);
+        font-family:
+          Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      main {
+        width: min(1120px, calc(100% - 32px));
+        margin: 0 auto;
+        padding: 44px 0 56px;
+      }
+
+      header {
+        display: grid;
+        gap: 18px;
+        padding: 28px;
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+      }
+
+      h1,
+      h2,
+      p {
+        margin: 0;
+      }
+
+      h1 {
+        font-size: clamp(2rem, 5vw, 4.4rem);
+        line-height: 0.95;
+        letter-spacing: 0;
+      }
+
+      h2 {
+        font-size: 1rem;
+        letter-spacing: 0;
+      }
+
+      .eyebrow {
+        color: var(--accent);
+        font-size: 0.78rem;
+        font-weight: 800;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .lede {
+        max-width: 780px;
+        color: var(--muted);
+        font-size: 1.08rem;
+        line-height: 1.65;
+      }
+
+      .link-grid,
+      .proof-grid,
+      .checklist,
+      .asset-grid {
+        display: grid;
+        gap: 12px;
+      }
+
+      .link-grid {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+      }
+
+      .proof-grid,
+      .asset-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .checklist {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      a,
+      .proof-card,
+      .check-card {
+        min-width: 0;
+        padding: 16px;
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+      }
+
+      a {
+        display: grid;
+        gap: 8px;
+        color: inherit;
+        text-decoration: none;
+      }
+
+      a:hover {
+        border-color: var(--accent);
+      }
+
+      a span,
+      .proof-card span,
+      .check-card span {
+        color: var(--muted);
+        font-size: 0.78rem;
+        font-weight: 800;
+        text-transform: uppercase;
+      }
+
+      a strong,
+      .proof-card strong,
+      .check-card strong {
+        overflow-wrap: anywhere;
+      }
+
+      section {
+        margin-top: 18px;
+        display: grid;
+        gap: 12px;
+      }
+
+      .proof-card,
+      .check-card {
+        display: grid;
+        gap: 8px;
+      }
+
+      .proof-card strong {
+        font-size: 1.8rem;
+      }
+
+      .ready {
+        color: var(--accent);
+      }
+
+      .external {
+        color: var(--warn);
+      }
+
+      .note {
+        padding: 16px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fffaf0;
+        color: #57452f;
+        line-height: 1.55;
+      }
+
+      .footer {
+        color: var(--muted);
+        font-size: 0.88rem;
+        line-height: 1.5;
+        overflow-wrap: anywhere;
+      }
+
+      @media (max-width: 860px) {
+        main {
+          width: min(100% - 20px, 680px);
+          padding-top: 20px;
+        }
+
+        header {
+          padding: 20px;
+        }
+
+        .link-grid,
+        .proof-grid,
+        .checklist,
+        .asset-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <p class="eyebrow">AIYES Track 1 Submission Hub</p>
+        <h1>Ouija</h1>
+        <p class="lede">
+          A student-safe AI experiment interpreter for middle and high school science labs. This hub gives judges one place
+          to open the live app, judge view, deck, walkthrough, source, and proof endpoints.
+        </p>
+        <div class="link-grid" aria-label="Primary submission links">
+          <a href="https://ouija-olive.vercel.app/?judge=1">
+            <span>Judge view</span>
+            <strong>Open full proof stack</strong>
+          </a>
+          <a href="https://ouija-olive.vercel.app">
+            <span>Student app</span>
+            <strong>Open default workflow</strong>
+          </a>
+          <a href="/submission/slide-deck.html">
+            <span>Slides</span>
+            <strong>View deck</strong>
+          </a>
+          <a href="/submission/assets/ouija-walkthrough.webm">
+            <span>Video</span>
+            <strong>Watch walkthrough</strong>
+          </a>
+          <a href="https://github.com/rushtanu14/ouija">
+            <span>Source</span>
+            <strong>GitHub repo</strong>
+          </a>
+        </div>
+      </header>
+
+      <section aria-labelledby="proof-heading">
+        <h2 id="proof-heading">Live Proof</h2>
+        <div class="proof-grid">
+          <a class="proof-card" href="/api/evaluate">
+            <span>Evaluation bench</span>
+            <strong>100/100</strong>
+            <p>9/9 live cases covering eight supported labs plus the unsupported-lab boundary.</p>
+          </a>
+          <a class="proof-card" href="/api/runtime-proof">
+            <span>Runtime proof</span>
+            <strong>fallback_ready</strong>
+            <p>Shows template count, evaluation coverage, server-only key boundary, and MCP bridge mode.</p>
+          </a>
+          <a class="proof-card" href="/api/mcp/status">
+            <span>MCP bridge</span>
+            <strong>10 routes</strong>
+            <p>Credentials-safe Composio dry-run bridge with connector readiness and consent gates.</p>
+          </a>
+        </div>
+      </section>
+
+      <section aria-labelledby="checklist-heading">
+        <h2 id="checklist-heading">Submission Checklist</h2>
+        <div class="checklist">
+          <article class="check-card">
+            <span>Track</span>
+            <strong class="ready">Track 1 AI Application Development</strong>
+            <p>Student-only practical AI app for middle/high school science experiments.</p>
+          </article>
+          <article class="check-card">
+            <span>Materials</span>
+            <strong class="ready">Deck, video, live app, source</strong>
+            <p>Hosted assets are public and linked above for judge verification.</p>
+          </article>
+          <article class="check-card">
+            <span>Technical proof</span>
+            <strong class="ready">Model strategy + eval harness</strong>
+            <p>Judge mode exposes classification, grounding, validators, privacy, MCP boundary, and AIYES rubric fit.</p>
+          </article>
+          <article class="check-card">
+            <span>External loop</span>
+            <strong class="external">Devpost team roster</strong>
+            <p>The live Devpost page lists a 2-5 student team requirement; handle that during final submission.</p>
+          </article>
+        </div>
+      </section>
+
+      <section aria-labelledby="assets-heading">
+        <h2 id="assets-heading">Visual Assets</h2>
+        <div class="asset-grid">
+          <a href="/submission/assets/ouija-demo-desktop.png">
+            <span>Desktop screenshot</span>
+            <strong>Open image</strong>
+          </a>
+          <a href="/submission/assets/ouija-demo-mobile.png">
+            <span>Mobile screenshot</span>
+            <strong>Open image</strong>
+          </a>
+          <a href="/submission/assets/ouija-custom-triage.png">
+            <span>Custom lab screenshot</span>
+            <strong>Open image</strong>
+          </a>
+        </div>
+      </section>
+
+      <section>
+        <p class="note">
+          Integrity boundary: Ouija explains expected patterns, checks data, and asks student-owned reasoning questions. It
+          does not write a complete lab report or final conclusion paragraph.
+        </p>
+        <p class="footer">
+          Current proof package: 147.76 second walkthrough, 15,333,631 bytes, SHA-256
+          f130cebc72c4ac784a7d78ad0b8082d4175892c173ab5e9edcb803c5d34640f3.
+        </p>
+      </section>
+    </main>
+  </body>
+</html>

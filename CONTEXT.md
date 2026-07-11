@@ -58,6 +58,10 @@ The UX split that keeps Ouija practical for students while preserving judge proo
 
 The newest MCP route in the server dry-run bridge. It adds `composio-browser-source-capture` for public source-page context capture through Composio Browser Tool (`BROWSER_TOOL_CREATE_TASK`, `BROWSER_TOOL_WATCH_TASK`). It is source-context support only; it must not browse private accounts, write the student's final claim, or run live without server-side credentials, allowed tools, and explicit consent.
 
+### Submission Hub
+
+The one-click judge packet at `https://ouija-olive.vercel.app/submission/`. It gathers the live app, Judge view, slide deck, walkthrough, source code, screenshots, and public proof endpoints so Devpost judges do not have to hunt through README links or app panels.
+
 ## Product Boundaries
 
 - Ouija should not become a teacher grading dashboard.
@@ -68,6 +72,17 @@ The newest MCP route in the server dry-run bridge. It adds `composio-browser-sou
 - Ouija's first supported set should balance physics, chemistry, biology, and earth science instead of overfitting to physics.
 - Ouija should support table input first before adding CSV upload or photo/OCR input.
 - Ouija's internet search should ground expected results and explanations in referenced content instead of inventing them from the model alone.
+
+## Submission Hub Checkpoint - 2026-07-09 local / 2026-07-10 UTC
+
+- Council verdict: Ouija works and is submittable for AIYES Track 1; first place still cannot be guaranteed because judging, Devpost submission, and team roster handling are external. The next highest-leverage gap was judge-first packaging, not more superficial Composio breadth.
+- Added `docs/submission-hub.html` and synced it to `public/submission/index.html`. The hosted hub links Judge view, student app, slide deck, walkthrough, source repo, screenshots, `/api/evaluate`, `/api/runtime-proof`, and `/api/mcp/status`.
+- Updated Judge Brief to include Submission Hub as a hosted readiness item, hosted link, checklist item, and proof statement.
+- Updated README, Devpost copy, AIYES submission brief, judging checklist, five-minute script, slide deck, and submission-assets proof to include `https://ouija-olive.vercel.app/submission/`.
+- Redeployed production: `https://ouija-olive.vercel.app`, deployment `dpl_GpWKJmyACSNVnHRHcpc6ybH51QLd`.
+- Public proof: `/submission/` returned HTTP 200 with content length `8310`; `/api/evaluate` returned `100/100` and `9/9`; `/api/runtime-proof` returned `fallback_ready`, eight templates, 9/9 coverage, and `server_dry_run`; `/api/mcp/status` returned 10 connector routes.
+- Verification passed: `npm run test` (12 files, 68 tests), `npm run build`, `npm run test:e2e` (9 passed), `npm audit --json` (0 vulnerabilities), `git diff --check`, `npm run sync:public-submission`, local and hosted Playwright hub smoke on desktop/mobile with no horizontal overflow and zero console errors, production deploy, and live endpoint checks.
+- Remaining external loops: CSB update, commit, push, actual Devpost submission, 2-5 member team roster, optional live Composio credentials only after server-side allowed tools/auth config/consent setup, and optional OpenAI web-search demo only with explicit API-key approval.
 
 ## Student Pilot Study Kit Checkpoint - 2026-07-09
 

@@ -7,6 +7,7 @@
 - Impact is practical: faster debugging of lab data, better understanding, fewer report-writing shortcuts.
 - Run Snapshot gives a first-scroll readout of rubric fit, evaluation status, learning impact, data flags, expected pattern, and current action.
 - Student/Judge views keep the default app practical for students while `?judge=1` exposes the full judge proof stack.
+- Submission Hub gives judges one hosted route for live app, judge view, deck, walkthrough, source, screenshots, and proof endpoints.
 - Practical science behavior is visible: students see whether the whole graph supports the expected pattern and whether repeated trials have enough count, average, and spread to support a claim.
 - AIYES Rubric Fit gives judges concrete problem/relevance evidence for each analyzed run.
 - AIYES Values Fit gives judges concrete mission evidence for student agency, access, connected evidence, practical innovation, and ethical inclusion.
@@ -124,15 +125,17 @@
 - Progress Portfolio appears near Saved Labs so judges can inspect score trend, subject breadth, and strongest saved run.
 - Portfolio Story Builder appears inside Progress Portfolio so judges can inspect student-authored impact prompts before any classroom export.
 - MCP Integration Coach appears near Progress Portfolio so judges can inspect the exact source-audit/export payload, Composio Search route, Scholar claim-check route, Browser source-capture route, Google Classroom pre-lab checkpoint route, Google Forms readiness route, Google Calendar next-trial reminder route, credential boundary, Composio route, and server dry-run readiness matrix before any live connector is enabled.
+- Submission Hub keeps the external judging packet scannable instead of forcing evaluators to hunt through the README or Devpost copy.
 - Desktop and mobile E2E checks verify no horizontal overflow.
 
 ## Remaining Submission Work
 
-- Submit the hosted live demo, slide deck, and video walkthrough on Devpost.
+- Submit the hosted Submission Hub, live demo, slide deck, and video walkthrough on Devpost.
+- Use `https://ouija-olive.vercel.app/submission/` as the one-click judge packet.
 - Use `https://ouija-olive.vercel.app/?judge=1` for judge walkthroughs and `https://ouija-olive.vercel.app` for the student default view.
 - Handle the live Devpost page's listed 2-5 member team requirement; the overview text also says participants may work individually, so verify the submission form behavior before final submit.
 - Optionally configure a real OpenAI API key for one web-search-enriched demo and live Composio credentials for classroom exports.
 - Use `/api/runtime-proof`, `/api/evaluate`, `/api/mcp/status`, and a consent-gated `/api/mcp/session` dry-run as quick public smoke checks after each deploy.
-- In Judge Brief, verify the AIYES Submission Checklist shows slide presentation, video walkthrough, source/deployment, and the external 2-5 student team step.
+- In Judge Brief, verify the AIYES Submission Checklist shows slide presentation, video walkthrough, submission hub, source/deployment, and the external 2-5 student team step.
 - Present or export `docs/aiyes-slide-deck.html`.
 - Paste `docs/devpost-submission-copy.md` into Devpost.

@@ -31,7 +31,7 @@ Ouija is a student-facing AI experiment interpreter for middle and high school s
 16. Use Progress Portfolio and Portfolio Story Builder to show saved-run count, score trend, subject breadth, strongest run, student-authored progress prompts, and next portfolio action.
 17. Use MCP Integration Coach to validate Composio Search source-audit, Scholar claim-check, and Composio Browser source-capture routes plus Google Docs, Google Sheets, Google Drive, Google Classroom, Google Forms, Google Calendar, and Notion handoffs through the server dry-run bridge, plus the readiness matrix, without exposing credentials or sending student data.
 18. Open AI Model Card for the architecture, grounding, evaluation, privacy, MCP-export boundary, and guardrail summary.
-19. Open Judge Brief for a compact Track 1 proof surface: live app, judge view, hosted deck/video/source links, AIYES submission checklist, judge demo path, official rubric fit, learning impact, student pilot protocol, student reflection drafts, progress portfolio, MCP readiness plan, AI pipeline, model strategy, evaluation, data-handling ethics, tests, and integrity constraints.
+19. Open Judge Brief for a compact Track 1 proof surface: submission hub, live app, judge view, hosted deck/video/source links, AIYES submission checklist, judge demo path, official rubric fit, learning impact, student pilot protocol, student reflection drafts, progress portfolio, MCP readiness plan, AI pipeline, model strategy, evaluation, data-handling ethics, tests, and integrity constraints.
 
 Guided Lab Flow gives students one current next action and six stable stages so the interface feels like a lab workflow rather than separate AI outputs.
 
@@ -173,6 +173,7 @@ npm run sync:public-submission
 Hosted submission links after deployment:
 
 - Source code: https://github.com/rushtanu14/ouija
+- Submission hub: https://ouija-olive.vercel.app/submission/
 - Live demo: https://ouija-olive.vercel.app
 - Slide deck: https://ouija-olive.vercel.app/submission/slide-deck.html
 - Video walkthrough: https://ouija-olive.vercel.app/submission/assets/ouija-walkthrough.webm

@@ -7,6 +7,7 @@ const publicSubmissionDir = resolve(repoRoot, "public", "submission");
 const publicAssetDir = resolve(publicSubmissionDir, "assets");
 
 const copies = [
+  ["docs/submission-hub.html", "public/submission/index.html"],
   ["docs/aiyes-slide-deck.html", "public/submission/slide-deck.html"],
   ["docs/assets/ouija-walkthrough.webm", "public/submission/assets/ouija-walkthrough.webm"],
   ["docs/assets/ouija-demo-desktop.png", "public/submission/assets/ouija-demo-desktop.png"],

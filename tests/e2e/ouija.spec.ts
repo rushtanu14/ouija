@@ -333,15 +333,20 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(page.getByLabel("Settings", { exact: true }).getByText("3/3")).toBeVisible();
   await page.getByRole("link", { name: "Judge Brief" }).click();
   await expect(page.getByLabel("Judge Brief").getByText("AIYES Track 1")).toBeVisible();
-  await expect(page.locator(".judge-status-grid").getByText("Hosted")).toHaveCount(2);
+  await expect(page.locator(".judge-status-grid").getByText("Hosted")).toHaveCount(3);
   await expect(page.locator(".judge-status-grid").getByText("Source code")).toBeVisible();
   await expect(page.locator(".judge-status-grid").getByText("Public")).toBeVisible();
   await expect(page.getByLabel("AIYES Submission Checklist").getByText("Slide presentation")).toBeVisible();
   await expect(page.getByLabel("AIYES Submission Checklist").getByText("Video walkthrough")).toBeVisible();
   await expect(page.getByLabel("AIYES Submission Checklist").getByText("Source or deployment")).toBeVisible();
+  await expect(page.getByLabel("AIYES Submission Checklist").getByText("Submission hub")).toBeVisible();
   await expect(page.getByLabel("AIYES Submission Checklist").getByText("Student team", { exact: true })).toBeVisible();
   await expect(page.getByLabel("AIYES Submission Checklist").getByText("External step", { exact: true })).toBeVisible();
   await expect(page.getByLabel("AIYES Submission Checklist").getByText("2-5 student team")).toBeVisible();
+  await expect(page.getByLabel("Hosted submission links").getByRole("link", { name: /Submission hub/i })).toHaveAttribute(
+    "href",
+    "https://ouija-olive.vercel.app/submission/"
+  );
   await expect(page.getByLabel("Hosted submission links").getByRole("link", { name: /Source code/i })).toHaveAttribute(
     "href",
     "https://github.com/rushtanu14/ouija"
@@ -363,6 +368,7 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(page.getByLabel("Judge Brief").getByText("AIYES Values Fit maps democracy, diversity, connectivity, innovation, and ethical inclusion to concrete product evidence.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("AIYES Development Journey maps problem, data, model, build, testing, UX, ethics, impact, constraints, and submission proof.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Learning Impact Loop measures the student's outcome for each run.")).toBeVisible();
+  await expect(page.getByLabel("Judge Brief").getByText("Submission Hub gives judges one URL for live app, judge view, deck, video, source, and proof endpoints.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Pre-Lab Design Coach helps students plan variables, controls, repeats, sources, and safety before collecting data.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Learning Exit Ticket proves students must explain variables, patterns, and next steps themselves.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Student Reflection Workspace captures student-authored exit-ticket drafts.")).toBeVisible();
