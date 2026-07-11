@@ -60,11 +60,21 @@ Generated from `server/app.ts`, `api/health.ts`, and `api/evaluate.ts`.
 | Issue | Fix |
 | --- | --- |
 | `/api/analyze` returns fallback grounding | Set `OPENAI_API_KEY` in the server environment if a web-search-enriched demo is required; fallback mode is expected without credentials. |
-| MCP Integration Coach shows server dry-run | Expected for the public demo. Enable live exports only after keeping `COMPOSIO_API_KEY` out of the Vite client, configuring `COMPOSIO_SESSION_USER_ID`, `COMPOSIO_LIVE_EXPORTS=true`, `COMPOSIO_<TOOLKIT>_ALLOWED_TOOLS`, toolkit auth config IDs where required, and preserving the consent step. Composio Search source-audit, Scholar claim-check, and Composio Browser source-capture routes use allowed-tool env vars without private account auth config IDs. |
+| MCP Integration Coach shows server dry-run | Expected for the public demo. Enable live exports only after keeping `COMPOSIO_API_KEY` out of the Vite client, configuring `COMPOSIO_SESSION_USER_ID`, `COMPOSIO_LIVE_EXPORTS=true`, `MCP_SESSION_AUTH_TOKEN`, `COMPOSIO_<TOOLKIT>_ALLOWED_TOOLS`, toolkit auth config IDs where required, and preserving the consent step. Composio Search source-audit, Scholar claim-check, and Composio Browser source-capture routes use allowed-tool env vars without private account auth config IDs. |
+| Browser request has no CORS access | Add the trusted preview origin to `OUIJA_ALLOWED_ORIGIN`; untrusted origins are intentionally not reflected. |
 | Empty description returns `400` | Enter a non-empty experiment description before analyzing. |
 | Walkthrough recording hangs | Run with `OUIJA_CAPTION_MS=4000`; the script sets a Playwright default timeout to avoid infinite waits. |
 | Vercel API works but frontend is stale | Run `npm run build`, refresh submission assets, sync `public/submission`, then redeploy. |
 | Public submission assets 404 | Run `npm run sync:public-submission` before deployment and verify files under `public/submission`. |
+
+## Verification gates
+
+- `npm test` runs the deterministic unit and API regression suite.
+- `npm run test:coverage` enforces at least 80% statements, functions, and lines plus 75% branch coverage across `src/lib`, `server`, and `api` logic. The current branch baseline is tracked explicitly instead of hiding untested decision paths.
+- `npm run test:e2e` runs Chromium, Firefox, WebKit, and mobile Safari projects.
+- `npm run build`, `npm audit --json`, and `git diff --check` remain required before release.
+
+Analysis throttling is intentionally mode-aware: deployments with `OPENAI_API_KEY` allow 20 analysis requests per client key per minute to protect paid web-search usage; credential-free deterministic deployments allow 120 per minute so classrooms and browser matrices sharing an address do not trip the cost-oriented budget. `/api/mcp/session` allows 10 session-ticket requests per client key per minute.
 
 ## Rollback Procedure
 

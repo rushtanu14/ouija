@@ -781,7 +781,7 @@ function RuntimeProofPanel({ proof, result }: { proof: RuntimeProof | null; resu
         <div>
           <p className="section-label">Active AI path</p>
           <strong>{proof?.webSearchConfigured ? "OpenAI web search ready" : "Deterministic fallback ready"}</strong>
-          <small>{proof?.judgeTakeaway ?? "Checking server runtime, evaluation bench, and secret boundary."}</small>
+          <small>{proof?.judgeTakeaway ?? "Checking server runtime, deterministic regression suite, and secret boundary."}</small>
         </div>
         <div>
           <p className="section-label">Current run</p>
@@ -1080,20 +1080,20 @@ function GroundingAuditPanel({ audit }: { audit: GroundingAudit }) {
 
 function EvaluationBenchPanel({ report }: { report: EvaluationReport | null }) {
   return (
-    <section className="evaluation-panel" id="evaluation" aria-label="Evaluation Bench">
+    <section className="evaluation-panel" id="evaluation" aria-label="Deterministic Regression Suite">
       <div className="panel-title">
         <ListChecks size={18} />
-        <h3>Evaluation Bench</h3>
+        <h3>Deterministic Regression Suite</h3>
       </div>
       {report ? (
         <>
           <div className={`eval-summary eval-summary-${report.status}`}>
             <div>
-              <p className="section-label">Live suite</p>
-              <strong>{report.score}/100</strong>
+              <p className="section-label">Internal behavior checks</p>
+              <strong>{report.passed}/{report.total}</strong>
             </div>
             <span>
-              {report.passed}/{report.total} passed
+              checks passed
             </span>
           </div>
           <p className="eval-verdict">{report.verdict}</p>
@@ -1110,7 +1110,7 @@ function EvaluationBenchPanel({ report }: { report: EvaluationReport | null }) {
           </div>
         </>
       ) : (
-        <p className="empty-copy">Evaluation bench is loading.</p>
+        <p className="empty-copy">Regression suite is loading.</p>
       )}
     </section>
   );
@@ -1198,7 +1198,7 @@ function JudgeBriefPanel({ result }: { result: AnalyzeResult | null }) {
     "Progress Portfolio shows learning over multiple saved runs.",
     "Portfolio Story Builder turns saved runs into student-written progress evidence.",
     "AIYES submission checklist makes deck, video, source/deploy link, and team requirement status visible.",
-    "Evaluation Bench runs nine live cases.",
+    "Deterministic Regression Suite runs nine internal behavior checks.",
     "Custom Lab Triage keeps unsupported labs useful without pretending full coverage.",
     "Hosted deck and walkthrough are public.",
     "Testing/evaluation proof is in the app and repo.",
@@ -1310,7 +1310,7 @@ function ModelCardPanel({ result }: { result: AnalyzeResult | null }) {
     "Claim Coach leaves blanks instead of writing conclusions.",
     "Safety Coach forces adult-review language when a lab match is uncertain.",
     "Next Trial Planner suggests what to measure next without writing claims.",
-    "Evaluation Bench tests eight supported labs plus the unsupported boundary."
+    "Deterministic Regression Suite tests eight supported labs plus the unsupported boundary."
   ];
 
   return (
@@ -1763,6 +1763,9 @@ function SettingsPanel({
           </article>
         ))}
       </div>
+      <p className="settings-privacy-note">
+        Do not enter names or personal information. Experiment descriptions may be sent to OpenAI only when server-side web enrichment is enabled.
+      </p>
     </section>
   );
 }
@@ -1892,10 +1895,14 @@ function DataImportPanel({
 }) {
   const [draft, setDraft] = useState("");
   const [status, setStatus] = useState<{ tone: "success" | "error"; message: string } | null>(null);
+  const previousTemplateId = useRef(result.templateId);
 
   useEffect(() => {
-    setDraft("");
-    setStatus(null);
+    if (previousTemplateId.current !== result.templateId) {
+      setDraft("");
+      setStatus(null);
+      previousTemplateId.current = result.templateId;
+    }
   }, [result.templateId]);
 
   function importRows() {

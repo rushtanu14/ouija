@@ -70,9 +70,9 @@ Type an unsupported paper towel absorbency lab. Show that Ouija labels it as a l
 
 Save two runs and show Saved Labs plus Progress Portfolio so judges see the workflow continues after one analysis and can measure saved-run trend, subject breadth, and the next portfolio action. Then show Portfolio Story Builder: saved-run evidence becomes prompts and blanks for a student-written progress story, not a generated essay. Then show MCP Integration Coach: Ouija validates Composio Search source-audit, Scholar claim-check, and Composio Browser source-capture routes plus Google Docs, Google Sheets, Google Drive, Google Classroom, Google Forms, Google Calendar, and Notion handoffs through a server dry-run, shows connector env vars/tools/scopes/data/checks, keeps Composio credentials server-side, can include pilot metrics in the Forms readiness route, and requires consent before source audit, Scholar check, Browser source capture, or export.
 
-## 4:56-4:58 - Evaluation Bench
+## 4:56-4:58 - Deterministic Regression Suite
 
-Show Evaluation Bench with 100/100 and 9/9 live checks: projectile, pendulum period vs length, Ohm's law circuits, reaction rate, enzyme activity, plant growth vs light color, density layering, water filtration, and unsupported-boundary behavior.
+Show Deterministic Regression Suite with 9/9 internal behavior checks: projectile, pendulum period vs length, Ohm's law circuits, reaction rate, enzyme activity, plant growth vs light color, density layering, water filtration, and unsupported-boundary behavior. State plainly that this is regression proof, not independent scientific or learning-impact validation.
 
 ## 4:58-5:00 - Judge Brief
 

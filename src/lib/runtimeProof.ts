@@ -12,7 +12,7 @@ interface RuntimeProofOptions {
 export function buildRuntimeProof(options: RuntimeProofOptions = {}): RuntimeProof {
   const evaluation = runEvaluationSuite();
   const webSearchConfigured = options.openAiConfigured ?? Boolean(process.env.OPENAI_API_KEY);
-  const model = options.model ?? process.env.OPENAI_MODEL ?? "gpt-5.5";
+  const model = options.model ?? process.env.OPENAI_MODEL ?? "gpt-5.6";
   const mcpBridgeMode = options.mcpBridgeMode ?? "server_dry_run";
   const status = webSearchConfigured ? "web_enriched_ready" : "fallback_ready";
 
@@ -45,10 +45,10 @@ export function buildRuntimeProof(options: RuntimeProofOptions = {}): RuntimePro
       },
       {
         id: "evaluation",
-        label: "Evaluation bench",
+        label: "Regression suite",
         status: evaluation.status === "pass" ? "active" : "review",
         value: `${evaluation.passed}/${evaluation.total} cases passed`,
-        detail: "The live bench covers eight supported labs and the unsupported-lab boundary."
+        detail: "The internal deterministic suite covers eight supported examples and the unsupported-lab boundary; it does not measure independent scientific accuracy or student outcomes."
       },
       {
         id: "privacy",
@@ -73,7 +73,7 @@ export function buildRuntimeProof(options: RuntimeProofOptions = {}): RuntimePro
       }
     ],
     judgeTakeaway: webSearchConfigured
-      ? "Ouija is running a web-enriched AI path with visible citations, a live evaluation bench, and server-only secret handling."
-      : "Ouija is still judge-demoable without credentials: deterministic AI classification, trusted fallback grounding, a live evaluation bench, and explicit server-only boundaries are visible."
+      ? "Ouija is running a web-enriched AI path with visible citations, a deterministic regression suite, and server-only secret handling."
+      : "Ouija is still judge-demoable without credentials: deterministic classification, trusted fallback grounding, a regression suite, and explicit server-only boundaries are visible."
   };
 }

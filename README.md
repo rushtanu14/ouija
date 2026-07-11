@@ -26,7 +26,7 @@ Ouija is a student-facing AI experiment interpreter for middle and high school s
 11. Copy the Evidence Packet as a student-owned reasoning handoff with judge demo path, Custom Lab Triage, Pattern Archetype Coach, Pre-Lab Design Coach, AIYES rubric fit, AIYES values fit, learning impact, pilot-study protocol, Learning Exit Ticket, student-level lens, Concept Mastery Check prompts, student reflection drafts, guided flow, Grounding Audit, AI Evaluation Harness, Data Handling Ledger, sources, checks, safety notes, concept vocabulary, pattern evidence, repeat reliability, data table, next-trial plan, blanks, and next question.
 12. Inspect Model Strategy, Technical Depth Proof, AI Evaluation Harness, Data Handling Ledger, AIYES Rubric Fit, AIYES Values Fit, and AIYES Development Journey to show candidate ranking, matched signals, fallback logic, validators, model-behavior checks, privacy flow, retention, student controls, risk controls, official criteria mapping, mission-values evidence, and the required problem/data/model/testing/UX/ethics/submission journey.
 13. Use Reasoning Trail to show how Ouija classified the experiment, exposed model strategy, ran the AI evaluation harness, guided the judge demo, planned the pre-lab setup, audited source grounding, guided the student path, built the concept scaffold, checked the learning exit ticket, checked the safety boundary, audited student-data handling, audited the table data, scored whole-pattern evidence, checked repeat reliability, planned the next trial, and maps the run to AIYES Track 1 evidence.
-14. Open Evaluation Bench to see nine live checks: eight supported lab demos plus the unsupported-lab boundary.
+14. Open Deterministic Regression Suite to see nine deterministic checks: eight supported lab demos plus the unsupported-lab boundary.
 15. Save lab snapshots locally so a student can return to a checked run without sending data to an account system.
 16. Use Progress Portfolio and Portfolio Story Builder to show saved-run count, score trend, subject breadth, strongest run, student-authored progress prompts, and next portfolio action.
 17. Use MCP Integration Coach to validate Composio Search source-audit, Scholar claim-check, and Composio Browser source-capture routes plus Google Docs, Google Sheets, Google Drive, Google Classroom, Google Forms, Google Calendar, and Notion handoffs through the server dry-run bridge, plus the readiness matrix, without exposing credentials or sending student data.
@@ -35,7 +35,7 @@ Ouija is a student-facing AI experiment interpreter for middle and high school s
 
 Guided Lab Flow gives students one current next action and six stable stages so the interface feels like a lab workflow rather than separate AI outputs.
 
-Run Snapshot gives students and judges a compact first-read of rubric fit, Evaluation Bench status, learning impact, data flags, expected pattern, and the current action before the deeper evidence panels.
+Run Snapshot gives students and judges a compact first-read of rubric fit, Deterministic Regression Suite status, learning impact, data flags, expected pattern, and the current action before the deeper evidence panels.
 
 Student Focus gives the default app a practical first path: next move, evidence check, repeat check, and before-claim guidance stay visible while judge-only panels are hidden until Judge mode is selected.
 
@@ -73,7 +73,7 @@ Custom Lab Triage keeps unsupported labs practical by inferring a likely focus, 
 
 Pre-Lab Design Coach turns classification and triage into a before-data checklist: independent/dependent variables, controls, repeats, table columns, a source task, a safety gate, and a hypothesis starter that keeps blanks for the student.
 
-Evaluation Bench runs a deterministic live suite against the same analysis engine used by students.
+Deterministic Regression Suite runs a deterministic live suite against the same analysis engine used by students.
 
 AI Model Card makes the model strategy inspectable: deterministic template matching, trusted fallback references, Grounding Audit, AI Evaluation Harness, Data Handling Ledger, Custom Lab Triage, Pattern Archetype Coach, Pre-Lab Design Coach, Student Pilot Study Kit, Student Level Lens adaptation, Concept Mastery Check scoring, optional server-side OpenAI web-search enrichment, live evaluation, privacy boundaries, and academic-integrity safeguards.
 
@@ -105,7 +105,9 @@ Progress Portfolio turns those saved labs into repeated learning evidence: saved
 
 Portfolio Story Builder turns saved-run evidence into prompts, evidence references, and blanks for a student-written progress story. It waits for enough saved evidence instead of generating an essay.
 
-MCP Integration Coach validates a practical Composio path for the same student-owned evidence: run a source-audit search through Composio Search, run a Scholar claim check against the expected pattern, capture a dynamic public source page through Composio Browser Tool, create a Google Docs evidence packet, append table rows to Google Sheets, save a portfolio archive to Google Drive, draft a Google Classroom pre-lab checkpoint, create a Google Forms readiness check that can include the pilot metrics, schedule a Google Calendar next-trial reminder, or create a Notion learning record with student-authored reflection drafts. The readiness matrix shows required auth config env vars where needed, allowed tools, least-privilege scopes, data shared, consent gates, dry-run checks, and a scoped Composio session ticket path. The public app now includes `/api/mcp/status`, `/api/mcp/export`, and `/api/mcp/session` for server-side validation; live connector execution still requires `COMPOSIO_API_KEY`, `COMPOSIO_SESSION_USER_ID`, allowed tools, `COMPOSIO_LIVE_EXPORTS=true`, connector auth config IDs where the toolkit requires them, and student or teacher consent before source audit, Scholar check, Browser source capture, or export.
+MCP Integration Coach validates a practical Composio path for the same student-owned evidence: run a source-audit search through Composio Search, run a Scholar claim check against the expected pattern, capture a dynamic public source page through Composio Browser Tool, create a Google Docs evidence packet, append table rows to Google Sheets, save a portfolio archive to Google Drive, draft a Google Classroom pre-lab checkpoint, create a Google Forms readiness check that can include the pilot metrics, schedule a Google Calendar next-trial reminder, or create a Notion learning record with student-authored reflection drafts. The readiness matrix shows required auth config env vars where needed, allowed tools, least-privilege scopes, data shared, consent gates, dry-run checks, and a scoped Composio session ticket path. The public app now includes `/api/mcp/status`, `/api/mcp/export`, and `/api/mcp/session` for server-side validation; live connector execution still requires `COMPOSIO_API_KEY`, `COMPOSIO_SESSION_USER_ID`, allowed tools, `COMPOSIO_LIVE_EXPORTS=true`, `MCP_SESSION_AUTH_TOKEN`, connector auth config IDs where the toolkit requires them, and student or teacher consent before source audit, Scholar check, Browser source capture, or export.
+
+API routes use an allowlisted CORS policy: production and local Vite origins are allowed by default, extra trusted preview origins go in `OUIJA_ALLOWED_ORIGIN`, and untrusted origins are not reflected.
 
 ## Run
 
@@ -144,6 +146,8 @@ Production deployment: https://ouija-olive.vercel.app
 ## AI Grounding
 
 Ouija works without credentials through deterministic built-in experiment templates and trusted citations. `GET /api/runtime-proof` reports whether the live deployment is using fallback or web-search-ready mode without exposing secret values. When `OPENAI_API_KEY` is present in the environment, the server attempts OpenAI Responses API web-search enrichment and falls back safely if enrichment is unavailable.
+
+Student privacy boundary: do not enter names, contact information, school identifiers, or other personal data in experiment descriptions. When web enrichment is configured, the description is sent server-side to OpenAI; credential-free fallback mode keeps analysis deterministic and does not call OpenAI.
 
 ## Composio MCP Bridge
 

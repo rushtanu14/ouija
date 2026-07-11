@@ -15,6 +15,7 @@ const composioEnvKeys = [
   "COMPOSIO_LIVE_EXPORTS",
   "COMPOSIO_SESSION_USER_ID",
   "COMPOSIO_API_BASE_URL",
+  "MCP_SESSION_AUTH_TOKEN",
   ...MCP_CONNECTOR_CATALOG.flatMap((connector) => [
     `COMPOSIO_${connector.envSuffix}_AUTH_CONFIG_ID`,
     `COMPOSIO_${connector.envSuffix}_ALLOWED_TOOLS`
@@ -35,6 +36,50 @@ afterEach(() => {
 });
 
 describe("POST /api/analyze", () => {
+  it("does not expose provider errors to students", async () => {
+    const app = createApp({
+      enrichExperiment: async () => {
+        throw new Error("OPENAI_API_KEY rejected for project secret-project-id");
+      }
+    });
+    const response = await request(app)
+      .post("/api/analyze")
+      .send({ description: "Projectile motion lab using launch angle and range data." })
+      .expect(200);
+
+    expect(response.body.groundingStatus.note).toContain("web enrichment was unavailable");
+    expect(response.body.groundingStatus.note).not.toContain("secret-project-id");
+    expect(response.body.groundingStatus.note).not.toContain("OPENAI_API_KEY");
+  });
+
+  it("rejects oversized experiment descriptions", async () => {
+    const app = createApp();
+    const response = await request(app)
+      .post("/api/analyze")
+      .send({ description: "x".repeat(2_001) })
+      .expect(400);
+
+    expect(response.body.error).toContain("2,000 characters or fewer");
+  });
+
+  it("rejects malformed and oversized student tables", async () => {
+    const app = createApp();
+    const malformed = await request(app)
+      .post("/api/analyze")
+      .send({ description: "Projectile motion lab", rows: ["not-a-row"] })
+      .expect(400);
+    const oversized = await request(app)
+      .post("/api/analyze")
+      .send({
+        description: "Projectile motion lab",
+        rows: Array.from({ length: 201 }, (_, index) => ({ id: String(index), angleDeg: 45 }))
+      })
+      .expect(400);
+
+    expect(malformed.body.error).toContain("valid table rows");
+    expect(oversized.body.error).toContain("200 rows or fewer");
+  });
+
   it("returns analysis for sample descriptions", async () => {
     delete process.env.OPENAI_API_KEY;
     const app = createApp();
@@ -143,7 +188,7 @@ describe("POST /api/analyze", () => {
 });
 
 describe("GET /api/evaluate", () => {
-  it("returns the live evaluation bench for supported coverage and boundary behavior", async () => {
+  it("returns the live deterministic regression suite for supported coverage and boundary behavior", async () => {
     const app = createApp();
     const response = await request(app).get("/api/evaluate").expect(200);
 
@@ -255,6 +300,27 @@ describe("Composio MCP bridge API", () => {
     expect(response.body.sanitizedPayload.rowCount).toBe(result.rows.length);
     expect(response.body.checks.find((check: { id: string }) => check.id === "consent")?.status).toBe("pass");
     expect(response.body.checks.find((check: { id: string }) => check.id === "credentials")?.status).toBe("review");
+  });
+
+  it("rejects malformed MCP rows and unsafe source URLs", async () => {
+    clearComposioEnv();
+    const app = createApp();
+    const response = await request(app)
+      .post("/api/mcp/export")
+      .send({
+        actionId: "google-calendar-next-trial-reminder",
+        consent: true,
+        payload: {
+          title: "Evidence packet",
+          description: "Projectile motion lab",
+          evidencePacket: "Claim: ___",
+          rows: ["not-a-row"],
+          sources: [{ id: "bad", title: "Bad", url: "javascript:alert(1)", publisher: "Bad", confidence: "web", note: "Bad" }]
+        }
+      })
+      .expect(400);
+
+    expect(response.body.error).toContain("valid MCP export action");
   });
 
   it("validates a Composio Search source-audit packet without requiring an account auth config", async () => {
@@ -382,6 +448,80 @@ describe("Composio MCP bridge API", () => {
     expect(JSON.stringify(response.body)).not.toContain("ak_");
   });
 
+  it("does not create a live Composio session without server authorization", async () => {
+    const result = analyzeExperiment({ description: "Projectile launch angle and measured range." });
+    const fetchCalls: string[] = [];
+    const response = await createMcpSessionTicket(
+      {
+        actionId: "google-calendar-next-trial-reminder",
+        consent: true,
+        payload: {
+          title: `Ouija Evidence Packet: ${result.classification.title}`,
+          description: "Projectile launch angle and measured range.",
+          evidencePacket: buildEvidencePacket(result, result.rows, "Projectile launch angle and measured range."),
+          rows: result.rows,
+          sources: result.sources
+        }
+      },
+      {
+        COMPOSIO_API_KEY: "ak_test_secret",
+        COMPOSIO_LIVE_EXPORTS: "true",
+        COMPOSIO_SESSION_USER_ID: "ouija-demo-student",
+        COMPOSIO_GOOGLE_CALENDAR_AUTH_CONFIG_ID: "ac_calendar_secret",
+        COMPOSIO_GOOGLE_CALENDAR_ALLOWED_TOOLS: "GOOGLECALENDAR_CREATE_EVENT",
+        MCP_SESSION_AUTH_TOKEN: "server-only-token"
+      },
+      async (url) => {
+        fetchCalls.push(url);
+        throw new Error("must not be called");
+      }
+    );
+
+    expect(response.statusCode).toBe(403);
+    expect(response.body).toEqual({ error: "Live MCP session creation requires authorized server access." });
+    expect(fetchCalls).toHaveLength(0);
+  });
+
+  it("returns a controlled gateway error when Composio is unreachable", async () => {
+    const result = analyzeExperiment({ description: "Projectile launch angle and measured range." });
+    const response = await createMcpSessionTicket(
+      {
+        actionId: "google-calendar-next-trial-reminder",
+        consent: true,
+        payload: {
+          title: `Ouija Evidence Packet: ${result.classification.title}`,
+          description: "Projectile launch angle and measured range.",
+          evidencePacket: buildEvidencePacket(result, result.rows, "Projectile launch angle and measured range."),
+          rows: result.rows,
+          sources: result.sources
+        }
+      },
+      {
+        COMPOSIO_API_KEY: "ak_test_secret",
+        COMPOSIO_LIVE_EXPORTS: "true",
+        COMPOSIO_SESSION_USER_ID: "ouija-demo-student",
+        COMPOSIO_GOOGLE_CALENDAR_AUTH_CONFIG_ID: "ac_calendar_secret",
+        COMPOSIO_GOOGLE_CALENDAR_ALLOWED_TOOLS: "GOOGLECALENDAR_CREATE_EVENT",
+        MCP_SESSION_AUTH_TOKEN: "server-only-token"
+      },
+      async () => {
+        throw new Error("network secret details");
+      },
+      "Bearer server-only-token"
+    );
+
+    expect(response.statusCode).toBe(502);
+    expect(response.body).toEqual({ error: "Composio session creation was unavailable." });
+  });
+
+  it("does not reflect untrusted origins in CORS", async () => {
+    clearComposioEnv();
+    const app = createApp();
+    const response = await request(app).get("/api/mcp/status").set("Origin", "https://attacker.example").expect(200);
+
+    expect(response.headers["access-control-allow-origin"]).toBeUndefined();
+  });
+
   it("creates a live Composio session server-side when the selected toolkit is configured", async () => {
     const result = analyzeExperiment({
       description: "Projectile launch angle and measured range."
@@ -418,9 +558,11 @@ describe("Composio MCP bridge API", () => {
         COMPOSIO_LIVE_EXPORTS: "true",
         COMPOSIO_SESSION_USER_ID: "ouija-demo-student",
         COMPOSIO_GOOGLE_CALENDAR_AUTH_CONFIG_ID: "ac_calendar_secret",
-        COMPOSIO_GOOGLE_CALENDAR_ALLOWED_TOOLS: "GOOGLECALENDAR_CREATE_EVENT"
+        COMPOSIO_GOOGLE_CALENDAR_ALLOWED_TOOLS: "GOOGLECALENDAR_CREATE_EVENT",
+        MCP_SESSION_AUTH_TOKEN: "server-only-token"
       },
-      fetchMock
+      fetchMock,
+      "Bearer server-only-token"
     );
 
     expect(response.statusCode).toBe(200);
@@ -486,9 +628,11 @@ describe("Composio MCP bridge API", () => {
         COMPOSIO_API_KEY: "ak_test_secret",
         COMPOSIO_LIVE_EXPORTS: "true",
         COMPOSIO_SESSION_USER_ID: "ouija-demo-student",
-        COMPOSIO_SEARCH_ALLOWED_TOOLS: "COMPOSIO_SEARCH_WEB,COMPOSIO_SEARCH_SCHOLAR,COMPOSIO_SEARCH_FETCH_URL_CONTENT"
+        COMPOSIO_SEARCH_ALLOWED_TOOLS: "COMPOSIO_SEARCH_WEB,COMPOSIO_SEARCH_SCHOLAR,COMPOSIO_SEARCH_FETCH_URL_CONTENT",
+        MCP_SESSION_AUTH_TOKEN: "server-only-token"
       },
-      fetchMock
+      fetchMock,
+      "Bearer server-only-token"
     );
 
     expect(response.statusCode).toBe(200);
@@ -551,9 +695,11 @@ describe("Composio MCP bridge API", () => {
         COMPOSIO_API_KEY: "ak_test_secret",
         COMPOSIO_LIVE_EXPORTS: "true",
         COMPOSIO_SESSION_USER_ID: "ouija-demo-student",
-        COMPOSIO_SEARCH_ALLOWED_TOOLS: "COMPOSIO_SEARCH_SCHOLAR"
+        COMPOSIO_SEARCH_ALLOWED_TOOLS: "COMPOSIO_SEARCH_SCHOLAR",
+        MCP_SESSION_AUTH_TOKEN: "server-only-token"
       },
-      fetchMock
+      fetchMock,
+      "Bearer server-only-token"
     );
 
     expect(response.statusCode).toBe(200);

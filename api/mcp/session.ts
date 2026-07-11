@@ -1,8 +1,11 @@
 import { createMcpSessionTicket } from "../../server/mcpBridge.js";
+import { consumeRateLimit } from "../../server/rateLimit.js";
+import { apiAllowedHeaders, isAllowedOrigin, readRequestHeader, requestClientKey } from "../../server/httpSecurity.js";
 
 interface RequestLike {
   method?: string;
   body?: unknown;
+  headers?: Record<string, string | string[] | undefined>;
 }
 
 interface ResponseLike {
@@ -13,7 +16,7 @@ interface ResponseLike {
 }
 
 export default async function handler(req: RequestLike, res: ResponseLike) {
-  setApiHeaders(res);
+  setApiHeaders(req, res);
 
   if (req.method === "OPTIONS") {
     res.status(204).end();
@@ -25,13 +28,22 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
     return;
   }
 
-  const response = await createMcpSessionTicket(req.body);
+  const limit = consumeRateLimit(`mcp-session:${requestClientKey(req.headers)}`, { limit: 10, windowMs: 60_000 });
+  if (!limit.allowed) {
+    res.setHeader("Retry-After", String(limit.retryAfterSeconds));
+    res.status(429).json({ error: "Too many MCP session requests. Try again shortly." });
+    return;
+  }
+
+  const authorization = readRequestHeader(req.headers, "authorization");
+  const response = await createMcpSessionTicket(req.body, process.env, fetch, authorization);
   res.status(response.statusCode).json(response.body);
 }
 
-function setApiHeaders(res: ResponseLike) {
-  res.setHeader("Access-Control-Allow-Origin", "*");
+function setApiHeaders(req: RequestLike, res: ResponseLike) {
+  const origin = readRequestHeader(req.headers, "origin");
+  if (origin && isAllowedOrigin(origin)) res.setHeader("Access-Control-Allow-Origin", origin);
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  res.setHeader("Access-Control-Allow-Headers", apiAllowedHeaders);
   res.setHeader("Cache-Control", "no-store");
 }

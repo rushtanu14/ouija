@@ -2296,7 +2296,7 @@ function buildAiEvaluationHarness(
   const integrityFlagged = issues.some((issue) => issue.id.startsWith("integrity-"));
   const lowConfidence = matchQuality === "closest_supported" || confidence < 0.6;
   const claimGuarded = labBrief.claimStarter.includes("___");
-  const coverageDetail = "Eight supported middle/high school lab templates plus one unsupported-boundary case are exercised in the live Evaluation Bench.";
+  const coverageDetail = "Eight supported middle/high school lab examples plus one unsupported-boundary case are exercised in the deterministic regression suite.";
 
   const checks: AiEvaluationHarness["checks"] = [
     {
@@ -2476,8 +2476,8 @@ function buildJudgeDemoPath(
         label: "Submission proof",
         criterion: "Submission Proof",
         status: "show",
-        proof: `Evaluation Bench runs nine live cases; pattern evidence is ${patternEvidence.score}/100 and repeat reliability is ${reliabilityCoach.score}/100.`,
-        demoAction: "End on Evaluation Bench, Judge Brief, and hosted deck/video/source links."
+        proof: `Deterministic Regression Suite runs nine internal behavior checks; pattern evidence is ${patternEvidence.score}/100 and repeat reliability is ${reliabilityCoach.score}/100.`,
+        demoAction: "End on Deterministic Regression Suite, Judge Brief, and hosted deck/video/source links."
       }
     ]
   };
@@ -3248,7 +3248,7 @@ function buildDevelopmentJourney(
       id: "testing-evaluation",
       label: "Testing and evaluation",
       status: aiEvaluationHarness.score >= 90 ? "strong" : aiEvaluationHarness.score >= 80 ? "ready" : "review",
-      evidence: `AI Evaluation Harness scores this run ${aiEvaluationHarness.score}/100, the public Evaluation Bench covers eight supported labs plus the unsupported-lab boundary, and the Student Pilot Study Kit is ${studentPilotStudyKit.status.replaceAll("_", " ")} with ${studentPilotStudyKit.metrics.length} student-centered metrics.`,
+      evidence: `AI Evaluation Harness scores this run ${aiEvaluationHarness.score}/100, the public Deterministic Regression Suite covers eight supported examples plus the unsupported-lab boundary, and the Student Pilot Study Kit is ${studentPilotStudyKit.status.replaceAll("_", " ")} with ${studentPilotStudyKit.metrics.length} student-centered metrics.`,
       judgeCue: "Use AI Evaluation Harness, `/api/evaluate` proof, and the Student Pilot Study Kit."
     },
     {
@@ -4710,10 +4710,10 @@ function evaluatePlantGrowthRows(rows: StudentDataRow[]): Issue[] {
 
   if (litValues.length > 0 && darkValues.length > 0 && averageValues(darkValues) > averageValues(litValues) * 0.75) {
     issues.push({
-      id: "plant-light-dark-pattern",
-      severity: "warning",
-      title: "Light and dark growth pattern needs review",
-      detail: "If dark-grown plants are close to or taller than lit plants, check starting height, hidden light, water, and measurement timing."
+      id: "plant-dark-etiolation-context",
+      severity: "info",
+      title: "Dark-grown height may reflect etiolation",
+      detail: "Dark-grown seedlings can develop long, pale stems while searching for light. Compare color, leaf development, mass, and health instead of treating height alone as better growth or bad data."
     });
   }
 

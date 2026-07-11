@@ -93,7 +93,7 @@
 - MCP Integration Coach visibly turns the Evidence Packet, Pre-Lab Design Coach, Next Trial Planner, and Progress Portfolio into a consent-gated source-audit, Scholar claim-check, Browser source-capture, and classroom handoff plan with a readiness matrix for env vars, allowed tools, scopes, dry-run checks, and data shared.
 - AI Model Card visibly summarizes architecture, grounding mode, evaluation method, privacy boundary, and risk controls.
 - Data Handling Ledger visibly summarizes privacy, retention, browser-local saves, and student controls.
-- Evaluation Bench exposes nine live checks through the app and `/api/evaluate`.
+- Deterministic Regression Suite exposes nine deterministic checks through the app and `/api/evaluate`.
 - Unsupported-boundary evaluation now proves Custom Lab Triage, Pattern Archetype Coach, and custom planner rows appear when a student asks about an off-template paper towel absorbency experiment.
 - Saved Labs and Settings nav items render real workflow sections; no dead top-nav placeholders.
 - Academic-integrity guard is implemented in both data model and UI.

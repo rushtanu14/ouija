@@ -62,7 +62,6 @@ test("student can analyze a sample experiment, edit table data, and see citation
     .getByRole("button", { name: /final claim/i })
     .click();
   await expect(page.getByLabel("Concept Mastery Check").getByText("3/3 passed")).toBeVisible();
-  await expect(page.getByLabel("Concept Mastery Check").getByText("100/100")).toBeVisible();
   await expect(page.getByRole("heading", { name: "Model Strategy" })).toBeVisible();
   await expect(page.getByLabel("Model Strategy").getByText("Selected Reaction Rate vs Temperature")).toBeVisible();
   await expect(page.getByLabel("Model Strategy").getByText("Top candidates")).toBeVisible();
@@ -213,13 +212,13 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(page.getByLabel("Pre-Lab Design Coach").locator(".section-label").filter({ hasText: "Repeat plan" })).toBeVisible();
   await expect(page.getByLabel("Pre-Lab Design Coach").getByText("Source task", { exact: true })).toBeVisible();
   await page.getByRole("link", { name: "Eval Bench" }).click();
-  await expect(page.getByLabel("Evaluation Bench").getByText("100/100")).toBeVisible();
-  await expect(page.getByLabel("Evaluation Bench").getByText("9/9 passed")).toBeVisible();
-  await expect(page.getByLabel("Evaluation Bench").getByText("Pendulum coverage")).toBeVisible();
-  await expect(page.getByLabel("Evaluation Bench").getByText("Circuit coverage")).toBeVisible();
-  await expect(page.getByLabel("Evaluation Bench").getByText("Plant light coverage")).toBeVisible();
-  await expect(page.getByLabel("Evaluation Bench").getByText("Density coverage")).toBeVisible();
-  await expect(page.getByLabel("Evaluation Bench").getByText("Coverage boundary")).toBeVisible();
+  await expect(page.getByLabel("Deterministic Regression Suite").getByText("9/9")).toBeVisible();
+  await expect(page.getByLabel("Deterministic Regression Suite").getByText("checks passed")).toBeVisible();
+  await expect(page.getByLabel("Deterministic Regression Suite").getByText("Pendulum coverage")).toBeVisible();
+  await expect(page.getByLabel("Deterministic Regression Suite").getByText("Circuit coverage")).toBeVisible();
+  await expect(page.getByLabel("Deterministic Regression Suite").getByText("Plant light coverage")).toBeVisible();
+  await expect(page.getByLabel("Deterministic Regression Suite").getByText("Density coverage")).toBeVisible();
+  await expect(page.getByLabel("Deterministic Regression Suite").getByText("Coverage boundary")).toBeVisible();
   await page.getByRole("link", { name: "Model Card" }).click();
   await expect(page.getByLabel("AI Model Card").getByText("Hybrid and inspectable")).toBeVisible();
   await expect(page.getByLabel("AI Model Card").getByText("Trusted fallback")).toBeVisible();
@@ -249,7 +248,7 @@ test("student can analyze a sample experiment, edit table data, and see citation
   ).toBeVisible();
   await expect(page.getByLabel("AI Model Card").getByText("MCP Readiness Matrix makes connector tools, scopes, dry-run checks, and least-privilege boundaries inspectable.")).toBeVisible();
   await expect(page.getByLabel("AI Model Card").getByText("Safety Coach forces adult-review language when a lab match is uncertain.")).toBeVisible();
-  await expect(page.getByLabel("AI Model Card").getByText("Evaluation Bench tests eight supported labs plus the unsupported boundary.")).toBeVisible();
+  await expect(page.getByLabel("AI Model Card").getByText("Deterministic Regression Suite tests eight supported labs plus the unsupported boundary.")).toBeVisible();
   await expect(page.getByLabel("AI Model Card").getByText("Data Handling Ledger makes student data flow, retention, and controls inspectable.")).toBeVisible();
   await page.getByRole("button", { name: "Save current lab" }).click();
   await page.getByRole("link", { name: "Saved Labs" }).click();
@@ -380,7 +379,7 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(page.getByLabel("Judge Brief").getByText("Guided Lab Flow gives students a clear next action.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Concept Coach turns results into student learning scaffolds.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Safety Coach makes school-lab risk checks visible.")).toBeVisible();
-  await expect(page.getByLabel("Judge Brief").getByText("Evaluation Bench runs nine live cases.")).toBeVisible();
+  await expect(page.getByLabel("Judge Brief").getByText("Deterministic Regression Suite runs nine internal behavior checks.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Data Handling Ledger shows privacy, retention, and student controls.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Evidence Packet exports a student-owned reasoning handoff.")).toBeVisible();
   await expect(
@@ -439,6 +438,7 @@ test("student mode keeps the core lab workflow focused before judge proof", asyn
 
 test("unsupported experiment descriptions show a low-confidence boundary", async ({ page }) => {
   await page.goto("/?judge=1");
+  await expect(page.getByRole("heading", { name: "Projectile Motion" })).toBeVisible();
   await page.getByLabel("Describe your experiment").fill("We compared paper towel brands by measuring how much water each towel absorbed.");
   await page.getByRole("button", { name: "Analyze" }).click();
 
@@ -466,6 +466,7 @@ test("unsupported experiment descriptions show a low-confidence boundary", async
 test("student can paste spreadsheet data into the active table", async ({ page }) => {
   await page.goto("/?judge=1");
   await page.getByRole("button", { name: "Reaction Rate" }).click();
+  await expect(page.getByRole("heading", { name: "Reaction Rate vs Temperature" })).toBeVisible();
 
   await page
     .getByLabel("Paste data table")
@@ -482,6 +483,7 @@ test("student can paste spreadsheet data into the active table", async ({ page }
 test("saved labs build a visible progress portfolio for judges", async ({ page }) => {
   await page.addInitScript(() => window.localStorage.clear());
   await page.goto("/?judge=1");
+  await expect(page.getByRole("heading", { name: "Projectile Motion" })).toBeVisible();
 
   await page.getByLabel("Describe your experiment").fill("We compared paper towel brands by measuring how much water each towel absorbed.");
   await page.getByRole("button", { name: "Analyze" }).click();

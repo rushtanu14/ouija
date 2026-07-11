@@ -36,16 +36,16 @@ export const TRUSTED_SOURCES = {
   chemLibreRate: {
     id: "source-rate-libre",
     title: "Factors that affect reaction rates",
-    url: "https://chem.libretexts.org/Bookshelves/Introductory_Chemistry/Introductory_Chemistry/17%3A_Kinetics/17.02%3A_Factors_That_Affect_Reaction_Rates",
-    publisher: "Chemistry LibreTexts",
+    url: "https://openstax.org/books/chemistry-2e/pages/12-2-factors-affecting-reaction-rates",
+    publisher: "OpenStax Chemistry 2e",
     confidence: "built-in" as const,
     note: "Grounds the expected relationship between temperature and reaction speed."
   },
   bioLibreEnzymes: {
     id: "source-enzyme-libre",
     title: "Enzymes and reaction rates",
-    url: "https://bio.libretexts.org/Bookshelves/Introductory_and_General_Biology/Introductory_Biology_(CK-12)/02%3A_Cell_Biology/2.05%3A_Enzymes",
-    publisher: "Biology LibreTexts",
+    url: "https://openstax.org/books/biology-2e/pages/6-5-enzymes",
+    publisher: "OpenStax Biology 2e",
     confidence: "built-in" as const,
     note: "Explains enzyme activity, optimum conditions, and denaturation."
   },
@@ -308,9 +308,9 @@ export const EXPERIMENT_TEMPLATES: ExperimentTemplate[] = [
     ],
     expectedResult: {
       summary:
-        "Plants usually grow better with usable light than in darkness, and chlorophyll uses red and blue wavelengths strongly. Exact height depends on plant species, brightness, duration, and setup.",
+        "Usable light supports photosynthesis, but height alone can mislead: dark-grown seedlings may become taller through etiolation while remaining pale and weak. Compare height with color, leaves, mass, and health.",
       pattern:
-        "Grouped relationship: white, red, and blue light should generally support more growth than green light or darkness when light duration, distance, water, soil, and plant type stay controlled.",
+        "Grouped relationship: light color can affect plant development, but interpret height together with color, leaf development, mass, and health because darkness may cause stem elongation without healthy growth.",
       graphTitle: "Light color vs plant height",
       xKey: "lightColor",
       yKey: "heightCm",
@@ -318,7 +318,7 @@ export const EXPERIMENT_TEMPLATES: ExperimentTemplate[] = [
       mixedEvidence: true
     },
     explanation:
-      "Plant growth depends on photosynthesis, where pigments such as chlorophyll capture light energy. Because chlorophyll absorbs red and blue wavelengths strongly and reflects much green light, color can affect growth, but classroom results also depend heavily on intensity, distance, duration, plant type, and water.",
+      "Plant development depends on photosynthesis and light signaling. Chlorophyll absorbs red and blue wavelengths strongly, while seedlings grown in darkness can etiolate—forming long, pale stems without normal leaf and chlorophyll development. Classroom results also depend on intensity, distance, duration, plant type, and water.",
     commonMistakes: [
       "Changing light distance or brightness while testing color.",
       "Using only one plant per color and treating it as enough evidence.",

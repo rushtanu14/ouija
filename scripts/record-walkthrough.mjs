@@ -303,8 +303,8 @@ await caption(
 );
 
 await page.locator("#evaluation").scrollIntoViewIfNeeded();
-await page.getByLabel("Evaluation Bench").getByText("100/100").waitFor();
-await caption(page, "Evaluation Bench", "The live app runs nine checks: eight supported labs plus custom triage for the unsupported-lab boundary.");
+await page.getByLabel("Deterministic Regression Suite").getByText("9/9 checks").waitFor();
+await caption(page, "Deterministic Regression Suite", "The live app runs nine checks: eight supported labs plus custom triage for the unsupported-lab boundary.");
 
 await page.locator("#judge").scrollIntoViewIfNeeded();
 await page.getByLabel("Judge Brief").getByText("AIYES Track 1").waitFor();

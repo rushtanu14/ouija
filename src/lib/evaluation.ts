@@ -102,15 +102,15 @@ export function runEvaluationSuite(): EvaluationReport {
   const score = Math.round((passed / cases.length) * 100);
 
   return {
-    suiteLabel: "Ouija V1 Track 1 evaluation suite",
+    suiteLabel: "Ouija V1 deterministic regression suite",
     score,
     passed,
     total: cases.length,
     status: passed === cases.length ? "pass" : "review",
     verdict:
       passed === cases.length
-        ? "Evaluation bench passes supported coverage, source-backed reasoning, and the unsupported-lab boundary."
-        : "Evaluation bench found a coverage or readiness gap that should be fixed before the final walkthrough.",
+        ? "All deterministic regression checks pass for the supported template examples and unsupported-lab boundary. This is not an independent scientific-accuracy or student-outcome evaluation."
+        : "The deterministic regression suite found a template or boundary behavior gap that should be fixed before the final walkthrough.",
     cases
   };
 }

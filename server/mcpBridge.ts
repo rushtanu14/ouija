@@ -1,4 +1,5 @@
 import { MCP_CONNECTOR_CATALOG } from "../src/lib/mcpIntegrationPlan.js";
+import { timingSafeEqual } from "node:crypto";
 import type {
   McpBridgeExportCheck,
   McpBridgeExportRequest,
@@ -22,14 +23,16 @@ interface BridgeResponse<T> {
 const composioSessionUserEnv = "COMPOSIO_SESSION_USER_ID";
 const composioApiBaseUrlEnv = "COMPOSIO_API_BASE_URL";
 const defaultComposioApiBaseUrl = "https://backend.composio.dev/api/v3.1";
+const mcpSessionAuthTokenEnv = "MCP_SESSION_AUTH_TOKEN";
 
 export function getMcpBridgeStatus(env: EnvMap = process.env): McpBridgeStatus {
   const apiKeyConfigured = hasValue(env.COMPOSIO_API_KEY);
   const liveExportsEnabled = env.COMPOSIO_LIVE_EXPORTS === "true";
   const toolkits = MCP_CONNECTOR_CATALOG.map((connector) => buildToolkitStatus(connector, apiKeyConfigured, env));
   const sessionUserConfigured = hasValue(env[composioSessionUserEnv]);
-  const missingEnv = buildMissingEnv(apiKeyConfigured, liveExportsEnabled, sessionUserConfigured, toolkits);
-  const ready = liveExportsEnabled && apiKeyConfigured && sessionUserConfigured && toolkits.every((toolkit) => toolkit.configured);
+  const sessionAuthConfigured = hasValue(env[mcpSessionAuthTokenEnv]);
+  const missingEnv = buildMissingEnv(apiKeyConfigured, liveExportsEnabled, sessionUserConfigured, sessionAuthConfigured, toolkits);
+  const ready = liveExportsEnabled && apiKeyConfigured && sessionUserConfigured && sessionAuthConfigured && toolkits.every((toolkit) => toolkit.configured);
 
   return {
     status: ready ? "ready" : "server_dry_run",
@@ -75,7 +78,7 @@ export function validateMcpExportRequest(rawBody: unknown, env: EnvMap = process
   if (!request) {
     return {
       statusCode: 400,
-      body: { error: "Send an MCP export action, consent flag, and payload for server dry-run validation." }
+      body: { error: "Send a valid MCP export action, consent flag, and bounded payload for server dry-run validation." }
     };
   }
 
@@ -97,7 +100,7 @@ export function validateMcpExportRequest(rawBody: unknown, env: EnvMap = process
 
   const bridge = getMcpBridgeStatus(env);
   const toolkit = bridge.toolkits.find((candidate) => candidate.actionId === connector.id) ?? buildToolkitStatus(connector, bridge.apiKeyConfigured, env);
-  const payload = normalizePayload(request.payload);
+  const payload = request.payload;
   const checks = buildExportChecks({
     payload,
     bridge,
@@ -143,7 +146,8 @@ export function validateMcpExportRequest(rawBody: unknown, env: EnvMap = process
 export async function createMcpSessionTicket(
   rawBody: unknown,
   env: EnvMap = process.env,
-  fetchImpl: FetchLike = fetch
+  fetchImpl: FetchLike = fetch,
+  authorizationHeader?: string
 ): Promise<BridgeResponse<McpBridgeSessionResponse | { error: string }>> {
   const request = parseRequest(rawBody);
 
@@ -172,7 +176,7 @@ export async function createMcpSessionTicket(
 
   const bridge = getMcpBridgeStatus(env);
   const toolkit = bridge.toolkits.find((candidate) => candidate.actionId === connector.id) ?? buildToolkitStatus(connector, bridge.apiKeyConfigured, env);
-  const payload = normalizePayload(request.payload);
+  const payload = request.payload;
   const checks = buildExportChecks({
     payload,
     bridge,
@@ -222,12 +226,27 @@ export async function createMcpSessionTicket(
     };
   }
 
-  const sessionResult = await createComposioSession({
-    connector,
-    toolkit,
-    env,
-    fetchImpl
-  });
+  if (!hasValidSessionAuthorization(authorizationHeader, env[mcpSessionAuthTokenEnv])) {
+    return {
+      statusCode: 403,
+      body: { error: "Live MCP session creation requires authorized server access." }
+    };
+  }
+
+  let sessionResult: Awaited<ReturnType<typeof createComposioSession>>;
+  try {
+    sessionResult = await createComposioSession({
+      connector,
+      toolkit,
+      env,
+      fetchImpl
+    });
+  } catch {
+    return {
+      statusCode: 502,
+      body: { error: "Composio session creation was unavailable." }
+    };
+  }
 
   if (!sessionResult.ok) {
     return {
@@ -288,12 +307,14 @@ function buildMissingEnv(
   apiKeyConfigured: boolean,
   liveExportsEnabled: boolean,
   sessionUserConfigured: boolean,
+  sessionAuthConfigured: boolean,
   toolkits: McpBridgeToolkitStatus[]
 ) {
   return [
     apiKeyConfigured ? "" : "COMPOSIO_API_KEY",
     liveExportsEnabled ? "" : "COMPOSIO_LIVE_EXPORTS=true",
     sessionUserConfigured ? "" : composioSessionUserEnv,
+    sessionAuthConfigured ? "" : mcpSessionAuthTokenEnv,
     ...toolkits.flatMap((toolkit) => toolkit.missingEnv)
   ].filter(Boolean).filter((value, index, values) => values.indexOf(value) === index);
 }
@@ -365,25 +386,72 @@ function markSelectedSessionCredentialsReady(checks: McpBridgeExportCheck[], too
 function parseRequest(rawBody: unknown): McpBridgeExportRequest | null {
   const body = typeof rawBody === "string" ? parseJson(rawBody) : rawBody;
   if (!isRecord(body) || typeof body.actionId !== "string" || typeof body.consent !== "boolean" || !isRecord(body.payload)) return null;
+  const payload = normalizePayload(body.payload);
+  if (!payload) return null;
 
   return {
     actionId: body.actionId as McpBridgeExportRequest["actionId"],
     consent: body.consent,
-    payload: normalizePayload(body.payload)
+    payload
   };
 }
 
-function normalizePayload(payload: unknown): McpBridgeExportRequest["payload"] {
-  const body = isRecord(payload) ? payload : {};
+function normalizePayload(payload: unknown): McpBridgeExportRequest["payload"] | null {
+  if (!isRecord(payload)) return null;
+  const body = payload;
+  const title = boundedString(body.title, 200);
+  const description = boundedString(body.description, 2_000);
+  const evidencePacket = boundedString(body.evidencePacket, 100_000);
+  if (title === null || description === null || evidencePacket === null) return null;
+  if (!Array.isArray(body.rows) || body.rows.length > 200 || !body.rows.every(isValidStudentRow)) return null;
+  if (!Array.isArray(body.sources) || body.sources.length > 20 || !body.sources.every(isValidSourceCard)) return null;
+  if (body.reflectionAnswers !== undefined && !isValidReflectionAnswers(body.reflectionAnswers)) return null;
 
   return {
-    title: typeof body.title === "string" ? body.title.trim() : "",
-    description: typeof body.description === "string" ? body.description.trim() : "",
-    evidencePacket: typeof body.evidencePacket === "string" ? body.evidencePacket.trim() : "",
-    rows: Array.isArray(body.rows) ? (body.rows as StudentDataRow[]) : [],
-    sources: Array.isArray(body.sources) ? (body.sources as SourceCard[]) : [],
-    reflectionAnswers: isRecord(body.reflectionAnswers) ? body.reflectionAnswers : undefined
+    title,
+    description,
+    evidencePacket,
+    rows: body.rows,
+    sources: body.sources,
+    reflectionAnswers: body.reflectionAnswers as McpBridgeExportRequest["payload"]["reflectionAnswers"]
   };
+}
+
+function boundedString(value: unknown, maxLength: number) {
+  if (typeof value !== "string") return null;
+  const normalized = value.trim();
+  return normalized.length <= maxLength ? normalized : null;
+}
+
+function isValidStudentRow(value: unknown): value is StudentDataRow {
+  if (!isRecord(value) || typeof value.id !== "string" || value.id.length > 100) return false;
+  return Object.entries(value).length <= 32 && Object.entries(value).every(([key, cell]) => {
+    if (!key || key.length > 100) return false;
+    if (typeof cell === "number") return Number.isFinite(cell);
+    return typeof cell === "string" && cell.length <= 500;
+  });
+}
+
+function isValidSourceCard(value: unknown): value is SourceCard {
+  if (!isRecord(value)) return false;
+  return [value.id, value.title, value.publisher, value.note].every((field) => typeof field === "string" && field.length <= 500)
+    && ["built-in", "web", "mixed"].includes(String(value.confidence))
+    && typeof value.url === "string"
+    && isHttpsUrl(value.url);
+}
+
+function isValidReflectionAnswers(value: unknown) {
+  return isRecord(value)
+    && Object.keys(value).length <= 10
+    && Object.entries(value).every(([key, answer]) => key.length <= 100 && typeof answer === "string" && answer.length <= 2_000);
+}
+
+function isHttpsUrl(value: string) {
+  try {
+    return new URL(value).protocol === "https:";
+  } catch {
+    return false;
+  }
 }
 
 function parseAllowedTools(value: string | undefined) {
@@ -425,7 +493,19 @@ function isToolkitReadyForSession({
   toolkit: McpBridgeToolkitStatus;
   env: EnvMap;
 }) {
-  return bridge.liveExportsEnabled && bridge.apiKeyConfigured && toolkit.configured && hasValue(env[composioSessionUserEnv]);
+  return bridge.liveExportsEnabled
+    && bridge.apiKeyConfigured
+    && toolkit.configured
+    && hasValue(env[composioSessionUserEnv])
+    && hasValue(env[mcpSessionAuthTokenEnv]);
+}
+
+function hasValidSessionAuthorization(header: string | undefined, expectedToken: string | undefined) {
+  const prefix = "Bearer ";
+  if (!header?.startsWith(prefix) || !hasValue(expectedToken)) return false;
+  const supplied = Buffer.from(header.slice(prefix.length));
+  const expected = Buffer.from(expectedToken as string);
+  return supplied.length === expected.length && timingSafeEqual(supplied, expected);
 }
 
 function buildSessionResponse({

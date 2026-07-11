@@ -4,18 +4,22 @@ import path from "node:path";
 import { analyzeExperiment, mergeEnrichment } from "../src/lib/analysis";
 import { runEvaluationSuite } from "../src/lib/evaluation";
 import { buildRuntimeProof } from "../src/lib/runtimeProof";
-import type { AnalyzeRequest } from "../src/lib/types";
 import { createMcpSessionTicket, getMcpBridgeStatus, validateMcpExportRequest } from "./mcpBridge";
 import { enrichWithOpenAIWebSearch } from "./openaiGrounding";
+import { validateAnalyzeRequest } from "./requestValidation";
+import { consumeRateLimit } from "./rateLimit";
+import { isAllowedOrigin } from "./httpSecurity";
 
 interface AppOptions {
   staticDir?: string;
+  enrichExperiment?: typeof enrichWithOpenAIWebSearch;
 }
 
 export function createApp(options: AppOptions = {}) {
   const app = express();
+  const enrichExperiment = options.enrichExperiment ?? enrichWithOpenAIWebSearch;
 
-  app.use(cors());
+  app.use(cors({ origin: allowCorsOrigin }));
   app.use(express.json({ limit: "1mb" }));
 
   app.get("/api/health", (_req, res) => {
@@ -44,35 +48,40 @@ export function createApp(options: AppOptions = {}) {
   });
 
   app.post("/api/mcp/session", async (req, res) => {
-    const response = await createMcpSessionTicket(req.body);
+    const limit = consumeRateLimit(`mcp-session:${req.ip}`, { limit: 10, windowMs: 60_000 });
+    if (!limit.allowed) {
+      res.setHeader("Retry-After", String(limit.retryAfterSeconds));
+      return res.status(429).json({ error: "Too many MCP session requests. Try again shortly." });
+    }
+    const response = await createMcpSessionTicket(req.body, process.env, fetch, req.header("authorization"));
     res.status(response.statusCode).json(response.body);
   });
 
   app.post("/api/analyze", async (req, res) => {
-    const body = req.body as Partial<AnalyzeRequest>;
-    const description = typeof body.description === "string" ? body.description.trim() : "";
-
-    if (!description) {
-      return res.status(400).json({
-        error: "Describe the experiment before Ouija analyzes expected results."
-      });
+    const requestLimit = process.env.OPENAI_API_KEY ? 20 : 120;
+    const limit = consumeRateLimit(`analyze:${req.ip}`, { limit: requestLimit, windowMs: 60_000 });
+    if (!limit.allowed) {
+      res.setHeader("Retry-After", String(limit.retryAfterSeconds));
+      return res.status(429).json({ error: "Too many analysis requests. Try again shortly." });
     }
+    const validation = validateAnalyzeRequest(req.body);
+    if (!validation.ok) return res.status(400).json({ error: validation.error });
+    const { description, rows } = validation.value;
 
     const fallback = analyzeExperiment({
       description,
-      rows: Array.isArray(body.rows) ? body.rows : undefined
+      rows
     });
 
     try {
-      const enrichment = await enrichWithOpenAIWebSearch(description, fallback);
+      const enrichment = await enrichExperiment(description, fallback);
       return res.json(mergeEnrichment(fallback, enrichment));
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Unknown enrichment error";
       return res.json({
         ...fallback,
         groundingStatus: {
           mode: "fallback",
-          note: `Using built-in science references because web enrichment was unavailable: ${message}`
+          note: "Using built-in science references because web enrichment was unavailable."
         }
       });
     }
@@ -90,4 +99,8 @@ export function createApp(options: AppOptions = {}) {
   }
 
   return app;
+}
+
+function allowCorsOrigin(origin: string | undefined, callback: (error: Error | null, allow?: boolean) => void) {
+  return callback(null, isAllowedOrigin(origin));
 }

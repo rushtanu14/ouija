@@ -16,6 +16,7 @@ const composioEnvKeys = [
   "COMPOSIO_LIVE_EXPORTS",
   "COMPOSIO_SESSION_USER_ID",
   "COMPOSIO_API_BASE_URL",
+  "MCP_SESSION_AUTH_TOKEN",
   ...MCP_CONNECTOR_CATALOG.flatMap((connector) => [
     `COMPOSIO_${connector.envSuffix}_AUTH_CONFIG_ID`,
     `COMPOSIO_${connector.envSuffix}_ALLOWED_TOOLS`
@@ -98,6 +99,56 @@ describe("Vercel API functions", () => {
     expect(response.body.error).toContain("Describe the experiment");
   });
 
+  it("bounds descriptions and table rows through the serverless analyze function", async () => {
+    const longDescriptionResponse = createMockResponse();
+    const malformedRowsResponse = createMockResponse();
+
+    await analyzeHandler(
+      { method: "POST", body: { description: "x".repeat(2_001) } },
+      longDescriptionResponse.res
+    );
+    await analyzeHandler(
+      { method: "POST", body: { description: "Projectile motion lab", rows: ["not-a-row"] } },
+      malformedRowsResponse.res
+    );
+
+    expect(longDescriptionResponse.statusCode).toBe(400);
+    expect(longDescriptionResponse.body.error).toContain("2,000 characters or fewer");
+    expect(malformedRowsResponse.statusCode).toBe(400);
+    expect(malformedRowsResponse.body.error).toContain("valid table rows");
+  });
+
+  it("does not allow untrusted origins on state-changing serverless routes", async () => {
+    const response = createMockResponse();
+
+    await analyzeHandler(
+      {
+        method: "POST",
+        headers: { origin: "https://attacker.example" },
+        body: { description: "Projectile motion lab using launch angle and range data." }
+      },
+      response.res
+    );
+
+    expect(response.headers["Access-Control-Allow-Origin"]).toBeUndefined();
+  });
+
+  it("allows the authorization header for scoped MCP session preflights from trusted origins", async () => {
+    const response = createMockResponse();
+
+    await mcpSessionHandler(
+      {
+        method: "OPTIONS",
+        headers: { origin: "https://ouija-olive.vercel.app" }
+      },
+      response.res
+    );
+
+    expect(response.statusCode).toBe(204);
+    expect(response.headers["Access-Control-Allow-Origin"]).toBe("https://ouija-olive.vercel.app");
+    expect(response.headers["Access-Control-Allow-Headers"]).toContain("Authorization");
+  });
+
   it("runs the evaluation bench through the serverless evaluate function", () => {
     const response = createMockResponse();
 
@@ -107,6 +158,9 @@ describe("Vercel API functions", () => {
     expect(response.body.score).toBe(100);
     expect(response.body.passed).toBe(9);
     expect(response.body.total).toBe(9);
+    expect(response.body.suiteLabel).toContain("regression suite");
+    expect(response.body.verdict).toContain("deterministic regression checks");
+    expect(response.body.verdict).not.toContain("source-backed reasoning");
     expect(response.body.cases.some((testCase: { id: string }) => testCase.id === "eval-pendulum")).toBe(true);
     expect(response.body.cases.some((testCase: { id: string }) => testCase.id === "eval-ohms-law")).toBe(true);
     expect(response.body.cases.some((testCase: { id: string }) => testCase.id === "eval-plant-light")).toBe(true);

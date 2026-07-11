@@ -170,7 +170,7 @@ describe("fallback analysis", () => {
     ]);
     expect(result.developmentJourney.slideCue).toContain("slide-deck spine");
     expect(result.developmentJourney.videoCue).toContain("walkthrough spine");
-    expect(result.developmentJourney.stages.some((stage) => stage.label === "Testing and evaluation" && stage.evidence.includes("Evaluation Bench"))).toBe(true);
+    expect(result.developmentJourney.stages.some((stage) => stage.label === "Testing and evaluation" && stage.evidence.includes("Deterministic Regression Suite"))).toBe(true);
     expect(result.trackEvidence.score).toBeGreaterThanOrEqual(90);
     expect(result.trackEvidence.readiness).toBe("competitive");
     expect(result.trackEvidence.pipeline.map((step) => step.id)).toContain("ground");
@@ -219,6 +219,16 @@ describe("fallback analysis", () => {
     expect(result.patternEvidence.observations.some((observation) => observation.id === "plant-light-vs-dark")).toBe(true);
     expect(result.nextTrialPlan.controlToTighten).toContain("plant species");
     expect(result.trackEvidence.readiness).toBe("competitive");
+  });
+
+  it("explains etiolation instead of treating taller dark-grown seedlings as bad data", () => {
+    const issues = evaluateRows("plant-growth-light-color", [
+      { id: "light", lightColor: "White light", heightCm: 8, days: 7, trial: "1" },
+      { id: "dark", lightColor: "Dark", heightCm: 12, days: 7, trial: "1" }
+    ]);
+
+    expect(issues.some((issue) => issue.id === "plant-dark-etiolation-context" && issue.severity === "info")).toBe(true);
+    expect(issues.some((issue) => issue.id === "plant-light-dark-pattern")).toBe(false);
   });
 
   it("marks unsupported descriptions as low-confidence closest matches instead of pretending full coverage", () => {

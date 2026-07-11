@@ -2,6 +2,11 @@ import OpenAI from "openai";
 import type { AnalyzeResult, SourceCard } from "../src/lib/types.js";
 
 type Enrichment = Partial<Pick<AnalyzeResult, "expectedResult" | "sources" | "explanation" | "groundingStatus">>;
+interface ParsedEnrichment {
+  expectedSummary: string;
+  explanation: string;
+  confidenceNote: string;
+}
 
 export async function enrichWithOpenAIWebSearch(
   description: string,
@@ -17,11 +22,29 @@ export async function enrichWithOpenAIWebSearch(
   }
 
   const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-  const model = process.env.OPENAI_MODEL ?? "gpt-5.5";
+  const model = process.env.OPENAI_MODEL ?? "gpt-5.6";
 
   const response = await client.responses.create({
     model,
     tools: [{ type: "web_search" }],
+    max_output_tokens: 700,
+    text: {
+      format: {
+        type: "json_schema",
+        name: "ouija_grounding_enrichment",
+        strict: true,
+        schema: {
+          type: "object",
+          additionalProperties: false,
+          properties: {
+            expectedSummary: { type: "string", maxLength: 1_500 },
+            explanation: { type: "string", maxLength: 2_500 },
+            confidenceNote: { type: "string", maxLength: 500 }
+          },
+          required: ["expectedSummary", "explanation", "confidenceNote"]
+        }
+      }
+    },
     input: [
       "You are enriching a middle/high school science experiment helper named Ouija.",
       "Use web search only for reputable education or science references.",
@@ -31,10 +54,10 @@ export async function enrichWithOpenAIWebSearch(
       `Built-in classification: ${fallback.classification.title}`,
       `Built-in expected pattern: ${fallback.expectedResult.pattern}`
     ].join("\n")
-  });
+  }, { signal: AbortSignal.timeout(15_000) });
 
   const rawText = response.output_text ?? "";
-  const parsed = parseJsonObject(rawText);
+  const parsed = parseEnrichmentText(rawText);
   const citations = extractUrlCitations(response);
 
   if (!parsed && citations.length === 0) {
@@ -64,28 +87,39 @@ export async function enrichWithOpenAIWebSearch(
   };
 }
 
-function parseJsonObject(text: string): Record<string, string> | null {
-  const match = text.match(/\{[\s\S]*\}/);
-  if (!match) return null;
-
+export function parseEnrichmentText(text: string): ParsedEnrichment | null {
   try {
-    const value = JSON.parse(match[0]);
-    return typeof value === "object" && value ? value : null;
+    const value = JSON.parse(text) as unknown;
+    if (!isRecord(value)) return null;
+    const keys = Object.keys(value).sort();
+    if (keys.join(",") !== "confidenceNote,expectedSummary,explanation") return null;
+    if (
+      !isBoundedString(value.expectedSummary, 1_500)
+      || !isBoundedString(value.explanation, 2_500)
+      || !isBoundedString(value.confidenceNote, 500)
+    ) return null;
+    return {
+      expectedSummary: value.expectedSummary,
+      explanation: value.explanation,
+      confidenceNote: value.confidenceNote
+    };
   } catch {
     return null;
   }
 }
 
-function extractUrlCitations(response: unknown): SourceCard[] {
+export function extractUrlCitations(response: unknown): SourceCard[] {
   const output = (response as { output?: Array<{ type?: string; content?: Array<{ annotations?: unknown[] }> }> }).output ?? [];
   const sources: SourceCard[] = [];
+  const seenUrls = new Set<string>();
 
   for (const item of output) {
     if (item.type !== "message") continue;
     for (const content of item.content ?? []) {
       for (const annotation of content.annotations ?? []) {
         const citation = annotation as { type?: string; url?: string; title?: string };
-        if (citation.type === "url_citation" && citation.url) {
+        if (citation.type === "url_citation" && citation.url && isSafeHttpsUrl(citation.url) && !seenUrls.has(citation.url)) {
+          seenUrls.add(citation.url);
           sources.push({
             id: `web-${sources.length + 1}`,
             title: citation.title ?? "Web reference",
@@ -100,4 +134,20 @@ function extractUrlCitations(response: unknown): SourceCard[] {
   }
 
   return sources;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return Boolean(value) && typeof value === "object" && !Array.isArray(value);
+}
+
+function isBoundedString(value: unknown, maxLength: number): value is string {
+  return typeof value === "string" && value.trim().length > 0 && value.length <= maxLength;
+}
+
+function isSafeHttpsUrl(value: string) {
+  try {
+    return new URL(value).protocol === "https:";
+  } catch {
+    return false;
+  }
 }

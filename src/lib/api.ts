@@ -28,7 +28,7 @@ export async function requestEvaluation(): Promise<EvaluationReport> {
   const response = await fetch("/api/evaluate");
 
   if (!response.ok) {
-    throw new Error("Ouija could not load the evaluation bench.");
+    throw new Error("Ouija could not load the deterministic regression suite.");
   }
 
   return response.json() as Promise<EvaluationReport>;
