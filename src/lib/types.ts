@@ -193,6 +193,33 @@ export interface StudentPilotStudyKit {
   judgeTakeaway: string;
 }
 
+export type PilotEvidenceIssueSignal = "" | "yes" | "no" | "unsure";
+
+export type PilotEvidenceReflectionStatus = "" | "ready" | "partial" | "not_ready";
+
+export interface PilotEvidenceEntry {
+  id: string;
+  label: string;
+  timeToGraphSeconds: string;
+  confidenceBefore: string;
+  confidenceAfter: string;
+  issueCaught: PilotEvidenceIssueSignal;
+  reflectionReadiness: PilotEvidenceReflectionStatus;
+  note: string;
+}
+
+export interface PilotEvidenceSummary {
+  status: "needs_evidence" | "collect_more" | "evidence_ready";
+  headline: string;
+  observationCount: number;
+  averageTimeToGraphSeconds: number | null;
+  averageConfidenceDelta: number | null;
+  issueCaughtCount: number;
+  reflectionReadyCount: number;
+  noteCount: number;
+  judgeTakeaway: string;
+}
+
 export interface LearningExitTicketPrompt {
   id: "variable-check" | "pattern-check" | "next-step-check";
   label: string;

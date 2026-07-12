@@ -106,6 +106,18 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(page.getByLabel("Student Pilot Study Kit").getByText("No names")).toBeVisible();
   await expect(page.getByLabel("Pilot tasks").getByText("Confirm the lab match")).toBeVisible();
   await expect(page.getByLabel("Pilot metrics").getByText("Time to first graph")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Pilot Evidence Tracker" })).toBeVisible();
+  await expect(page.getByLabel("Pilot Evidence Tracker").getByText("No pilot observations yet.")).toBeVisible();
+  await expect(page.getByLabel("Pilot Evidence Tracker").getByText("Do not claim completed student testing yet")).toBeVisible();
+  await page.getByLabel("Time to graph Observation 1").fill("90");
+  await page.getByLabel("Confidence before Observation 1").selectOption("2");
+  await page.getByLabel("Confidence after Observation 1").selectOption("4");
+  await page.getByLabel("Issue spotted Observation 1").selectOption("yes");
+  await page.getByLabel("Exit ticket Observation 1").selectOption("ready");
+  await page.getByLabel("Pilot note Observation 1").fill("Student found the graph warning before writing.");
+  await expect(page.getByLabel("Pilot evidence metrics").getByText("1/3")).toBeVisible();
+  await expect(page.getByLabel("Pilot evidence metrics").getByText("1m 30s")).toBeVisible();
+  await expect(page.getByLabel("Pilot evidence metrics").getByText("+2.0")).toBeVisible();
   await expect(page.getByRole("heading", { name: "Learning Exit Ticket" })).toBeVisible();
   await expect(page.getByLabel("Learning Exit Ticket").getByText("Exit ticket prompts")).toBeVisible();
   await expect(page.getByLabel("Learning Exit Ticket").getByText(/Which part of your setup was the independent variable/i)).toBeVisible();
@@ -174,6 +186,9 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(page.getByLabel("Student evidence packet")).toHaveValue(/Grounding Audit/);
   await expect(page.getByLabel("Student evidence packet")).toHaveValue(/Expected Overlay/);
   await expect(page.getByLabel("Student evidence packet")).toHaveValue(/Learning Impact Loop/);
+  await expect(page.getByLabel("Student evidence packet")).toHaveValue(/Pilot Evidence Tracker/);
+  await expect(page.getByLabel("Student evidence packet")).toHaveValue(/Anonymous observations: 1/);
+  await expect(page.getByLabel("Student evidence packet")).toHaveValue(/Average confidence shift: \+2.0 points/);
   await expect(page.getByLabel("Student evidence packet")).toHaveValue(/Learning Exit Ticket/);
   await expect(page.getByLabel("Student evidence packet")).toHaveValue(/Exit ticket prompt:/);
   await expect(page.getByLabel("Student evidence packet")).toHaveValue(/Student Reflection Drafts/);
@@ -234,6 +249,7 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(page.getByLabel("AI Model Card").getByText("AIYES Development Journey turns the required slide and video story into inspectable run evidence.")).toBeVisible();
   await expect(page.getByLabel("AI Model Card").getByText("Learning Impact Loop turns analysis into measurable student readiness and next-trial evidence.")).toBeVisible();
   await expect(page.getByLabel("AI Model Card").getByText("Student Pilot Study Kit defines anonymous student-testing tasks, metrics, observer notes, and evidence to collect.")).toBeVisible();
+  await expect(page.getByLabel("AI Model Card").getByText("Pilot Evidence Tracker summarizes anonymous time-to-graph, confidence shift, issue spotting, and exit-ticket readiness without collecting student identifiers.")).toBeVisible();
   await expect(page.getByLabel("AI Model Card").getByText("Pre-Lab Design Coach turns classification into variables, controls, repeats, source checks, and safety before data collection.")).toBeVisible();
   await expect(page.getByLabel("AI Model Card").getByText("Learning Exit Ticket converts the AI feedback into student reflection prompts judges can inspect.")).toBeVisible();
   await expect(page.getByLabel("AI Model Card").getByText("Student Reflection Workspace stores student-written drafts without generating answers.")).toBeVisible();
@@ -327,6 +343,7 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(page.getByLabel("MCP payload preview")).toHaveValue(/MCP readiness matrix/);
   await expect(page.getByLabel("MCP payload preview")).toHaveValue(/Dry-run checks/);
   await expect(page.getByLabel("MCP payload preview")).toHaveValue(/Pre-Lab Design Coach/);
+  await expect(page.getByLabel("MCP payload preview")).toHaveValue(/Pilot Evidence Tracker summary/);
   await expect(page.getByLabel("MCP payload preview")).toHaveValue(/Student Reflection Drafts/);
   await page.locator(".mcp-action-card").filter({ hasText: "Run Scholar claim check" }).getByRole("button", { name: "Validate route" }).click();
   await expect(page.getByLabel("MCP export dry-run result").getByText("Dry-run passed", { exact: true })).toBeVisible();
@@ -383,6 +400,7 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(page.getByLabel("Judge Brief").getByText("AIYES Values Fit maps democracy, diversity, connectivity, innovation, and ethical inclusion to concrete product evidence.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("AIYES Development Journey maps problem, data, model, build, testing, UX, ethics, impact, constraints, and submission proof.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Learning Impact Loop measures the student's outcome for each run.")).toBeVisible();
+  await expect(page.getByLabel("Judge Brief").getByText("Pilot Evidence Tracker logs anonymous browser-local observations without letting the team claim fake completed testing.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Submission Hub gives judges one URL for live app, judge view, deck, video, source, Devpost pack, and proof endpoints.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Pre-Lab Design Coach helps students plan variables, controls, repeats, sources, and safety before collecting data.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Learning Exit Ticket proves students must explain variables, patterns, and next steps themselves.")).toBeVisible();

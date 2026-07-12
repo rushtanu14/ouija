@@ -38,9 +38,9 @@ Show AIYES Values Fit: the same run maps to democracy, diversity, connectivity, 
 
 Show AIYES Development Journey: the run maps the required development story from problem and data handling through model strategy, testing, UX, ethics, impact, constraints, and submission proof.
 
-## 2:34-2:50 - Pre-Lab, Student Level Lens, Concept Mastery, Learning Impact, Pilot Kit, Exit Ticket, And Reflection Workspace
+## 2:34-2:50 - Pre-Lab, Student Level Lens, Concept Mastery, Learning Impact, Pilot Evidence, Exit Ticket, And Reflection Workspace
 
-Show Student Level Lens: the same run switches between middle-school pattern reading and high-school quantitative evidence, controls, repeats, and uncertainty. Then show Pre-Lab Design Coach: Ouija turns the match into variables, controls, repeats, source checks, table columns, and a safety gate before data collection. Then show Learning Impact Loop: Ouija scores whether the student is ready to reason, should review flags, or needs to fix the run, using outcome, data quality, concept learning, integrity, pattern evidence, repeat reliability, and next-trial metrics. Then show Student Pilot Study Kit: it gives an anonymous 10-minute protocol, tasks, metrics, observer notes, and evidence to collect instead of claiming fake completed user testing.
+Show Student Level Lens: the same run switches between middle-school pattern reading and high-school quantitative evidence, controls, repeats, and uncertainty. Then show Pre-Lab Design Coach: Ouija turns the match into variables, controls, repeats, source checks, table columns, and a safety gate before data collection. Then show Learning Impact Loop: Ouija scores whether the student is ready to reason, should review flags, or needs to fix the run, using outcome, data quality, concept learning, integrity, pattern evidence, repeat reliability, and next-trial metrics. Then show Student Pilot Study Kit and Pilot Evidence Tracker: the kit gives an anonymous 10-minute protocol, and the tracker starts empty with a no-fake-testing warning before logging time-to-graph, confidence shift, issue spotting, exit-ticket readiness, and non-identifying notes.
 
 Show Concept Mastery Check: students answer quick variable, expected-pattern, and integrity questions before the evidence packet moves forward.
 
@@ -56,7 +56,7 @@ Show Pattern Evidence Engine first: whole-graph support, trend checks, and the s
 
 ## 3:16-4:05 - Next Trial Planner, Claim Coach, And Evidence Packet
 
-Scroll to Next Trial Planner, Claim Coach, and Evidence Packet. Show that Ouija does not write the conclusion. It first tells the student whether to extend the pattern or repeat/fix a warning, then gives a claim starter with blanks, Judge Demo Path, Pre-Lab Design Coach, Student Pilot Study Kit, Student Level Lens, Concept Mastery Check, Learning Exit Ticket, Student Reflection Drafts, Data Handling Ledger, safety notes, an evidence checklist, source trail, copied table data, and a next question.
+Scroll to Next Trial Planner, Claim Coach, and Evidence Packet. Show that Ouija does not write the conclusion. It first tells the student whether to extend the pattern or repeat/fix a warning, then gives a claim starter with blanks, Judge Demo Path, Pre-Lab Design Coach, Student Pilot Study Kit, Pilot Evidence Tracker summary, Student Level Lens, Concept Mastery Check, Learning Exit Ticket, Student Reflection Drafts, Data Handling Ledger, safety notes, an evidence checklist, source trail, copied table data, and a next question.
 
 ## 4:05-4:40 - Breadth
 
@@ -68,7 +68,7 @@ Type an unsupported paper towel absorbency lab. Show that Ouija labels it as a l
 
 ## 4:50-4:56 - Saved Lab Snapshot, Progress Portfolio, Portfolio Story, And MCP Export
 
-Save two runs and show Saved Labs plus Progress Portfolio so judges see the workflow continues after one analysis and can measure saved-run trend, subject breadth, and the next portfolio action. Then show Portfolio Story Builder: saved-run evidence becomes prompts and blanks for a student-written progress story, not a generated essay. Then show MCP Integration Coach: Ouija validates Composio Search source-audit, Scholar claim-check, and Composio Browser source-capture routes plus Google Docs, Google Sheets, Google Drive, Google Classroom, Google Forms, Google Calendar, and Notion handoffs through a server dry-run, shows connector env vars/tools/scopes/data/checks, keeps Composio credentials server-side, can include pilot metrics in the Forms readiness route, and requires consent before source audit, Scholar check, Browser source capture, or export.
+Save two runs and show Saved Labs plus Progress Portfolio so judges see the workflow continues after one analysis and can measure saved-run trend, subject breadth, and the next portfolio action. Then show Portfolio Story Builder: saved-run evidence becomes prompts and blanks for a student-written progress story, not a generated essay. Then show MCP Integration Coach: Ouija validates Composio Search source-audit, Scholar claim-check, and Composio Browser source-capture routes plus Google Docs, Google Sheets, Google Drive, Google Classroom, Google Forms, Google Calendar, and Notion handoffs through a server dry-run, shows connector env vars/tools/scopes/data/checks, keeps Composio credentials server-side, can include pilot metrics and Pilot Evidence Tracker summaries in Forms/Sheets/Notion routes, and requires consent before source audit, Scholar check, Browser source capture, or export.
 
 ## 4:56-4:58 - Deterministic Regression Suite
 
@@ -76,7 +76,7 @@ Show Deterministic Regression Suite with 9/9 internal behavior checks: projectil
 
 ## 4:58-5:00 - Judge Brief
 
-Show Judge Brief so evaluators see Track 1 fit, Judge Demo Path, Submission Hub, live app, hosted deck/video/source links, AIYES submission checklist, official rubric fit, learning impact, student pilot protocol, learning exit ticket, student level lens, Concept Mastery Check, student reflection workspace, progress portfolio, grounding audit, AI evaluation harness, data-handling ethics, pattern evidence, model strategy, AI pipeline, evaluation, tests, and integrity constraints in one place.
+Show Judge Brief so evaluators see Track 1 fit, Judge Demo Path, Submission Hub, live app, hosted deck/video/source links, AIYES submission checklist, official rubric fit, learning impact, student pilot protocol, pilot evidence capture, learning exit ticket, student level lens, Concept Mastery Check, student reflection workspace, progress portfolio, grounding audit, AI evaluation harness, data-handling ethics, pattern evidence, model strategy, AI pipeline, evaluation, tests, and integrity constraints in one place.
 
 ## Closing Line
 

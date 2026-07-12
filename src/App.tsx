@@ -40,6 +40,12 @@ import type { ConceptMasteryAnswerMap, ConceptMasteryCheck } from "./lib/concept
 import { buildPasteExample, parsePastedTable } from "./lib/dataImport";
 import { buildEvidencePacket } from "./lib/evidencePacket";
 import { buildMcpIntegrationPlan } from "./lib/mcpIntegrationPlan";
+import {
+  createInitialPilotEvidenceEntries,
+  formatPilotEvidenceSeconds,
+  normalizePilotEvidenceEntries,
+  summarizePilotEvidence
+} from "./lib/pilotEvidence";
 import { buildProgressPortfolio } from "./lib/progressPortfolio";
 import { SAMPLE_PROMPTS } from "./lib/samples";
 import { buildStudentReflectionWorkspace } from "./lib/studentReflectionWorkspace";
@@ -70,6 +76,8 @@ import type {
   NextTrialPlan,
   OfficialRubricFit,
   PatternEvidence,
+  PilotEvidenceEntry,
+  PilotEvidenceSummary,
   PreLabDesignCoach,
   ProgressPortfolio,
   ProgressPortfolioSnapshot,
@@ -84,6 +92,7 @@ import type {
 
 const initialPrompt = SAMPLE_PROMPTS[0].text;
 const savedLabsKey = "ouija:saved-labs";
+const pilotEvidenceKey = "ouija:pilot-evidence";
 const sourceCodeUrl = "https://github.com/rushtanu14/ouija";
 const liveDemoUrl = "https://ouija-olive.vercel.app";
 const judgeDemoUrl = "https://ouija-olive.vercel.app/?judge=1";
@@ -105,6 +114,7 @@ const studentNavLinks = [
   { href: "#sources", label: "Sources" },
   { href: "#impact", label: "Impact" },
   { href: "#pilot", label: "Pilot" },
+  { href: "#pilot-evidence", label: "Pilot Log" },
   { href: "#saved", label: "Saved Labs" },
   { href: "#progress", label: "Progress" },
   { href: "#settings", label: "Settings" }
@@ -120,6 +130,7 @@ const judgeNavLinks = [
   { href: "#journey", label: "Journey" },
   { href: "#impact", label: "Impact" },
   { href: "#pilot", label: "Pilot" },
+  { href: "#pilot-evidence", label: "Pilot Log" },
   { href: "#evaluation", label: "Regression" },
   { href: "#saved", label: "Saved Labs" },
   { href: "#progress", label: "Progress" },
@@ -143,6 +154,7 @@ export function App() {
   const [reflectionAnswers, setReflectionAnswers] = useState<StudentReflectionAnswers>({});
   const [masteryAnswers, setMasteryAnswers] = useState<ConceptMasteryAnswerMap>({});
   const [savedLabs, setSavedLabs] = useState<SavedLab[]>(loadSavedLabs);
+  const [pilotEvidenceEntries, setPilotEvidenceEntries] = useState<PilotEvidenceEntry[]>(loadPilotEvidenceEntries);
   const [evaluationReport, setEvaluationReport] = useState<EvaluationReport | null>(null);
   const [runtimeProof, setRuntimeProof] = useState<RuntimeProof | null>(null);
   const [mcpBridgeStatus, setMcpBridgeStatus] = useState<McpBridgeStatus | null>(null);
@@ -238,6 +250,18 @@ export function App() {
     }));
   }
 
+  function updatePilotEvidenceEntry(id: string, patch: Partial<Omit<PilotEvidenceEntry, "id" | "label">>) {
+    const nextEntries = pilotEvidenceEntries.map((entry) => (entry.id === id ? { ...entry, ...patch } : entry));
+    setPilotEvidenceEntries(nextEntries);
+    storePilotEvidenceEntries(nextEntries);
+  }
+
+  function resetPilotEvidenceEntries() {
+    const nextEntries = createInitialPilotEvidenceEntries();
+    setPilotEvidenceEntries(nextEntries);
+    storePilotEvidenceEntries(nextEntries);
+  }
+
   const chartData = useMemo(() => {
     if (!result) return [];
     const comparisonByRow = new Map(result.expectedComparison.points.map((point) => [point.rowId, point]));
@@ -249,6 +273,7 @@ export function App() {
     }));
   }, [result, rows]);
   const progressPortfolio = useMemo(() => buildProgressPortfolio(savedLabs), [savedLabs]);
+  const pilotEvidenceSummary = useMemo(() => summarizePilotEvidence(pilotEvidenceEntries), [pilotEvidenceEntries]);
   const studentReflectionWorkspace = useMemo(() => {
     if (!result) return null;
     return buildStudentReflectionWorkspace(result.learningExitTicket, reflectionAnswers);
@@ -259,8 +284,8 @@ export function App() {
   }, [masteryAnswers, result]);
   const evidencePacket = useMemo(() => {
     if (!result) return "";
-    return buildEvidencePacket(result, rows, description, reflectionAnswers);
-  }, [description, reflectionAnswers, result, rows]);
+    return buildEvidencePacket(result, rows, description, reflectionAnswers, pilotEvidenceSummary);
+  }, [description, pilotEvidenceSummary, reflectionAnswers, result, rows]);
   const mcpIntegrationPlan = useMemo(() => {
     if (!result) return null;
     return buildMcpIntegrationPlan({
@@ -494,6 +519,12 @@ export function App() {
               <NextTrialPanel plan={result.nextTrialPlan} />
               <LearningImpactPanel snapshot={result.impactSnapshot} />
               <StudentPilotStudyKitPanel kit={result.studentPilotStudyKit} />
+              <PilotEvidenceTrackerPanel
+                entries={pilotEvidenceEntries}
+                summary={pilotEvidenceSummary}
+                onEntryChange={updatePilotEvidenceEntry}
+                onReset={resetPilotEvidenceEntries}
+              />
               <LearningExitTicketPanel ticket={result.learningExitTicket} />
               {studentReflectionWorkspace ? (
                 <StudentReflectionWorkspacePanel
@@ -1184,6 +1215,7 @@ function JudgeBriefPanel({ result }: { result: AnalyzeResult | null }) {
     "AIYES Development Journey maps problem, data, model, build, testing, UX, ethics, impact, constraints, and submission proof.",
     "Learning Impact Loop measures the student's outcome for each run.",
     "Student Pilot Study Kit prepares a consent-safe 10-minute protocol for collecting UX and impact evidence.",
+    "Pilot Evidence Tracker logs anonymous browser-local observations without letting the team claim fake completed testing.",
     "Submission Hub gives judges one URL for live app, judge view, deck, video, source, Devpost pack, and proof endpoints.",
     "Pre-Lab Design Coach helps students plan variables, controls, repeats, sources, and safety before collecting data.",
     "Learning Exit Ticket proves students must explain variables, patterns, and next steps themselves.",
@@ -1299,6 +1331,7 @@ function ModelCardPanel({ result }: { result: AnalyzeResult | null }) {
     "AIYES Development Journey turns the required slide and video story into inspectable run evidence.",
     "Learning Impact Loop turns analysis into measurable student readiness and next-trial evidence.",
     "Student Pilot Study Kit defines anonymous student-testing tasks, metrics, observer notes, and evidence to collect.",
+    "Pilot Evidence Tracker summarizes anonymous time-to-graph, confidence shift, issue spotting, and exit-ticket readiness without collecting student identifiers.",
     "Pre-Lab Design Coach turns classification into variables, controls, repeats, source checks, and safety before data collection.",
     "Learning Exit Ticket converts the AI feedback into student reflection prompts judges can inspect.",
     "Student Reflection Workspace stores student-written drafts without generating answers.",
@@ -2264,6 +2297,162 @@ function StudentPilotStudyKitPanel({ kit }: { kit: StudentPilotStudyKit }) {
   );
 }
 
+function PilotEvidenceTrackerPanel({
+  entries,
+  summary,
+  onEntryChange,
+  onReset
+}: {
+  entries: PilotEvidenceEntry[];
+  summary: PilotEvidenceSummary;
+  onEntryChange: (id: string, patch: Partial<Omit<PilotEvidenceEntry, "id" | "label">>) => void;
+  onReset: () => void;
+}) {
+  return (
+    <section
+      className={`pilot-evidence-tracker pilot-evidence-tracker-${summary.status}`}
+      id="pilot-evidence"
+      aria-label="Pilot Evidence Tracker"
+    >
+      <div className="pilot-evidence-header">
+        <div className="panel-title">
+          <ClipboardCheck size={18} />
+          <h3>Pilot Evidence Tracker</h3>
+        </div>
+        <button type="button" onClick={onReset}>
+          <Trash2 size={16} />
+          Clear pilot evidence
+        </button>
+      </div>
+      <div className="pilot-evidence-summary">
+        <div>
+          <p className="section-label">Evidence status</p>
+          <strong>{formatPilotEvidenceStatus(summary.status)}</strong>
+        </div>
+        <span>{summary.headline}</span>
+      </div>
+      <div className="pilot-evidence-metrics" aria-label="Pilot evidence metrics">
+        <article>
+          <p className="section-label">Observations</p>
+          <strong>{summary.observationCount}/3</strong>
+          <span>Anonymous student runs logged</span>
+        </article>
+        <article>
+          <p className="section-label">Avg time to graph</p>
+          <strong>{formatPilotEvidenceSeconds(summary.averageTimeToGraphSeconds)}</strong>
+          <span>Analyze click to graph/table understanding</span>
+        </article>
+        <article>
+          <p className="section-label">Confidence shift</p>
+          <strong>{formatPilotEvidenceDelta(summary.averageConfidenceDelta)}</strong>
+          <span>Student self-rating before vs after</span>
+        </article>
+        <article>
+          <p className="section-label">Issues spotted</p>
+          <strong>{summary.issueCaughtCount}</strong>
+          <span>Data, source, or method flags noticed</span>
+        </article>
+      </div>
+      <div className="pilot-evidence-entry-grid" aria-label="Pilot observation entries">
+        {entries.map((entry) => (
+          <article key={entry.id}>
+            <div>
+              <p className="section-label">{entry.label}</p>
+              <strong>Anonymous observation</strong>
+            </div>
+            <label>
+              <span>Time to graph</span>
+              <input
+                aria-label={`Time to graph ${entry.label}`}
+                inputMode="numeric"
+                min="1"
+                type="number"
+                value={entry.timeToGraphSeconds}
+                onChange={(event) => onEntryChange(entry.id, { timeToGraphSeconds: event.target.value })}
+                placeholder="seconds"
+              />
+            </label>
+            <label>
+              <span>Confidence before</span>
+              <select
+                aria-label={`Confidence before ${entry.label}`}
+                value={entry.confidenceBefore}
+                onChange={(event) => onEntryChange(entry.id, { confidenceBefore: event.target.value })}
+              >
+                <option value="">Not rated</option>
+                <option value="1">1 - lost</option>
+                <option value="2">2 - unsure</option>
+                <option value="3">3 - okay</option>
+                <option value="4">4 - clear</option>
+                <option value="5">5 - confident</option>
+              </select>
+            </label>
+            <label>
+              <span>Confidence after</span>
+              <select
+                aria-label={`Confidence after ${entry.label}`}
+                value={entry.confidenceAfter}
+                onChange={(event) => onEntryChange(entry.id, { confidenceAfter: event.target.value })}
+              >
+                <option value="">Not rated</option>
+                <option value="1">1 - lost</option>
+                <option value="2">2 - unsure</option>
+                <option value="3">3 - okay</option>
+                <option value="4">4 - clear</option>
+                <option value="5">5 - confident</option>
+              </select>
+            </label>
+            <label>
+              <span>Issue spotted</span>
+              <select
+                aria-label={`Issue spotted ${entry.label}`}
+                value={entry.issueCaught}
+                onChange={(event) => onEntryChange(entry.id, { issueCaught: event.target.value as PilotEvidenceEntry["issueCaught"] })}
+              >
+                <option value="">Not recorded</option>
+                <option value="yes">Yes</option>
+                <option value="no">No</option>
+                <option value="unsure">Unsure</option>
+              </select>
+            </label>
+            <label>
+              <span>Exit ticket</span>
+              <select
+                aria-label={`Exit ticket ${entry.label}`}
+                value={entry.reflectionReadiness}
+                onChange={(event) =>
+                  onEntryChange(entry.id, {
+                    reflectionReadiness: event.target.value as PilotEvidenceEntry["reflectionReadiness"]
+                  })
+                }
+              >
+                <option value="">Not recorded</option>
+                <option value="ready">Ready</option>
+                <option value="partial">Partial</option>
+                <option value="not_ready">Not ready</option>
+              </select>
+            </label>
+            <label className="pilot-evidence-note">
+              <span>Non-identifying note</span>
+              <textarea
+                aria-label={`Pilot note ${entry.label}`}
+                maxLength={160}
+                value={entry.note}
+                onChange={(event) => onEntryChange(entry.id, { note: event.target.value })}
+                placeholder="No names, contact info, grades, faces, or private class details."
+              />
+            </label>
+          </article>
+        ))}
+      </div>
+      <div className="pilot-evidence-boundary">
+        <strong>{summary.judgeTakeaway}</strong>
+        <span>Browser-local only. Export routes can summarize counts later; they should not send raw student identifiers.</span>
+      </div>
+    </section>
+  );
+}
+
 function LearningExitTicketPanel({ ticket }: { ticket: LearningExitTicket }) {
   return (
     <section className={`learning-exit-ticket learning-exit-ticket-${ticket.status}`} aria-label="Learning Exit Ticket">
@@ -3160,6 +3349,18 @@ function formatMcpPayloadPreview(plan: McpIntegrationPlan) {
   ].join("\n");
 }
 
+function formatPilotEvidenceStatus(status: PilotEvidenceSummary["status"]) {
+  if (status === "evidence_ready") return "Evidence ready";
+  if (status === "collect_more") return "Collect more";
+  return "Needs evidence";
+}
+
+function formatPilotEvidenceDelta(delta: number | null) {
+  if (delta === null) return "Not measured";
+  if (delta > 0) return `+${delta.toFixed(1)}`;
+  return delta.toFixed(1);
+}
+
 function formatColumnLabel(result: AnalyzeResult, key: string) {
   const column = result.columns.find((candidate) => candidate.key === key);
   if (!column) return key;
@@ -3232,7 +3433,23 @@ function loadSavedLabs(): SavedLab[] {
   }
 }
 
+function loadPilotEvidenceEntries(): PilotEvidenceEntry[] {
+  if (typeof window === "undefined") return createInitialPilotEvidenceEntries();
+
+  try {
+    const parsed = JSON.parse(window.localStorage.getItem(pilotEvidenceKey) ?? "[]");
+    return normalizePilotEvidenceEntries(parsed);
+  } catch {
+    return createInitialPilotEvidenceEntries();
+  }
+}
+
 function storeSavedLabs(savedLabs: SavedLab[]) {
   if (typeof window === "undefined") return;
   window.localStorage.setItem(savedLabsKey, JSON.stringify(savedLabs));
+}
+
+function storePilotEvidenceEntries(entries: PilotEvidenceEntry[]) {
+  if (typeof window === "undefined") return;
+  window.localStorage.setItem(pilotEvidenceKey, JSON.stringify(entries));
 }

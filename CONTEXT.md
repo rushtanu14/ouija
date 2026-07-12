@@ -58,6 +58,10 @@ The UX split that keeps Ouija practical for students while preserving judge proo
 
 The newest MCP route in the server dry-run bridge. It adds `composio-browser-source-capture` for public source-page context capture through Composio Browser Tool (`BROWSER_TOOL_CREATE_TASK`, `BROWSER_TOOL_WATCH_TASK`). It is source-context support only; it must not browse private accounts, write the student's final claim, or run live without server-side credentials, allowed tools, and explicit consent.
 
+### Pilot Evidence Tracker
+
+The browser-local student-testing evidence layer. It logs anonymous pilot observations for time to first graph, confidence before/after, issue spotting, exit-ticket readiness, and non-identifying notes. It starts empty with an explicit no-fake-testing warning and must not collect names, grades, faces, contact info, or private classroom details.
+
 ### Submission Hub
 
 The one-click judge packet at `https://ouija-olive.vercel.app/submission/`. It gathers the live app, Judge view, slide deck, walkthrough, source code, screenshots, and public proof endpoints so Devpost judges do not have to hunt through README links or app panels.
@@ -72,6 +76,17 @@ The one-click judge packet at `https://ouija-olive.vercel.app/submission/`. It g
 - Ouija's first supported set should balance physics, chemistry, biology, and earth science instead of overfitting to physics.
 - Ouija should support table input first before adding CSV upload or photo/OCR input.
 - Ouija's internet search should ground expected results and explanations in referenced content instead of inventing them from the model alone.
+
+## Pilot Evidence Tracker Checkpoint - 2026-07-11 PDT / 2026-07-12 UTC
+
+- Council verdict: Ouija works and remains submittable for AIYES Track 1; first place/top-award outcome still cannot be guaranteed because judging, final Devpost submission, and the 2-5 student roster are external.
+- Composio discovery confirmed the practical route: Forms/Sheets/Notion are most valuable when they carry real pilot evidence, not when Ouija adds more superficial connector names. DeepWiki did not find `rushtanu14/ouija` indexed yet, so the live app keeps that route as a public-source proof dry-run rather than claiming a live DeepWiki result.
+- Added `Pilot Evidence Tracker` after Student Pilot Study Kit. It stores three anonymous browser-local observation rows, summarizes time-to-graph, confidence shift, issue spotting, exit-ticket readiness, and non-identifying notes, and starts with a warning not to claim completed student testing.
+- Evidence Packet now includes a Pilot Evidence Tracker section. MCP payload previews now include `Pilot Evidence Tracker summary` so Google Forms, Google Sheets, and Notion handoffs can carry anonymous counts later without exposing student identifiers.
+- Updated README, Devpost copy, five-minute demo script, AI Model Card, Judge Brief, unit tests, and E2E coverage for the tracker.
+- Production: `dpl_2WURxeVkLJWMXB6ZVDgmG37WJ4zN`, aliased to `https://ouija-olive.vercel.app`.
+- Verification: `npm run test` (15 files, 86 tests), `npm run build`, `npm run test:e2e` (36 passed across Chromium, Firefox, WebKit, and mobile Safari), `npm audit --json` (0 vulnerabilities), `git diff --check`, production deploy, live `/api/mcp/status` (200, `server_dry_run`, 11 routes, `deepwiki_mcp` present), live `/api/evaluate` (200, 100 score, 9/9 pass), and hosted desktop/mobile Playwright smoke for Pilot Evidence Tracker with no horizontal overflow and zero console errors.
+- Remaining loops: commit/push, actual Devpost submission, final 2-5 member team roster on Devpost, optional live OpenAI/Composio credentials only with explicit approval and consent/server setup, and optional DeepWiki indexing if the public repo route should become live proof.
 
 ## Regression Wording Polish Checkpoint - 2026-07-11
 

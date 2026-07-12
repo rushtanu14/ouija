@@ -1,12 +1,14 @@
 import { buildStudentReflectionWorkspace } from "./studentReflectionWorkspace";
 import { buildConceptMasteryCheck } from "./conceptMasteryCheck";
-import type { AnalyzeResult, StudentDataRow, StudentReflectionAnswers } from "./types";
+import { formatPilotEvidenceSeconds } from "./pilotEvidence";
+import type { AnalyzeResult, PilotEvidenceSummary, StudentDataRow, StudentReflectionAnswers } from "./types";
 
 export function buildEvidencePacket(
   result: AnalyzeResult,
   rows: StudentDataRow[],
   description: string,
-  reflectionAnswers: StudentReflectionAnswers = {}
+  reflectionAnswers: StudentReflectionAnswers = {},
+  pilotEvidenceSummary?: PilotEvidenceSummary
 ): string {
   const warnings = result.issues.filter((issue) => issue.severity !== "info");
   const dataTable = formatDataTable(result, rows);
@@ -218,6 +220,21 @@ export function buildEvidencePacket(
     ...result.studentPilotStudyKit.evidenceToCollect.map((item) => `  - ${item}`),
     `- Judge takeaway: ${result.studentPilotStudyKit.judgeTakeaway}`,
     "",
+    "## Pilot Evidence Tracker",
+    `- Status: ${pilotEvidenceSummary ? formatPilotEvidenceStatus(pilotEvidenceSummary.status) : "Needs evidence"}`,
+    `- Summary: ${pilotEvidenceSummary?.headline ?? "No pilot observations yet."}`,
+    `- Anonymous observations: ${pilotEvidenceSummary?.observationCount ?? 0}`,
+    `- Average time to first graph: ${formatPilotEvidenceSeconds(pilotEvidenceSummary?.averageTimeToGraphSeconds ?? null)}`,
+    `- Average confidence shift: ${formatPilotEvidenceDelta(pilotEvidenceSummary?.averageConfidenceDelta ?? null)}`,
+    `- Data or source issues spotted: ${pilotEvidenceSummary?.issueCaughtCount ?? 0}`,
+    `- Exit tickets ready: ${pilotEvidenceSummary?.reflectionReadyCount ?? 0}`,
+    `- Non-identifying observer notes: ${pilotEvidenceSummary?.noteCount ?? 0}`,
+    "- Privacy boundary: Browser-local only; no names, contact info, grades, faces, or private classroom data.",
+    `- Judge takeaway: ${
+      pilotEvidenceSummary?.judgeTakeaway ??
+      "Do not claim completed student testing yet; this tracker shows exactly what evidence still needs to be collected."
+    }`,
+    "",
     "## Learning Exit Ticket",
     `- Status: ${formatLearningExitTicketStatus(result.learningExitTicket.status)}`,
     `- Summary: ${result.learningExitTicket.summary}`,
@@ -410,6 +427,18 @@ function formatLearningExitTicketStatus(status: AnalyzeResult["learningExitTicke
   if (status === "blocked") return "blocked";
   if (status === "review") return "review first";
   return "ready";
+}
+
+function formatPilotEvidenceStatus(status: PilotEvidenceSummary["status"]) {
+  if (status === "evidence_ready") return "Evidence ready";
+  if (status === "collect_more") return "Collect more";
+  return "Needs evidence";
+}
+
+function formatPilotEvidenceDelta(delta: number | null) {
+  if (delta === null) return "Not measured";
+  if (delta > 0) return `+${delta.toFixed(1)} points`;
+  return `${delta.toFixed(1)} points`;
 }
 
 function formatAiEvaluationCheckStatus(status: AnalyzeResult["aiEvaluationHarness"]["checks"][number]["status"]): string {

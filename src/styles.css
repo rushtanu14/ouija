@@ -1528,6 +1528,136 @@ a:focus-visible {
   border: 1px solid #d9e5f2;
 }
 
+.pilot-evidence-tracker {
+  display: grid;
+  gap: 14px;
+  border: 1px solid #d9e5f2;
+  border-radius: 8px;
+  padding: 16px;
+  background: #ffffff;
+}
+
+.pilot-evidence-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.pilot-evidence-header button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border: 1px solid #d9e5f2;
+  border-radius: 8px;
+  padding: 9px 11px;
+  color: #36475c;
+  background: #fbfdff;
+  cursor: pointer;
+}
+
+.pilot-evidence-summary {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 14px;
+  align-items: center;
+  border-radius: 8px;
+  padding: 13px;
+  color: #173b74;
+  background: #eef5ff;
+}
+
+.pilot-evidence-tracker-needs_evidence .pilot-evidence-summary {
+  color: #6e4a03;
+  background: #fff7e5;
+}
+
+.pilot-evidence-tracker-evidence_ready .pilot-evidence-summary {
+  color: #145a31;
+  background: #ecfff3;
+}
+
+.pilot-evidence-summary strong {
+  display: block;
+  font-size: 21px;
+  line-height: 1;
+}
+
+.pilot-evidence-summary span,
+.pilot-evidence-boundary span {
+  min-width: 0;
+  color: inherit;
+}
+
+.pilot-evidence-metrics,
+.pilot-evidence-entry-grid {
+  display: grid;
+  gap: 8px;
+}
+
+.pilot-evidence-metrics {
+  grid-template-columns: repeat(4, minmax(130px, 1fr));
+}
+
+.pilot-evidence-entry-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.pilot-evidence-metrics article,
+.pilot-evidence-entry-grid article {
+  display: grid;
+  gap: 9px;
+  min-width: 0;
+  border: 1px solid #d9e5f2;
+  border-radius: 8px;
+  padding: 11px;
+  background: #fbfdff;
+}
+
+.pilot-evidence-metrics strong,
+.pilot-evidence-entry-grid strong {
+  color: #172439;
+  line-height: 1.2;
+}
+
+.pilot-evidence-entry-grid label {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+  color: #526176;
+  font-size: 12px;
+  font-weight: 760;
+}
+
+.pilot-evidence-entry-grid input,
+.pilot-evidence-entry-grid select,
+.pilot-evidence-entry-grid textarea {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid #c8d5e4;
+  border-radius: 8px;
+  padding: 9px;
+  color: #172439;
+  background: #ffffff;
+  font: inherit;
+}
+
+.pilot-evidence-entry-grid textarea {
+  min-height: 76px;
+  resize: vertical;
+}
+
+.pilot-evidence-boundary {
+  display: grid;
+  gap: 5px;
+  border-radius: 8px;
+  padding: 10px 11px;
+  color: #173b74;
+  background: #f8fbff;
+  border: 1px solid #d9e5f2;
+}
+
 .exit-ticket-summary {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
@@ -5231,6 +5361,18 @@ td input {
   }
 
   .pilot-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .pilot-evidence-header,
+  .pilot-evidence-summary {
+    align-items: stretch;
+    flex-direction: column;
+    grid-template-columns: 1fr;
+  }
+
+  .pilot-evidence-metrics,
+  .pilot-evidence-entry-grid {
     grid-template-columns: 1fr;
   }
 

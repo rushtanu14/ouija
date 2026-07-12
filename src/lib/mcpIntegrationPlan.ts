@@ -255,6 +255,7 @@ export function buildMcpIntegrationPlan({
         "Progress Portfolio summary",
         "Pre-Lab Design Coach",
         "Student Pilot Study Kit",
+        "Pilot Evidence Tracker summary",
         "Learning Exit Ticket prompts",
         "Google Forms readiness prompts",
         "Google Calendar next-trial reminder",
