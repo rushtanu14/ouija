@@ -535,6 +535,7 @@ export type McpIntegrationActionId =
   | "composio-search-source-audit"
   | "composio-scholar-claim-check"
   | "composio-browser-source-capture"
+  | "deepwiki-source-proof"
   | "google-docs-evidence-packet"
   | "google-sheets-data-log"
   | "google-drive-portfolio-archive"
@@ -548,6 +549,7 @@ export interface McpIntegrationAction {
   toolkit:
     | "Composio Search"
     | "Composio Browser"
+    | "DeepWiki"
     | "Google Docs"
     | "Google Sheets"
     | "Google Drive"

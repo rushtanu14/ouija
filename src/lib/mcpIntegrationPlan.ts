@@ -59,6 +59,22 @@ export const MCP_CONNECTOR_CATALOG: McpConnectorCatalogItem[] = [
     recommendedTools: ["BROWSER_TOOL_CREATE_TASK", "BROWSER_TOOL_WATCH_TASK"]
   },
   {
+    id: "deepwiki-source-proof",
+    toolkit: "DeepWiki",
+    toolkitSlug: "deepwiki_mcp",
+    envSuffix: "DEEPWIKI",
+    requiresAuthConfig: false,
+    label: "Audit public source proof",
+    studentValue: "Gives judges and teammates a public-codebase verification route for Ouija's architecture claims without touching student lab data.",
+    composioCapability: "read the public GitHub repo wiki structure, contents, and architecture answers through DeepWiki MCP",
+    safetyNote: "DeepWiki should inspect public source and docs only; it must not receive student descriptions, table rows, or reflection drafts.",
+    requiredScopes: ["public GitHub repository analysis", "source documentation read", "architecture question answering"],
+    dataShared: "Public repository name, submission artifact links, and a judge-facing architecture question.",
+    consentGate: "Team reviews the public repo question before any live DeepWiki source-proof session.",
+    docsUrl: "https://deepwiki.com",
+    recommendedTools: ["DEEPWIKI_MCP_READ_WIKI_STRUCTURE", "DEEPWIKI_MCP_READ_WIKI_CONTENTS", "DEEPWIKI_MCP_ASK_QUESTION"]
+  },
+  {
     id: "google-docs-evidence-packet",
     toolkit: "Google Docs",
     toolkitSlug: "googledocs",
@@ -234,6 +250,7 @@ export function buildMcpIntegrationPlan({
         "Composio Search source-audit query",
         "Composio Scholar claim-check query",
         "Composio Browser source-page capture task",
+        "DeepWiki public-source proof question",
         "Pattern Archetype Coach source question",
         "Progress Portfolio summary",
         "Pre-Lab Design Coach",
@@ -277,8 +294,8 @@ function buildSafeguards(status: McpIntegrationPlan["status"]) {
     status === "ready"
       ? "Live MCP mode keeps Composio, Google Workspace, Notion, and Calendar execution on the server after consent."
       : status === "server_dry_run"
-      ? "Server dry-run mode validates Composio packets but does not call Composio Search, Composio Browser, Google Classroom, Google Workspace, Notion, or Calendar APIs."
-      : "Preview mode does not call Composio Search, Composio Browser, Google Classroom, Google Workspace, or Notion APIs.";
+      ? "Server dry-run mode validates Composio packets but does not call Composio Search, Composio Browser, DeepWiki, Google Classroom, Google Workspace, Notion, or Calendar APIs."
+      : "Preview mode does not call Composio Search, Composio Browser, DeepWiki, Google Classroom, Google Workspace, or Notion APIs.";
 
   return [
     firstLine,
@@ -288,6 +305,7 @@ function buildSafeguards(status: McpIntegrationPlan["status"]) {
       "Composio Search source audits use topic and variable terms only; students review the query before live lookup.",
       "Composio Scholar claim checks compare the expected pattern against scholarly snippets without writing the student's final claim.",
       "Composio Browser captures public source-page context only after the student reviews the URL and task prompt.",
+      "DeepWiki source proof uses the public GitHub repo only and does not receive student lab data.",
       "Google Classroom handoff creates a teacher-review checkpoint, not an auto-submitted assignment.",
       "Google Forms handoff creates student prompts, not completed answers.",
       "Google Calendar handoff schedules a next-trial reminder, not a generated result.",
@@ -407,6 +425,9 @@ function buildPayloadSummary(
   if (connector.id === "composio-browser-source-capture") {
     const sourceLabel = result.sources[0]?.title ?? "student-reviewed source";
     return `Browser source-capture task for ${sourceLabel}: verify page context before trusting the expected pattern.`;
+  }
+  if (connector.id === "deepwiki-source-proof") {
+    return `DeepWiki source-proof question for rushtanu14/ouija: verify the MCP bridge, academic-integrity boundary, evaluation suite, and submission artifact claims from public code/docs.`;
   }
   if (connector.id === "google-docs-evidence-packet") return `${title} with source trail, checks, and integrity boundary`;
   if (connector.id === "google-sheets-data-log") return `${rowCount} rows across ${result.columns.length} columns: ${formatColumnList(result)}`;

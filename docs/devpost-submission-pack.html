@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Ouija Devpost Submission Pack</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #17201b;
+        --muted: #637169;
+        --line: #d9e2dc;
+        --panel: #ffffff;
+        --soft: #f4f8f5;
+        --accent: #1f7a5a;
+        --blue: #315f9f;
+        --warn: #9b5b1f;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background: var(--soft);
+        color: var(--ink);
+        font-family:
+          Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      main {
+        width: min(1120px, calc(100% - 32px));
+        margin: 0 auto;
+        padding: 44px 0 56px;
+      }
+
+      header,
+      section,
+      article {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--panel);
+      }
+
+      header {
+        display: grid;
+        gap: 18px;
+        padding: 28px;
+      }
+
+      section {
+        margin-top: 18px;
+        padding: 22px;
+      }
+
+      h1,
+      h2,
+      h3,
+      p {
+        margin: 0;
+      }
+
+      h1 {
+        font-size: clamp(2rem, 5vw, 4.2rem);
+        line-height: 0.95;
+        letter-spacing: 0;
+      }
+
+      h2 {
+        font-size: 1.05rem;
+        letter-spacing: 0;
+      }
+
+      h3 {
+        font-size: 0.95rem;
+      }
+
+      .eyebrow {
+        color: var(--accent);
+        font-size: 0.78rem;
+        font-weight: 800;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .lede,
+      .note,
+      li,
+      article p {
+        color: var(--muted);
+        line-height: 1.55;
+      }
+
+      .lede {
+        max-width: 820px;
+        font-size: 1.08rem;
+      }
+
+      .grid,
+      .link-grid,
+      .criteria-grid,
+      .team-grid {
+        display: grid;
+        gap: 12px;
+      }
+
+      .link-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .criteria-grid,
+      .team-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      article,
+      a {
+        min-width: 0;
+        padding: 16px;
+      }
+
+      a {
+        display: grid;
+        gap: 8px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--panel);
+        color: inherit;
+        text-decoration: none;
+      }
+
+      a:hover {
+        border-color: var(--accent);
+      }
+
+      span {
+        color: var(--muted);
+        font-size: 0.78rem;
+        font-weight: 800;
+        text-transform: uppercase;
+      }
+
+      strong {
+        overflow-wrap: anywhere;
+      }
+
+      ul {
+        margin: 12px 0 0;
+        padding-left: 20px;
+      }
+
+      code {
+        padding: 2px 5px;
+        border-radius: 4px;
+        background: #eef4f0;
+      }
+
+      .copy-box {
+        display: grid;
+        gap: 10px;
+        padding: 16px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fbfdfb;
+      }
+
+      .copy-box p {
+        color: var(--ink);
+      }
+
+      .warn {
+        color: var(--warn);
+      }
+
+      @media (max-width: 860px) {
+        main {
+          width: min(100% - 20px, 680px);
+          padding-top: 20px;
+        }
+
+        header,
+        section {
+          padding: 18px;
+        }
+
+        .link-grid,
+        .criteria-grid,
+        .team-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <p class="eyebrow">Devpost Submission Pack</p>
+        <h1>Ouija</h1>
+        <p class="lede">
+          Copy-ready submission details for the AIYES Track 1 app: a student-safe AI experiment interpreter for middle and
+          high school labs. Use this page beside Devpost so the final form is complete, source-backed, and honest about the
+          remaining team-roster step.
+        </p>
+        <div class="link-grid" aria-label="Primary links">
+          <a href="https://ouija-olive.vercel.app">
+            <span>Live demo</span>
+            <strong>ouija-olive.vercel.app</strong>
+          </a>
+          <a href="https://ouija-olive.vercel.app/?judge=1">
+            <span>Judge view</span>
+            <strong>Full proof stack</strong>
+          </a>
+          <a href="https://github.com/rushtanu14/ouija">
+            <span>Source code</span>
+            <strong>rushtanu14/ouija</strong>
+          </a>
+          <a href="/submission/">
+            <span>Submission hub</span>
+            <strong>All hosted artifacts</strong>
+          </a>
+          <a href="/submission/slide-deck.html">
+            <span>Slide deck</span>
+            <strong>AIYES presentation</strong>
+          </a>
+          <a href="/submission/assets/ouija-walkthrough.webm">
+            <span>Walkthrough</span>
+            <strong>2:27 video demo</strong>
+          </a>
+        </div>
+      </header>
+
+      <section aria-labelledby="copy-heading">
+        <h2 id="copy-heading">Copy-Ready Fields</h2>
+        <div class="grid">
+          <div class="copy-box">
+            <span>Project title</span>
+            <p>Ouija</p>
+          </div>
+          <div class="copy-box">
+            <span>Tagline</span>
+            <p>A student-safe AI experiment interpreter for middle and high school science labs.</p>
+          </div>
+          <div class="copy-box">
+            <span>Built with</span>
+            <p>React, Vite, TypeScript, Express, OpenAI Responses API, Composio MCP session planning, Recharts, Vitest, Playwright, and Vercel.</p>
+          </div>
+          <div class="copy-box">
+            <span>Short description</span>
+            <p>
+              Ouija helps students describe a lab, identify the experiment, inspect expected science patterns with citations,
+              enter or paste their own table data, compare the graph against an expected overlay, and get hints without receiving
+              a generated lab report.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section aria-labelledby="criteria-heading">
+        <h2 id="criteria-heading">Judging Map</h2>
+        <div class="criteria-grid">
+          <article>
+            <span>Problem + relevance</span>
+            <strong>Middle/high school lab reasoning</strong>
+            <p>Students have data and sources but often need help connecting variables, graphs, repeated trials, and claims.</p>
+          </article>
+          <article>
+            <span>AI design</span>
+            <strong>Hybrid, inspectable, guarded</strong>
+            <p>Template matching, optional web-search grounding, evaluation checks, runtime proof, and source-audit handoffs stay visible.</p>
+          </article>
+          <article>
+            <span>UX + design</span>
+            <strong>Student mode first</strong>
+            <p>The default workflow prioritizes description, expected pattern, table input, graph comparison, next trial, and claim coaching.</p>
+          </article>
+        </div>
+      </section>
+
+      <section aria-labelledby="mcp-heading">
+        <h2 id="mcp-heading">Composio MCP Proof</h2>
+        <div class="criteria-grid">
+          <article>
+            <span>Research</span>
+            <strong>Search, Scholar, Browser</strong>
+            <p>Ouija validates source-audit search, Scholar claim-check, and public source-page capture routes through <code>/api/mcp/export</code>.</p>
+          </article>
+          <article>
+            <span>Source proof</span>
+            <strong>DeepWiki public repo audit</strong>
+            <p>New route: a no-student-data DeepWiki MCP handoff can inspect <code>rushtanu14/ouija</code> architecture claims from public code/docs.</p>
+          </article>
+          <article>
+            <span>Classroom handoff</span>
+            <strong>Docs, Sheets, Drive, Classroom, Forms, Calendar, Notion</strong>
+            <p>Each route has explicit scopes, data shared, consent gates, dry-run validation, and server-only credential boundaries.</p>
+          </article>
+        </div>
+      </section>
+
+      <section aria-labelledby="team-heading">
+        <h2 id="team-heading">Team Roster Worksheet</h2>
+        <p class="note">
+          The final Devpost form must be completed by eligible students. Keep names and contact details inside Devpost, not on
+          this public page. The live AIYES page lists a 2-5 student team requirement, so confirm the form before submitting.
+        </p>
+        <div class="team-grid">
+          <article>
+            <span>Slot 1</span>
+            <strong>Product and demo lead</strong>
+            <p>Owns the live walkthrough, problem framing, and final Devpost review.</p>
+          </article>
+          <article>
+            <span>Slot 2</span>
+            <strong>AI and systems lead</strong>
+            <p>Owns model strategy, runtime proof, MCP bridge, and technical Q&A.</p>
+          </article>
+          <article>
+            <span>Slot 3</span>
+            <strong>UX and testing lead</strong>
+            <p>Owns mobile/desktop checks, table workflow, and student pilot evidence.</p>
+          </article>
+          <article>
+            <span>Optional slot 4</span>
+            <strong>Science evidence lead</strong>
+            <p>Owns citations, expected-pattern checks, and unsupported-lab boundaries.</p>
+          </article>
+          <article>
+            <span>Optional slot 5</span>
+            <strong>Submission lead</strong>
+            <p>Owns deck, video, source links, final assets, and roster completion.</p>
+          </article>
+        </div>
+      </section>
+
+      <section aria-labelledby="final-heading">
+        <h2 id="final-heading">Final Checklist</h2>
+        <ul>
+          <li>Paste the long-form copy from <code>docs/devpost-submission-copy.md</code>.</li>
+          <li>Use the live demo, judge view, slide deck, walkthrough, source code, and submission hub links above.</li>
+          <li>Open <code>/api/evaluate</code>, <code>/api/runtime-proof</code>, and <code>/api/mcp/status</code> once before final submission.</li>
+          <li>Complete the eligible student roster inside Devpost.</li>
+          <li>Do not add student names, school identifiers, private lab data, or API keys to public artifacts.</li>
+        </ul>
+        <p class="note warn">
+          Integrity boundary: Ouija explains concepts, checks data, validates sources, and asks Socratic questions. It does not
+          write the final claim, conclusion paragraph, or complete lab report.
+        </p>
+      </section>
+    </main>
+  </body>
+</html>

@@ -88,6 +88,7 @@ const sourceCodeUrl = "https://github.com/rushtanu14/ouija";
 const liveDemoUrl = "https://ouija-olive.vercel.app";
 const judgeDemoUrl = "https://ouija-olive.vercel.app/?judge=1";
 const submissionHubUrl = "https://ouija-olive.vercel.app/submission/";
+const devpostPackUrl = "https://ouija-olive.vercel.app/submission/devpost-pack.html";
 const slideDeckUrl = "https://ouija-olive.vercel.app/submission/slide-deck.html";
 const walkthroughVideoUrl = "https://ouija-olive.vercel.app/submission/assets/ouija-walkthrough.webm";
 
@@ -1125,12 +1126,14 @@ function JudgeBriefPanel({ result }: { result: AnalyzeResult | null }) {
     { label: "Slide deck", value: "Hosted" },
     { label: "Video", value: "Hosted" },
     { label: "Submission hub", value: "Hosted" },
+    { label: "Devpost pack", value: "Hosted" },
     { label: "Source code", value: "Public" },
     { label: "MCP export", value: "Server dry-run" },
     { label: "Integrity", value: "Guarded" }
   ];
   const submissionLinks = [
     { label: "Submission hub", href: submissionHubUrl },
+    { label: "Devpost pack", href: devpostPackUrl },
     { label: "Source code", href: sourceCodeUrl },
     { label: "Live demo", href: liveDemoUrl },
     { label: "Judge view", href: judgeDemoUrl },
@@ -1159,6 +1162,11 @@ function JudgeBriefPanel({ result }: { result: AnalyzeResult | null }) {
       detail: "Single hosted page gathers live app, judge view, deck, video, source, and proof endpoints."
     },
     {
+      label: "Devpost form pack",
+      status: "Ready",
+      detail: "Hosted packet gathers copy-ready fields, judging map, Composio route proof, and the roster worksheet."
+    },
+    {
       label: "Student team",
       status: "External step",
       detail: "Devpost lists a required 2-5 student team; final submission still needs the team roster handled on Devpost."
@@ -1176,7 +1184,7 @@ function JudgeBriefPanel({ result }: { result: AnalyzeResult | null }) {
     "AIYES Development Journey maps problem, data, model, build, testing, UX, ethics, impact, constraints, and submission proof.",
     "Learning Impact Loop measures the student's outcome for each run.",
     "Student Pilot Study Kit prepares a consent-safe 10-minute protocol for collecting UX and impact evidence.",
-    "Submission Hub gives judges one URL for live app, judge view, deck, video, source, and proof endpoints.",
+    "Submission Hub gives judges one URL for live app, judge view, deck, video, source, Devpost pack, and proof endpoints.",
     "Pre-Lab Design Coach helps students plan variables, controls, repeats, sources, and safety before collecting data.",
     "Learning Exit Ticket proves students must explain variables, patterns, and next steps themselves.",
     "Student Reflection Workspace captures student-authored exit-ticket drafts.",
@@ -1192,12 +1200,12 @@ function JudgeBriefPanel({ result }: { result: AnalyzeResult | null }) {
     "Data Handling Ledger shows privacy, retention, and student controls.",
     "Spreadsheet paste/import flows into data checks.",
     "Evidence Packet exports a student-owned reasoning handoff.",
-    "MCP Integration Coach validates Composio Search source audits, Scholar claim checks, Browser source capture, plus Docs, Sheets, Drive, Classroom, Forms, Calendar, and Notion handoffs through a server dry-run and scoped session ticket without exposing credentials.",
+    "MCP Integration Coach validates Composio Search source audits, Scholar claim checks, Browser source capture, DeepWiki public-source proof, plus Docs, Sheets, Drive, Classroom, Forms, Calendar, and Notion handoffs through a server dry-run and scoped session ticket without exposing credentials.",
     "MCP Readiness Matrix shows exact connector env vars, tools, scopes, data shared, dry-run checks, and consent gates.",
     "Next Trial Planner gives adaptive measurement guidance.",
     "Progress Portfolio shows learning over multiple saved runs.",
     "Portfolio Story Builder turns saved runs into student-written progress evidence.",
-    "AIYES submission checklist makes deck, video, source/deploy link, and team requirement status visible.",
+    "AIYES submission checklist makes deck, video, source/deploy link, Devpost form pack, and team requirement status visible.",
     "Deterministic Regression Suite runs nine internal behavior checks.",
     "Custom Lab Triage keeps unsupported labs useful without pretending full coverage.",
     "Hosted deck and walkthrough are public.",
@@ -1301,7 +1309,7 @@ function ModelCardPanel({ result }: { result: AnalyzeResult | null }) {
     "Data Handling Ledger makes student data flow, retention, and controls inspectable.",
     "Progress Portfolio turns saved labs into repeated learning evidence for judges.",
     "Portfolio Story Builder gives prompts and blanks for a student-authored progress story.",
-    "MCP Integration Coach keeps Composio credentials server-side, validates packets with /api/mcp/export, prepares session tickets with /api/mcp/session, and requires student consent before any source audit, Scholar claim check, Browser source capture, or export.",
+    "MCP Integration Coach keeps Composio credentials server-side, validates packets with /api/mcp/export, prepares session tickets with /api/mcp/session, and requires student consent before any source audit, Scholar claim check, Browser source capture, DeepWiki source proof, or export.",
     "MCP Readiness Matrix makes connector tools, scopes, dry-run checks, and least-privilege boundaries inspectable.",
     "Pattern Evidence Engine quantifies whether the dataset supports the expected science pattern.",
     "Reliability Coach checks repeated trials, averages, and spread before students trust a claim.",

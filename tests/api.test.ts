@@ -249,9 +249,10 @@ describe("Composio MCP bridge API", () => {
     expect(response.body.mode).toBe("server_dry_run");
     expect(response.body.apiKeyConfigured).toBe(false);
     expect(response.body.missingEnv).toContain("COMPOSIO_API_KEY");
-    expect(response.body.toolkits).toHaveLength(10);
+    expect(response.body.toolkits).toHaveLength(11);
     expect(response.body.missingEnv.filter((value: string) => value === "COMPOSIO_SEARCH_ALLOWED_TOOLS")).toHaveLength(1);
     expect(response.body.missingEnv.filter((value: string) => value === "COMPOSIO_BROWSER_ALLOWED_TOOLS")).toHaveLength(1);
+    expect(response.body.missingEnv.filter((value: string) => value === "COMPOSIO_DEEPWIKI_ALLOWED_TOOLS")).toHaveLength(1);
     expect(response.body.toolkits.find((toolkit: { actionId: string }) => toolkit.actionId === "composio-search-source-audit")?.authConfigRequired).toBe(false);
     expect(response.body.toolkits.find((toolkit: { actionId: string }) => toolkit.actionId === "composio-scholar-claim-check")?.recommendedTools).toEqual([
       "COMPOSIO_SEARCH_SCHOLAR"
@@ -263,6 +264,11 @@ describe("Composio MCP bridge API", () => {
     expect(response.body.toolkits.find((toolkit: { actionId: string }) => toolkit.actionId === "composio-browser-source-capture")?.missingEnv).toEqual([
       "COMPOSIO_BROWSER_ALLOWED_TOOLS"
     ]);
+    expect(response.body.toolkits.find((toolkit: { actionId: string }) => toolkit.actionId === "deepwiki-source-proof")?.toolkitSlug).toBe("deepwiki_mcp");
+    expect(response.body.toolkits.find((toolkit: { actionId: string }) => toolkit.actionId === "deepwiki-source-proof")?.authConfigRequired).toBe(false);
+    expect(response.body.toolkits.find((toolkit: { actionId: string }) => toolkit.actionId === "deepwiki-source-proof")?.recommendedTools).toContain(
+      "DEEPWIKI_MCP_ASK_QUESTION"
+    );
     expect(response.body.toolkits.find((toolkit: { toolkit: string }) => toolkit.toolkit === "Google Calendar")?.recommendedTools).toContain(
       "GOOGLECALENDAR_CREATE_EVENT"
     );
@@ -413,6 +419,37 @@ describe("Composio MCP bridge API", () => {
     expect(response.body.target.toolkitSlug).toBe("browser_tool");
     expect(response.body.target.authConfigEnv).toBe("COMPOSIO_BROWSER_AUTH_CONFIG_ID");
     expect(response.body.target.recommendedTools).toEqual(["BROWSER_TOOL_CREATE_TASK", "BROWSER_TOOL_WATCH_TASK"]);
+    expect(response.body.checks.find((check: { id: string }) => check.id === "credentials")?.status).toBe("review");
+  });
+
+  it("validates a DeepWiki public-source proof packet without requiring an account auth config", async () => {
+    clearComposioEnv();
+    const app = createApp();
+    const result = analyzeExperiment({
+      description: "Projectile launch angle and measured range."
+    });
+    const packet = buildEvidencePacket(result, result.rows, "Projectile launch angle and measured range.");
+
+    const response = await request(app)
+      .post("/api/mcp/export")
+      .send({
+        actionId: "deepwiki-source-proof",
+        consent: true,
+        payload: {
+          title: `Ouija Evidence Packet: ${result.classification.title}`,
+          description: "Projectile launch angle and measured range.",
+          evidencePacket: packet,
+          rows: result.rows,
+          sources: result.sources
+        }
+      })
+      .expect(200);
+
+    expect(response.body.status).toBe("dry_run");
+    expect(response.body.toolkit).toBe("DeepWiki");
+    expect(response.body.target.toolkitSlug).toBe("deepwiki_mcp");
+    expect(response.body.target.authConfigEnv).toBe("COMPOSIO_DEEPWIKI_AUTH_CONFIG_ID");
+    expect(response.body.target.recommendedTools).toContain("DEEPWIKI_MCP_ASK_QUESTION");
     expect(response.body.checks.find((check: { id: string }) => check.id === "credentials")?.status).toBe("review");
   });
 

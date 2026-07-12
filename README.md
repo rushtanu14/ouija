@@ -29,7 +29,7 @@ Ouija is a student-facing AI experiment interpreter for middle and high school s
 14. Open Deterministic Regression Suite to see nine deterministic checks: eight supported lab demos plus the unsupported-lab boundary.
 15. Save lab snapshots locally so a student can return to a checked run without sending data to an account system.
 16. Use Progress Portfolio and Portfolio Story Builder to show saved-run count, score trend, subject breadth, strongest run, student-authored progress prompts, and next portfolio action.
-17. Use MCP Integration Coach to validate Composio Search source-audit, Scholar claim-check, and Composio Browser source-capture routes plus Google Docs, Google Sheets, Google Drive, Google Classroom, Google Forms, Google Calendar, and Notion handoffs through the server dry-run bridge, plus the readiness matrix, without exposing credentials or sending student data.
+17. Use MCP Integration Coach to validate Composio Search source-audit, Scholar claim-check, Composio Browser source-capture, and DeepWiki public-source proof routes plus Google Docs, Google Sheets, Google Drive, Google Classroom, Google Forms, Google Calendar, and Notion handoffs through the server dry-run bridge, plus the readiness matrix, without exposing credentials or sending student data.
 18. Open AI Model Card for the architecture, grounding, evaluation, privacy, MCP-export boundary, and guardrail summary.
 19. Open Judge Brief for a compact Track 1 proof surface: submission hub, live app, judge view, hosted deck/video/source links, AIYES submission checklist, judge demo path, official rubric fit, learning impact, student pilot protocol, student reflection drafts, progress portfolio, MCP readiness plan, AI pipeline, model strategy, evaluation, data-handling ethics, tests, and integrity constraints.
 
@@ -105,7 +105,7 @@ Progress Portfolio turns those saved labs into repeated learning evidence: saved
 
 Portfolio Story Builder turns saved-run evidence into prompts, evidence references, and blanks for a student-written progress story. It waits for enough saved evidence instead of generating an essay.
 
-MCP Integration Coach validates a practical Composio path for the same student-owned evidence: run a source-audit search through Composio Search, run a Scholar claim check against the expected pattern, capture a dynamic public source page through Composio Browser Tool, create a Google Docs evidence packet, append table rows to Google Sheets, save a portfolio archive to Google Drive, draft a Google Classroom pre-lab checkpoint, create a Google Forms readiness check that can include the pilot metrics, schedule a Google Calendar next-trial reminder, or create a Notion learning record with student-authored reflection drafts. The readiness matrix shows required auth config env vars where needed, allowed tools, least-privilege scopes, data shared, consent gates, dry-run checks, and a scoped Composio session ticket path. The public app now includes `/api/mcp/status`, `/api/mcp/export`, and `/api/mcp/session` for server-side validation; live connector execution still requires `COMPOSIO_API_KEY`, `COMPOSIO_SESSION_USER_ID`, allowed tools, `COMPOSIO_LIVE_EXPORTS=true`, `MCP_SESSION_AUTH_TOKEN`, connector auth config IDs where the toolkit requires them, and student or teacher consent before source audit, Scholar check, Browser source capture, or export.
+MCP Integration Coach validates a practical Composio path for the same student-owned evidence: run a source-audit search through Composio Search, run a Scholar claim check against the expected pattern, capture a dynamic public source page through Composio Browser Tool, audit public source proof through DeepWiki MCP, create a Google Docs evidence packet, append table rows to Google Sheets, save a portfolio archive to Google Drive, draft a Google Classroom pre-lab checkpoint, create a Google Forms readiness check that can include the pilot metrics, schedule a Google Calendar next-trial reminder, or create a Notion learning record with student-authored reflection drafts. The readiness matrix shows required auth config env vars where needed, allowed tools, least-privilege scopes, data shared, consent gates, dry-run checks, and a scoped Composio session ticket path. The public app now includes `/api/mcp/status`, `/api/mcp/export`, and `/api/mcp/session` for server-side validation; live connector execution still requires `COMPOSIO_API_KEY`, `COMPOSIO_SESSION_USER_ID`, allowed tools, `COMPOSIO_LIVE_EXPORTS=true`, `MCP_SESSION_AUTH_TOKEN`, connector auth config IDs where the toolkit requires them, and student or teacher consent before source audit, Scholar check, Browser source capture, DeepWiki source proof, or export.
 
 API routes use an allowlisted CORS policy: production and local Vite origins are allowed by default, extra trusted preview origins go in `OUIJA_ALLOWED_ORIGIN`, and untrusted origins are not reflected.
 
@@ -151,7 +151,7 @@ Student privacy boundary: do not enter names, contact information, school identi
 
 ## Composio MCP Bridge
 
-Ouija works without Composio credentials through server dry-run validation. `GET /api/mcp/status` reports connector readiness without leaking secret values. `POST /api/mcp/export` validates a consent-gated packet for Composio Search source audit, Composio Scholar claim check, Composio Browser source capture, Google Docs, Sheets, Drive, Classroom, Forms, Calendar, or Notion. `POST /api/mcp/session` shows the scoped Tool Router session plan in public mode and can create a server-side Composio session only when live env gates are configured; it withholds raw MCP URLs from browser responses.
+Ouija works without Composio credentials through server dry-run validation. `GET /api/mcp/status` reports connector readiness without leaking secret values. `POST /api/mcp/export` validates a consent-gated packet for Composio Search source audit, Composio Scholar claim check, Composio Browser source capture, DeepWiki public-source proof, Google Docs, Sheets, Drive, Classroom, Forms, Calendar, or Notion. `POST /api/mcp/session` shows the scoped Tool Router session plan in public mode and can create a server-side Composio session only when live env gates are configured; it withholds raw MCP URLs from browser responses.
 
 ## Submission Assets
 
@@ -160,6 +160,7 @@ Ouija works without Composio credentials through server dry-run validation. `GET
 - `docs/CONTRIBUTING.md`
 - `docs/aiyes-slide-deck.html`
 - `docs/devpost-submission-copy.md`
+- `docs/devpost-submission-pack.html`
 - `docs/ENV.md`
 - `docs/five-minute-demo-script.md`
 - `docs/judging-checklist.md`
@@ -178,6 +179,7 @@ Hosted submission links after deployment:
 
 - Source code: https://github.com/rushtanu14/ouija
 - Submission hub: https://ouija-olive.vercel.app/submission/
+- Devpost pack: https://ouija-olive.vercel.app/submission/devpost-pack.html
 - Live demo: https://ouija-olive.vercel.app
 - Slide deck: https://ouija-olive.vercel.app/submission/slide-deck.html
 - Video walkthrough: https://ouija-olive.vercel.app/submission/assets/ouija-walkthrough.webm

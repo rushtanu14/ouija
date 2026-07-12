@@ -198,7 +198,7 @@ describe("Vercel API functions", () => {
 
     expect(response.statusCode).toBe(200);
     expect(response.body.status).toBe("server_dry_run");
-    expect(response.body.toolkits).toHaveLength(10);
+    expect(response.body.toolkits).toHaveLength(11);
     expect(response.body.toolkits.find((toolkit: { actionId: string }) => toolkit.actionId === "composio-search-source-audit")?.toolkitSlug).toBe("composio_search");
     expect(response.body.toolkits.find((toolkit: { actionId: string }) => toolkit.actionId === "composio-scholar-claim-check")?.toolkitSlug).toBe("composio_search");
     expect(response.body.toolkits.find((toolkit: { actionId: string }) => toolkit.actionId === "composio-scholar-claim-check")?.recommendedTools).toEqual([
@@ -209,6 +209,10 @@ describe("Vercel API functions", () => {
       "BROWSER_TOOL_CREATE_TASK",
       "BROWSER_TOOL_WATCH_TASK"
     ]);
+    expect(response.body.toolkits.find((toolkit: { actionId: string }) => toolkit.actionId === "deepwiki-source-proof")?.toolkitSlug).toBe("deepwiki_mcp");
+    expect(response.body.toolkits.find((toolkit: { actionId: string }) => toolkit.actionId === "deepwiki-source-proof")?.recommendedTools).toContain(
+      "DEEPWIKI_MCP_READ_WIKI_CONTENTS"
+    );
     expect(response.body.toolkits.find((toolkit: { toolkit: string }) => toolkit.toolkit === "Google Calendar")?.toolkitSlug).toBe("googlecalendar");
   });
 

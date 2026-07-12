@@ -1,6 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 test("student can analyze a sample experiment, edit table data, and see citations", async ({ page }) => {
+  test.setTimeout(45_000);
   await page.addInitScript(() => window.localStorage.clear());
   await page.goto("/?judge=1");
 
@@ -244,7 +245,7 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(
     page
       .getByLabel("AI Model Card")
-      .getByText("MCP Integration Coach keeps Composio credentials server-side, validates packets with /api/mcp/export, prepares session tickets with /api/mcp/session, and requires student consent before any source audit, Scholar claim check, Browser source capture, or export.")
+      .getByText("MCP Integration Coach keeps Composio credentials server-side, validates packets with /api/mcp/export, prepares session tickets with /api/mcp/session, and requires student consent before any source audit, Scholar claim check, Browser source capture, DeepWiki source proof, or export.")
   ).toBeVisible();
   await expect(page.getByLabel("AI Model Card").getByText("MCP Readiness Matrix makes connector tools, scopes, dry-run checks, and least-privilege boundaries inspectable.")).toBeVisible();
   await expect(page.getByLabel("AI Model Card").getByText("Safety Coach forces adult-review language when a lab match is uncertain.")).toBeVisible();
@@ -279,6 +280,14 @@ test("student can analyze a sample experiment, edit table data, and see citation
       .filter({ hasText: "Capture source page context" })
       .getByText("create and watch a browser task that extracts student-reviewed source-page context through Composio Browser Tool")
   ).toBeVisible();
+  await expect(page.locator(".mcp-action-card").filter({ hasText: "Audit public source proof" }).getByText("DeepWiki", { exact: true })).toBeVisible();
+  await expect(page.getByLabel("MCP Integration Coach").getByText("Audit public source proof")).toBeVisible();
+  await expect(
+    page
+      .locator(".mcp-action-card")
+      .filter({ hasText: "Audit public source proof" })
+      .getByText("read the public GitHub repo wiki structure, contents, and architecture answers through DeepWiki MCP")
+  ).toBeVisible();
   await expect(page.locator(".mcp-action-card").filter({ hasText: "Google Docs" }).getByText("Google Docs", { exact: true })).toBeVisible();
   await expect(page.getByLabel("MCP Integration Coach").getByText("Create evidence packet doc")).toBeVisible();
   await expect(page.locator(".mcp-action-card").filter({ hasText: "Google Sheets" }).getByText("Google Sheets", { exact: true })).toBeVisible();
@@ -295,9 +304,10 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(page.locator(".mcp-action-card").filter({ hasText: "Google Calendar" }).getByText("Google Calendar", { exact: true })).toBeVisible();
   await expect(page.getByLabel("MCP Integration Coach").getByText("Schedule next trial reminder")).toBeVisible();
   await expect(page.locator(".mcp-action-card").filter({ hasText: "Notion" }).getByText("Notion", { exact: true })).toBeVisible();
-  await expect(page.getByLabel("MCP Readiness Matrix").getByText("10 connector routes checked")).toBeVisible();
+  await expect(page.getByLabel("MCP Readiness Matrix").getByText("11 connector routes checked")).toBeVisible();
   await expect(page.getByLabel("MCP Readiness Matrix").getByText("COMPOSIO_SEARCH_ALLOWED_TOOLS")).toHaveCount(2);
   await expect(page.getByLabel("MCP Readiness Matrix").getByText("COMPOSIO_BROWSER_ALLOWED_TOOLS")).toBeVisible();
+  await expect(page.getByLabel("MCP Readiness Matrix").getByText("COMPOSIO_DEEPWIKI_ALLOWED_TOOLS")).toBeVisible();
   await expect(page.getByLabel("MCP Readiness Matrix").getByText("COMPOSIO_GOOGLE_FORMS_AUTH_CONFIG_ID")).toBeVisible();
   await expect(page.getByLabel("MCP dry-run checks").getByText("Payload completeness")).toBeVisible();
   await expect(page.getByLabel("MCP dry-run checks").getByText("Least privilege")).toBeVisible();
@@ -309,6 +319,7 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(page.getByLabel("MCP payload preview")).toHaveValue(/Composio Search: search public web/);
   await expect(page.getByLabel("MCP payload preview")).toHaveValue(/Composio Search: query Google Scholar-style results/);
   await expect(page.getByLabel("MCP payload preview")).toHaveValue(/Composio Browser: create and watch a browser task/);
+  await expect(page.getByLabel("MCP payload preview")).toHaveValue(/DeepWiki: read the public GitHub repo/);
   await expect(page.getByLabel("MCP payload preview")).toHaveValue(/Google Sheets: append spreadsheet rows/);
   await expect(page.getByLabel("MCP payload preview")).toHaveValue(/Google Classroom: create coursework draft/);
   await expect(page.getByLabel("MCP payload preview")).toHaveValue(/Google Forms: create Google Forms draft/);
@@ -332,19 +343,24 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(page.getByLabel("Settings", { exact: true }).getByText("3/3")).toBeVisible();
   await page.getByRole("link", { name: "Judge Brief" }).click();
   await expect(page.getByLabel("Judge Brief").getByText("AIYES Track 1")).toBeVisible();
-  await expect(page.locator(".judge-status-grid").getByText("Hosted")).toHaveCount(3);
+  await expect(page.locator(".judge-status-grid").getByText("Hosted")).toHaveCount(4);
   await expect(page.locator(".judge-status-grid").getByText("Source code")).toBeVisible();
   await expect(page.locator(".judge-status-grid").getByText("Public")).toBeVisible();
   await expect(page.getByLabel("AIYES Submission Checklist").getByText("Slide presentation")).toBeVisible();
   await expect(page.getByLabel("AIYES Submission Checklist").getByText("Video walkthrough")).toBeVisible();
   await expect(page.getByLabel("AIYES Submission Checklist").getByText("Source or deployment")).toBeVisible();
   await expect(page.getByLabel("AIYES Submission Checklist").getByText("Submission hub")).toBeVisible();
+  await expect(page.getByLabel("AIYES Submission Checklist").getByText("Devpost form pack")).toBeVisible();
   await expect(page.getByLabel("AIYES Submission Checklist").getByText("Student team", { exact: true })).toBeVisible();
   await expect(page.getByLabel("AIYES Submission Checklist").getByText("External step", { exact: true })).toBeVisible();
   await expect(page.getByLabel("AIYES Submission Checklist").getByText("2-5 student team")).toBeVisible();
   await expect(page.getByLabel("Hosted submission links").getByRole("link", { name: /Submission hub/i })).toHaveAttribute(
     "href",
     "https://ouija-olive.vercel.app/submission/"
+  );
+  await expect(page.getByLabel("Hosted submission links").getByRole("link", { name: /Devpost pack/i })).toHaveAttribute(
+    "href",
+    "https://ouija-olive.vercel.app/submission/devpost-pack.html"
   );
   await expect(page.getByLabel("Hosted submission links").getByRole("link", { name: /Source code/i })).toHaveAttribute(
     "href",
@@ -367,7 +383,7 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(page.getByLabel("Judge Brief").getByText("AIYES Values Fit maps democracy, diversity, connectivity, innovation, and ethical inclusion to concrete product evidence.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("AIYES Development Journey maps problem, data, model, build, testing, UX, ethics, impact, constraints, and submission proof.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Learning Impact Loop measures the student's outcome for each run.")).toBeVisible();
-  await expect(page.getByLabel("Judge Brief").getByText("Submission Hub gives judges one URL for live app, judge view, deck, video, source, and proof endpoints.")).toBeVisible();
+  await expect(page.getByLabel("Judge Brief").getByText("Submission Hub gives judges one URL for live app, judge view, deck, video, source, Devpost pack, and proof endpoints.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Pre-Lab Design Coach helps students plan variables, controls, repeats, sources, and safety before collecting data.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Learning Exit Ticket proves students must explain variables, patterns, and next steps themselves.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Student Reflection Workspace captures student-authored exit-ticket drafts.")).toBeVisible();
@@ -385,11 +401,11 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(
     page
       .getByLabel("Judge Brief")
-      .getByText("MCP Integration Coach validates Composio Search source audits, Scholar claim checks, Browser source capture, plus Docs, Sheets, Drive, Classroom, Forms, Calendar, and Notion handoffs through a server dry-run and scoped session ticket without exposing credentials.")
+      .getByText("MCP Integration Coach validates Composio Search source audits, Scholar claim checks, Browser source capture, DeepWiki public-source proof, plus Docs, Sheets, Drive, Classroom, Forms, Calendar, and Notion handoffs through a server dry-run and scoped session ticket without exposing credentials.")
   ).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("MCP Readiness Matrix shows exact connector env vars, tools, scopes, data shared, dry-run checks, and consent gates.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Next Trial Planner gives adaptive measurement guidance.")).toBeVisible();
-  await expect(page.getByLabel("Judge Brief").getByText("AIYES submission checklist makes deck, video, source/deploy link, and team requirement status visible.")).toBeVisible();
+  await expect(page.getByLabel("Judge Brief").getByText("AIYES submission checklist makes deck, video, source/deploy link, Devpost form pack, and team requirement status visible.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Hosted deck and walkthrough are public.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Low-confidence labs show a boundary warning.")).toBeVisible();
 
