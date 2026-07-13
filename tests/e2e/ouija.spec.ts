@@ -270,7 +270,7 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(
     page
       .getByLabel("AI Model Card")
-      .getByText("MCP Integration Coach keeps Composio credentials server-side, validates packets with /api/mcp/export, prepares session tickets with /api/mcp/session, and requires student consent before any source audit, Scholar claim check, Semantic Scholar reference check, Browser source capture, DeepWiki source proof, Canvas assignment import, or export.")
+      .getByText("MCP Integration Coach keeps Composio credentials server-side, validates packets with /api/mcp/export, prepares session tickets with /api/mcp/session, and requires student consent before any source audit, Scholar claim check, Semantic Scholar reference check, Browser source capture, DeepWiki source proof, Canvas assignment import, Gmail teacher-review draft, or export.")
   ).toBeVisible();
   await expect(page.getByLabel("AI Model Card").getByText("Composio Sessions Strategy separates read-only source verification and Canvas assignment-context sessions from later consent-gated export sessions.")).toBeVisible();
   await expect(page.getByLabel("AI Model Card").getByText("MCP Readiness Matrix makes connector tools, scopes, dry-run checks, and least-privilege boundaries inspectable.")).toBeVisible();
@@ -353,7 +353,7 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(page.locator(".mcp-action-card").filter({ hasText: "Google Calendar" }).getByText("Google Calendar", { exact: true })).toBeVisible();
   await expect(page.getByLabel("MCP Integration Coach").getByText("Schedule next trial reminder")).toBeVisible();
   await expect(page.locator(".mcp-action-card").filter({ hasText: "Notion" }).getByText("Notion", { exact: true })).toBeVisible();
-  await expect(page.getByLabel("MCP Readiness Matrix").getByText("13 connector routes checked")).toBeVisible();
+  await expect(page.getByLabel("MCP Readiness Matrix").getByText("14 connector routes checked")).toBeVisible();
   await expect(page.getByLabel("MCP Readiness Matrix").getByText("COMPOSIO_SEARCH_ALLOWED_TOOLS")).toHaveCount(2);
   await expect(page.getByLabel("MCP Readiness Matrix").getByText("COMPOSIO_SEMANTIC_SCHOLAR_ALLOWED_TOOLS")).toBeVisible();
   await expect(page.getByLabel("MCP Readiness Matrix").getByText("COMPOSIO_BROWSER_ALLOWED_TOOLS")).toBeVisible();
@@ -464,7 +464,7 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(
     page
       .getByLabel("Judge Brief")
-      .getByText("MCP Integration Coach validates Composio Search source audits, Scholar claim checks, Semantic Scholar reference checks, Browser source capture, DeepWiki public-source proof, Canvas assignment-context imports, plus Docs, Sheets, Drive, Classroom, Forms, Calendar, and Notion handoffs through Composio Sessions, a server dry-run, and scoped session tickets without exposing credentials.")
+      .getByText("MCP Integration Coach validates Composio Search source audits, Scholar claim checks, Semantic Scholar reference checks, Browser source capture, DeepWiki public-source proof, Canvas assignment-context imports, plus Docs, Sheets, Drive, Classroom, Forms, Calendar, Gmail teacher-review drafts, and Notion handoffs through Composio Sessions, a server dry-run, and scoped session tickets without exposing credentials.")
   ).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Composio Sessions Strategy separates read-only source verification and Canvas assignment-context sessions from later consent-gated export sessions.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("MCP Readiness Matrix shows exact connector env vars, tools, scopes, data shared, dry-run checks, and consent gates.")).toBeVisible();
@@ -544,7 +544,7 @@ test("student mode keeps the core lab workflow focused before judge proof", asyn
   await expect(page.getByRole("heading", { name: "AI Architecture Map" })).toBeVisible();
   await expect(page.getByLabel("AI Architecture Map").getByText("Classifier -> grounding -> data audit -> learning guard -> MCP bridge")).toBeVisible();
   await expect(page.getByLabel("AI Architecture Map").getByText("Not a chat wrapper")).toBeVisible();
-  await expect(page.getByLabel("AI Architecture Map").getByText("13 MCP routes")).toBeVisible();
+  await expect(page.getByLabel("AI Architecture Map").getByText("14 MCP routes")).toBeVisible();
   await expect(page.getByRole("heading", { name: "AIYES Development Journey" })).toBeVisible();
   await expect(page.getByRole("link", { name: "MCP Export" })).toBeVisible();
   await expect(page.getByRole("link", { name: "Architecture" })).toBeVisible();

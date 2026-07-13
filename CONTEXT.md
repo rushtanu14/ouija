@@ -78,9 +78,13 @@ The Composio-backed scientific source route. It adds `semanticscholar-reference-
 
 The read-only classroom context route. It adds `canvas-assignment-context` through Canvas tools (`CANVAS_LIST_COURSES`, `CANVAS_LIST_PLANNER_ITEMS`, `CANVAS_GET_ASSIGNMENT2`, `CANVAS_GET_ASSIGNMENT_RUBRIC`) so a future consented session can import lab prompts, due dates, attached material metadata, and rubric criteria without submitting work, editing grades, or accessing private courses without explicit auth and consent.
 
+### Gmail Teacher Review Draft
+
+The consent-gated teacher-feedback route. It adds `gmail-teacher-review-draft` through Gmail draft creation (`GMAIL_CREATE_EMAIL_DRAFT`) so a future consented session can prepare an unsent teacher-review email asking for feedback on variables, controls, source trust, safety, data flags, and claim blanks. It must not send email automatically, read inbox content, delete messages, collect direct identifiers by default, or write the student's final conclusion.
+
 ### Composio Sessions Strategy
 
-The judge-visible MCP planning layer that turns Ouija's connector story into scoped sessions instead of a vague integration list. The first planned session is read-only source verification across Composio Search, Semantic Scholar, Composio Browser, and DeepWiki public-source proof. A separate read-only assignment context session targets Canvas lab prompts/rubrics. Later student export sessions are consent-gated and can target Google Docs, Sheets, Drive, Classroom, Forms, Calendar, and Notion only after server-side credentials, allowed tools, auth config, and consent are in place.
+The judge-visible MCP planning layer that turns Ouija's connector story into scoped sessions instead of a vague integration list. The first planned session is read-only source verification across Composio Search, Semantic Scholar, Composio Browser, and DeepWiki public-source proof. A separate read-only assignment context session targets Canvas lab prompts/rubrics. Later student export sessions are consent-gated and can target Google Docs, Sheets, Drive, Classroom, Forms, Calendar, Gmail draft, and Notion only after server-side credentials, allowed tools, auth config, and consent are in place.
 
 ### Pilot Evidence Tracker
 
@@ -108,6 +112,27 @@ The one-click judge packet at `https://ouija-olive.vercel.app/submission/`. It g
 - Ouija's first supported set should balance physics, chemistry, biology, and earth science instead of overfitting to physics.
 - Ouija should support table input first before adding CSV upload or photo/OCR input.
 - Ouija's internet search should ground expected results and explanations in referenced content instead of inventing them from the model alone.
+
+## Gmail Teacher Review MCP Checkpoint - 2026-07-13 UTC / 2026-07-12 PDT
+
+- Council verdict: this is a practical Composio upgrade, not connector decoration. Teacher-review drafting improves the student lab workflow because students often need feedback on variables, controls, source trust, safety, and evidence before writing a final claim.
+- Added `gmail-teacher-review-draft` as the fourteenth consent-gated Composio/MCP route. It uses toolkit slug `gmail`, env suffix `GMAIL`, and recommended tool `GMAIL_CREATE_EMAIL_DRAFT`.
+- Safety boundary: the route prepares an unsent Gmail draft only. It does not send email automatically, read inbox content, delete messages, include direct identifiers by default, or write the student's conclusion.
+- Updated MCP Integration Coach, readiness matrix, payload preview, Composio Sessions strategy, AI Model Card, Judge Brief, AI Architecture Map, README, API/ENV/RUNBOOK docs, Devpost copy, AIYES brief, judging checklist, slide deck, five-minute script, submission hub, Devpost pack, public submission assets, and unit/API/serverless/E2E tests.
+- Production: `dpl_6s2WzuL4hUoEJZas4WeY3L4dRfQe`, aliased to `https://ouija-olive.vercel.app`.
+- Verification: Composio tool discovery for Gmail draft creation, focused MCP/API/submission tests (4 files, 50 tests), `npm run test` (15 files, 94 tests), `npm run build`, `npm run test:e2e` (40 passed), `npm audit --audit-level=moderate` (0 vulnerabilities), `git diff --check`, production deploy, live `/api/evaluate` (200, score 100), live `/api/mcp/status` (200, `server_dry_run`, 14 routes, Gmail route present), live `/api/runtime-proof` (200), hosted submission pages (200 with 14-route/Gmail copy), hosted video HEAD (200, `content-length: 20807299`), and hosted desktop/mobile Playwright smoke confirming 14 connector routes, Gmail teacher-review draft, no horizontal overflow, and zero console errors.
+- Remaining loops: commit/push, actual Devpost submission, final team roster, optional live OpenAI/Composio credentials only with explicit approval and consent/server setup, optional DeepWiki indexing, and real anonymous pilot observations if the team wants true user-testing evidence.
+
+## Walkthrough Submission Gate Refresh - 2026-07-13 UTC / 2026-07-12 PDT
+
+- Council verdict: Ouija works and is submittable/competitive for AIYES Track 1. First place/top-award outcome still cannot be guaranteed because judging, final Devpost submission, final 2-5 student roster, and real anonymous student pilot observations are external.
+- Highest-leverage controllable gap: the required walkthrough video needed to visibly include the latest UX proof, Top Award Radar, and AIYES Submission Gate instead of only listing them in docs.
+- Updated `scripts/record-walkthrough.mjs` to include UX and Accessibility Proof, Top Award Radar, and AIYES Submission Gate beats, and shortened default caption timing so the full proof path stays under the five-minute cap.
+- Regenerated `docs/assets/ouija-walkthrough.webm` and synced it to `public/submission/assets/ouija-walkthrough.webm`.
+- Video proof: 1440x900, 214.64 seconds, 20,807,299 bytes, SHA-256 `59fb75c50692bcd6fb4ed7132b67543999fd59a6d18bd29e4565841beeb2d8a2`.
+- Production: `dpl_9QynNE3L86uJuRYwBRGY9hqBAtnJ`, aliased to `https://ouija-olive.vercel.app`.
+- Verification: official AIYES/Devpost page rechecked on 2026-07-13 for deadline, eligibility, Track 1 requirements, and judging criteria; `npm run record:walkthrough`; `ffprobe`; frame extraction/visual check for Submission Gate caption/panel; `npm run sync:public-submission`; `npm run test` (15 files, 91 tests); `npm run build`; `npm run test:e2e` (40 passed); `npm audit --audit-level=moderate` (0 vulnerabilities); `git diff --check`; production deploy; live `/api/evaluate` (200, score 100, 9/9 checks); live `/api/mcp/status` (200, `server_dry_run`, 13 routes); live `/api/runtime-proof` (200, `fallback_ready`, 8 templates); hosted submission pages (200 with Submission Gate copy); hosted video HEAD (200, `content-length: 20807299`); and hosted desktop/mobile Playwright smoke for Submission Gate with no horizontal overflow and zero console errors.
+- Remaining loops: commit/push, actual Devpost submission, final team roster, optional live OpenAI/Composio credentials only with explicit approval and consent/server setup, optional DeepWiki indexing, and real anonymous pilot observations if the team wants true user-testing evidence.
 
 ## AIYES Submission Gate Checkpoint - 2026-07-13 UTC / 2026-07-12 PDT
 

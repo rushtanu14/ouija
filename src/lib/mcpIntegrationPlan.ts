@@ -196,6 +196,21 @@ export const MCP_CONNECTOR_CATALOG: McpConnectorCatalogItem[] = [
     recommendedTools: ["GOOGLECALENDAR_CREATE_EVENT", "GOOGLECALENDAR_QUICK_ADD"]
   },
   {
+    id: "gmail-teacher-review-draft",
+    toolkit: "Gmail",
+    toolkitSlug: "gmail",
+    envSuffix: "GMAIL",
+    label: "Draft teacher review email",
+    studentValue: "Prepares an unsent teacher-review draft so a student can ask for feedback on variables, sources, safety, and evidence before writing the final claim.",
+    composioCapability: "create an unsent Gmail draft from the evidence packet and teacher-review questions without sending email automatically",
+    safetyNote: "Gmail handoff should create a draft only; it must not send messages, read inbox content, include direct identifiers by default, or write the student's final conclusion.",
+    requiredScopes: ["draft create", "student-selected recipient", "manual review before send"],
+    dataShared: "Evidence packet excerpt, data/source counts, review questions, and blank claim starter for a teacher-selected recipient.",
+    consentGate: "Student reviews the recipient, subject, and draft body before a Gmail draft can be created.",
+    docsUrl: "https://docs.composio.dev/toolkits/gmail",
+    recommendedTools: ["GMAIL_CREATE_EMAIL_DRAFT"]
+  },
+  {
     id: "notion-learning-record",
     toolkit: "Notion",
     toolkitSlug: "notion",
@@ -293,6 +308,7 @@ export function buildMcpIntegrationPlan({
         "Learning Exit Ticket prompts",
         "Google Forms readiness prompts",
         "Google Calendar next-trial reminder",
+        "Gmail teacher-review draft prompt",
         "Composio session ticket scope",
         "Student Reflection Drafts",
         "Portfolio Story Builder prompts",
@@ -329,8 +345,8 @@ function buildSafeguards(status: McpIntegrationPlan["status"]) {
     status === "ready"
       ? "Live MCP mode keeps Composio, Google Workspace, Notion, and Calendar execution on the server after consent."
       : status === "server_dry_run"
-      ? "Server dry-run mode validates Composio packets but does not call Composio Search, Semantic Scholar, Composio Browser, DeepWiki, Canvas, Google Classroom, Google Workspace, Notion, or Calendar APIs."
-      : "Preview mode does not call Composio Search, Semantic Scholar, Composio Browser, DeepWiki, Canvas, Google Classroom, Google Workspace, or Notion APIs.";
+      ? "Server dry-run mode validates Composio packets but does not call Composio Search, Semantic Scholar, Composio Browser, DeepWiki, Canvas, Google Classroom, Google Workspace, Gmail, Notion, or Calendar APIs."
+      : "Preview mode does not call Composio Search, Semantic Scholar, Composio Browser, DeepWiki, Canvas, Google Classroom, Google Workspace, Gmail, or Notion APIs.";
 
   return [
     firstLine,
@@ -346,6 +362,7 @@ function buildSafeguards(status: McpIntegrationPlan["status"]) {
       "Google Classroom handoff creates a teacher-review checkpoint, not an auto-submitted assignment.",
       "Google Forms handoff creates student prompts, not completed answers.",
       "Google Calendar handoff schedules a next-trial reminder, not a generated result.",
+      "Gmail handoff creates an unsent teacher-review draft only; no automatic send, inbox read, or delete route is enabled.",
       "Exported packets preserve the academic-integrity blanks instead of writing conclusions.",
       "Reflection drafts are exported only when the student typed them in the workspace."
   ];
@@ -555,6 +572,9 @@ function buildPayloadSummary(
   }
   if (connector.id === "google-calendar-next-trial-reminder") {
     return `Next trial reminder: ${result.nextTrialPlan.nextMeasurement}`;
+  }
+  if (connector.id === "gmail-teacher-review-draft") {
+    return `Teacher review draft for ${title}: ask for feedback on variables, controls, source trust, safety, data flags, and the blank claim starter before submission.`;
   }
 
   return `${result.trackEvidence.score}/100 readiness, ${result.learningExitTicket.prompts.length} exit-ticket prompts, next action`;

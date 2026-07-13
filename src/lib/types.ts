@@ -591,6 +591,7 @@ export type McpIntegrationActionId =
   | "google-classroom-prelab-checkpoint"
   | "google-forms-readiness-check"
   | "google-calendar-next-trial-reminder"
+  | "gmail-teacher-review-draft"
   | "notion-learning-record";
 
 export interface McpIntegrationAction {
@@ -607,6 +608,7 @@ export interface McpIntegrationAction {
     | "Google Classroom"
     | "Google Forms"
     | "Google Calendar"
+    | "Gmail"
     | "Notion";
   label: string;
   studentValue: string;

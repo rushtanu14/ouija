@@ -32,6 +32,7 @@ describe("AIYES submission assets", () => {
     expect(deck).toContain("Semantic Scholar reference-check");
     expect(deck).toContain("Composio Browser source-capture");
     expect(deck).toContain("Canvas assignment-context");
+    expect(deck).toContain("Gmail teacher-review draft");
     expect(deck).toContain("AIYES Values Fit");
     expect(deck).toContain("AIYES Development Journey");
     expect(deck).toContain("Technical Depth Proof");
@@ -66,6 +67,7 @@ describe("AIYES submission assets", () => {
     expect(copy).toContain("Composio Browser source capture");
     expect(copy).toContain("DeepWiki public-source proof");
     expect(copy).toContain("Canvas assignment-context");
+    expect(copy).toContain("Gmail teacher-review draft");
     expect(copy).toContain("AIYES Values Fit");
     expect(copy).toContain("AIYES Development Journey");
     expect(copy).toContain("Technical Depth Proof");
@@ -96,10 +98,11 @@ describe("AIYES submission assets", () => {
     expect(hub).toContain("/api/evaluate");
     expect(hub).toContain("/api/runtime-proof");
     expect(hub).toContain("/api/mcp/status");
-    expect(hub).toContain("13 routes");
+    expect(hub).toContain("14 routes");
     expect(pack).toContain("Devpost Submission Pack");
     expect(pack).toContain("DeepWiki public repo audit");
     expect(pack).toContain("Canvas read-only import");
+    expect(pack).toContain("Gmail draft");
     expect(pack).toContain("Team Roster Worksheet");
     expect(pack).toContain("https://ouija-olive.vercel.app/?judge=1");
     expect(`${copy}\n${assets}\n${hub}\n${pack}`).not.toMatch(/TODO|TBD|placeholder|use the repository URL|use the final recorded/i);

@@ -249,7 +249,7 @@ describe("Composio MCP bridge API", () => {
     expect(response.body.mode).toBe("server_dry_run");
     expect(response.body.apiKeyConfigured).toBe(false);
     expect(response.body.missingEnv).toContain("COMPOSIO_API_KEY");
-    expect(response.body.toolkits).toHaveLength(13);
+    expect(response.body.toolkits).toHaveLength(14);
     expect(response.body.missingEnv.filter((value: string) => value === "COMPOSIO_SEARCH_ALLOWED_TOOLS")).toHaveLength(1);
     expect(response.body.missingEnv.filter((value: string) => value === "COMPOSIO_BROWSER_ALLOWED_TOOLS")).toHaveLength(1);
     expect(response.body.missingEnv.filter((value: string) => value === "COMPOSIO_DEEPWIKI_ALLOWED_TOOLS")).toHaveLength(1);
@@ -284,6 +284,10 @@ describe("Composio MCP bridge API", () => {
     expect(response.body.toolkits.find((toolkit: { toolkit: string }) => toolkit.toolkit === "Google Calendar")?.recommendedTools).toContain(
       "GOOGLECALENDAR_CREATE_EVENT"
     );
+    expect(response.body.toolkits.find((toolkit: { actionId: string }) => toolkit.actionId === "gmail-teacher-review-draft")?.toolkitSlug).toBe("gmail");
+    expect(response.body.toolkits.find((toolkit: { actionId: string }) => toolkit.actionId === "gmail-teacher-review-draft")?.recommendedTools).toEqual([
+      "GMAIL_CREATE_EMAIL_DRAFT"
+    ]);
     expect(JSON.stringify(response.body)).not.toContain("sk-");
   });
 
@@ -493,6 +497,37 @@ describe("Composio MCP bridge API", () => {
     expect(response.body.target.toolkitSlug).toBe("canvas");
     expect(response.body.target.authConfigEnv).toBe("COMPOSIO_CANVAS_AUTH_CONFIG_ID");
     expect(response.body.target.recommendedTools).toContain("CANVAS_GET_ASSIGNMENT_RUBRIC");
+    expect(response.body.summary).toContain("no Composio");
+  });
+
+  it("validates a Gmail teacher-review draft packet without sending email", async () => {
+    clearComposioEnv();
+    const app = createApp();
+    const result = analyzeExperiment({
+      description: "Projectile launch angle and measured range."
+    });
+    const packet = buildEvidencePacket(result, result.rows, "Projectile launch angle and measured range.");
+
+    const response = await request(app)
+      .post("/api/mcp/export")
+      .send({
+        actionId: "gmail-teacher-review-draft",
+        consent: true,
+        payload: {
+          title: `Ouija Evidence Packet: ${result.classification.title}`,
+          description: "Projectile launch angle and measured range.",
+          evidencePacket: packet,
+          rows: result.rows,
+          sources: result.sources
+        }
+      })
+      .expect(200);
+
+    expect(response.body.status).toBe("dry_run");
+    expect(response.body.toolkit).toBe("Gmail");
+    expect(response.body.target.toolkitSlug).toBe("gmail");
+    expect(response.body.target.authConfigEnv).toBe("COMPOSIO_GMAIL_AUTH_CONFIG_ID");
+    expect(response.body.target.recommendedTools).toEqual(["GMAIL_CREATE_EMAIL_DRAFT"]);
     expect(response.body.summary).toContain("no Composio");
   });
 
@@ -830,6 +865,70 @@ describe("Composio MCP bridge API", () => {
     expect(body.toolkits.enable).toEqual(["composio_search"]);
     expect(body.auth_configs).toBeUndefined();
     expect(body.tools.composio_search.enable).toEqual(["COMPOSIO_SEARCH_SCHOLAR"]);
+  });
+
+  it("creates a live Gmail draft session server-side without exposing the MCP URL", async () => {
+    const result = analyzeExperiment({
+      description: "Projectile launch angle and measured range."
+    });
+    const packet = buildEvidencePacket(result, result.rows, "Projectile launch angle and measured range.");
+    const fetchCalls: Array<{ url: string; init?: RequestInit }> = [];
+    const fetchMock = async (url: string, init?: RequestInit) => {
+      fetchCalls.push({ url, init });
+      return {
+        ok: true,
+        json: async () => ({
+          session_id: "trs_gmail123456",
+          mcp: {
+            url: "https://app.composio.dev/tool_router/v3/trs_gmail123456/mcp"
+          }
+        })
+      } as Response;
+    };
+
+    const response = await createMcpSessionTicket(
+      {
+        actionId: "gmail-teacher-review-draft",
+        consent: true,
+        payload: {
+          title: `Ouija Evidence Packet: ${result.classification.title}`,
+          description: "Projectile launch angle and measured range.",
+          evidencePacket: packet,
+          rows: result.rows,
+          sources: result.sources
+        }
+      },
+      {
+        COMPOSIO_API_KEY: "ak_test_secret",
+        COMPOSIO_LIVE_EXPORTS: "true",
+        COMPOSIO_SESSION_USER_ID: "ouija-demo-student",
+        COMPOSIO_GMAIL_AUTH_CONFIG_ID: "ac_gmail_secret",
+        COMPOSIO_GMAIL_ALLOWED_TOOLS: "GMAIL_CREATE_EMAIL_DRAFT",
+        MCP_SESSION_AUTH_TOKEN: "server-only-token"
+      },
+      fetchMock,
+      "Bearer server-only-token"
+    );
+
+    expect(response.statusCode).toBe(200);
+    expect("sessionPlan" in response.body).toBe(true);
+    if (!("sessionPlan" in response.body)) {
+      throw new Error("Expected a Gmail session response.");
+    }
+    expect(response.body.status).toBe("created");
+    expect(response.body.sessionPlan.enabledToolkit).toBe("gmail");
+    expect(response.body.sessionPlan.enabledTools).toEqual(["GMAIL_CREATE_EMAIL_DRAFT"]);
+    expect(JSON.stringify(response.body)).not.toContain("ac_gmail_secret");
+    expect(JSON.stringify(response.body)).not.toContain("https://app.composio.dev/tool_router");
+    expect(fetchCalls).toHaveLength(1);
+    const body = JSON.parse(fetchCalls[0].init?.body as string) as {
+      toolkits: { enable: string[] };
+      auth_configs?: Record<string, string>;
+      tools: Record<string, { enable: string[] }>;
+    };
+    expect(body.toolkits.enable).toEqual(["gmail"]);
+    expect(body.auth_configs?.gmail).toBe("ac_gmail_secret");
+    expect(body.tools.gmail.enable).toEqual(["GMAIL_CREATE_EMAIL_DRAFT"]);
   });
 
   it("rejects MCP dry-runs without explicit consent", async () => {

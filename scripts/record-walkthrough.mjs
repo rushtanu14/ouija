@@ -9,9 +9,9 @@ const assetDir = resolve(repoRoot, "docs", "assets");
 const baseUrl = process.env.OUIJA_URL ?? "https://ouija-olive.vercel.app";
 const recordingDir = mkdtempSync(join(tmpdir(), "ouija-walkthrough-"));
 const outputPath = resolve(assetDir, "ouija-walkthrough.webm");
-const captionDurationMs = Number(process.env.OUIJA_CAPTION_MS ?? 6000);
+const captionDurationMs = Number(process.env.OUIJA_CAPTION_MS ?? 4000);
 let captionIndex = 0;
-const captionTotal = 45;
+const captionTotal = 51;
 
 mkdirSync(assetDir, { recursive: true });
 
@@ -264,6 +264,30 @@ await caption(
   page,
   "AIYES Development Journey",
   "The required Track 1 story is visible too: problem, data, model strategy, testing, UX, ethics, impact, constraints, and submission proof."
+);
+
+await page.locator("#ux-proof").scrollIntoViewIfNeeded();
+await page.getByLabel("UX and Accessibility Proof").getByText("User Experience and Design").waitFor();
+await caption(
+  page,
+  "UX and Accessibility Proof",
+  "Ouija maps the official UX criterion to student-first flow, judge navigation, responsive layout, labeled controls, clickable citations, and integrity prompts."
+);
+
+await page.locator("#top-award").scrollIntoViewIfNeeded();
+await page.getByLabel("Top Award Radar").getByText("Submittable and competitive").waitFor();
+await caption(
+  page,
+  "Top Award Radar",
+  "The app answers the hard council question honestly: submittable and competitive, but not a first-place guarantee because judging and final Devpost steps are external."
+);
+
+await page.locator("#submission-gate").scrollIntoViewIfNeeded();
+await page.getByLabel("AIYES Submission Gate").getByText("Submittability audit").waitFor();
+await caption(
+  page,
+  "AIYES Submission Gate",
+  "The required Devpost items are now visible as pass, review, or external: app, deck, video, source, impact, AI design, UX, and the external roster/final-submit step."
 );
 
 for (const sample of ["Projectile Motion", "Pendulum", "Ohm's Law", "Reaction Rate", "Enzyme Activity", "Plant Light", "Density Layers", "Water Filtration"]) {
