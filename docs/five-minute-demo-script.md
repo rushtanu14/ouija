@@ -38,7 +38,11 @@ Show AIYES Values Fit: the same run maps to democracy, diversity, connectivity, 
 
 Show AIYES Development Journey: the run maps the required development story from problem and data handling through model strategy, testing, UX, ethics, impact, constraints, and submission proof.
 
-## 2:34-2:50 - Pre-Lab, Student Level Lens, Concept Mastery, Learning Impact, Pilot Evidence, Exit Ticket, And Reflection Workspace
+## 2:34-2:42 - Top Award Radar
+
+Show Top Award Radar: Ouija is submittable and competitive, but it does not pretend first place is guaranteed. Point to problem relevance, AI/model strategy, UX, submission package readiness, pilot evidence, and the external Devpost/team/judging blockers.
+
+## 2:42-2:56 - Pre-Lab, Student Level Lens, Concept Mastery, Learning Impact, Pilot Evidence, Exit Ticket, And Reflection Workspace
 
 Show Student Level Lens: the same run switches between middle-school pattern reading and high-school quantitative evidence, controls, repeats, and uncertainty. Then show Pre-Lab Design Coach: Ouija turns the match into variables, controls, repeats, source checks, table columns, and a safety gate before data collection. Then show Learning Impact Loop: Ouija scores whether the student is ready to reason, should review flags, or needs to fix the run, using outcome, data quality, concept learning, integrity, pattern evidence, repeat reliability, and next-trial metrics. Then show Student Pilot Study Kit and Pilot Evidence Tracker: the kit gives an anonymous 10-minute protocol, and the tracker starts empty with a no-fake-testing warning before logging time-to-graph, confidence shift, issue spotting, exit-ticket readiness, and non-identifying notes.
 
@@ -76,7 +80,7 @@ Show Deterministic Regression Suite with 9/9 internal behavior checks: projectil
 
 ## 4:58-5:00 - Judge Brief
 
-Show Judge Brief so evaluators see Track 1 fit, Judge Demo Path, Submission Hub, live app, hosted deck/video/source links, AIYES submission checklist, official rubric fit, learning impact, student pilot protocol, pilot evidence capture, learning exit ticket, student level lens, Concept Mastery Check, student reflection workspace, progress portfolio, grounding audit, AI evaluation harness, data-handling ethics, pattern evidence, model strategy, AI pipeline, evaluation, tests, and integrity constraints in one place.
+Show Judge Brief so evaluators see Track 1 fit, Judge Demo Path, Submission Hub, live app, hosted deck/video/source links, AIYES submission checklist, official rubric fit, Top Award Radar, learning impact, student pilot protocol, pilot evidence capture, learning exit ticket, student level lens, Concept Mastery Check, student reflection workspace, progress portfolio, grounding audit, AI evaluation harness, data-handling ethics, pattern evidence, model strategy, AI pipeline, evaluation, tests, and integrity constraints in one place.
 
 ## Closing Line
 

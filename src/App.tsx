@@ -136,6 +136,7 @@ const judgeNavLinks = [
   { href: "#progress", label: "Progress" },
   { href: "#mcp-export", label: "MCP Export" },
   { href: "#model-card", label: "Model Card" },
+  { href: "#top-award", label: "Award Radar" },
   { href: "#judge", label: "Judge Brief" },
   { href: "#settings", label: "Settings" }
 ];
@@ -610,6 +611,14 @@ export function App() {
             />
             <EvaluationBenchPanel report={evaluationReport} />
             <ModelCardPanel result={result} />
+            <TopAwardRadarPanel
+              result={result}
+              evaluationReport={evaluationReport}
+              runtimeProof={runtimeProof}
+              mcpBridgeStatus={mcpBridgeStatus}
+              pilotEvidenceSummary={pilotEvidenceSummary}
+              savedLabCount={savedLabs.length}
+            />
             <JudgeBriefPanel result={result} />
           </>
         ) : null}
@@ -1144,6 +1153,111 @@ function EvaluationBenchPanel({ report }: { report: EvaluationReport | null }) {
       ) : (
         <p className="empty-copy">Regression suite is loading.</p>
       )}
+    </section>
+  );
+}
+
+function TopAwardRadarPanel({
+  result,
+  evaluationReport,
+  runtimeProof,
+  mcpBridgeStatus,
+  pilotEvidenceSummary,
+  savedLabCount
+}: {
+  result: AnalyzeResult | null;
+  evaluationReport: EvaluationReport | null;
+  runtimeProof: RuntimeProof | null;
+  mcpBridgeStatus: McpBridgeStatus | null;
+  pilotEvidenceSummary: PilotEvidenceSummary;
+  savedLabCount: number;
+}) {
+  const regressionReady = evaluationReport?.status === "pass";
+  const runtimeReady = runtimeProof?.status === "fallback_ready" || runtimeProof?.status === "web_enriched_ready";
+  const mcpRouteCount = mcpBridgeStatus?.toolkits.length ?? 0;
+  const pilotReady = pilotEvidenceSummary.status === "evidence_ready";
+  const savedEvidenceReady = savedLabCount >= 2;
+  const radarItems = [
+    {
+      label: "Problem and relevance",
+      status: "Strong",
+      detail: "Student-only middle/high school science workflow with expected-results, graphing, safety, and learning support."
+    },
+    {
+      label: "AI and model strategy",
+      status: runtimeReady && regressionReady ? "Strong" : "Review",
+      detail: `${runtimeReady ? "Runtime proof ready" : "Runtime proof loading"}; ${
+        regressionReady ? "9/9 regression checks passed" : "regression proof loading"
+      }; Model Strategy and Technical Depth Proof are visible.`
+    },
+    {
+      label: "UX and design",
+      status: "Strong",
+      detail: "Student mode keeps graph/table work first, Judge mode exposes proof, and E2E covers mobile no-overflow."
+    },
+    {
+      label: "Submission package",
+      status: "Ready",
+      detail: "Submission Hub, Devpost pack, hosted deck, hosted walkthrough, source link, and live deployment are prepared."
+    },
+    {
+      label: "Impact evidence",
+      status: pilotReady ? "Strong" : "Collect",
+      detail: `${pilotEvidenceSummary.observationCount}/3 anonymous pilot observations logged; ${savedLabCount} saved lab snapshot${
+        savedLabCount === 1 ? "" : "s"
+      } available.`
+    },
+    {
+      label: "External blockers",
+      status: "External",
+      detail: "Final Devpost submission, team roster handling, and judging outcome cannot be solved inside the app."
+    }
+  ];
+  const nextMoves = [
+    pilotReady ? "Use the logged pilot evidence in the demo." : "Collect 3 anonymous pilot observations before claiming user testing.",
+    savedEvidenceReady ? "Show Progress Portfolio as repeated learning proof." : "Save at least 2 lab runs to show progress evidence.",
+    "Confirm the 2-5 student team roster in the Devpost submission flow.",
+    mcpRouteCount >= 11 ? "Use MCP dry-run proof as technical depth evidence." : "Open MCP status before the demo if route count is still loading.",
+    "Optional: enable live OpenAI/Composio only with explicit credentials, consent, and server-side setup."
+  ];
+
+  return (
+    <section className="top-award-radar" id="top-award" aria-label="Top Award Radar">
+      <div className="top-award-header">
+        <div className="panel-title">
+          <Trophy size={18} />
+          <h3>Top Award Radar</h3>
+        </div>
+        <span>{result?.trackEvidence.readiness === "competitive" ? "Gold-competitive" : "Submittable"}</span>
+      </div>
+      <div className="top-award-verdict">
+        <div>
+          <p className="section-label">Council verdict</p>
+          <strong>Submittable and competitive</strong>
+        </div>
+        <p className="top-award-verdict-copy">
+          Not a first-place guarantee: judges, final Devpost submission, and team roster are external.
+        </p>
+      </div>
+      <div className="top-award-grid">
+        {radarItems.map((item) => (
+          <article className={`top-award-item top-award-item-${item.status.toLowerCase()}`} key={item.label}>
+            <div>
+              <p className="section-label">{item.label}</p>
+              <strong>{item.status}</strong>
+            </div>
+            <span>{item.detail}</span>
+          </article>
+        ))}
+      </div>
+      <div className="top-award-actions" aria-label="Top award next moves">
+        <p className="section-label">Next moves before judging</p>
+        <ol>
+          {nextMoves.map((move) => (
+            <li key={move}>{move}</li>
+          ))}
+        </ol>
+      </div>
     </section>
   );
 }

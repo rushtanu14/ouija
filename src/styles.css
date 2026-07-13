@@ -189,6 +189,7 @@ a {
 .progress-portfolio-panel,
 .mcp-integration-panel,
 .evaluation-panel,
+.top-award-radar,
 .judge-brief-panel,
 .settings-panel,
 .source-status,
@@ -3640,6 +3641,7 @@ td input {
 .mcp-integration-panel,
 .evaluation-panel,
 .model-card-panel,
+.top-award-radar,
 .judge-brief-panel,
 .settings-panel {
   display: grid;
@@ -3803,6 +3805,106 @@ td input {
   background: #edf8f1;
   font-size: 11px;
   font-weight: 850;
+}
+
+.top-award-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+}
+
+.top-award-header > span {
+  border-radius: 999px;
+  padding: 7px 10px;
+  color: #173b74;
+  background: #eef5ff;
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.top-award-verdict {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+  align-items: start;
+  border-radius: 8px;
+  padding: 13px;
+  color: #173b74;
+  background: #eef5ff;
+}
+
+.top-award-verdict strong {
+  display: block;
+  color: inherit;
+  font-size: 22px;
+  line-height: 1;
+}
+
+.top-award-verdict-copy {
+  margin: 0;
+  min-width: 0;
+  color: inherit;
+  line-height: 1.4;
+}
+
+.top-award-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 9px;
+}
+
+.top-award-item {
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+  border: 1px solid #d9e5f2;
+  border-left-width: 4px;
+  border-radius: 8px;
+  padding: 11px;
+  background: #fbfdff;
+}
+
+.top-award-item-strong,
+.top-award-item-ready {
+  border-left-color: #2e9f65;
+}
+
+.top-award-item-collect,
+.top-award-item-review,
+.top-award-item-external {
+  border-left-color: #d89100;
+}
+
+.top-award-item strong {
+  color: #172439;
+}
+
+.top-award-item span {
+  color: #526276;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.top-award-actions {
+  display: grid;
+  gap: 8px;
+  border-radius: 8px;
+  padding: 12px;
+  color: #36475c;
+  background: #f8fbff;
+  border: 1px solid #d9e5f2;
+}
+
+.top-award-actions ol {
+  display: grid;
+  gap: 7px;
+  margin: 0;
+  padding-left: 18px;
+}
+
+.top-award-actions li {
+  line-height: 1.4;
 }
 
 .judge-score {
@@ -5400,6 +5502,17 @@ td input {
   }
 
   .runtime-proof-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .top-award-header,
+  .top-award-verdict {
+    align-items: stretch;
+    flex-direction: column;
+    grid-template-columns: 1fr;
+  }
+
+  .top-award-grid {
     grid-template-columns: 1fr;
   }
 

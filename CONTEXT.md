@@ -77,6 +77,16 @@ The one-click judge packet at `https://ouija-olive.vercel.app/submission/`. It g
 - Ouija should support table input first before adding CSV upload or photo/OCR input.
 - Ouija's internet search should ground expected results and explanations in referenced content instead of inventing them from the model alone.
 
+## Top Award Radar Checkpoint - 2026-07-12
+
+- Council verdict: Ouija works and is submittable for AIYES Track 1. It is now stronger because the live app directly answers the top-award question, but first place/top-award outcome still cannot be guaranteed because judging, final Devpost submission, and the team roster are external.
+- Added `Top Award Radar` in Judge mode with a clear verdict: `Submittable and competitive`, plus explicit `Not a first-place guarantee` copy.
+- The radar separates problem/relevance, AI/model strategy, UX/design, submission package, impact evidence, and external blockers, then lists next moves before judging: collect pilot observations, save progress evidence, confirm the team roster, use MCP dry-run proof, and only enable live OpenAI/Composio with explicit credentials and consent.
+- Updated README, Devpost copy, and the five-minute demo script to include Top Award Radar in the submission story.
+- Production: `dpl_BDvnaNhDZxKymjb9Zprj5MRkEFaX`, aliased to `https://ouija-olive.vercel.app`.
+- Verification: `npm run test` (15 files, 86 tests), `npm run build`, `npm run test:e2e` (40 passed across Chromium, Firefox, WebKit, and mobile Safari), `npm audit --json` (0 vulnerabilities), `git diff --check`, production deploy, live `/api/evaluate` (200, 100 score, 9/9 pass), live `/api/mcp/status` (200, `server_dry_run`, 11 routes, DeepWiki present), and hosted desktop/mobile Playwright smoke for Top Award Radar with no horizontal overflow and zero console errors.
+- Remaining loops: commit/push, actual Devpost submission, final 2-5 member team roster on Devpost, optional live OpenAI/Composio credentials only with explicit approval and consent/server setup, and optional DeepWiki indexing if the public repo route should become live proof.
+
 ## Pilot Evidence Tracker Checkpoint - 2026-07-11 PDT / 2026-07-12 UTC
 
 - Council verdict: Ouija works and remains submittable for AIYES Track 1; first place/top-award outcome still cannot be guaranteed because judging, final Devpost submission, and the 2-5 student roster are external.

@@ -442,6 +442,31 @@ test("student can analyze a sample experiment, edit table data, and see citation
   expect(overflow).toBe(false);
 });
 
+test("judge mode shows a top award radar with honest win gaps", async ({ page }) => {
+  await page.addInitScript(() => window.localStorage.clear());
+  await page.goto("/?judge=1");
+
+  await page.getByRole("button", { name: "Reaction Rate" }).click();
+  await expect(page.getByRole("heading", { name: "Reaction Rate vs Temperature" })).toBeVisible();
+  await page.getByLabel("Time to graph Observation 1").fill("90");
+  await page.getByLabel("Confidence before Observation 1").selectOption("2");
+  await page.getByLabel("Confidence after Observation 1").selectOption("4");
+  await page.getByLabel("Issue spotted Observation 1").selectOption("yes");
+  await page.getByLabel("Exit ticket Observation 1").selectOption("ready");
+  await page.getByRole("link", { name: "Award Radar" }).click();
+
+  await expect(page.getByRole("heading", { name: "Top Award Radar" })).toBeVisible();
+  await expect(page.getByLabel("Top Award Radar").getByText("Submittable and competitive")).toBeVisible();
+  await expect(page.getByLabel("Top Award Radar").getByText("Not a first-place guarantee")).toBeVisible();
+  await expect(page.getByLabel("Top Award Radar").getByText("Problem and relevance")).toBeVisible();
+  await expect(page.getByLabel("Top Award Radar").getByText("AI and model strategy")).toBeVisible();
+  await expect(page.getByLabel("Top Award Radar").getByText("UX and design")).toBeVisible();
+  await expect(page.getByLabel("Top Award Radar").getByText("Impact evidence")).toBeVisible();
+  await expect(page.getByLabel("Top Award Radar").getByText("1/3 anonymous pilot observations logged")).toBeVisible();
+  await expect(page.getByLabel("Top award next moves").getByText("Collect 3 anonymous pilot observations before claiming user testing.")).toBeVisible();
+  await expect(page.getByLabel("Top award next moves").getByText("Confirm the 2-5 student team roster in the Devpost submission flow.")).toBeVisible();
+});
+
 test("student mode keeps the core lab workflow focused before judge proof", async ({ page }) => {
   await page.addInitScript(() => window.localStorage.clear());
   await page.goto("/");
@@ -457,6 +482,7 @@ test("student mode keeps the core lab workflow focused before judge proof", asyn
   await expect(page.getByRole("heading", { name: "Model Strategy" })).toHaveCount(0);
   await expect(page.getByRole("heading", { name: "Judge Brief" })).toHaveCount(0);
   await expect(page.getByRole("link", { name: "MCP Export" })).toHaveCount(0);
+  await expect(page.getByRole("link", { name: "Award Radar" })).toHaveCount(0);
 
   await page.getByLabel("View mode").getByRole("button", { name: "Judge" }).click();
   await expect(page).toHaveURL(/judge=1/);
@@ -464,6 +490,7 @@ test("student mode keeps the core lab workflow focused before judge proof", asyn
   await expect(page.getByRole("heading", { name: "Model Strategy" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "AIYES Development Journey" })).toBeVisible();
   await expect(page.getByRole("link", { name: "MCP Export" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Award Radar" })).toBeVisible();
 
   await page.getByLabel("View mode").getByRole("button", { name: "Student" }).click();
   await expect(page.getByLabel("View mode").getByRole("button", { name: "Student" })).toHaveAttribute("aria-pressed", "true");

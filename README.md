@@ -31,7 +31,8 @@ Ouija is a student-facing AI experiment interpreter for middle and high school s
 16. Use Progress Portfolio and Portfolio Story Builder to show saved-run count, score trend, subject breadth, strongest run, student-authored progress prompts, and next portfolio action.
 17. Use MCP Integration Coach to validate Composio Search source-audit, Scholar claim-check, Composio Browser source-capture, and DeepWiki public-source proof routes plus Google Docs, Google Sheets, Google Drive, Google Classroom, Google Forms, Google Calendar, and Notion handoffs through the server dry-run bridge, plus the readiness matrix, without exposing credentials or sending student data.
 18. Open AI Model Card for the architecture, grounding, evaluation, privacy, MCP-export boundary, and guardrail summary.
-19. Open Judge Brief for a compact Track 1 proof surface: submission hub, live app, judge view, hosted deck/video/source links, AIYES submission checklist, judge demo path, official rubric fit, learning impact, student pilot protocol, student reflection drafts, progress portfolio, MCP readiness plan, AI pipeline, model strategy, evaluation, data-handling ethics, tests, and integrity constraints.
+19. Open Top Award Radar for the honest council verdict: Ouija is submittable and competitive, but not guaranteed to win; it names the remaining judge/team/submission gaps and next moves.
+20. Open Judge Brief for a compact Track 1 proof surface: submission hub, live app, judge view, hosted deck/video/source links, AIYES submission checklist, judge demo path, official rubric fit, learning impact, student pilot protocol, student reflection drafts, progress portfolio, MCP readiness plan, AI pipeline, model strategy, evaluation, data-handling ethics, tests, and integrity constraints.
 
 Guided Lab Flow gives students one current next action and six stable stages so the interface feels like a lab workflow rather than separate AI outputs.
 
@@ -84,6 +85,8 @@ AIYES Rubric Fit maps each run to the three visible official judging criteria us
 AIYES Values Fit maps each run to democracy, diversity, connectivity, innovation, and ethical inclusion using concrete product evidence, so judges can see how the app matches AIYES's stated mission beyond the scoring rubric.
 
 AIYES Development Journey maps each run to the required Track 1 story: problem identification, data handling, model integration, app build, testing, UX, ethics, impact, constraints, and hosted submission proof.
+
+Top Award Radar turns the internal council audit into a judge-visible card: it separates submittable evidence from top-award risk, highlights impact evidence, AI/model proof, UX/design, submission package readiness, and external blockers, then lists the next moves before judging.
 
 Learning Impact Loop measures student readiness for each run through outcome, data quality, concept learning, integrity, whole-pattern evidence, repeat reliability, and next-trial metrics.
 
