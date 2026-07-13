@@ -44,6 +44,21 @@ export const MCP_CONNECTOR_CATALOG: McpConnectorCatalogItem[] = [
     recommendedTools: ["COMPOSIO_SEARCH_SCHOLAR"]
   },
   {
+    id: "semanticscholar-reference-check",
+    toolkit: "Semantic Scholar",
+    toolkitSlug: "semanticscholar",
+    envSuffix: "SEMANTIC_SCHOLAR",
+    label: "Check academic references",
+    studentValue: "Finds structured paper metadata for advanced source checks when a classroom lab needs stronger science grounding.",
+    composioCapability: "search Semantic Scholar papers, retrieve paper details, and compare abstracts or metadata against the expected pattern",
+    safetyNote: "Reference checks should surface paper context and limitations; they must not turn papers into a finished claim or conclusion.",
+    requiredScopes: ["paper search", "paper metadata read", "citation context review"],
+    dataShared: "Experiment title, variables, expected pattern summary, and a student-reviewed academic search query.",
+    consentGate: "Student reviews the academic search query before any live Semantic Scholar lookup.",
+    docsUrl: "https://composio.dev/toolkits/semanticscholar",
+    recommendedTools: ["SEMANTICSCHOLAR_SEARCH_PAPERS", "SEMANTICSCHOLAR_GET_DETAILS_FOR_MULTIPLE_PAPERS_AT_ONCE"]
+  },
+  {
     id: "composio-browser-source-capture",
     toolkit: "Composio Browser",
     toolkitSlug: "browser_tool",
@@ -74,6 +89,21 @@ export const MCP_CONNECTOR_CATALOG: McpConnectorCatalogItem[] = [
     consentGate: "Team reviews the public repo question before any live DeepWiki source-proof session.",
     docsUrl: "https://deepwiki.com",
     recommendedTools: ["DEEPWIKI_MCP_READ_WIKI_STRUCTURE", "DEEPWIKI_MCP_READ_WIKI_CONTENTS", "DEEPWIKI_MCP_ASK_QUESTION"]
+  },
+  {
+    id: "canvas-assignment-context",
+    toolkit: "Canvas",
+    toolkitSlug: "canvas",
+    envSuffix: "CANVAS",
+    label: "Import assignment context",
+    studentValue: "Lets a student pull the lab prompt, due date, attached materials, and rubric into Ouija before planning or graphing.",
+    composioCapability: "read Canvas courses, planner items, assignments, rubrics, and attached files for student-reviewed lab context",
+    safetyNote: "Canvas access should read assignment context only; it must not submit work, message a class, change grades, or write conclusions.",
+    requiredScopes: ["course list read", "assignment read", "rubric read", "file metadata read"],
+    dataShared: "Selected course id, assignment id, rubric criteria, due date, and lab prompt text the student chooses to import.",
+    consentGate: "Student selects the Canvas assignment and reviews the imported prompt before Ouija uses it.",
+    docsUrl: "https://composio.dev/toolkits/canvas",
+    recommendedTools: ["CANVAS_LIST_COURSES", "CANVAS_LIST_PLANNER_ITEMS", "CANVAS_GET_ASSIGNMENT2", "CANVAS_GET_ASSIGNMENT_RUBRIC"]
   },
   {
     id: "google-docs-evidence-packet",
@@ -251,8 +281,10 @@ export function buildMcpIntegrationPlan({
         "Trusted citation links",
         "Composio Search source-audit query",
         "Composio Scholar claim-check query",
+        "Semantic Scholar reference-check query",
         "Composio Browser source-page capture task",
         "DeepWiki public-source proof question",
+        "Canvas assignment prompt and rubric context",
         "Pattern Archetype Coach source question",
         "Progress Portfolio summary",
         "Pre-Lab Design Coach",
@@ -270,7 +302,7 @@ export function buildMcpIntegrationPlan({
     },
     safeguards: buildSafeguards(status),
     judgeTakeaway:
-      "MCP Integration Coach connects Ouija to a real research-and-classroom handoff path with Composio Sessions, connector prerequisites, least-privilege scopes, server dry-runs, scoped session tickets, and consent gates visible to judges."
+      "MCP Integration Coach connects Ouija to a real research, LMS-context, and classroom handoff path with Composio Sessions, connector prerequisites, least-privilege scopes, server dry-runs, scoped session tickets, and consent gates visible to judges."
   };
 }
 
@@ -297,8 +329,8 @@ function buildSafeguards(status: McpIntegrationPlan["status"]) {
     status === "ready"
       ? "Live MCP mode keeps Composio, Google Workspace, Notion, and Calendar execution on the server after consent."
       : status === "server_dry_run"
-      ? "Server dry-run mode validates Composio packets but does not call Composio Search, Composio Browser, DeepWiki, Google Classroom, Google Workspace, Notion, or Calendar APIs."
-      : "Preview mode does not call Composio Search, Composio Browser, DeepWiki, Google Classroom, Google Workspace, or Notion APIs.";
+      ? "Server dry-run mode validates Composio packets but does not call Composio Search, Semantic Scholar, Composio Browser, DeepWiki, Canvas, Google Classroom, Google Workspace, Notion, or Calendar APIs."
+      : "Preview mode does not call Composio Search, Semantic Scholar, Composio Browser, DeepWiki, Canvas, Google Classroom, Google Workspace, or Notion APIs.";
 
   return [
     firstLine,
@@ -307,8 +339,10 @@ function buildSafeguards(status: McpIntegrationPlan["status"]) {
       "Scoped Composio sessions are prepared server-side and raw MCP URLs are withheld from browser responses.",
       "Composio Search source audits use topic and variable terms only; students review the query before live lookup.",
       "Composio Scholar claim checks compare the expected pattern against scholarly snippets without writing the student's final claim.",
+      "Semantic Scholar reference checks use student-reviewed academic queries and return paper context, not a generated conclusion.",
       "Composio Browser captures public source-page context only after the student reviews the URL and task prompt.",
       "DeepWiki source proof uses the public GitHub repo only and does not receive student lab data.",
+      "Canvas assignment context is read-only and must not submit work, message a class, or alter grades.",
       "Google Classroom handoff creates a teacher-review checkpoint, not an auto-submitted assignment.",
       "Google Forms handoff creates student prompts, not completed answers.",
       "Google Calendar handoff schedules a next-trial reminder, not a generated result.",
@@ -321,12 +355,18 @@ function buildSessionStrategy(actions: McpIntegrationAction[], status: McpIntegr
   const sourceVerificationActionIds = [
     "composio-search-source-audit",
     "composio-scholar-claim-check",
+    "semanticscholar-reference-check",
     "composio-browser-source-capture",
     "deepwiki-source-proof"
   ];
+  const assignmentContextActionIds = ["canvas-assignment-context"];
   const sourceVerificationActions = actions.filter((action) => sourceVerificationActionIds.includes(action.id));
-  const studentExportActions = actions.filter((action) => !sourceVerificationActionIds.includes(action.id));
+  const assignmentContextActions = actions.filter((action) => assignmentContextActionIds.includes(action.id));
+  const studentExportActions = actions.filter(
+    (action) => !sourceVerificationActionIds.includes(action.id) && !assignmentContextActionIds.includes(action.id)
+  );
   const sourceTools = uniqueTools(sourceVerificationActions);
+  const assignmentTools = uniqueTools(assignmentContextActions);
   const exportTools = uniqueTools(studentExportActions);
 
   return {
@@ -338,7 +378,7 @@ function buildSessionStrategy(actions: McpIntegrationAction[], status: McpIntegr
     sessionShape:
       "One scoped Composio session can expose selected toolkits, exact tool allowlists, and an MCP URL that remains server-side.",
     selectedToolkits: uniqueToolkits(actions),
-    preloadTools: sourceTools,
+    preloadTools: [...sourceTools, ...assignmentTools],
     bundles: [
       {
         id: "source-verification",
@@ -347,9 +387,20 @@ function buildSessionStrategy(actions: McpIntegrationAction[], status: McpIntegr
         toolkits: uniqueToolkits(sourceVerificationActions),
         tools: sourceTools,
         dataShared:
-          "Experiment title, variables, citation URLs, source-quality question, and public repository question only.",
+          "Experiment title, variables, citation URLs, academic search query, source-quality question, and public repository question only.",
         blockedUntil:
           "Live search/browser/source-proof calls wait for COMPOSIO_API_KEY, allowed tools, server authorization, and student-reviewed prompts."
+      },
+      {
+        id: "assignment-context",
+        label: "Read-only assignment context session",
+        status: "safe_dry_run",
+        toolkits: uniqueToolkits(assignmentContextActions),
+        tools: assignmentTools,
+        dataShared:
+          "Selected Canvas course id, assignment id, prompt text, due date, attached file metadata, and rubric criteria.",
+        blockedUntil:
+          "Live LMS reads wait for a student-selected assignment, Canvas connection, allowed tools, server authorization, and reviewed import text."
       },
       {
         id: "student-export",
@@ -366,7 +417,7 @@ function buildSessionStrategy(actions: McpIntegrationAction[], status: McpIntegr
     docsBasis:
       "Composio Sessions replace one-off MCP servers with a per-user session that can span selected toolkits, restrict tools, and expose a hosted MCP endpoint for server-side agents.",
     judgeTakeaway:
-      "This is not a vague integration list: Ouija names the first safe read-only session, separates it from write/export sessions, keeps the tool list under control, and stops before live execution unless consent and server credentials exist."
+      "This is not a vague integration list: Ouija names the safe read-only source and assignment-context sessions, separates them from write/export sessions, keeps the tool list under control, and stops before live execution unless consent and server credentials exist."
   };
 }
 
@@ -478,12 +529,18 @@ function buildPayloadSummary(
   if (connector.id === "composio-scholar-claim-check") {
     return `Scholar query for ${result.classification.title}: ${result.expectedResult.pattern}`;
   }
+  if (connector.id === "semanticscholar-reference-check") {
+    return `Semantic Scholar query for ${result.classification.title}: compare ${result.expectedResult.pattern.toLowerCase()} against paper metadata and abstracts before trusting advanced references.`;
+  }
   if (connector.id === "composio-browser-source-capture") {
     const sourceLabel = result.sources[0]?.title ?? "student-reviewed source";
     return `Browser source-capture task for ${sourceLabel}: verify page context before trusting the expected pattern.`;
   }
   if (connector.id === "deepwiki-source-proof") {
     return `DeepWiki source-proof question for rushtanu14/ouija: verify the MCP bridge, academic-integrity boundary, evaluation suite, and submission artifact claims from public code/docs.`;
+  }
+  if (connector.id === "canvas-assignment-context") {
+    return `Canvas read-only import for ${result.classification.title}: fetch the selected assignment prompt, rubric criteria, due date, and attached lab-material metadata before planning variables.`;
   }
   if (connector.id === "google-docs-evidence-packet") return `${title} with source trail, checks, and integrity boundary`;
   if (connector.id === "google-sheets-data-log") return `${rowCount} rows across ${result.columns.length} columns: ${formatColumnList(result)}`;

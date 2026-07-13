@@ -581,8 +581,10 @@ export type McpIntegrationStatus = "preview_only" | "server_dry_run" | "ready";
 export type McpIntegrationActionId =
   | "composio-search-source-audit"
   | "composio-scholar-claim-check"
+  | "semanticscholar-reference-check"
   | "composio-browser-source-capture"
   | "deepwiki-source-proof"
+  | "canvas-assignment-context"
   | "google-docs-evidence-packet"
   | "google-sheets-data-log"
   | "google-drive-portfolio-archive"
@@ -595,8 +597,10 @@ export interface McpIntegrationAction {
   id: McpIntegrationActionId;
   toolkit:
     | "Composio Search"
+    | "Semantic Scholar"
     | "Composio Browser"
     | "DeepWiki"
+    | "Canvas"
     | "Google Docs"
     | "Google Sheets"
     | "Google Drive"
@@ -647,7 +651,7 @@ export interface McpIntegrationPayloadPreview {
 }
 
 export interface McpSessionBundle {
-  id: "source-verification" | "student-export";
+  id: "source-verification" | "assignment-context" | "student-export";
   label: string;
   status: "safe_dry_run" | "consent_required";
   toolkits: McpIntegrationAction["toolkit"][];

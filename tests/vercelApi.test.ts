@@ -198,7 +198,7 @@ describe("Vercel API functions", () => {
 
     expect(response.statusCode).toBe(200);
     expect(response.body.status).toBe("server_dry_run");
-    expect(response.body.toolkits).toHaveLength(11);
+    expect(response.body.toolkits).toHaveLength(13);
     expect(response.body.toolkits.find((toolkit: { actionId: string }) => toolkit.actionId === "composio-search-source-audit")?.toolkitSlug).toBe("composio_search");
     expect(response.body.toolkits.find((toolkit: { actionId: string }) => toolkit.actionId === "composio-scholar-claim-check")?.toolkitSlug).toBe("composio_search");
     expect(response.body.toolkits.find((toolkit: { actionId: string }) => toolkit.actionId === "composio-scholar-claim-check")?.recommendedTools).toEqual([
@@ -209,6 +209,16 @@ describe("Vercel API functions", () => {
       "BROWSER_TOOL_CREATE_TASK",
       "BROWSER_TOOL_WATCH_TASK"
     ]);
+    expect(response.body.toolkits.find((toolkit: { actionId: string }) => toolkit.actionId === "semanticscholar-reference-check")?.toolkitSlug).toBe(
+      "semanticscholar"
+    );
+    expect(response.body.toolkits.find((toolkit: { actionId: string }) => toolkit.actionId === "semanticscholar-reference-check")?.recommendedTools).toContain(
+      "SEMANTICSCHOLAR_SEARCH_PAPERS"
+    );
+    expect(response.body.toolkits.find((toolkit: { actionId: string }) => toolkit.actionId === "canvas-assignment-context")?.toolkitSlug).toBe("canvas");
+    expect(response.body.toolkits.find((toolkit: { actionId: string }) => toolkit.actionId === "canvas-assignment-context")?.recommendedTools).toContain(
+      "CANVAS_GET_ASSIGNMENT2"
+    );
     expect(response.body.toolkits.find((toolkit: { actionId: string }) => toolkit.actionId === "deepwiki-source-proof")?.toolkitSlug).toBe("deepwiki_mcp");
     expect(response.body.toolkits.find((toolkit: { actionId: string }) => toolkit.actionId === "deepwiki-source-proof")?.recommendedTools).toContain(
       "DEEPWIKI_MCP_READ_WIKI_CONTENTS"
@@ -342,6 +352,59 @@ describe("Vercel API functions", () => {
     expect(response.body.toolkit).toBe("Composio Browser");
     expect(response.body.target.recommendedTools).toEqual(["BROWSER_TOOL_CREATE_TASK", "BROWSER_TOOL_WATCH_TASK"]);
     expect(response.body.target.authConfigEnv).toBe("COMPOSIO_BROWSER_AUTH_CONFIG_ID");
+  });
+
+  it("validates Semantic Scholar and Canvas MCP routes through the serverless export function", () => {
+    clearComposioEnv();
+    const result = analyzeExperiment({
+      description: "Projectile launch angle and measured range."
+    });
+
+    const semanticResponse = createMockResponse();
+    mcpExportHandler(
+      {
+        method: "POST",
+        body: {
+          actionId: "semanticscholar-reference-check",
+          consent: true,
+          payload: {
+            title: `Ouija Evidence Packet: ${result.classification.title}`,
+            description: "Projectile launch angle and measured range.",
+            evidencePacket: buildEvidencePacket(result, result.rows, "Projectile launch angle and measured range."),
+            rows: result.rows,
+            sources: result.sources
+          }
+        }
+      },
+      semanticResponse.res
+    );
+
+    expect(semanticResponse.statusCode).toBe(200);
+    expect(semanticResponse.body.toolkit).toBe("Semantic Scholar");
+    expect(semanticResponse.body.target.recommendedTools).toContain("SEMANTICSCHOLAR_SEARCH_PAPERS");
+
+    const canvasResponse = createMockResponse();
+    mcpExportHandler(
+      {
+        method: "POST",
+        body: {
+          actionId: "canvas-assignment-context",
+          consent: true,
+          payload: {
+            title: `Ouija Evidence Packet: ${result.classification.title}`,
+            description: "Projectile launch angle and measured range.",
+            evidencePacket: buildEvidencePacket(result, result.rows, "Projectile launch angle and measured range."),
+            rows: result.rows,
+            sources: result.sources
+          }
+        }
+      },
+      canvasResponse.res
+    );
+
+    expect(canvasResponse.statusCode).toBe(200);
+    expect(canvasResponse.body.toolkit).toBe("Canvas");
+    expect(canvasResponse.body.target.recommendedTools).toContain("CANVAS_GET_ASSIGNMENT_RUBRIC");
   });
 });
 

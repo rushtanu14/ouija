@@ -270,9 +270,9 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(
     page
       .getByLabel("AI Model Card")
-      .getByText("MCP Integration Coach keeps Composio credentials server-side, validates packets with /api/mcp/export, prepares session tickets with /api/mcp/session, and requires student consent before any source audit, Scholar claim check, Browser source capture, DeepWiki source proof, or export.")
+      .getByText("MCP Integration Coach keeps Composio credentials server-side, validates packets with /api/mcp/export, prepares session tickets with /api/mcp/session, and requires student consent before any source audit, Scholar claim check, Semantic Scholar reference check, Browser source capture, DeepWiki source proof, Canvas assignment import, or export.")
   ).toBeVisible();
-  await expect(page.getByLabel("AI Model Card").getByText("Composio Sessions Strategy separates a first read-only source verification session from later consent-gated export sessions.")).toBeVisible();
+  await expect(page.getByLabel("AI Model Card").getByText("Composio Sessions Strategy separates read-only source verification and Canvas assignment-context sessions from later consent-gated export sessions.")).toBeVisible();
   await expect(page.getByLabel("AI Model Card").getByText("MCP Readiness Matrix makes connector tools, scopes, dry-run checks, and least-privilege boundaries inspectable.")).toBeVisible();
   await expect(page.getByLabel("AI Model Card").getByText("Safety Coach forces adult-review language when a lab match is uncertain.")).toBeVisible();
   await expect(page.getByLabel("AI Model Card").getByText("Deterministic Regression Suite tests eight supported labs plus the unsupported boundary.")).toBeVisible();
@@ -305,6 +305,14 @@ test("student can analyze a sample experiment, edit table data, and see citation
       .filter({ hasText: "Run Scholar claim check" })
       .getByText("query Google Scholar-style results through Composio Search Scholar and compare snippets against the expected pattern")
   ).toBeVisible();
+  await expect(page.locator(".mcp-action-card").filter({ hasText: "Check academic references" }).getByText("Semantic Scholar", { exact: true })).toBeVisible();
+  await expect(page.getByLabel("MCP Integration Coach").getByText("Check academic references")).toBeVisible();
+  await expect(
+    page
+      .locator(".mcp-action-card")
+      .filter({ hasText: "Check academic references" })
+      .getByText("search Semantic Scholar papers, retrieve paper details, and compare abstracts or metadata against the expected pattern")
+  ).toBeVisible();
   await expect(page.locator(".mcp-action-card").filter({ hasText: "Capture source page context" }).getByText("Composio Browser", { exact: true })).toBeVisible();
   await expect(page.getByLabel("MCP Integration Coach").getByText("Capture source page context")).toBeVisible();
   await expect(
@@ -320,6 +328,14 @@ test("student can analyze a sample experiment, edit table data, and see citation
       .locator(".mcp-action-card")
       .filter({ hasText: "Audit public source proof" })
       .getByText("read the public GitHub repo wiki structure, contents, and architecture answers through DeepWiki MCP")
+  ).toBeVisible();
+  await expect(page.locator(".mcp-action-card").filter({ hasText: "Import assignment context" }).getByText("Canvas", { exact: true })).toBeVisible();
+  await expect(page.getByLabel("MCP Integration Coach").getByText("Import assignment context")).toBeVisible();
+  await expect(
+    page
+      .locator(".mcp-action-card")
+      .filter({ hasText: "Import assignment context" })
+      .getByText("read Canvas courses, planner items, assignments, rubrics, and attached files for student-reviewed lab context")
   ).toBeVisible();
   await expect(page.locator(".mcp-action-card").filter({ hasText: "Google Docs" }).getByText("Google Docs", { exact: true })).toBeVisible();
   await expect(page.getByLabel("MCP Integration Coach").getByText("Create evidence packet doc")).toBeVisible();
@@ -337,10 +353,12 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(page.locator(".mcp-action-card").filter({ hasText: "Google Calendar" }).getByText("Google Calendar", { exact: true })).toBeVisible();
   await expect(page.getByLabel("MCP Integration Coach").getByText("Schedule next trial reminder")).toBeVisible();
   await expect(page.locator(".mcp-action-card").filter({ hasText: "Notion" }).getByText("Notion", { exact: true })).toBeVisible();
-  await expect(page.getByLabel("MCP Readiness Matrix").getByText("11 connector routes checked")).toBeVisible();
+  await expect(page.getByLabel("MCP Readiness Matrix").getByText("13 connector routes checked")).toBeVisible();
   await expect(page.getByLabel("MCP Readiness Matrix").getByText("COMPOSIO_SEARCH_ALLOWED_TOOLS")).toHaveCount(2);
+  await expect(page.getByLabel("MCP Readiness Matrix").getByText("COMPOSIO_SEMANTIC_SCHOLAR_ALLOWED_TOOLS")).toBeVisible();
   await expect(page.getByLabel("MCP Readiness Matrix").getByText("COMPOSIO_BROWSER_ALLOWED_TOOLS")).toBeVisible();
   await expect(page.getByLabel("MCP Readiness Matrix").getByText("COMPOSIO_DEEPWIKI_ALLOWED_TOOLS")).toBeVisible();
+  await expect(page.getByLabel("MCP Readiness Matrix").getByText("COMPOSIO_CANVAS_AUTH_CONFIG_ID")).toBeVisible();
   await expect(page.getByLabel("MCP Readiness Matrix").getByText("COMPOSIO_GOOGLE_FORMS_AUTH_CONFIG_ID")).toBeVisible();
   await expect(page.getByLabel("MCP dry-run checks").getByText("Payload completeness")).toBeVisible();
   await expect(page.getByLabel("MCP dry-run checks").getByText("Least privilege")).toBeVisible();
@@ -351,14 +369,17 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(page.getByLabel("MCP payload preview")).toHaveValue(/# Ouija Evidence Packet: Reaction Rate vs Temperature/);
   await expect(page.getByLabel("MCP payload preview")).toHaveValue(/Composio Search: search public web/);
   await expect(page.getByLabel("MCP payload preview")).toHaveValue(/Composio Search: query Google Scholar-style results/);
+  await expect(page.getByLabel("MCP payload preview")).toHaveValue(/Semantic Scholar: search Semantic Scholar papers/);
   await expect(page.getByLabel("MCP payload preview")).toHaveValue(/Composio Browser: create and watch a browser task/);
   await expect(page.getByLabel("MCP payload preview")).toHaveValue(/DeepWiki: read the public GitHub repo/);
+  await expect(page.getByLabel("MCP payload preview")).toHaveValue(/Canvas: read Canvas courses/);
   await expect(page.getByLabel("MCP payload preview")).toHaveValue(/Google Sheets: append spreadsheet rows/);
   await expect(page.getByLabel("MCP payload preview")).toHaveValue(/Google Classroom: create coursework draft/);
   await expect(page.getByLabel("MCP payload preview")).toHaveValue(/Google Forms: create Google Forms draft/);
   await expect(page.getByLabel("MCP payload preview")).toHaveValue(/Google Calendar: create calendar event draft/);
   await expect(page.getByLabel("MCP payload preview")).toHaveValue(/Composio Sessions strategy/);
   await expect(page.getByLabel("MCP payload preview")).toHaveValue(/Read-only source verification session/);
+  await expect(page.getByLabel("MCP payload preview")).toHaveValue(/Read-only assignment context session/);
   await expect(page.getByLabel("MCP payload preview")).toHaveValue(/Student export session/);
   await expect(page.getByLabel("MCP payload preview")).toHaveValue(/MCP readiness matrix/);
   await expect(page.getByLabel("MCP payload preview")).toHaveValue(/Dry-run checks/);
@@ -440,9 +461,9 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(
     page
       .getByLabel("Judge Brief")
-      .getByText("MCP Integration Coach validates Composio Search source audits, Scholar claim checks, Browser source capture, DeepWiki public-source proof, plus Docs, Sheets, Drive, Classroom, Forms, Calendar, and Notion handoffs through Composio Sessions, a server dry-run, and scoped session tickets without exposing credentials.")
+      .getByText("MCP Integration Coach validates Composio Search source audits, Scholar claim checks, Semantic Scholar reference checks, Browser source capture, DeepWiki public-source proof, Canvas assignment-context imports, plus Docs, Sheets, Drive, Classroom, Forms, Calendar, and Notion handoffs through Composio Sessions, a server dry-run, and scoped session tickets without exposing credentials.")
   ).toBeVisible();
-  await expect(page.getByLabel("Judge Brief").getByText("Composio Sessions Strategy separates a first read-only source verification session from later consent-gated export sessions.")).toBeVisible();
+  await expect(page.getByLabel("Judge Brief").getByText("Composio Sessions Strategy separates read-only source verification and Canvas assignment-context sessions from later consent-gated export sessions.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("MCP Readiness Matrix shows exact connector env vars, tools, scopes, data shared, dry-run checks, and consent gates.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Next Trial Planner gives adaptive measurement guidance.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("AIYES submission checklist makes deck, video, source/deploy link, Devpost form pack, and team requirement status visible.")).toBeVisible();

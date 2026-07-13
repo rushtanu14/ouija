@@ -38,8 +38,10 @@ describe("MCP integration plan", () => {
     expect(plan.actions.map((action) => action.id)).toEqual([
       "composio-search-source-audit",
       "composio-scholar-claim-check",
+      "semanticscholar-reference-check",
       "composio-browser-source-capture",
       "deepwiki-source-proof",
+      "canvas-assignment-context",
       "google-docs-evidence-packet",
       "google-sheets-data-log",
       "google-drive-portfolio-archive",
@@ -53,6 +55,11 @@ describe("MCP integration plan", () => {
     expect(plan.actions.find((action) => action.id === "composio-search-source-audit")?.payloadSummary).toContain("supported template pattern");
     expect(plan.actions.find((action) => action.id === "composio-scholar-claim-check")?.recommendedTools).toEqual(["COMPOSIO_SEARCH_SCHOLAR"]);
     expect(plan.actions.find((action) => action.id === "composio-scholar-claim-check")?.payloadSummary).toContain("Scholar query");
+    expect(plan.actions.find((action) => action.id === "semanticscholar-reference-check")?.toolkit).toBe("Semantic Scholar");
+    expect(plan.actions.find((action) => action.id === "semanticscholar-reference-check")?.recommendedTools).toContain(
+      "SEMANTICSCHOLAR_SEARCH_PAPERS"
+    );
+    expect(plan.actions.find((action) => action.id === "semanticscholar-reference-check")?.payloadSummary).toContain("Semantic Scholar query");
     expect(plan.actions.find((action) => action.id === "composio-browser-source-capture")?.toolkit).toBe("Composio Browser");
     expect(plan.actions.find((action) => action.id === "composio-browser-source-capture")?.recommendedTools).toEqual([
       "BROWSER_TOOL_CREATE_TASK",
@@ -62,6 +69,9 @@ describe("MCP integration plan", () => {
     expect(plan.actions.find((action) => action.id === "deepwiki-source-proof")?.toolkit).toBe("DeepWiki");
     expect(plan.actions.find((action) => action.id === "deepwiki-source-proof")?.recommendedTools).toContain("DEEPWIKI_MCP_ASK_QUESTION");
     expect(plan.actions.find((action) => action.id === "deepwiki-source-proof")?.payloadSummary).toContain("rushtanu14/ouija");
+    expect(plan.actions.find((action) => action.id === "canvas-assignment-context")?.toolkit).toBe("Canvas");
+    expect(plan.actions.find((action) => action.id === "canvas-assignment-context")?.payloadSummary).toContain("Canvas read-only import");
+    expect(plan.actions.find((action) => action.id === "canvas-assignment-context")?.recommendedTools).toContain("CANVAS_GET_ASSIGNMENT_RUBRIC");
     expect(plan.actions.find((action) => action.id === "google-docs-evidence-packet")?.toolkit).toBe("Google Docs");
     expect(plan.actions.find((action) => action.id === "google-sheets-data-log")?.payloadSummary).toContain("4 rows");
     expect(plan.actions.find((action) => action.id === "google-classroom-prelab-checkpoint")?.toolkit).toBe("Google Classroom");
@@ -72,7 +82,7 @@ describe("MCP integration plan", () => {
     expect(plan.actions.find((action) => action.id === "google-calendar-next-trial-reminder")?.toolkit).toBe("Google Calendar");
     expect(plan.actions.find((action) => action.id === "google-calendar-next-trial-reminder")?.payloadSummary).toContain("Next trial reminder");
     expect(plan.actions.every((action) => action.requiresConsent)).toBe(true);
-    expect(plan.readinessMatrix).toHaveLength(11);
+    expect(plan.readinessMatrix).toHaveLength(13);
     expect(plan.readinessMatrix.every((connector) => connector.status === "needs_server_setup")).toBe(true);
     expect(plan.readinessMatrix.find((connector) => connector.toolkit === "Composio Search")?.requiredEnv).toEqual(["COMPOSIO_SEARCH_ALLOWED_TOOLS"]);
     expect(plan.readinessMatrix.find((connector) => connector.toolkit === "Composio Search")?.recommendedTools).toContain("COMPOSIO_SEARCH_SCHOLAR");
@@ -80,6 +90,19 @@ describe("MCP integration plan", () => {
     expect(plan.readinessMatrix.find((connector) => connector.toolkit === "Composio Browser")?.recommendedTools).toContain("BROWSER_TOOL_CREATE_TASK");
     expect(plan.readinessMatrix.find((connector) => connector.toolkit === "DeepWiki")?.requiredEnv).toEqual(["COMPOSIO_DEEPWIKI_ALLOWED_TOOLS"]);
     expect(plan.readinessMatrix.find((connector) => connector.toolkit === "DeepWiki")?.recommendedTools).toContain("DEEPWIKI_MCP_READ_WIKI_CONTENTS");
+    expect(plan.readinessMatrix.find((connector) => connector.toolkit === "Semantic Scholar")?.requiredEnv).toEqual([
+      "COMPOSIO_SEMANTIC_SCHOLAR_AUTH_CONFIG_ID",
+      "COMPOSIO_SEMANTIC_SCHOLAR_ALLOWED_TOOLS"
+    ]);
+    expect(plan.readinessMatrix.find((connector) => connector.toolkit === "Semantic Scholar")?.recommendedTools).toContain(
+      "SEMANTICSCHOLAR_SEARCH_PAPERS"
+    );
+    expect(plan.readinessMatrix.find((connector) => connector.toolkit === "Canvas")?.requiredEnv).toEqual([
+      "COMPOSIO_CANVAS_AUTH_CONFIG_ID",
+      "COMPOSIO_CANVAS_ALLOWED_TOOLS"
+    ]);
+    expect(plan.readinessMatrix.find((connector) => connector.toolkit === "Canvas")?.recommendedTools).toContain("CANVAS_GET_ASSIGNMENT2");
+    expect(plan.readinessMatrix.find((connector) => connector.toolkit === "Canvas")?.consentGate).toContain("selects the Canvas assignment");
     expect(plan.readinessMatrix.find((connector) => connector.actionId === "composio-scholar-claim-check")?.requiredEnv).toEqual([
       "COMPOSIO_SEARCH_ALLOWED_TOOLS"
     ]);
@@ -94,23 +117,31 @@ describe("MCP integration plan", () => {
     expect(plan.sessionStrategy.headline).toContain("dry-run validated");
     expect(plan.sessionStrategy.sessionShape).toContain("MCP URL");
     expect(plan.sessionStrategy.preloadTools).toContain("COMPOSIO_SEARCH_SCHOLAR");
+    expect(plan.sessionStrategy.preloadTools).toContain("SEMANTICSCHOLAR_SEARCH_PAPERS");
     expect(plan.sessionStrategy.preloadTools).toContain("BROWSER_TOOL_CREATE_TASK");
     expect(plan.sessionStrategy.preloadTools).toContain("DEEPWIKI_MCP_ASK_QUESTION");
+    expect(plan.sessionStrategy.preloadTools).toContain("CANVAS_GET_ASSIGNMENT_RUBRIC");
     expect(plan.sessionStrategy.preloadTools).not.toContain("GOOGLEDOCS_CREATE_DOCUMENT");
     expect(plan.sessionStrategy.preloadTools.length).toBeLessThan(20);
-    expect(plan.sessionStrategy.bundles).toHaveLength(2);
+    expect(plan.sessionStrategy.bundles).toHaveLength(3);
     expect(plan.sessionStrategy.bundles[0]).toMatchObject({
       id: "source-verification",
       status: "safe_dry_run"
     });
-    expect(plan.sessionStrategy.bundles[0].toolkits).toEqual(["Composio Search", "Composio Browser", "DeepWiki"]);
+    expect(plan.sessionStrategy.bundles[0].toolkits).toEqual(["Composio Search", "Semantic Scholar", "Composio Browser", "DeepWiki"]);
     expect(plan.sessionStrategy.bundles[0].dataShared).toContain("citation URLs");
     expect(plan.sessionStrategy.bundles[1]).toMatchObject({
+      id: "assignment-context",
+      status: "safe_dry_run"
+    });
+    expect(plan.sessionStrategy.bundles[1].toolkits).toEqual(["Canvas"]);
+    expect(plan.sessionStrategy.bundles[1].dataShared).toContain("rubric criteria");
+    expect(plan.sessionStrategy.bundles[2]).toMatchObject({
       id: "student-export",
       status: "consent_required"
     });
-    expect(plan.sessionStrategy.bundles[1].toolkits).toContain("Google Docs");
-    expect(plan.sessionStrategy.bundles[1].toolkits).toContain("Notion");
+    expect(plan.sessionStrategy.bundles[2].toolkits).toContain("Google Docs");
+    expect(plan.sessionStrategy.bundles[2].toolkits).toContain("Notion");
     expect(plan.sessionStrategy.judgeTakeaway).toContain("not a vague integration list");
     expect(plan.executionBoundary).toContain("dry-run only");
     expect(plan.payloadPreview.title).toBe("Ouija Evidence Packet: Reaction Rate vs Temperature");
@@ -121,8 +152,10 @@ describe("MCP integration plan", () => {
     expect(plan.payloadPreview.includedSections).toContain("Pre-Lab Design Coach");
     expect(plan.payloadPreview.includedSections).toContain("Student Pilot Study Kit");
     expect(plan.payloadPreview.includedSections).toContain("Composio Scholar claim-check query");
+    expect(plan.payloadPreview.includedSections).toContain("Semantic Scholar reference-check query");
     expect(plan.payloadPreview.includedSections).toContain("Composio Browser source-page capture task");
     expect(plan.payloadPreview.includedSections).toContain("DeepWiki public-source proof question");
+    expect(plan.payloadPreview.includedSections).toContain("Canvas assignment prompt and rubric context");
     expect(plan.payloadPreview.includedSections).toContain("Pattern Archetype Coach source question");
     expect(plan.payloadPreview.includedSections).toContain("Google Forms readiness prompts");
     expect(plan.payloadPreview.includedSections).toContain("Google Calendar next-trial reminder");
@@ -130,12 +163,14 @@ describe("MCP integration plan", () => {
     expect(plan.payloadPreview.includedSections).toContain("Student Reflection Drafts");
     expect(plan.payloadPreview.includedSections).toContain("Portfolio Story Builder prompts");
     expect(plan.payloadPreview.markdownExcerpt).toContain("## Student Description");
-    expect(plan.safeguards).toContain("Preview mode does not call Composio Search, Composio Browser, DeepWiki, Google Classroom, Google Workspace, or Notion APIs.");
+    expect(plan.safeguards).toContain("Preview mode does not call Composio Search, Semantic Scholar, Composio Browser, DeepWiki, Canvas, Google Classroom, Google Workspace, or Notion APIs.");
     expect(plan.safeguards).toContain("Scoped Composio sessions are prepared server-side and raw MCP URLs are withheld from browser responses.");
     expect(plan.safeguards).toContain("Composio Search source audits use topic and variable terms only; students review the query before live lookup.");
     expect(plan.safeguards).toContain("Composio Scholar claim checks compare the expected pattern against scholarly snippets without writing the student's final claim.");
+    expect(plan.safeguards).toContain("Semantic Scholar reference checks use student-reviewed academic queries and return paper context, not a generated conclusion.");
     expect(plan.safeguards).toContain("Composio Browser captures public source-page context only after the student reviews the URL and task prompt.");
     expect(plan.safeguards).toContain("DeepWiki source proof uses the public GitHub repo only and does not receive student lab data.");
+    expect(plan.safeguards).toContain("Canvas assignment context is read-only and must not submit work, message a class, or alter grades.");
     expect(plan.safeguards).toContain("Google Calendar handoff schedules a next-trial reminder, not a generated result.");
     expect(plan.safeguards).toContain("Reflection drafts are exported only when the student typed them in the workspace.");
     expect(plan.privacyBoundary).toContain("Student chooses");
@@ -166,8 +201,10 @@ describe("MCP integration plan", () => {
     expect(plan.actions.find((action) => action.toolkit === "Google Sheets")?.composioCapability).toContain("append");
     expect(plan.actions.find((action) => action.toolkit === "Composio Search")?.composioCapability).toContain("scholar");
     expect(plan.actions.find((action) => action.id === "composio-scholar-claim-check")?.composioCapability).toContain("Composio Search Scholar");
+    expect(plan.actions.find((action) => action.toolkit === "Semantic Scholar")?.composioCapability).toContain("paper details");
     expect(plan.actions.find((action) => action.toolkit === "Composio Browser")?.composioCapability).toContain("browser task");
     expect(plan.actions.find((action) => action.toolkit === "DeepWiki")?.composioCapability).toContain("public GitHub repo");
+    expect(plan.actions.find((action) => action.toolkit === "Canvas")?.composioCapability).toContain("assignments, rubrics");
     expect(plan.actions.find((action) => action.toolkit === "Google Classroom")?.composioCapability).toContain("create coursework draft");
     expect(plan.actions.find((action) => action.toolkit === "Google Forms")?.composioCapability).toContain("Forms draft");
     expect(plan.actions.find((action) => action.toolkit === "Google Calendar")?.composioCapability).toContain("calendar event");

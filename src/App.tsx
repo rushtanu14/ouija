@@ -1262,7 +1262,7 @@ function TopAwardRadarPanel({
       status: pilotReady ? "Strong" : "Collect",
       detail: `${pilotEvidenceSummary.observationCount}/3 anonymous pilot observations logged; ${savedLabCount} saved lab snapshot${
         savedLabCount === 1 ? "" : "s"
-      } available.`
+      } available; CSV-ready export is available in Pilot Evidence Tracker.`
     },
     {
       label: "External blockers",
@@ -1274,7 +1274,7 @@ function TopAwardRadarPanel({
     pilotReady ? "Use the logged pilot evidence in the demo." : "Collect 3 anonymous pilot observations before claiming user testing.",
     savedEvidenceReady ? "Show Progress Portfolio as repeated learning proof." : "Save at least 2 lab runs to show progress evidence.",
     "Confirm the 2-5 student team roster in the Devpost submission flow.",
-    mcpRouteCount >= 11 ? "Use MCP dry-run proof as technical depth evidence." : "Open MCP status before the demo if route count is still loading.",
+    mcpRouteCount >= 13 ? "Use MCP dry-run proof as technical depth evidence." : "Open MCP status before the demo if route count is still loading.",
     "Optional: enable live OpenAI/Composio only with explicit credentials, consent, and server-side setup."
   ];
 
@@ -1388,6 +1388,7 @@ function JudgeBriefPanel({ result }: { result: AnalyzeResult | null }) {
     "Learning Impact Loop measures the student's outcome for each run.",
     "Student Pilot Study Kit prepares a consent-safe 10-minute protocol for collecting UX and impact evidence.",
     "Pilot Evidence Tracker logs anonymous browser-local observations without letting the team claim fake completed testing.",
+    "Pilot Evidence Export gives the team a CSV-ready, redacted handoff for Devpost or classroom tools.",
     "Submission Hub gives judges one URL for live app, judge view, deck, video, source, Devpost pack, and proof endpoints.",
     "Pre-Lab Design Coach helps students plan variables, controls, repeats, sources, and safety before collecting data.",
     "Learning Exit Ticket proves students must explain variables, patterns, and next steps themselves.",
@@ -1404,8 +1405,8 @@ function JudgeBriefPanel({ result }: { result: AnalyzeResult | null }) {
     "Data Handling Ledger shows privacy, retention, and student controls.",
     "Spreadsheet paste/import flows into data checks.",
     "Evidence Packet exports a student-owned reasoning handoff.",
-    "MCP Integration Coach validates Composio Search source audits, Scholar claim checks, Browser source capture, DeepWiki public-source proof, plus Docs, Sheets, Drive, Classroom, Forms, Calendar, and Notion handoffs through Composio Sessions, a server dry-run, and scoped session tickets without exposing credentials.",
-    "Composio Sessions Strategy separates a first read-only source verification session from later consent-gated export sessions.",
+    "MCP Integration Coach validates Composio Search source audits, Scholar claim checks, Semantic Scholar reference checks, Browser source capture, DeepWiki public-source proof, Canvas assignment-context imports, plus Docs, Sheets, Drive, Classroom, Forms, Calendar, and Notion handoffs through Composio Sessions, a server dry-run, and scoped session tickets without exposing credentials.",
+    "Composio Sessions Strategy separates read-only source verification and Canvas assignment-context sessions from later consent-gated export sessions.",
     "MCP Readiness Matrix shows exact connector env vars, tools, scopes, data shared, dry-run checks, and consent gates.",
     "Next Trial Planner gives adaptive measurement guidance.",
     "Progress Portfolio shows learning over multiple saved runs.",
@@ -1516,8 +1517,8 @@ function ModelCardPanel({ result }: { result: AnalyzeResult | null }) {
     "Data Handling Ledger makes student data flow, retention, and controls inspectable.",
     "Progress Portfolio turns saved labs into repeated learning evidence for judges.",
     "Portfolio Story Builder gives prompts and blanks for a student-authored progress story.",
-    "MCP Integration Coach keeps Composio credentials server-side, validates packets with /api/mcp/export, prepares session tickets with /api/mcp/session, and requires student consent before any source audit, Scholar claim check, Browser source capture, DeepWiki source proof, or export.",
-    "Composio Sessions Strategy separates a first read-only source verification session from later consent-gated export sessions.",
+    "MCP Integration Coach keeps Composio credentials server-side, validates packets with /api/mcp/export, prepares session tickets with /api/mcp/session, and requires student consent before any source audit, Scholar claim check, Semantic Scholar reference check, Browser source capture, DeepWiki source proof, Canvas assignment import, or export.",
+    "Composio Sessions Strategy separates read-only source verification and Canvas assignment-context sessions from later consent-gated export sessions.",
     "MCP Readiness Matrix makes connector tools, scopes, dry-run checks, and least-privilege boundaries inspectable.",
     "Pattern Evidence Engine quantifies whether the dataset supports the expected science pattern.",
     "Reliability Coach checks repeated trials, averages, and spread before students trust a claim.",

@@ -58,9 +58,17 @@ The UX split that keeps Ouija practical for students while preserving judge proo
 
 The newest MCP route in the server dry-run bridge. It adds `composio-browser-source-capture` for public source-page context capture through Composio Browser Tool (`BROWSER_TOOL_CREATE_TASK`, `BROWSER_TOOL_WATCH_TASK`). It is source-context support only; it must not browse private accounts, write the student's final claim, or run live without server-side credentials, allowed tools, and explicit consent.
 
+### Semantic Scholar Reference Check
+
+The Composio-backed scientific source route. It adds `semanticscholar-reference-check` through Semantic Scholar tools (`SEMANTICSCHOLAR_SEARCH_PAPERS`, `SEMANTICSCHOLAR_GET_DETAILS_FOR_MULTIPLE_PAPERS_AT_ONCE`) so Ouija can inspect structured paper metadata and abstracts for experiment background without writing student conclusions or claiming a live connection before credentials exist.
+
+### Canvas Assignment Context
+
+The read-only classroom context route. It adds `canvas-assignment-context` through Canvas tools (`CANVAS_LIST_COURSES`, `CANVAS_LIST_PLANNER_ITEMS`, `CANVAS_GET_ASSIGNMENT2`, `CANVAS_GET_ASSIGNMENT_RUBRIC`) so a future consented session can import lab prompts, due dates, attached material metadata, and rubric criteria without submitting work, editing grades, or accessing private courses without explicit auth and consent.
+
 ### Composio Sessions Strategy
 
-The judge-visible MCP planning layer that turns Ouija's connector story into scoped sessions instead of a vague integration list. The first planned session is read-only source verification across Composio Search, Composio Browser, and DeepWiki public-source proof. Later student export sessions are consent-gated and can target Google Docs, Sheets, Drive, Classroom, Forms, Calendar, and Notion only after server-side credentials, allowed tools, auth config, and consent are in place.
+The judge-visible MCP planning layer that turns Ouija's connector story into scoped sessions instead of a vague integration list. The first planned session is read-only source verification across Composio Search, Semantic Scholar, Composio Browser, and DeepWiki public-source proof. A separate read-only assignment context session targets Canvas lab prompts/rubrics. Later student export sessions are consent-gated and can target Google Docs, Sheets, Drive, Classroom, Forms, Calendar, and Notion only after server-side credentials, allowed tools, auth config, and consent are in place.
 
 ### Pilot Evidence Tracker
 
@@ -88,6 +96,18 @@ The one-click judge packet at `https://ouija-olive.vercel.app/submission/`. It g
 - Ouija's first supported set should balance physics, chemistry, biology, and earth science instead of overfitting to physics.
 - Ouija should support table input first before adding CSV upload or photo/OCR input.
 - Ouija's internet search should ground expected results and explanations in referenced content instead of inventing them from the model alone.
+
+## Semantic Scholar And Canvas MCP Checkpoint - 2026-07-13 UTC / 2026-07-12 PDT
+
+- Council verdict: Ouija is stronger and still submittable/competitive for AIYES Track 1. First place/top-award outcome still cannot be guaranteed because judging, final Devpost submission, final 2-5 student roster, and actual student pilot observations are external.
+- Added `semanticscholar-reference-check` as a Composio Semantic Scholar route for structured scientific paper metadata and abstract lookup. It is a reference-check path, not a student conclusion writer.
+- Added `canvas-assignment-context` as a read-only Canvas route for lab prompt, due date, attachment metadata, and rubric context after explicit credentials/auth config/consent exist.
+- Updated Composio Sessions Strategy so source verification now covers Composio Search, Semantic Scholar, Composio Browser, and DeepWiki, with Canvas split into a read-only assignment context session and student exports kept consent-gated.
+- `/api/mcp/status` now reports 13 connector routes in server dry-run mode, including the new Semantic Scholar and Canvas readiness contracts.
+- Updated README, API/env/runbook docs, Devpost copy, slide deck, submission hub, Devpost pack, demo script, judging checklist, public submission assets, UI copy, and tests so the submission story reflects the new practical MCP routes without claiming unconfigured live access.
+- Production: `dpl_EVwWufmCGqrRt1veQp3vYnv9yv2y`, aliased to `https://ouija-olive.vercel.app`.
+- Verification: `npm run test` (15 files, 91 tests), `npm run build`, `npm run test:e2e` (40 passed across Chromium, Firefox, WebKit, and mobile Safari), `npm audit --json` (0 vulnerabilities), `git diff --check`, production deploy, live `/api/evaluate` (200, score 100), live `/api/mcp/status` (200, `server_dry_run`, 13 routes), hosted submission pages (200), and hosted desktop/mobile browser smoke with Semantic Scholar, Canvas, 13-route proof, no horizontal overflow, and zero console errors.
+- Remaining loops: commit/push, actual Devpost submission, final team roster, optional live OpenAI/Composio credentials only with explicit approval and consent/server setup, optional DeepWiki indexing, and real anonymous pilot observations if the team wants true user-testing evidence.
 
 ## Pilot Evidence Export Checkpoint - 2026-07-13 UTC / 2026-07-12 PDT
 

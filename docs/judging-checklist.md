@@ -23,7 +23,7 @@
 - Student Reflection Workspace proves those exit-ticket answers are student-authored drafts, not generated conclusions.
 - Progress Portfolio shows whether saved runs demonstrate learning trend, subject breadth, and a next portfolio action.
 - Portfolio Story Builder turns saved-run evidence into prompts for a student-written progress story.
-- MCP Integration Coach shows how the same student-owned evidence could move into a Composio Search source audit, Composio Scholar claim check, Composio Browser source capture, DeepWiki public-source proof, and classroom tools, including a Google Classroom pre-lab checkpoint, Google Forms readiness check, and Google Calendar next-trial reminder, without sending data before consent. Composio Sessions Strategy separates the first read-only source verification bundle from later export sessions.
+- MCP Integration Coach shows how the same student-owned evidence could move into a Composio Search source audit, Composio Scholar claim check, Semantic Scholar reference check, Composio Browser source capture, DeepWiki public-source proof, Canvas assignment-context import, and classroom tools, including a Google Classroom pre-lab checkpoint, Google Forms readiness check, and Google Calendar next-trial reminder, without sending data before consent. Composio Sessions Strategy separates read-only source verification and assignment-context bundles from later export sessions.
 - Judge Demo Path gives evaluators a direct route through problem fit, AI design, student workflow, evidence handoff, and submission proof.
 - Custom Lab Triage and Pattern Archetype Coach keep unsupported student experiments useful without claiming full V1 coverage, because they give students a concrete investigation planner plus comparison/trend/optimum/time-series graph guidance instead of a fake expected result.
 
@@ -38,7 +38,7 @@
 - Data Handling Ledger exposes what student data is used, where it is stored, retention, local snapshots, student controls, and the server-only API-key boundary.
 - Student Pilot Study Kit is included in the analysis schema, Evidence Packet, rubric fit, development journey, evaluation evidence, and Google Forms MCP preview.
 - Pilot Evidence Tracker export redacts direct contact details and keeps the pilot evidence path browser-local until the team intentionally copies or validates a consent-gated handoff.
-- MCP Integration Coach validates Composio-powered Search, Scholar claim checks, Browser source capture, DeepWiki public-source proof, Google Docs, Google Sheets, Google Drive, Google Classroom, Google Forms, Google Calendar, and Notion routes through `/api/mcp/export`, then prepares a scoped `/api/mcp/session` ticket while keeping `COMPOSIO_API_KEY`, auth config IDs where required, and raw MCP URLs server-side. Judge Mode shows the source-verification session before any write/export connector.
+- MCP Integration Coach validates Composio-powered Search, Scholar claim checks, Semantic Scholar reference checks, Browser source capture, DeepWiki public-source proof, Canvas assignment context, Google Docs, Google Sheets, Google Drive, Google Classroom, Google Forms, Google Calendar, and Notion routes through `/api/mcp/export`, then prepares a scoped `/api/mcp/session` ticket while keeping `COMPOSIO_API_KEY`, auth config IDs where required, and raw MCP URLs server-side. Judge Mode shows the source-verification and Canvas assignment-context sessions before any write/export connector.
 - Grounding Audit scores citation visibility, source agreement, mixed-evidence boundaries, and student source use.
 - Result schema separates classification, expected result, citations, row checks, hints, and Claim Coach.
 - Method Audit adds deterministic experiment-quality evaluation beyond plain text generation.
@@ -93,7 +93,7 @@
 - Progress Portfolio visibly turns Saved Labs into repeated learning evidence instead of only storage.
 - Portfolio Story Builder visibly keeps the progress narrative student-owned through prompts, evidence references, and blanks.
 - Expected graph and editable table now appear before Model Strategy, AI Evaluation Harness, Data Handling Ledger, and AIYES Rubric Fit, so the practical student workflow is visible before the deeper judge evidence stack.
-- MCP Integration Coach visibly turns the Evidence Packet, Pre-Lab Design Coach, Next Trial Planner, and Progress Portfolio into a consent-gated source-audit, Scholar claim-check, Browser source-capture, DeepWiki source-proof, and classroom handoff plan with a Composio Sessions strategy, readiness matrix for env vars, allowed tools, scopes, dry-run checks, and data shared.
+- MCP Integration Coach visibly turns the Evidence Packet, Pre-Lab Design Coach, Next Trial Planner, and Progress Portfolio into a consent-gated source-audit, Scholar claim-check, Semantic Scholar reference-check, Browser source-capture, DeepWiki source-proof, Canvas assignment-context, and classroom handoff plan with a Composio Sessions strategy, readiness matrix for env vars, allowed tools, scopes, dry-run checks, and data shared.
 - AI Model Card visibly summarizes architecture, grounding mode, evaluation method, privacy boundary, and risk controls.
 - Data Handling Ledger visibly summarizes privacy, retention, browser-local saves, and student controls.
 - Deterministic Regression Suite exposes nine deterministic checks through the app and `/api/evaluate`.
@@ -128,7 +128,7 @@
 - Student Reflection Workspace appears in the app and Evidence Packet so judges can inspect student-authored answers without Ouija writing the conclusion.
 - Progress Portfolio appears near Saved Labs so judges can inspect score trend, subject breadth, and strongest saved run.
 - Portfolio Story Builder appears inside Progress Portfolio so judges can inspect student-authored impact prompts before any classroom export.
-- MCP Integration Coach appears near Progress Portfolio so judges can inspect the exact source-audit/export payload, Composio Search route, Scholar claim-check route, Browser source-capture route, DeepWiki source-proof route, Google Classroom pre-lab checkpoint route, Google Forms readiness route, Google Calendar next-trial reminder route, credential boundary, Composio route, and server dry-run readiness matrix before any live connector is enabled.
+- MCP Integration Coach appears near Progress Portfolio so judges can inspect the exact source-audit/export payload, Composio Search route, Scholar claim-check route, Semantic Scholar reference-check route, Browser source-capture route, DeepWiki source-proof route, Canvas assignment-context route, Google Classroom pre-lab checkpoint route, Google Forms readiness route, Google Calendar next-trial reminder route, credential boundary, Composio route, and server dry-run readiness matrix before any live connector is enabled.
 - Submission Hub keeps the external judging packet scannable instead of forcing evaluators to hunt through the README or Devpost copy.
 - Desktop and mobile E2E checks verify no horizontal overflow.
 
