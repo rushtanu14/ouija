@@ -32,7 +32,7 @@ Ouija is a student-facing AI experiment interpreter for middle and high school s
 17. Use MCP Integration Coach to validate Composio Search source-audit, Scholar claim-check, Semantic Scholar reference-check, Composio Browser source-capture, DeepWiki public-source proof, and Canvas assignment-context routes plus Google Docs, Google Sheets, Google Drive, Google Classroom, Google Forms, Google Calendar, Gmail teacher-review draft, and Notion handoffs through the server dry-run bridge. The Composio Sessions strategy separates read-only source verification and assignment-context sessions from later consent-gated export sessions without exposing credentials or sending student data during the public demo.
 18. Open UX and Accessibility Proof to show the official UX/design criterion through student-first flow, judge navigation, responsive layout, named controls, clickable citations, and integrity prompts.
 19. Open AI Model Card for the architecture, grounding, evaluation, privacy, MCP-export boundary, and guardrail summary.
-20. Open Top Award Radar for the honest council verdict: Ouija is submittable and competitive, but not guaranteed to win; it names the remaining judge/team/submission gaps and next moves.
+20. Open Top Award Radar for the honest council verdict: Ouija is submittable and competitive, targets Gold-level evidence across the official AIYES award bands, but is not guaranteed to win; it names the remaining judge/team/submission gaps and next moves.
 21. Open AIYES Submission Gate to see Devpost requirements converted into pass, review, and external-step statuses for eligibility, Track 1 fit, deck, video, source/deploy link, problem/impact, AI design, and UX.
 22. Open Judge Brief for a compact Track 1 proof surface: submission hub, live app, judge view, hosted deck/video/source links, AIYES submission checklist, judge demo path, official rubric fit, learning impact, student pilot protocol, student reflection drafts, progress portfolio, MCP readiness plan, AI pipeline, model strategy, architecture map, UX proof, evaluation, data-handling ethics, tests, and integrity constraints.
 
@@ -94,7 +94,7 @@ AIYES Values Fit maps each run to democracy, diversity, connectivity, innovation
 
 AIYES Development Journey maps each run to the required Track 1 story: problem identification, data handling, model integration, app build, testing, UX, ethics, impact, constraints, and hosted submission proof.
 
-Top Award Radar turns the internal council audit into a judge-visible card: it separates submittable evidence from top-award risk, highlights impact evidence, AI/model proof, UX/design, submission package readiness, and external blockers, then lists the next moves before judging.
+Top Award Radar turns the internal council audit into a judge-visible card: it separates submittable evidence from top-award risk, anchors the win target to the official Gold/Silver/Bronze/Honorable Mention certificate bands, highlights impact evidence, AI/model proof, UX/design, submission package readiness, and external blockers, then lists the next moves before judging.
 
 AIYES Submission Gate turns the live Devpost requirements into a judge-visible submittability audit: most app, deck, video, source, AI, impact, and UX items pass inside the product, while roster and final submit remain marked as external.
 

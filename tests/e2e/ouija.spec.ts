@@ -504,11 +504,14 @@ test("judge mode shows a top award radar with honest win gaps", async ({ page })
   await expect(page.getByRole("heading", { name: "Top Award Radar" })).toBeVisible();
   await expect(page.getByLabel("Top Award Radar").getByText("Submittable and competitive")).toBeVisible();
   await expect(page.getByLabel("Top Award Radar").getByText("Not a first-place guarantee")).toBeVisible();
+  await expect(page.getByLabel("Official AIYES award target").getByText("Gold / Silver / Bronze / Honorable Mention")).toBeVisible();
+  await expect(page.getByLabel("Official AIYES award target").getByText("Ouija targets Gold-level evidence instead of a literal first-place rank.")).toBeVisible();
+  await expect(page.getByLabel("Official AIYES award target").getByText("Three criteria strong")).toBeVisible();
   await expect(page.getByLabel("Top Award Radar").getByText("Problem and relevance")).toBeVisible();
   await expect(page.getByLabel("Top Award Radar").getByText("AI and model strategy")).toBeVisible();
   await expect(page.getByLabel("Top Award Radar").getByText("Model Strategy, AI Architecture Map, and Technical Depth Proof are visible.")).toBeVisible();
   await expect(page.getByLabel("Top Award Radar").getByText("UX and design")).toBeVisible();
-  await expect(page.getByLabel("Top Award Radar").getByText("Impact evidence")).toBeVisible();
+  await expect(page.locator(".top-award-grid").getByText("Impact evidence", { exact: true })).toBeVisible();
   await expect(page.getByLabel("Top Award Radar").getByText("1/3 anonymous pilot observations logged")).toBeVisible();
   await expect(page.getByLabel("Top award next moves").getByText("Collect 3 anonymous pilot observations before claiming user testing.")).toBeVisible();
   await expect(page.getByLabel("Top award next moves").getByText("Confirm the 2-5 student team roster in the Devpost submission flow.")).toBeVisible();

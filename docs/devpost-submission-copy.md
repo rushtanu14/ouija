@@ -58,7 +58,7 @@ React, Vite, TypeScript, Express, OpenAI Responses API, Composio Sessions/MCP pl
 - Added AIYES Rubric Fit so the live app maps all three official judging criteria to concrete run evidence.
 - Added AIYES Values Fit so the live app maps democracy, diversity, connectivity, innovation, and ethical inclusion to concrete product evidence.
 - Added AIYES Development Journey so the live app maps the required problem, data, model, testing, UX, ethics, impact, constraints, and submission story to concrete run evidence.
-- Added Top Award Radar so judges and the team can see the submittable/competitive verdict, top-award gaps, and next moves before final judging.
+- Added Top Award Radar so judges and the team can see the submittable/competitive verdict, official Gold/Silver/Bronze/Honorable Mention award framing, top-award gaps, and next moves before final judging.
 - Added Student Impact Brief so real-world relevance is visible before the deeper proof stack.
 - Added Learning Impact Loop so the live app measures student readiness instead of only describing intended impact.
 - Added Student Pilot Study Kit so each run creates an anonymous pilot protocol with student tasks, UX/impact metrics, observer notes, and evidence to collect before submission.

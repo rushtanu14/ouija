@@ -33,6 +33,7 @@ describe("AIYES submission assets", () => {
     expect(deck).toContain("Composio Browser source-capture");
     expect(deck).toContain("Canvas assignment-context");
     expect(deck).toContain("Gmail teacher-review draft");
+    expect(deck).toContain("Gold/Silver/Bronze/Honorable Mention");
     expect(deck).toContain("AIYES Values Fit");
     expect(deck).toContain("AIYES Development Journey");
     expect(deck).toContain("Technical Depth Proof");
@@ -68,6 +69,7 @@ describe("AIYES submission assets", () => {
     expect(copy).toContain("DeepWiki public-source proof");
     expect(copy).toContain("Canvas assignment-context");
     expect(copy).toContain("Gmail teacher-review draft");
+    expect(copy).toContain("Gold/Silver/Bronze/Honorable Mention");
     expect(copy).toContain("AIYES Values Fit");
     expect(copy).toContain("AIYES Development Journey");
     expect(copy).toContain("Technical Depth Proof");

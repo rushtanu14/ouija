@@ -113,6 +113,16 @@ The one-click judge packet at `https://ouija-olive.vercel.app/submission/`. It g
 - Ouija should support table input first before adding CSV upload or photo/OCR input.
 - Ouija's internet search should ground expected results and explanations in referenced content instead of inventing them from the model alone.
 
+## Gold Award Framing Checkpoint - 2026-07-13 UTC / 2026-07-12 PDT
+
+- Council verdict: Ouija works and is submittable/award-competitive, but a guaranteed first-place claim is impossible and mismatched to AIYES because the live Devpost page frames awards as Gold, Silver, Bronze, and Honorable Mention certificates.
+- Highest-leverage controllable gap after Gmail MCP: the live app still used first-place language without showing the official award-band structure. That could make the pitch sound less tailored to AIYES.
+- Updated Top Award Radar with an `Official AIYES award target` section that names Gold/Silver/Bronze/Honorable Mention, positions Ouija as targeting Gold-level evidence, and ties the Gold target to the three official criteria: problem relevance, AI/model strategy, and UX/design.
+- Updated README, Devpost copy, AIYES brief, slide deck, five-minute demo script, judging checklist, public submission assets, and E2E/submission asset tests so the external packet matches the live app.
+- Production: `dpl_3xb2mkkWVt9dBX3RWmVX9iULAzSg`, aliased to `https://ouija-olive.vercel.app`.
+- Verification: official AIYES/Devpost page rechecked on 2026-07-13; focused submission asset test; focused Chromium award radar E2E; `npm run test` (15 files, 94 tests); `npm run build`; `npm run test:e2e` (40 passed); `npm audit --audit-level=moderate` (0 vulnerabilities); `git diff --check`; production deploy; live `/api/evaluate` (200, score 100); live `/api/mcp/status` (200, `server_dry_run`, 14 routes, Gmail route present); live `/api/runtime-proof` (200); hosted submission pages (200 with official award-band deck copy); and hosted desktop/mobile Playwright smoke confirming the official award-band target, no horizontal overflow, and zero console errors.
+- Remaining loops: actual Devpost submission, final team roster, optional live OpenAI/Composio credentials only with explicit approval and consent/server setup, optional DeepWiki indexing, and real anonymous pilot observations if the team wants true user-testing evidence.
+
 ## Gmail Teacher Review MCP Checkpoint - 2026-07-13 UTC / 2026-07-12 PDT
 
 - Council verdict: this is a practical Composio upgrade, not connector decoration. Teacher-review drafting improves the student lab workflow because students often need feedback on variables, controls, source trust, safety, and evidence before writing a final claim.

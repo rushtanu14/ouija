@@ -1348,6 +1348,25 @@ function TopAwardRadarPanel({
       detail: "Final Devpost submission, team roster handling, and judging outcome cannot be solved inside the app."
     }
   ];
+  const awardFitItems = [
+    {
+      label: "Official award format",
+      value: "Gold / Silver / Bronze / Honorable Mention",
+      detail: "AIYES lists certificate award bands, so Ouija targets Gold-level evidence instead of a literal first-place rank."
+    },
+    {
+      label: "Gold target",
+      value: "Three criteria strong",
+      detail: "Problem relevance, AI/model strategy, and UX proof are all visible in the live app and submission packet."
+    },
+    {
+      label: "Remaining Gold risk",
+      value: pilotReady ? "Judge-dependent" : "Impact evidence",
+      detail: pilotReady
+        ? "Anonymous pilot evidence is ready, but final award outcome still depends on judges."
+        : "Collect real anonymous pilot observations before claiming completed user testing."
+    }
+  ];
   const nextMoves = [
     pilotReady ? "Use the logged pilot evidence in the demo." : "Collect 3 anonymous pilot observations before claiming user testing.",
     savedEvidenceReady ? "Show Progress Portfolio as repeated learning proof." : "Save at least 2 lab runs to show progress evidence.",
@@ -1371,8 +1390,17 @@ function TopAwardRadarPanel({
           <strong>Submittable and competitive</strong>
         </div>
         <p className="top-award-verdict-copy">
-          Not a first-place guarantee: judges, final Devpost submission, and team roster are external.
+          Not a first-place guarantee: AIYES uses award bands, and judges, final Devpost submission, and team roster are external.
         </p>
+      </div>
+      <div className="top-award-official" aria-label="Official AIYES award target">
+        {awardFitItems.map((item) => (
+          <article key={item.label}>
+            <p className="section-label">{item.label}</p>
+            <strong>{item.value}</strong>
+            <span>{item.detail}</span>
+          </article>
+        ))}
       </div>
       <div className="top-award-grid">
         {radarItems.map((item) => (

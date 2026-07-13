@@ -135,6 +135,7 @@
 - MCP Integration Coach appears near Progress Portfolio so judges can inspect the exact source-audit/export payload, Composio Search route, Scholar claim-check route, Semantic Scholar reference-check route, Browser source-capture route, DeepWiki source-proof route, Canvas assignment-context route, Google Classroom pre-lab checkpoint route, Google Forms readiness route, Google Calendar next-trial reminder route, credential boundary, Composio route, and server dry-run readiness matrix before any live connector is enabled.
 - Submission Hub keeps the external judging packet scannable instead of forcing evaluators to hunt through the README or Devpost copy.
 - AIYES Submission Gate separates passed app/deck/video/source/AI/UX requirements from the external Devpost roster and final-submit step.
+- Top Award Radar now maps the win target to the official AIYES Gold/Silver/Bronze/Honorable Mention certificate bands, so the team can aim for Gold-level evidence without pretending a literal first-place rank is guaranteed.
 - Desktop and mobile E2E checks verify no horizontal overflow.
 
 ## Remaining Submission Work
