@@ -85,6 +85,7 @@ import type {
   RuntimeProof,
   SafetyCoach,
   StudentDataRow,
+  StudentImpactBrief,
   StudentPilotStudyKit,
   StudentReflectionAnswers,
   StudentReflectionWorkspace
@@ -477,6 +478,7 @@ export function App() {
               </div>
 
               <RunSnapshotPanel result={result} evaluationReport={evaluationReport} />
+              <StudentImpactBriefPanel brief={result.studentImpactBrief} />
               {isJudgeMode ? <JudgeDemoPathPanel path={result.judgeDemoPath} /> : <StudentFocusPanel result={result} />}
               {isJudgeMode ? <RuntimeProofPanel proof={runtimeProof} result={result} /> : null}
               {result.customLabTriage.status === "needs_student_details" ? <CustomLabTriagePanel triage={result.customLabTriage} /> : null}
@@ -687,6 +689,60 @@ function RunSnapshotPanel({ result, evaluationReport }: { result: AnalyzeResult;
           <strong>{result.guidedFlow.currentAction}</strong>
         </article>
       </div>
+    </section>
+  );
+}
+
+function StudentImpactBriefPanel({ brief }: { brief: StudentImpactBrief }) {
+  return (
+    <section className={`student-impact-brief student-impact-brief-${brief.status}`} aria-label="Student Impact Brief">
+      <div className="student-impact-header">
+        <div className="panel-title">
+          <BookOpen size={18} />
+          <h3>Student Impact Brief</h3>
+        </div>
+        <span>{formatStudentImpactStatus(brief.status)}</span>
+      </div>
+      <div className="student-impact-main">
+        <article>
+          <p className="section-label">Target user</p>
+          <strong>{brief.targetUser}</strong>
+        </article>
+        <article>
+          <p className="section-label">Problem</p>
+          <strong>{brief.problem}</strong>
+        </article>
+      </div>
+      <div className="student-impact-before-after">
+        <article>
+          <p className="section-label">Before Ouija</p>
+          <span>{brief.beforeOuija}</span>
+        </article>
+        <article>
+          <p className="section-label">After Ouija</p>
+          <span>{brief.afterOuija}</span>
+        </article>
+      </div>
+      <div className="student-impact-signals">
+        {brief.signals.map((signal) => (
+          <article className={`student-impact-signal student-impact-signal-${signal.status}`} key={signal.id}>
+            <p className="section-label">{signal.label}</p>
+            <strong>{signal.value}</strong>
+            <span>{signal.detail}</span>
+          </article>
+        ))}
+      </div>
+      <div className="student-impact-footer">
+        <article>
+          <p className="section-label">Why AI</p>
+          <strong>{brief.whyAi}</strong>
+        </article>
+        <article>
+          <p className="section-label">Remaining proof gap</p>
+          <strong>{brief.remainingProofGap}</strong>
+        </article>
+      </div>
+      <p>{brief.judgeTakeaway}</p>
     </section>
   );
 }
@@ -1319,6 +1375,7 @@ function JudgeBriefPanel({ result }: { result: AnalyzeResult | null }) {
   ];
   const proofItems = [
     "Student problem and user are specific.",
+    "Student Impact Brief states the target user, lab-reasoning problem, before/after benefit, evidence basis, and remaining proof gap.",
     "Judge Demo Path gives evaluators a five-step walkthrough.",
     "AI pipeline is visible in Reasoning Trail.",
     "Model Strategy shows candidate ranking and risk controls.",
@@ -1444,6 +1501,7 @@ function ModelCardPanel({ result }: { result: AnalyzeResult | null }) {
     "Official Rubric Fit maps problem relevance, AI design, and UX to concrete app evidence.",
     "AIYES Values Fit ties the app to AIYES values without changing the student's work into a generated report.",
     "AIYES Development Journey turns the required slide and video story into inspectable run evidence.",
+    "Student Impact Brief makes real-world relevance visible before the deeper proof stack.",
     "Learning Impact Loop turns analysis into measurable student readiness and next-trial evidence.",
     "Student Pilot Study Kit defines anonymous student-testing tasks, metrics, observer notes, and evidence to collect.",
     "Pilot Evidence Tracker summarizes anonymous time-to-graph, confidence shift, issue spotting, and exit-ticket readiness without collecting student identifiers.",
@@ -3509,6 +3567,12 @@ function formatPilotEvidenceStatus(status: PilotEvidenceSummary["status"]) {
   if (status === "evidence_ready") return "Evidence ready";
   if (status === "collect_more") return "Collect more";
   return "Needs evidence";
+}
+
+function formatStudentImpactStatus(status: StudentImpactBrief["status"]) {
+  if (status === "strong") return "Strong relevance";
+  if (status === "needs_evidence") return "Needs evidence";
+  return "Review framing";
 }
 
 function formatPilotEvidenceDelta(delta: number | null) {

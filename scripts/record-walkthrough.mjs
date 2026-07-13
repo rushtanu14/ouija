@@ -53,6 +53,13 @@ await caption(
   "Ouija now starts each run with rubric fit, evaluation status, learning impact, data flags, expected pattern, and the student's current action."
 );
 
+await page.getByRole("heading", { name: "Student Impact Brief" }).scrollIntoViewIfNeeded();
+await caption(
+  page,
+  "Student Impact Brief",
+  "Judges see the target student, lab-reasoning pain point, before-and-after benefit, why AI helps, and the remaining anonymous-pilot proof gap before the deeper panels."
+);
+
 await page.getByRole("heading", { name: "Judge Demo Path" }).scrollIntoViewIfNeeded();
 await caption(
   page,

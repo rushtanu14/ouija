@@ -29,6 +29,7 @@ import type {
   SafetyCoach,
   SourceCard,
   StudentDataRow,
+  StudentImpactBrief,
   StudentPilotStudyKit,
   TrackEvidence
 } from "./types.js";
@@ -118,6 +119,14 @@ export function analyzeExperiment(request: AnalyzeRequest): AnalyzeResult {
     customLabTriage,
     preLabDesignCoach,
     nextTrialPlan
+  );
+  const studentImpactBrief = buildStudentImpactBrief(
+    template,
+    confidence,
+    allIssues,
+    matchQuality,
+    impactSnapshot,
+    studentPilotStudyKit
   );
   const groundingStatus = {
     mode: "fallback" as const,
@@ -268,6 +277,7 @@ export function analyzeExperiment(request: AnalyzeRequest): AnalyzeResult {
     nextTrialPlan,
     impactSnapshot,
     studentPilotStudyKit,
+    studentImpactBrief,
     learningExitTicket,
     officialRubricFit,
     aiyesValuesFit,
@@ -819,6 +829,16 @@ export function mergeEnrichment(base: AnalyzeResult, enrichment: Partial<Analyze
         nextTrialPlan
       )
     : base.studentPilotStudyKit;
+  const studentImpactBrief = template
+    ? buildStudentImpactBrief(
+        template,
+        base.classification.confidence,
+        issues,
+        base.classification.matchQuality,
+        impactSnapshot,
+        studentPilotStudyKit
+      )
+    : base.studentImpactBrief;
   const officialRubricFit = template
     ? buildOfficialRubricFit(
         template,
@@ -917,6 +937,7 @@ export function mergeEnrichment(base: AnalyzeResult, enrichment: Partial<Analyze
     nextTrialPlan,
     impactSnapshot,
     studentPilotStudyKit,
+    studentImpactBrief,
     learningExitTicket,
     officialRubricFit,
     aiyesValuesFit,
@@ -1046,6 +1067,14 @@ export function refreshResultForRows(result: AnalyzeResult, rows: StudentDataRow
     preLabDesignCoach,
     nextTrialPlan
   );
+  const studentImpactBrief = buildStudentImpactBrief(
+    template,
+    result.classification.confidence,
+    issues,
+    result.classification.matchQuality,
+    impactSnapshot,
+    studentPilotStudyKit
+  );
   const officialRubricFit = buildOfficialRubricFit(
     template,
     result.classification.confidence,
@@ -1136,6 +1165,7 @@ export function refreshResultForRows(result: AnalyzeResult, rows: StudentDataRow
     nextTrialPlan,
     impactSnapshot,
     studentPilotStudyKit,
+    studentImpactBrief,
     learningExitTicket,
     officialRubricFit,
     aiyesValuesFit,
@@ -2796,6 +2826,81 @@ function buildStudentPilotStudyKit(
       status === "ready_to_pilot"
         ? "Ouija has a concrete student pilot protocol judges can inspect for UX and impact evidence."
         : "Ouija labels the pilot boundary honestly before collecting any user-testing evidence."
+  };
+}
+
+function buildStudentImpactBrief(
+  template: ExperimentTemplate,
+  confidence: number,
+  issues: Issue[],
+  matchQuality: AnalyzeResult["classification"]["matchQuality"],
+  impactSnapshot: LearningImpactSnapshot,
+  studentPilotStudyKit: StudentPilotStudyKit
+): StudentImpactBrief {
+  const warningCount = issues.filter((issue) => issue.severity === "warning").length;
+  const errorCount = issues.filter((issue) => issue.severity === "error").length;
+  const lowConfidence = matchQuality === "closest_supported" || confidence < 0.6;
+  const status: StudentImpactBrief["status"] =
+    lowConfidence || errorCount > 0
+      ? "review"
+      : studentPilotStudyKit.status === "ready_to_pilot"
+        ? "strong"
+        : "needs_evidence";
+  const xLabel = formatColumnName(template, template.expectedResult.xKey);
+  const yLabel = formatColumnName(template, template.expectedResult.yKey);
+  const targetUser = `Middle/high school students working through ${template.shortName.toLowerCase()} labs.`;
+  const problem = `Students often have a table and graph but do not know whether the ${xLabel} to ${yLabel} pattern supports a claim.`;
+
+  return {
+    status,
+    targetUser,
+    problem,
+    whyAi:
+      "Ouija combines experiment classification, expected-pattern grounding, data checks, graph comparison, and Socratic prompts in one student workflow.",
+    beforeOuija:
+      "Before Ouija, the student has to guess the lab type, search sources separately, build a graph, and decide alone whether the data is usable.",
+    afterOuija:
+      lowConfidence
+        ? "After Ouija, the student gets an honest closest-match warning, a starter investigation plan, and teacher-review questions instead of a fake answer."
+        : `After Ouija, the student can compare their graph to an expected ${xLabel} vs ${yLabel} pattern, see data-quality flags, and write their own claim from evidence.`,
+    signals: [
+      {
+        id: "target-user",
+        label: "Defined user",
+        value: "Students only",
+        status: "strong",
+        detail: targetUser
+      },
+      {
+        id: "pain-point",
+        label: "Real-world need",
+        value: "Lab reasoning gap",
+        status: lowConfidence ? "review" : "strong",
+        detail: problem
+      },
+      {
+        id: "before-after",
+        label: "Before / after",
+        value: impactSnapshot.score >= 90 ? "Clear benefit" : "Review benefit",
+        status: impactSnapshot.score >= 90 ? "strong" : warningCount > 0 ? "needs_evidence" : "review",
+        detail: impactSnapshot.studentOutcome
+      },
+      {
+        id: "evidence-basis",
+        label: "Evidence basis",
+        value: studentPilotStudyKit.status === "ready_to_pilot" ? "Pilot-ready" : "Needs review",
+        status: studentPilotStudyKit.status === "ready_to_pilot" ? "strong" : "needs_evidence",
+        detail: `${studentPilotStudyKit.metrics.length} pilot metrics prepared; ${warningCount} warning${warningCount === 1 ? "" : "s"} and ${errorCount} error${errorCount === 1 ? "" : "s"} visible.`
+      }
+    ],
+    remainingProofGap:
+      studentPilotStudyKit.status === "ready_to_pilot"
+        ? "Collect three anonymous pilot observations before claiming real user testing."
+        : "Confirm the lab match or blocking checks before using this run as impact evidence.",
+    judgeTakeaway:
+      status === "strong"
+        ? "Problem relevance is concrete: Ouija targets a real student lab-reasoning moment and names measurable before/after evidence."
+        : "Problem relevance is visible, but this run should be framed as review/pilot-ready instead of completed impact evidence."
   };
 }
 

@@ -44,6 +44,11 @@ describe("buildEvidencePacket", () => {
     expect(packet).toContain("Slide cue:");
     expect(packet).toContain("Video cue:");
     expect(packet).toContain("Testing and evaluation");
+    expect(packet).toContain("## Student Impact Brief");
+    expect(packet).toContain("Target user:");
+    expect(packet).toContain("Before Ouija:");
+    expect(packet).toContain("After Ouija:");
+    expect(packet).toContain("Remaining proof gap:");
     expect(packet).toContain("## Grounding Audit");
     expect(packet).toContain("Student source task:");
     expect(packet).toContain("## Expected Overlay");

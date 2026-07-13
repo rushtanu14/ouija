@@ -8,7 +8,7 @@ Students do not just need answers after a lab. They need help connecting the exp
 
 ## 0:30-1:05 - Input And Classification
 
-Open Ouija in the default Student view. Click `Reaction Rate`. Show that a normal student description becomes a classified experiment with subject, concepts, variables, confidence, and a Student Focus panel for next move, evidence check, repeat check, and before-claim guidance. Then switch to Judge mode or open `?judge=1` for the full proof stack.
+Open Ouija in the default Student view. Click `Reaction Rate`. Show that a normal student description becomes a classified experiment with subject, concepts, variables, confidence, Run Snapshot, Student Impact Brief, and a Student Focus panel for next move, evidence check, repeat check, and before-claim guidance. Student Impact Brief should be the real-world relevance moment: target student, lab-reasoning pain point, before/after benefit, why AI helps, evidence basis, and the remaining anonymous-pilot proof gap. Then switch to Judge mode or open `?judge=1` for the full proof stack.
 
 ## 1:05-1:20 - Judge Demo Path And Runtime Proof
 

@@ -15,15 +15,15 @@ Ouija is a student-facing AI experiment interpreter for middle and high school s
 
 1. Describe or choose a middle/high school experiment.
 2. Use Student mode for the focused lab workflow or Judge mode for the full proof stack.
-3. Review Ouija's classification, Run Snapshot, Student Focus, variables, expected pattern, expected-overlay graph, and citations.
+3. Review Ouija's classification, Run Snapshot, Student Impact Brief, Student Focus, variables, expected pattern, expected-overlay graph, and citations.
 4. Use Judge Demo Path to walk evaluators through problem fit, AI design, student workflow, evidence handoff, and submission proof.
 5. Use AI Runtime Proof to verify the active AI path, fallback/web-search readiness, live evaluation coverage, server-only key boundary, and MCP bridge mode.
 6. Use Guided Lab Flow, Student Level Lens, Concept Mastery Check, and Pre-Lab Design Coach to see the current next action, middle/high school support mode, understanding proof, variables, controls, repeats, source task, table plan, and safety gate.
 7. Paste spreadsheet rows or edit table data near the top of the workflow.
 8. Use Grounding Audit, the expected overlay, Pattern Evidence Engine, Method Audit, Reliability Coach, Safety Coach, Concept Coach, Comparison Insights, Custom Lab Triage, Pattern Archetype Coach, and Claim Coach to find source-trust gaps, visual pattern mismatches, whole-graph support, control-variable issues, repeat-trial gaps, safety boundaries, data problems, vocabulary gaps, evidence gaps, unsupported-lab graph-shape questions, and the next reasoning question.
 9. Use Pattern Evidence Engine, Reliability Coach, and Next Trial Planner to decide what to repeat, average, tighten, or measure next before writing the claim.
-10. Review Learning Impact Loop, Student Pilot Study Kit, Pilot Evidence Tracker, Learning Exit Ticket, Student Level Lens, Concept Mastery Check, and Student Reflection Workspace to see whether the student is ready to plan, reason, check understanding, log anonymous pilot evidence, and explain answers themselves before writing.
-11. Copy the Evidence Packet as a student-owned reasoning handoff with judge demo path, Custom Lab Triage, Pattern Archetype Coach, Pre-Lab Design Coach, AIYES rubric fit, AIYES values fit, learning impact, pilot-study protocol, anonymous pilot evidence summary, Learning Exit Ticket, student-level lens, Concept Mastery Check prompts, student reflection drafts, guided flow, Grounding Audit, AI Evaluation Harness, Data Handling Ledger, sources, checks, safety notes, concept vocabulary, pattern evidence, repeat reliability, data table, next-trial plan, blanks, and next question.
+10. Review Student Impact Brief, Learning Impact Loop, Student Pilot Study Kit, Pilot Evidence Tracker, Learning Exit Ticket, Student Level Lens, Concept Mastery Check, and Student Reflection Workspace to see whether the student is ready to plan, reason, check understanding, log anonymous pilot evidence, and explain answers themselves before writing.
+11. Copy the Evidence Packet as a student-owned reasoning handoff with judge demo path, Custom Lab Triage, Pattern Archetype Coach, Pre-Lab Design Coach, AIYES rubric fit, AIYES values fit, Student Impact Brief, learning impact, pilot-study protocol, anonymous pilot evidence summary, Learning Exit Ticket, student-level lens, Concept Mastery Check prompts, student reflection drafts, guided flow, Grounding Audit, AI Evaluation Harness, Data Handling Ledger, sources, checks, safety notes, concept vocabulary, pattern evidence, repeat reliability, data table, next-trial plan, blanks, and next question.
 12. Inspect Model Strategy, Technical Depth Proof, AI Evaluation Harness, Data Handling Ledger, AIYES Rubric Fit, AIYES Values Fit, and AIYES Development Journey to show candidate ranking, matched signals, fallback logic, validators, model-behavior checks, privacy flow, retention, student controls, risk controls, official criteria mapping, mission-values evidence, and the required problem/data/model/testing/UX/ethics/submission journey.
 13. Use Reasoning Trail to show how Ouija classified the experiment, exposed model strategy, ran the AI evaluation harness, guided the judge demo, planned the pre-lab setup, audited source grounding, guided the student path, built the concept scaffold, checked the learning exit ticket, checked the safety boundary, audited student-data handling, audited the table data, scored whole-pattern evidence, checked repeat reliability, planned the next trial, and maps the run to AIYES Track 1 evidence.
 14. Open Deterministic Regression Suite to see nine deterministic checks: eight supported lab demos plus the unsupported-lab boundary.
@@ -37,6 +37,8 @@ Ouija is a student-facing AI experiment interpreter for middle and high school s
 Guided Lab Flow gives students one current next action and six stable stages so the interface feels like a lab workflow rather than separate AI outputs.
 
 Run Snapshot gives students and judges a compact first-read of rubric fit, Deterministic Regression Suite status, learning impact, data flags, expected pattern, and the current action before the deeper evidence panels.
+
+Student Impact Brief makes the real-world relevance criterion visible before the proof stack: target student, lab-reasoning pain point, before/after benefit, why AI is useful, evidence basis, and the remaining anonymous-pilot proof gap.
 
 Student Focus gives the default app a practical first path: next move, evidence check, repeat check, and before-claim guidance stay visible while judge-only panels are hidden until Judge mode is selected.
 
@@ -76,7 +78,7 @@ Pre-Lab Design Coach turns classification and triage into a before-data checklis
 
 Deterministic Regression Suite runs a deterministic live suite against the same analysis engine used by students.
 
-AI Model Card makes the model strategy inspectable: deterministic template matching, trusted fallback references, Grounding Audit, AI Evaluation Harness, Data Handling Ledger, Custom Lab Triage, Pattern Archetype Coach, Pre-Lab Design Coach, Student Pilot Study Kit, Pilot Evidence Tracker, Student Level Lens adaptation, Concept Mastery Check scoring, optional server-side OpenAI web-search enrichment, live evaluation, privacy boundaries, and academic-integrity safeguards.
+AI Model Card makes the model strategy inspectable: deterministic template matching, trusted fallback references, Grounding Audit, AI Evaluation Harness, Data Handling Ledger, Custom Lab Triage, Pattern Archetype Coach, Pre-Lab Design Coach, Student Impact Brief, Student Pilot Study Kit, Pilot Evidence Tracker, Student Level Lens adaptation, Concept Mastery Check scoring, optional server-side OpenAI web-search enrichment, live evaluation, privacy boundaries, and academic-integrity safeguards.
 
 Technical Depth Proof makes the "beyond simple API use" argument visible in the live app: decision trace, evaluation harness, grounding quality, pattern engine, privacy, and integrity are summarized from the current run before the judge reaches the deeper evidence panels.
 

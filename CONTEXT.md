@@ -66,6 +66,10 @@ The judge-visible MCP planning layer that turns Ouija's connector story into sco
 
 The browser-local student-testing evidence layer. It logs anonymous pilot observations for time to first graph, confidence before/after, issue spotting, exit-ticket readiness, and non-identifying notes. It starts empty with an explicit no-fake-testing warning and must not collect names, grades, faces, contact info, or private classroom details.
 
+### Student Impact Brief
+
+The first-scroll real-world relevance layer. It names the target student, lab-reasoning pain point, before/after benefit, why AI helps, evidence basis, and remaining anonymous-pilot proof gap before judges reach the deeper technical proof stack.
+
 ### Submission Hub
 
 The one-click judge packet at `https://ouija-olive.vercel.app/submission/`. It gathers the live app, Judge view, slide deck, walkthrough, source code, screenshots, and public proof endpoints so Devpost judges do not have to hunt through README links or app panels.
@@ -80,6 +84,17 @@ The one-click judge packet at `https://ouija-olive.vercel.app/submission/`. It g
 - Ouija's first supported set should balance physics, chemistry, biology, and earth science instead of overfitting to physics.
 - Ouija should support table input first before adding CSV upload or photo/OCR input.
 - Ouija's internet search should ground expected results and explanations in referenced content instead of inventing them from the model alone.
+
+## Student Impact Brief Checkpoint - 2026-07-13 UTC / 2026-07-12 PDT
+
+- Council verdict: Ouija works and is submittable for AIYES Track 1. First place/top-award outcome still cannot be guaranteed because judging, final Devpost submission, and the final 2-5 student roster are external, but this pass improves the weakest controllable judging area: first-scan problem definition and real-world relevance.
+- Added typed `studentImpactBrief` to analysis output. It recomputes on fallback analysis, OpenAI enrichment merges, and table-row refreshes, and it degrades honestly for low-confidence/unsupported labs.
+- Added the `Student Impact Brief` panel immediately after Run Snapshot. It shows target student, lab-reasoning pain point, before/after benefit, why AI helps, impact signals, and the remaining anonymous-pilot proof gap before the deeper technical proof stack.
+- Added Student Impact Brief to Evidence Packet, Judge Brief proof copy, AI Model Card safeguards, README, Devpost copy, judging checklist, AIYES brief, slide deck, and walkthrough script.
+- Refreshed submission screenshots and walkthrough. New walkthrough proof is 1440x900, 197.36 seconds, 19,577,913 bytes, SHA-256 `6854fb3510c61fe036cd7d4668943108b844352439b6a6c7a652493377683ee0`.
+- Production: `dpl_HSt5n21ZmTifC1mcQSp7xiKQAPpW`, aliased to `https://ouija-olive.vercel.app`.
+- Verification: `npm run test` (15 files, 86 tests), `npm run build`, `npm run test:e2e` (40 passed across Chromium, Firefox, WebKit, and mobile Safari), `npm audit --json` (0 vulnerabilities), local capture/record/sync submission assets, production deploy, live `/api/evaluate` (200, score 100), live `/api/mcp/status` (200, `server_dry_run`, 11 toolkits, Composio docs links), hosted video HEAD (200, `content-length: 19577913`), and hosted desktop/mobile Playwright smoke for Student Impact Brief with no horizontal overflow and zero console errors.
+- Remaining loops: commit/push, actual Devpost submission, final team roster, optional live OpenAI/Composio credentials only with explicit approval and consent/server setup, optional DeepWiki indexing, and actual anonymous pilot observations if the team wants real user-testing evidence.
 
 ## Composio Sessions Strategy Checkpoint - 2026-07-13 UTC / 2026-07-12 PDT
 

@@ -193,6 +193,26 @@ export interface StudentPilotStudyKit {
   judgeTakeaway: string;
 }
 
+export interface StudentImpactSignal {
+  id: "target-user" | "pain-point" | "before-after" | "evidence-basis";
+  label: string;
+  value: string;
+  detail: string;
+  status: "strong" | "needs_evidence" | "review";
+}
+
+export interface StudentImpactBrief {
+  status: "strong" | "needs_evidence" | "review";
+  targetUser: string;
+  problem: string;
+  whyAi: string;
+  beforeOuija: string;
+  afterOuija: string;
+  signals: StudentImpactSignal[];
+  remainingProofGap: string;
+  judgeTakeaway: string;
+}
+
 export type PilotEvidenceIssueSignal = "" | "yes" | "no" | "unsure";
 
 export type PilotEvidenceReflectionStatus = "" | "ready" | "partial" | "not_ready";
@@ -923,6 +943,7 @@ export interface AnalyzeResult {
   nextTrialPlan: NextTrialPlan;
   impactSnapshot: LearningImpactSnapshot;
   studentPilotStudyKit: StudentPilotStudyKit;
+  studentImpactBrief: StudentImpactBrief;
   learningExitTicket: LearningExitTicket;
   officialRubricFit: OfficialRubricFit;
   aiyesValuesFit: AiyesValuesFit;

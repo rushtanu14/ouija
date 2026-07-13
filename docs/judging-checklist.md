@@ -6,6 +6,7 @@
 - Problem is common in middle and high school labs: students struggle to connect experiment setup, data quality, expected scientific patterns, and evidence-backed reasoning.
 - Impact is practical: faster debugging of lab data, better understanding, fewer report-writing shortcuts.
 - Run Snapshot gives a first-scroll readout of rubric fit, evaluation status, learning impact, data flags, expected pattern, and current action.
+- Student Impact Brief gives judges a first-scroll answer for target user, lab-reasoning pain point, before/after student benefit, evidence basis, and remaining proof gap.
 - Student/Judge views keep the default app practical for students while `?judge=1` exposes the full judge proof stack.
 - Submission Hub gives judges one hosted route for live app, judge view, deck, walkthrough, source, screenshots, and proof endpoints.
 - Practical science behavior is visible: students see whether the whole graph supports the expected pattern and whether repeated trials have enough count, average, and spread to support a claim.
@@ -116,6 +117,7 @@
 - AIYES Rubric Fit appears in the app and Evidence Packet so judges can inspect the official UX/design fit during the live demo or exported handoff.
 - AIYES Values Fit appears in the app and Evidence Packet so judges can inspect the values fit during the live demo or exported handoff.
 - AIYES Development Journey appears in the app and Evidence Packet so judges can inspect the required slide/video story during the live demo or exported handoff.
+- Student Impact Brief appears in the app and Evidence Packet so problem relevance is not buried in the slide deck.
 - Learning Impact Loop appears in the app and Evidence Packet so the user's practical benefit is measurable inside the workflow.
 - Pre-Lab Design Coach appears in the app and Evidence Packet so students can use Ouija before collecting data, not only after a table exists.
 - Learning Exit Ticket appears in the app and Evidence Packet so judges can inspect student understanding prompts during the demo or exported handoff.

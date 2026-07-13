@@ -124,6 +124,18 @@ describe("fallback analysis", () => {
       "integrity-boundary"
     ]);
     expect(result.studentPilotStudyKit.evidenceToCollect).toContain("Time to first graph");
+    expect(result.studentImpactBrief.status).toBe("strong");
+    expect(result.studentImpactBrief.targetUser).toContain("Middle/high school students");
+    expect(result.studentImpactBrief.problem).toContain("pattern supports a claim");
+    expect(result.studentImpactBrief.whyAi).toContain("experiment classification");
+    expect(result.studentImpactBrief.afterOuija).toContain("expected");
+    expect(result.studentImpactBrief.signals.map((signal) => signal.id)).toEqual([
+      "target-user",
+      "pain-point",
+      "before-after",
+      "evidence-basis"
+    ]);
+    expect(result.studentImpactBrief.remainingProofGap).toContain("three anonymous pilot observations");
     expect((result as any).learningExitTicket.status).toBe("ready");
     expect((result as any).learningExitTicket.summary).toContain("exit ticket");
     expect((result as any).learningExitTicket.prompts).toHaveLength(3);
@@ -248,6 +260,10 @@ describe("fallback analysis", () => {
     expect(result.studentPilotStudyKit.summary).toContain("review gate");
     expect(result.studentPilotStudyKit.metrics.some((metric) => metric.id === "time-to-graph" && metric.status === "watch")).toBe(true);
     expect(result.studentPilotStudyKit.tasks[0].successSignal).toContain("closest-supported boundary");
+    expect(result.studentImpactBrief.status).toBe("review");
+    expect(result.studentImpactBrief.afterOuija).toContain("closest-match warning");
+    expect(result.studentImpactBrief.remainingProofGap).toContain("Confirm the lab match");
+    expect(result.studentImpactBrief.signals.some((signal) => signal.id === "pain-point" && signal.status === "review")).toBe(true);
     expect((result as any).learningExitTicket.status).toBe("review");
     expect((result as any).learningExitTicket.prompts[0].studentPrompt).toContain("closest supported");
     expect(result.impactSnapshot.metrics.some((metric) => metric.id === "student-outcome" && metric.status === "needs_action")).toBe(true);

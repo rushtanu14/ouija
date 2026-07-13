@@ -14,6 +14,12 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(page.getByLabel("Run Snapshot").getByText("Expected pattern", { exact: true })).toBeVisible();
   await expect(page.getByLabel("Run Snapshot").getByText("Current action", { exact: true })).toBeVisible();
   await expect(page.locator(".run-snapshot-header > span").getByText("Competitive", { exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Student Impact Brief" })).toBeVisible();
+  await expect(page.getByLabel("Student Impact Brief").getByText("Strong relevance")).toBeVisible();
+  await expect(page.getByLabel("Student Impact Brief").getByText("Target user")).toBeVisible();
+  await expect(page.getByLabel("Student Impact Brief").getByText("Before Ouija", { exact: true })).toBeVisible();
+  await expect(page.getByLabel("Student Impact Brief").getByText("After Ouija", { exact: true })).toBeVisible();
+  await expect(page.getByLabel("Student Impact Brief").getByText("Remaining proof gap", { exact: true })).toBeVisible();
   const coreWorkflowBeforeJudgeMeta = await page.locator(".analysis-panel").evaluate((panel) => {
     const children = Array.from(panel.children);
     const indexOf = (className: string) => children.findIndex((child) => child.classList.contains(className));
@@ -410,6 +416,7 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(page.getByLabel("Judge Brief").getByText("Official Rubric Fit maps all three visible AIYES criteria.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("AIYES Values Fit maps democracy, diversity, connectivity, innovation, and ethical inclusion to concrete product evidence.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("AIYES Development Journey maps problem, data, model, build, testing, UX, ethics, impact, constraints, and submission proof.")).toBeVisible();
+  await expect(page.getByLabel("Judge Brief").getByText("Student Impact Brief states the target user, lab-reasoning problem, before/after benefit, evidence basis, and remaining proof gap.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Learning Impact Loop measures the student's outcome for each run.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Pilot Evidence Tracker logs anonymous browser-local observations without letting the team claim fake completed testing.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Submission Hub gives judges one URL for live app, judge view, deck, video, source, Devpost pack, and proof endpoints.")).toBeVisible();

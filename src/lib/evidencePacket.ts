@@ -190,6 +190,20 @@ export function buildEvidencePacket(
       `    - Judge cue: ${stage.judgeCue}`
     ]),
     "",
+    "## Student Impact Brief",
+    `- Status: ${formatStudentImpactStatus(result.studentImpactBrief.status)}`,
+    `- Target user: ${result.studentImpactBrief.targetUser}`,
+    `- Problem: ${result.studentImpactBrief.problem}`,
+    `- Why AI: ${result.studentImpactBrief.whyAi}`,
+    `- Before Ouija: ${result.studentImpactBrief.beforeOuija}`,
+    `- After Ouija: ${result.studentImpactBrief.afterOuija}`,
+    "- Impact signals:",
+    ...result.studentImpactBrief.signals.map(
+      (signal) => `  - ${signal.label}: ${signal.value} (${formatStudentImpactStatus(signal.status)}) - ${signal.detail}`
+    ),
+    `- Remaining proof gap: ${result.studentImpactBrief.remainingProofGap}`,
+    `- Judge takeaway: ${result.studentImpactBrief.judgeTakeaway}`,
+    "",
     "## Learning Impact Loop",
     `- Score: ${result.impactSnapshot.score}/100`,
     `- Headline: ${result.impactSnapshot.headline}`,
@@ -433,6 +447,12 @@ function formatPilotEvidenceStatus(status: PilotEvidenceSummary["status"]) {
   if (status === "evidence_ready") return "Evidence ready";
   if (status === "collect_more") return "Collect more";
   return "Needs evidence";
+}
+
+function formatStudentImpactStatus(status: AnalyzeResult["studentImpactBrief"]["status"]) {
+  if (status === "strong") return "strong";
+  if (status === "needs_evidence") return "needs evidence";
+  return "review";
 }
 
 function formatPilotEvidenceDelta(delta: number | null) {
