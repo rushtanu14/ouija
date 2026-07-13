@@ -54,6 +54,10 @@ The Track 1 submission-story layer. Ouija maps each run to problem identificatio
 
 The UX split that keeps Ouija practical for students while preserving judge proof. The default app opens in Student mode with Student Focus, core lab workflow, graph/table comparison, and student-owned evidence. `?judge=1` opens Judge mode with the full proof stack, including model strategy, runtime proof, evaluation/data/rubric/development journey panels, MCP Integration Coach, and Judge Brief.
 
+### AI Architecture Map
+
+The judge-visible system-design layer. It makes Ouija's AI path readable as intake, template classifier, grounding, data engine, learning guard, and evidence bridge, with explicit inputs, outputs, and evaluation contracts. It exists to strengthen AIYES Track 1 architecture clarity without adding more student-facing clutter.
+
 ### Composio Browser Source Capture
 
 The newest MCP route in the server dry-run bridge. It adds `composio-browser-source-capture` for public source-page context capture through Composio Browser Tool (`BROWSER_TOOL_CREATE_TASK`, `BROWSER_TOOL_WATCH_TASK`). It is source-context support only; it must not browse private accounts, write the student's final claim, or run live without server-side credentials, allowed tools, and explicit consent.
@@ -96,6 +100,16 @@ The one-click judge packet at `https://ouija-olive.vercel.app/submission/`. It g
 - Ouija's first supported set should balance physics, chemistry, biology, and earth science instead of overfitting to physics.
 - Ouija should support table input first before adding CSV upload or photo/OCR input.
 - Ouija's internet search should ground expected results and explanations in referenced content instead of inventing them from the model alone.
+
+## AI Architecture Map Checkpoint - 2026-07-13 UTC / 2026-07-12 PDT
+
+- Council verdict: Ouija still works and is submittable/competitive for AIYES Track 1. First place/top-award outcome still cannot be guaranteed because judging, final Devpost submission, final 2-5 student roster, and actual student pilot observations are external.
+- Highest-leverage controllable gap: architecture clarity and technical depth beyond simple API use. The app had strong evidence, but the judge path could still make the system shape easier to read at speed.
+- Added `AI Architecture Map` in Judge mode after Model Strategy. It shows intake, classifier, grounding, data engine, learning guard, evidence bridge, inputs, outputs, and evaluation contracts.
+- Added Judge nav, Top Award Radar, Judge Brief, Model Card, README, Devpost copy, AIYES brief, slide deck, demo script, judging checklist, submission hub, Devpost pack, and public submission pages references to the architecture map.
+- Production: `dpl_6KtahA3SR8vxEDL2po6bj7ysYhf3`, aliased to `https://ouija-olive.vercel.app`.
+- Verification: `npm run test` (15 files, 91 tests), `npm run build`, `npm run test:e2e` (40 passed across Chromium, Firefox, WebKit, and mobile Safari), `npm audit --json` (0 vulnerabilities), `git diff --check`, `npm run sync:public-submission`, production deploy, live `/api/evaluate` (200, score 100), live `/api/mcp/status` (200, `server_dry_run`, 13 routes, Semantic Scholar and Canvas present), hosted submission pages (200, architecture copy visible), and hosted desktop/mobile Playwright smoke for AI Architecture Map with no horizontal overflow and zero console errors.
+- Remaining loops: commit/push, actual Devpost submission, final team roster, optional live OpenAI/Composio credentials only with explicit approval and consent/server setup, optional DeepWiki indexing, and real anonymous pilot observations if the team wants true user-testing evidence.
 
 ## Semantic Scholar And Canvas MCP Checkpoint - 2026-07-13 UTC / 2026-07-12 PDT
 

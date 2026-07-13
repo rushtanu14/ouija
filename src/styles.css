@@ -164,6 +164,7 @@ a {
 .student-level-lens,
 .concept-mastery-check,
 .model-strategy,
+.ai-architecture-map,
 .technical-depth-proof,
 .ai-evaluation-harness,
 .data-handling-ledger,
@@ -1401,6 +1402,11 @@ a:focus-visible {
   gap: 13px;
 }
 
+.ai-architecture-map {
+  display: grid;
+  gap: 13px;
+}
+
 .technical-depth-proof {
   display: grid;
   gap: 13px;
@@ -2507,6 +2513,86 @@ a:focus-visible {
   border-radius: 8px;
   padding: 10px 12px;
   background: #f8fbff;
+}
+
+.architecture-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  border-radius: 8px;
+  padding: 13px;
+  color: #173b74;
+  background: #eef5ff;
+}
+
+.architecture-summary strong {
+  display: block;
+  color: #173b74;
+  font-size: 16px;
+  line-height: 1.35;
+}
+
+.architecture-summary > span {
+  flex: 0 0 auto;
+  border-radius: 8px;
+  padding: 7px 10px;
+  color: #1f5b3d;
+  background: #edf8f1;
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.architecture-stage-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.architecture-stage-grid article,
+.architecture-contract-grid article {
+  display: grid;
+  gap: 8px;
+  border: 1px solid #d9e5f2;
+  border-radius: 8px;
+  padding: 11px;
+  background: #fbfdff;
+}
+
+.architecture-stage-grid article {
+  grid-template-columns: auto minmax(0, 1fr);
+}
+
+.architecture-stage-grid small {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  color: #173b74;
+  background: #e4eefc;
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.architecture-stage-grid strong,
+.architecture-contract-grid strong {
+  color: #172439;
+  font-size: 15px;
+  line-height: 1.25;
+}
+
+.architecture-stage-grid span,
+.architecture-contract-grid span {
+  color: #536478;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.architecture-contract-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
 }
 
 .ai-eval-summary {
@@ -5576,6 +5662,11 @@ td input {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .architecture-stage-grid,
+  .architecture-contract-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .technical-depth-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -5799,6 +5890,16 @@ td input {
   }
 
   .strategy-signal-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .architecture-summary {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .architecture-stage-grid,
+  .architecture-contract-grid {
     grid-template-columns: 1fr;
   }
 

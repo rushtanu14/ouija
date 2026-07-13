@@ -435,6 +435,9 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(page.getByLabel("Judge Brief").getByText("AI pipeline is visible in Reasoning Trail.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Judge Demo Path gives evaluators a five-step walkthrough.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Model Strategy shows candidate ranking and risk controls.")).toBeVisible();
+  await expect(
+    page.getByLabel("Judge Brief").getByText("AI Architecture Map makes the system design readable as classifier, grounding, data audit, learning guard, and MCP bridge.")
+  ).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Technical Depth Proof makes beyond-simple-API architecture evidence visible.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("AI Evaluation Harness scores model behavior and safeguards.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Official Rubric Fit maps all three visible AIYES criteria.")).toBeVisible();
@@ -503,6 +506,7 @@ test("judge mode shows a top award radar with honest win gaps", async ({ page })
   await expect(page.getByLabel("Top Award Radar").getByText("Not a first-place guarantee")).toBeVisible();
   await expect(page.getByLabel("Top Award Radar").getByText("Problem and relevance")).toBeVisible();
   await expect(page.getByLabel("Top Award Radar").getByText("AI and model strategy")).toBeVisible();
+  await expect(page.getByLabel("Top Award Radar").getByText("Model Strategy, AI Architecture Map, and Technical Depth Proof are visible.")).toBeVisible();
   await expect(page.getByLabel("Top Award Radar").getByText("UX and design")).toBeVisible();
   await expect(page.getByLabel("Top Award Radar").getByText("Impact evidence")).toBeVisible();
   await expect(page.getByLabel("Top Award Radar").getByText("1/3 anonymous pilot observations logged")).toBeVisible();
@@ -523,16 +527,23 @@ test("student mode keeps the core lab workflow focused before judge proof", asyn
   await expect(page.getByRole("heading", { name: "Student data table" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Evidence Packet" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Model Strategy" })).toHaveCount(0);
+  await expect(page.getByRole("heading", { name: "AI Architecture Map" })).toHaveCount(0);
   await expect(page.getByRole("heading", { name: "Judge Brief" })).toHaveCount(0);
   await expect(page.getByRole("link", { name: "MCP Export" })).toHaveCount(0);
+  await expect(page.getByRole("link", { name: "Architecture" })).toHaveCount(0);
   await expect(page.getByRole("link", { name: "Award Radar" })).toHaveCount(0);
 
   await page.getByLabel("View mode").getByRole("button", { name: "Judge" }).click();
   await expect(page).toHaveURL(/judge=1/);
   await expect(page.getByRole("heading", { name: "Judge Demo Path" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Model Strategy" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "AI Architecture Map" })).toBeVisible();
+  await expect(page.getByLabel("AI Architecture Map").getByText("Classifier -> grounding -> data audit -> learning guard -> MCP bridge")).toBeVisible();
+  await expect(page.getByLabel("AI Architecture Map").getByText("Not a chat wrapper")).toBeVisible();
+  await expect(page.getByLabel("AI Architecture Map").getByText("13 MCP routes")).toBeVisible();
   await expect(page.getByRole("heading", { name: "AIYES Development Journey" })).toBeVisible();
   await expect(page.getByRole("link", { name: "MCP Export" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Architecture" })).toBeVisible();
   await expect(page.getByRole("link", { name: "Award Radar" })).toBeVisible();
 
   await page.getByLabel("View mode").getByRole("button", { name: "Student" }).click();

@@ -33,6 +33,7 @@
 - Server-side grounding keeps the API key out of the browser.
 - AI Runtime Proof shows fallback/web-search readiness, template count, evaluation coverage, server-only key boundary, and MCP bridge mode through the UI and `/api/runtime-proof`.
 - Model Strategy exposes candidate rankings, matched signals, confidence, fallback behavior, validation layers, safety layer, and risk controls.
+- AI Architecture Map shows the classifier, grounding, data-audit, learning-guard, and MCP evidence bridge as a single inspectable system with inputs, outputs, and evaluation contracts.
 - Technical Depth Proof gives judges a compact beyond-simple-API scorecard for decision trace, evaluation harness, grounding quality, expected-pattern engine, privacy, and integrity.
 - AI Evaluation Harness scores classifier confidence, coverage, source grounding, pattern validation, repeat reliability, row validators, safety/integrity, and fallback boundaries.
 - Data Handling Ledger exposes what student data is used, where it is stored, retention, local snapshots, student controls, and the server-only API-key boundary.
@@ -64,6 +65,7 @@
 
 - Eight supported demo labs across physics, chemistry, biology, and earth science.
 - Model Strategy prevents the AI design from looking like a black-box chatbot or a simple prompt wrapper.
+- AI Architecture Map prevents the system design from getting lost in feature breadth by showing the end-to-end classifier-to-grounding-to-data-audit path.
 - Technical Depth Proof prevents the fallback demo from looking template-only by showing the live decision trace, validators, overlays, audits, and evaluation suite in one place.
 - AI Runtime Proof gives judges a live endpoint for the deployed AI path instead of asking them to trust screenshots or prose.
 - AI Evaluation Harness turns model behavior and safeguards into visible pass/review/fail checks.

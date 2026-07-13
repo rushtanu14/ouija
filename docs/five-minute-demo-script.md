@@ -16,9 +16,9 @@ Show Judge Demo Path: problem fit, AI design, student workflow, evidence handoff
 
 Show AI Runtime Proof: fallback/web-search readiness, live evaluation coverage, server-only secret boundary, and MCP bridge mode. Mention that `/api/runtime-proof`, `/api/evaluate`, `/api/mcp/status`, and the consent-gated Composio Sessions dry-run at `/api/mcp/session` are public smoke checks.
 
-## 1:20-1:42 - Model Strategy And Technical Depth
+## 1:20-1:42 - Model Strategy, Architecture, And Technical Depth
 
-Show Model Strategy and Technical Depth Proof: candidate ranking, matched signals, confidence, fallback behavior, validators, pattern evidence, safety layer, repeat reliability, decision trace, evaluation harness, grounding quality, privacy, integrity, and risk controls. This proves the AI design is inspectable instead of a simple prompt wrapper.
+Show Model Strategy, AI Architecture Map, and Technical Depth Proof: candidate ranking, matched signals, confidence, fallback behavior, classifier-to-grounding-to-data-audit-to-learning-guard flow, validators, pattern evidence, safety layer, repeat reliability, decision trace, evaluation harness, grounding quality, privacy, integrity, and risk controls. This proves the AI design is inspectable instead of a simple prompt wrapper.
 
 ## 1:42-2:02 - AI Evaluation Harness And Data Handling Ledger
 

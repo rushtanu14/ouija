@@ -136,6 +136,7 @@ const judgeNavLinks = [
   { href: "#evaluation", label: "Regression" },
   { href: "#saved", label: "Saved Labs" },
   { href: "#progress", label: "Progress" },
+  { href: "#architecture", label: "Architecture" },
   { href: "#mcp-export", label: "MCP Export" },
   { href: "#model-card", label: "Model Card" },
   { href: "#top-award", label: "Award Radar" },
@@ -541,6 +542,7 @@ export function App() {
               {isJudgeMode ? (
                 <>
                   <ModelStrategyPanel strategy={result.modelStrategy} />
+                  <AiArchitectureMapPanel result={result} mcpBridgeStatus={mcpBridgeStatus} />
                   <TechnicalDepthProofPanel result={result} />
                   <AiEvaluationHarnessPanel harness={result.aiEvaluationHarness} />
                   <DataHandlingLedgerPanel ledger={result.dataHandlingLedger} />
@@ -1245,7 +1247,7 @@ function TopAwardRadarPanel({
       status: runtimeReady && regressionReady ? "Strong" : "Review",
       detail: `${runtimeReady ? "Runtime proof ready" : "Runtime proof loading"}; ${
         regressionReady ? "9/9 regression checks passed" : "regression proof loading"
-      }; Model Strategy and Technical Depth Proof are visible.`
+      }; Model Strategy, AI Architecture Map, and Technical Depth Proof are visible.`
     },
     {
       label: "UX and design",
@@ -1380,6 +1382,7 @@ function JudgeBriefPanel({ result }: { result: AnalyzeResult | null }) {
     "Judge Demo Path gives evaluators a five-step walkthrough.",
     "AI pipeline is visible in Reasoning Trail.",
     "Model Strategy shows candidate ranking and risk controls.",
+    "AI Architecture Map makes the system design readable as classifier, grounding, data audit, learning guard, and MCP bridge.",
     "Technical Depth Proof makes beyond-simple-API architecture evidence visible.",
     "AI Evaluation Harness scores model behavior and safeguards.",
     "Official Rubric Fit maps all three visible AIYES criteria.",
@@ -1500,6 +1503,7 @@ function ModelCardPanel({ result }: { result: AnalyzeResult | null }) {
     "Technical Depth Proof summarizes decision trace, evaluation harness, grounding quality, pattern engine, privacy, and integrity signals.",
     "AI Evaluation Harness scores classifier confidence, coverage, grounding, validators, safety, and fallback boundaries.",
     "Judge Demo Path reduces the live demo to problem fit, AI design, student workflow, evidence handoff, and submission proof.",
+    "AI Architecture Map makes the classifier, grounding, data-audit, learning-guard, and MCP-bridge path visible as one system.",
     "Official Rubric Fit maps problem relevance, AI design, and UX to concrete app evidence.",
     "AIYES Values Fit ties the app to AIYES values without changing the student's work into a generated report.",
     "AIYES Development Journey turns the required slide and video story into inspectable run evidence.",
@@ -2241,6 +2245,109 @@ function ModelStrategyPanel({ strategy }: { strategy: ModelStrategy }) {
         <p className="section-label">Controls</p>
         {strategy.riskControls.slice(0, 3).map((control) => (
           <span key={control}>{control}</span>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function AiArchitectureMapPanel({
+  result,
+  mcpBridgeStatus
+}: {
+  result: AnalyzeResult;
+  mcpBridgeStatus: McpBridgeStatus | null;
+}) {
+  const topCandidate = result.modelStrategy.candidates[0];
+  const runnerUp = result.modelStrategy.candidates[1];
+  const routeCount = mcpBridgeStatus?.toolkits.length ?? 13;
+  const architectureStages = [
+    {
+      label: "Intake",
+      value: "Student description + table rows",
+      detail: `${result.columns.length} typed columns stay in the student workspace.`
+    },
+    {
+      label: "Classifier",
+      value: `${result.modelStrategy.candidates.length} template candidates`,
+      detail:
+        runnerUp && topCandidate
+          ? `${topCandidate.title} outranks ${runnerUp.title} before any explanation is shown.`
+          : `${result.classification.title} is selected with visible confidence.`
+    },
+    {
+      label: "Grounding",
+      value: result.groundingStatus.mode === "web_enriched" ? "Web search enriched" : "Trusted fallback",
+      detail: `${result.sources.length} citation${result.sources.length === 1 ? "" : "s"} feed the Grounding Audit and mixed-evidence boundary.`
+    },
+    {
+      label: "Data engine",
+      value: "Overlay + validators",
+      detail: `${result.patternEvidence.score}/100 pattern evidence with ${result.issues.length} data-quality signal${
+        result.issues.length === 1 ? "" : "s"
+      }.`
+    },
+    {
+      label: "Learning guard",
+      value: "Hints, blanks, checks",
+      detail: `${result.learningExitTicket.prompts.length} exit-ticket prompts and Concept Mastery checks keep the conclusion student-authored.`
+    },
+    {
+      label: "Evidence bridge",
+      value: `${routeCount} MCP routes`,
+      detail: "Source checks, Canvas context, and classroom exports stay consent-gated and server-side."
+    }
+  ];
+  const contracts = [
+    {
+      label: "Inputs",
+      value: "Prompt, table, public sources",
+      detail: "Private accounts and API keys never enter browser responses."
+    },
+    {
+      label: "Outputs",
+      value: "Graph, flags, evidence packet",
+      detail: "Ouija exports scaffolds and source trails, not completed lab reports."
+    },
+    {
+      label: "Evaluation",
+      value: `${result.aiEvaluationHarness.score}/100 harness`,
+      detail: "Run-level AI checks plus the public nine-case regression suite."
+    }
+  ];
+
+  return (
+    <section className="ai-architecture-map" id="architecture" aria-label="AI Architecture Map">
+      <div className="panel-title">
+        <Workflow size={18} />
+        <h3>AI Architecture Map</h3>
+      </div>
+      <div className="architecture-summary">
+        <div>
+          <p className="section-label">Technical shape</p>
+          <strong>Classifier {"->"} grounding {"->"} data audit {"->"} learning guard {"->"} MCP bridge</strong>
+        </div>
+        <span>Not a chat wrapper</span>
+      </div>
+      <div className="architecture-stage-grid">
+        {architectureStages.map((stage, index) => (
+          <article key={stage.label}>
+            <small>{String(index + 1).padStart(2, "0")}</small>
+            <div>
+              <p className="section-label">{stage.label}</p>
+              <strong>{stage.value}</strong>
+              <span>{stage.detail}</span>
+            </div>
+          </article>
+        ))}
+      </div>
+      <div className="architecture-contract-grid" aria-label="Architecture contracts">
+        {contracts.map((contract) => (
+          <article key={contract.label}>
+            <p className="section-label">{contract.label}</p>
+            <strong>{contract.value}</strong>
+            <span>{contract.detail}</span>
+          </article>
         ))}
       </div>
     </section>
