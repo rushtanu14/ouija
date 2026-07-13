@@ -192,6 +192,7 @@ a {
 .mcp-integration-panel,
 .evaluation-panel,
 .ux-proof-panel,
+.submission-gate-panel,
 .top-award-radar,
 .judge-brief-panel,
 .settings-panel,
@@ -3907,6 +3908,7 @@ td input {
 .mcp-integration-panel,
 .evaluation-panel,
 .ux-proof-panel,
+.submission-gate-panel,
 .model-card-panel,
 .top-award-radar,
 .judge-brief-panel,
@@ -4236,6 +4238,85 @@ td input {
 
 .top-award-actions li {
   line-height: 1.4;
+}
+
+.submission-gate-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-radius: 8px;
+  padding: 12px;
+  color: #173b74;
+  background: #eef5ff;
+}
+
+.submission-gate-summary strong {
+  display: block;
+  color: #173b74;
+  line-height: 1.2;
+}
+
+.submission-gate-summary > span {
+  flex: 0 0 auto;
+  border-radius: 8px;
+  padding: 7px 10px;
+  color: #7a4b13;
+  background: #fff7e8;
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.submission-gate-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.submission-gate-item {
+  display: grid;
+  gap: 8px;
+  border: 1px solid #d9e5f2;
+  border-radius: 8px;
+  padding: 10px;
+  background: #fbfdff;
+}
+
+.submission-gate-item strong {
+  color: #172439;
+  font-size: 15px;
+  line-height: 1.25;
+}
+
+.submission-gate-item-pass {
+  border-color: #bfe4cb;
+  background: #f6fcf8;
+}
+
+.submission-gate-item-review {
+  border-color: #f3d59b;
+  background: #fffaf0;
+}
+
+.submission-gate-item-external {
+  border-color: #d9e5f2;
+  background: #f8fbff;
+}
+
+.submission-gate-item span,
+.submission-gate-boundary {
+  color: #536478;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.submission-gate-boundary {
+  margin: 0;
+  border-left: 4px solid #d89124;
+  border-radius: 8px;
+  padding: 10px 12px;
+  background: #fff8ec;
+  font-weight: 750;
 }
 
 .judge-score {
@@ -5737,6 +5818,10 @@ td input {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .submission-gate-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .technical-depth-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -5979,6 +6064,15 @@ td input {
   }
 
   .ux-proof-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .submission-gate-summary {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .submission-gate-grid {
     grid-template-columns: 1fr;
   }
 

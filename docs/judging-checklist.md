@@ -134,6 +134,7 @@
 - Portfolio Story Builder appears inside Progress Portfolio so judges can inspect student-authored impact prompts before any classroom export.
 - MCP Integration Coach appears near Progress Portfolio so judges can inspect the exact source-audit/export payload, Composio Search route, Scholar claim-check route, Semantic Scholar reference-check route, Browser source-capture route, DeepWiki source-proof route, Canvas assignment-context route, Google Classroom pre-lab checkpoint route, Google Forms readiness route, Google Calendar next-trial reminder route, credential boundary, Composio route, and server dry-run readiness matrix before any live connector is enabled.
 - Submission Hub keeps the external judging packet scannable instead of forcing evaluators to hunt through the README or Devpost copy.
+- AIYES Submission Gate separates passed app/deck/video/source/AI/UX requirements from the external Devpost roster and final-submit step.
 - Desktop and mobile E2E checks verify no horizontal overflow.
 
 ## Remaining Submission Work
@@ -144,6 +145,6 @@
 - Handle the live Devpost page's listed 2-5 member team requirement; the overview text also says participants may work individually, so verify the submission form behavior before final submit.
 - Optionally configure a real OpenAI API key for one web-search-enriched demo and live Composio credentials for classroom exports.
 - Use `/api/runtime-proof`, `/api/evaluate`, `/api/mcp/status`, and a consent-gated `/api/mcp/session` dry-run as quick public smoke checks after each deploy.
-- In Judge Brief, verify the AIYES Submission Checklist shows slide presentation, video walkthrough, submission hub, source/deployment, and the external 2-5 student team step.
+- In Judge mode, verify AIYES Submission Gate and Judge Brief show slide presentation, video walkthrough, submission hub, source/deployment, and the external 2-5 student team step.
 - Present or export `docs/aiyes-slide-deck.html`.
 - Paste `docs/devpost-submission-copy.md` into Devpost.

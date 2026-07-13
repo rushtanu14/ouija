@@ -40,7 +40,7 @@ Show AIYES Development Journey: the run maps the required development story from
 
 ## 2:34-2:42 - Top Award Radar
 
-Show Top Award Radar and UX and Accessibility Proof: Ouija is submittable and competitive, but it does not pretend first place is guaranteed. Point to problem relevance, AI/model strategy, student-first UX, responsive/no-overflow proof, submission package readiness, pilot evidence, and the external Devpost/team/judging blockers.
+Show Top Award Radar, UX and Accessibility Proof, and AIYES Submission Gate: Ouija is submittable and competitive, but it does not pretend first place is guaranteed. Point to problem relevance, AI/model strategy, student-first UX, responsive/no-overflow proof, deck/video/source readiness, pilot evidence, and the external Devpost/team/judging blockers.
 
 ## 2:42-2:56 - Pre-Lab, Student Level Lens, Concept Mastery, Learning Impact, Pilot Evidence, Exit Ticket, And Reflection Workspace
 
@@ -80,7 +80,7 @@ Show Deterministic Regression Suite with 9/9 internal behavior checks: projectil
 
 ## 4:58-5:00 - Judge Brief
 
-Show Judge Brief so evaluators see Track 1 fit, Judge Demo Path, Submission Hub, live app, hosted deck/video/source links, AIYES submission checklist, official rubric fit, Top Award Radar, UX proof, learning impact, student pilot protocol, pilot evidence capture, learning exit ticket, student level lens, Concept Mastery Check, student reflection workspace, progress portfolio, grounding audit, AI evaluation harness, data-handling ethics, pattern evidence, model strategy, AI pipeline, evaluation, tests, and integrity constraints in one place.
+Show Judge Brief so evaluators see Track 1 fit, Judge Demo Path, Submission Hub, live app, hosted deck/video/source links, AIYES Submission Gate, official rubric fit, Top Award Radar, UX proof, learning impact, student pilot protocol, pilot evidence capture, learning exit ticket, student level lens, Concept Mastery Check, student reflection workspace, progress portfolio, grounding audit, AI evaluation harness, data-handling ethics, pattern evidence, model strategy, AI pipeline, evaluation, tests, and integrity constraints in one place.
 
 ## Closing Line
 

@@ -24,6 +24,7 @@ Ouija connects four pieces in one workflow:
 - Model Strategy that exposes candidate ranking, matched signals, fallback logic, validators, and risk controls.
 - AI Architecture Map that shows the classifier, grounding, data-audit, learning-guard, and MCP evidence bridge as one inspectable system.
 - UX and Accessibility Proof that maps the official UX/design criterion to student-first flow, judge navigation, responsive layout, labeled controls, clickable citations, and integrity prompts.
+- AIYES Submission Gate that converts live Devpost requirements into pass, review, and external statuses for eligibility, Track 1 fit, deck, video, source/deploy link, impact, AI design, and UX.
 - Technical Depth Proof that condenses decision trace, evaluation harness, grounding quality, expected-pattern engine, privacy, and integrity into one judge-readable panel.
 - AI Evaluation Harness that scores classifier confidence, coverage, grounding, validators, safety/integrity, and fallback boundaries.
 - Data Handling Ledger that exposes privacy score, data flows, retention, student controls, and server-only API-key boundaries.

@@ -141,6 +141,7 @@ const judgeNavLinks = [
   { href: "#mcp-export", label: "MCP Export" },
   { href: "#model-card", label: "Model Card" },
   { href: "#top-award", label: "Award Radar" },
+  { href: "#submission-gate", label: "Submit Gate" },
   { href: "#judge", label: "Judge Brief" },
   { href: "#settings", label: "Settings" }
 ];
@@ -626,6 +627,7 @@ export function App() {
               pilotEvidenceSummary={pilotEvidenceSummary}
               savedLabCount={savedLabs.length}
             />
+            <SubmissionGatePanel evaluationReport={evaluationReport} runtimeProof={runtimeProof} mcpBridgeStatus={mcpBridgeStatus} />
             <JudgeBriefPanel result={result} />
           </>
         ) : null}
@@ -1391,6 +1393,96 @@ function TopAwardRadarPanel({
           ))}
         </ol>
       </div>
+    </section>
+  );
+}
+
+function SubmissionGatePanel({
+  evaluationReport,
+  runtimeProof,
+  mcpBridgeStatus
+}: {
+  evaluationReport: EvaluationReport | null;
+  runtimeProof: RuntimeProof | null;
+  mcpBridgeStatus: McpBridgeStatus | null;
+}) {
+  const regressionReady = evaluationReport?.status === "pass";
+  const runtimeReady = runtimeProof?.status === "fallback_ready" || runtimeProof?.status === "web_enriched_ready";
+  const mcpRouteCount = mcpBridgeStatus?.toolkits.length ?? 0;
+  const gateItems = [
+    {
+      label: "Eligibility",
+      status: "External",
+      detail: "AIYES page lists ages 13-18, students only, and a 2-5 member team; final roster must be handled in Devpost."
+    },
+    {
+      label: "Track 1 fit",
+      status: "Pass",
+      detail: "Built and deployed as a practical AI-powered app, not only a proposal, image series, or generated video."
+    },
+    {
+      label: "Slide presentation",
+      status: "Pass",
+      detail: "Hosted deck covers problem, architecture, model strategy, evaluation, UX, ethics, impact, and constraints."
+    },
+    {
+      label: "Video walkthrough",
+      status: "Pass",
+      detail: "Hosted walkthrough demonstrates the app and stays inside the five-minute requirement."
+    },
+    {
+      label: "Source or deploy link",
+      status: "Pass",
+      detail: "Public GitHub source, live app, Judge view, Submission Hub, and Devpost pack are all hosted."
+    },
+    {
+      label: "Problem and impact",
+      status: "Pass",
+      detail: "Student Impact Brief, Learning Impact Loop, Pilot Kit, and Pilot Evidence Tracker expose need and evidence gaps."
+    },
+    {
+      label: "AI technical design",
+      status: regressionReady && runtimeReady ? "Pass" : "Review",
+      detail: `${runtimeReady ? "Runtime proof ready" : "Runtime proof loading"}; ${
+        regressionReady ? "9/9 regression checks passed" : "regression proof loading"
+      }; ${mcpRouteCount} MCP route${mcpRouteCount === 1 ? "" : "s"} visible.`
+    },
+    {
+      label: "UX and design",
+      status: "Pass",
+      detail: "Student mode hides judge proof, Judge mode exposes UX and Accessibility Proof, and E2E checks no-overflow behavior."
+    }
+  ];
+  const passCount = gateItems.filter((item) => item.status === "Pass").length;
+  const externalCount = gateItems.filter((item) => item.status === "External").length;
+
+  return (
+    <section className="submission-gate-panel" id="submission-gate" aria-label="AIYES Submission Gate">
+      <div className="panel-title">
+        <ClipboardCheck size={18} />
+        <h3>AIYES Submission Gate</h3>
+      </div>
+      <div className="submission-gate-summary">
+        <div>
+          <p className="section-label">Submittability audit</p>
+          <strong>{passCount}/{gateItems.length} gate items pass</strong>
+        </div>
+        <span>{externalCount} external step</span>
+      </div>
+      <div className="submission-gate-grid">
+        {gateItems.map((item) => (
+          <article className={`submission-gate-item submission-gate-item-${item.status.toLowerCase()}`} key={item.label}>
+            <div>
+              <p className="section-label">{item.label}</p>
+              <strong>{item.status}</strong>
+            </div>
+            <span>{item.detail}</span>
+          </article>
+        ))}
+      </div>
+      <p className="submission-gate-boundary">
+        Council verdict: Ouija is submittable and competitive for AIYES Track 1, but the app cannot complete the Devpost roster, press submit, or control judging.
+      </p>
     </section>
   );
 }

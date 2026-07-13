@@ -529,11 +529,13 @@ test("student mode keeps the core lab workflow focused before judge proof", asyn
   await expect(page.getByRole("heading", { name: "Model Strategy" })).toHaveCount(0);
   await expect(page.getByRole("heading", { name: "AI Architecture Map" })).toHaveCount(0);
   await expect(page.getByRole("heading", { name: "UX and Accessibility Proof" })).toHaveCount(0);
+  await expect(page.getByRole("heading", { name: "AIYES Submission Gate" })).toHaveCount(0);
   await expect(page.getByRole("heading", { name: "Judge Brief" })).toHaveCount(0);
   await expect(page.getByRole("link", { name: "MCP Export" })).toHaveCount(0);
   await expect(page.getByRole("link", { name: "Architecture" })).toHaveCount(0);
   await expect(page.getByRole("link", { name: "UX Proof" })).toHaveCount(0);
   await expect(page.getByRole("link", { name: "Award Radar" })).toHaveCount(0);
+  await expect(page.getByRole("link", { name: "Submit Gate" })).toHaveCount(0);
 
   await page.getByLabel("View mode").getByRole("button", { name: "Judge" }).click();
   await expect(page).toHaveURL(/judge=1/);
@@ -556,6 +558,14 @@ test("student mode keeps the core lab workflow focused before judge proof", asyn
   await expect(page.getByLabel("UX and Accessibility Proof").getByText("Clickable citations")).toBeVisible();
   await expect(page.getByLabel("UX and Accessibility Proof").getByText("Integrity by design")).toBeVisible();
   await expect(page.getByRole("link", { name: "Award Radar" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Submit Gate" })).toBeVisible();
+  await page.getByRole("link", { name: "Submit Gate" }).click();
+  await expect(page.getByRole("heading", { name: "AIYES Submission Gate" })).toBeVisible();
+  await expect(page.getByLabel("AIYES Submission Gate").getByText("Submittability audit")).toBeVisible();
+  await expect(page.getByLabel("AIYES Submission Gate").getByText("Track 1 fit")).toBeVisible();
+  await expect(page.getByLabel("AIYES Submission Gate").getByText("Source or deploy link")).toBeVisible();
+  await expect(page.getByLabel("AIYES Submission Gate").getByText("Eligibility")).toBeVisible();
+  await expect(page.getByLabel("AIYES Submission Gate").getByText("final roster must be handled in Devpost")).toBeVisible();
 
   await page.getByLabel("View mode").getByRole("button", { name: "Student" }).click();
   await expect(page.getByLabel("View mode").getByRole("button", { name: "Student" })).toHaveAttribute("aria-pressed", "true");

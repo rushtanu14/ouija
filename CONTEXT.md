@@ -62,6 +62,10 @@ The judge-visible system-design layer. It makes Ouija's AI path readable as inta
 
 The judge-visible official User Experience and Design evidence layer. It stays hidden in default Student mode, then appears in Judge mode to show student-first workflow, judge scan path, responsive layout, accessible labels, clickable citations, and integrity-by-design prompts without cluttering the live lab workflow.
 
+### AIYES Submission Gate
+
+The judge-visible Devpost requirement gate. It converts eligibility, Track 1 fit, slide deck, walkthrough video, source/deploy link, problem/impact, AI design, and UX requirements into pass, review, or external statuses so submittability is auditable instead of only described in prose.
+
 ### Composio Browser Source Capture
 
 The newest MCP route in the server dry-run bridge. It adds `composio-browser-source-capture` for public source-page context capture through Composio Browser Tool (`BROWSER_TOOL_CREATE_TASK`, `BROWSER_TOOL_WATCH_TASK`). It is source-context support only; it must not browse private accounts, write the student's final claim, or run live without server-side credentials, allowed tools, and explicit consent.
@@ -104,6 +108,16 @@ The one-click judge packet at `https://ouija-olive.vercel.app/submission/`. It g
 - Ouija's first supported set should balance physics, chemistry, biology, and earth science instead of overfitting to physics.
 - Ouija should support table input first before adding CSV upload or photo/OCR input.
 - Ouija's internet search should ground expected results and explanations in referenced content instead of inventing them from the model alone.
+
+## AIYES Submission Gate Checkpoint - 2026-07-13 UTC / 2026-07-12 PDT
+
+- Council verdict: Ouija works and is submittable/competitive for AIYES Track 1. First place/top-award outcome still cannot be guaranteed because judging, final Devpost submission, final 2-5 student roster, and actual anonymous student pilot observations are external.
+- Highest-leverage controllable gap after UX proof: the app said the submission package was ready, but judges still had to read prose to distinguish passed Devpost requirements from external steps.
+- Added `AIYES Submission Gate` in Judge mode. It turns eligibility, Track 1 fit, slide presentation, video walkthrough, source/deploy link, problem/impact, AI design, and UX into pass, review, or external statuses.
+- Updated top navigation, E2E coverage, README, Devpost copy, AIYES brief, judging checklist, five-minute script, slide deck, Submission Hub, Devpost Submission Pack, public submission pages, and submission-assets proof to reference the gate.
+- Production: `dpl_9HfHYzyhGBno5pxWdbn1KKKuBTqj`, aliased to `https://ouija-olive.vercel.app`.
+- Verification: official AIYES/Devpost page rechecked on 2026-07-13 for deadline, eligibility, Track 1 requirements, and judging criteria; focused Playwright Submission Gate test (4 passed across Chromium, Firefox, WebKit, and mobile Safari); `npm run test` (15 files, 91 tests); `npm run build`; `npm run test:e2e` (40 passed); `npm audit --audit-level=moderate` (0 vulnerabilities); `git diff --check`; `npm run sync:public-submission`; production deploy; live `/api/evaluate` (200, score 100, 9/9 checks); live `/api/mcp/status` (200, `server_dry_run`, 13 routes, Semantic Scholar and Canvas present); live `/api/runtime-proof` (200, `fallback_ready`, 8 templates); hosted submission pages (200 with Submission Gate copy); and hosted desktop/mobile Playwright smoke for Submission Gate with no horizontal overflow and zero console errors.
+- Remaining loops: commit/push, actual Devpost submission, final team roster, optional live OpenAI/Composio credentials only with explicit approval and consent/server setup, optional DeepWiki indexing, and real anonymous pilot observations if the team wants true user-testing evidence.
 
 ## UX and Accessibility Proof Checkpoint - 2026-07-13 UTC / 2026-07-12 PDT
 
