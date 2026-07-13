@@ -88,6 +88,40 @@ export function formatPilotEvidenceSeconds(seconds: number | null): string {
   return `${minutes}m ${remainder}s`;
 }
 
+export function buildPilotEvidenceExport(entries: PilotEvidenceEntry[], summary: PilotEvidenceSummary): string {
+  const header = [
+    "Ouija Pilot Evidence Export",
+    `Status,${formatCsvCell(summary.status)}`,
+    `Summary,${formatCsvCell(summary.headline)}`,
+    `Anonymous observations,${summary.observationCount}`,
+    `Average time to first graph,${formatCsvCell(formatPilotEvidenceSeconds(summary.averageTimeToGraphSeconds))}`,
+    `Average confidence shift,${formatCsvCell(formatExportDelta(summary.averageConfidenceDelta))}`,
+    `Issues spotted,${summary.issueCaughtCount}`,
+    `Exit tickets ready,${summary.reflectionReadyCount}`,
+    `Non-identifying notes,${summary.noteCount}`,
+    "Privacy boundary,No names contact info grades faces or private classroom details. Review notes before sharing externally."
+  ];
+  const rows = [
+    "Observation,Time to graph seconds,Confidence before,Confidence after,Confidence delta,Issue spotted,Exit ticket readiness,Non-identifying note",
+    ...entries.map((entry) =>
+      [
+        entry.label,
+        entry.timeToGraphSeconds || "not recorded",
+        entry.confidenceBefore || "not rated",
+        entry.confidenceAfter || "not rated",
+        formatEntryDelta(entry),
+        formatEvidenceSignal(entry.issueCaught),
+        formatReflectionSignal(entry.reflectionReadiness),
+        redactSensitiveNote(entry.note.trim() || "none")
+      ]
+        .map(formatCsvCell)
+        .join(",")
+    )
+  ];
+
+  return [...header, "", ...rows].join("\n");
+}
+
 function cleanNumberText(value: unknown) {
   if (typeof value !== "string") return "";
   return value.replace(/[^\d.]/g, "").slice(0, 6);
@@ -121,6 +155,46 @@ function isNumber(value: number | null): value is number {
 function average(values: number[]) {
   if (values.length === 0) return null;
   return values.reduce((sum, value) => sum + value, 0) / values.length;
+}
+
+function formatEntryDelta(entry: PilotEvidenceEntry) {
+  const before = toPositiveNumber(entry.confidenceBefore);
+  const after = toPositiveNumber(entry.confidenceAfter);
+  if (before === null || after === null) return "not measured";
+  return formatExportDelta(after - before);
+}
+
+function formatExportDelta(delta: number | null) {
+  if (delta === null) return "not measured";
+  return `${delta >= 0 ? "+" : ""}${delta.toFixed(1)}`;
+}
+
+function formatEvidenceSignal(value: PilotEvidenceEntry["issueCaught"]) {
+  if (value === "yes") return "yes";
+  if (value === "no") return "no";
+  if (value === "unsure") return "unsure";
+  return "not recorded";
+}
+
+function formatReflectionSignal(value: PilotEvidenceEntry["reflectionReadiness"]) {
+  if (value === "ready") return "ready";
+  if (value === "partial") return "partial";
+  if (value === "not_ready") return "not ready";
+  return "not recorded";
+}
+
+function redactSensitiveNote(note: string) {
+  return note
+    .replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi, "[redacted email]")
+    .replace(/\b(?:\+?1[-.\s]?)?(?:\(?\d{3}\)?[-.\s]?)\d{3}[-.\s]?\d{4}\b/g, "[redacted phone]")
+    .replace(/\s+/g, " ")
+    .slice(0, 160);
+}
+
+function formatCsvCell(value: string | number) {
+  const text = String(value);
+  if (!/[",\n]/.test(text)) return text;
+  return `"${text.replaceAll("\"", "\"\"")}"`;
 }
 
 function buildHeadline(status: PilotEvidenceSummary["status"], observationCount: number) {

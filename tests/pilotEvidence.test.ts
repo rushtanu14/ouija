@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  buildPilotEvidenceExport,
   createInitialPilotEvidenceEntries,
   formatPilotEvidenceSeconds,
   normalizePilotEvidenceEntries,
@@ -59,5 +60,28 @@ describe("pilot evidence tracker", () => {
     expect(normalized[0].issueCaught).toBe("");
     expect(normalized[0].reflectionReadiness).toBe("ready");
     expect(normalized[0].note).toHaveLength(160);
+  });
+
+  it("builds a CSV-ready anonymous export and redacts direct contact details", () => {
+    const entries = createInitialPilotEvidenceEntries();
+    const nextEntries = entries.map((entry, index) => ({
+      ...entry,
+      timeToGraphSeconds: index === 0 ? "90" : entry.timeToGraphSeconds,
+      confidenceBefore: index === 0 ? "2" : entry.confidenceBefore,
+      confidenceAfter: index === 0 ? "4" : entry.confidenceAfter,
+      issueCaught: index === 0 ? ("yes" as const) : entry.issueCaught,
+      reflectionReadiness: index === 0 ? ("ready" as const) : entry.reflectionReadiness,
+      note: index === 0 ? "Student emailed rushil@example.com and used 555-123-4567." : entry.note
+    }));
+    const summary = summarizePilotEvidence(nextEntries);
+    const exported = buildPilotEvidenceExport(nextEntries, summary);
+
+    expect(exported).toContain("Ouija Pilot Evidence Export");
+    expect(exported).toContain("Anonymous observations,1");
+    expect(exported).toContain("Observation 1,90,2,4,+2.0,yes,ready");
+    expect(exported).toContain("[redacted email]");
+    expect(exported).toContain("[redacted phone]");
+    expect(exported).not.toContain("rushil@example.com");
+    expect(exported).not.toContain("555-123-4567");
   });
 });

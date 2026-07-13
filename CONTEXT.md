@@ -66,6 +66,10 @@ The judge-visible MCP planning layer that turns Ouija's connector story into sco
 
 The browser-local student-testing evidence layer. It logs anonymous pilot observations for time to first graph, confidence before/after, issue spotting, exit-ticket readiness, and non-identifying notes. It starts empty with an explicit no-fake-testing warning and must not collect names, grades, faces, contact info, or private classroom details.
 
+### Pilot Evidence Export
+
+The copyable evidence handoff inside Pilot Evidence Tracker. It turns browser-local anonymous observations into a CSV-ready summary for Devpost, Sheets, Forms, or Notion and redacts direct contact strings before sharing, while still warning the team to review notes and avoid fake completed user-testing claims.
+
 ### Student Impact Brief
 
 The first-scroll real-world relevance layer. It names the target student, lab-reasoning pain point, before/after benefit, why AI helps, evidence basis, and remaining anonymous-pilot proof gap before judges reach the deeper technical proof stack.
@@ -84,6 +88,19 @@ The one-click judge packet at `https://ouija-olive.vercel.app/submission/`. It g
 - Ouija's first supported set should balance physics, chemistry, biology, and earth science instead of overfitting to physics.
 - Ouija should support table input first before adding CSV upload or photo/OCR input.
 - Ouija's internet search should ground expected results and explanations in referenced content instead of inventing them from the model alone.
+
+## Pilot Evidence Export Checkpoint - 2026-07-13 UTC / 2026-07-12 PDT
+
+- Council verdict: Ouija works and is submittable for AIYES Track 1, but first place/top-award outcome still cannot be guaranteed because judging, final Devpost submission, final 2-5 student roster, and actual student pilot observations are external.
+- Added `buildPilotEvidenceExport` so anonymous pilot observations produce a CSV-ready export with status, summary metrics, observation rows, confidence deltas, and privacy boundary copy.
+- Added direct-contact redaction for emails and phone-like strings in exported pilot notes. This does not replace human review, but it lowers the risk of accidentally sharing direct identifiers.
+- Added a `Pilot evidence export` card inside Pilot Evidence Tracker with a copy button and read-only CSV preview for Devpost, Sheets, Forms, Notion, or Composio handoff.
+- Updated README, Devpost copy, judging checklist, AIYES brief, and demo script so judges see a practical route from anonymous pilot protocol to exportable evidence.
+- Added `OUIJA_ANALYZE_RATE_LIMIT` so trusted classroom/demo/E2E runs can raise deterministic `/api/analyze` throughput without changing the lower public paid-enrichment defaults. This fixed a Firefox full-matrix 429 in local Playwright without weakening production rate-limit behavior.
+- Refreshed submission screenshots and walkthrough. New walkthrough proof is 1440x900, 201.36 seconds, 20,452,016 bytes, SHA-256 `bf7e6b5822ddb36b3c49eb239c02b217a5d4f1db89037f1a46035083ae1e0600`.
+- Production: `dpl_2dx1LZH3XUSzwxtGyCN3G5JhZypq`, aliased to `https://ouija-olive.vercel.app`.
+- Verification: `npm run test` (15 files, 88 tests), `npm run build`, `npm run test:e2e` (40 passed across Chromium, Firefox, WebKit, and mobile Safari), `npm audit --json` (0 vulnerabilities), focused Chromium and Firefox checks, local capture/record/sync submission assets, production deploy, live `/api/evaluate` (200, score 100), live `/api/mcp/status` (200, `server_dry_run`), hosted video HEAD (200, `content-length: 20452016`), and hosted desktop/mobile Playwright smoke for Pilot Evidence Export with no horizontal overflow and zero console errors.
+- Remaining loops: commit/push, actual Devpost submission, final team roster, optional live OpenAI/Composio credentials only with explicit approval and consent/server setup, optional DeepWiki indexing, and real anonymous pilot observations if the team wants true user-testing evidence.
 
 ## Student Impact Brief Checkpoint - 2026-07-13 UTC / 2026-07-12 PDT
 

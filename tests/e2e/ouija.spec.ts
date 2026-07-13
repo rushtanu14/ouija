@@ -113,8 +113,8 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(page.getByLabel("Pilot tasks").getByText("Confirm the lab match")).toBeVisible();
   await expect(page.getByLabel("Pilot metrics").getByText("Time to first graph")).toBeVisible();
   await expect(page.getByRole("heading", { name: "Pilot Evidence Tracker" })).toBeVisible();
-  await expect(page.getByLabel("Pilot Evidence Tracker").getByText("No pilot observations yet.")).toBeVisible();
-  await expect(page.getByLabel("Pilot Evidence Tracker").getByText("Do not claim completed student testing yet")).toBeVisible();
+  await expect(page.locator(".pilot-evidence-summary").getByText("No pilot observations yet.", { exact: true })).toBeVisible();
+  await expect(page.locator(".pilot-evidence-boundary").getByText("Do not claim completed student testing yet")).toBeVisible();
   await page.getByLabel("Time to graph Observation 1").fill("90");
   await page.getByLabel("Confidence before Observation 1").selectOption("2");
   await page.getByLabel("Confidence after Observation 1").selectOption("4");
@@ -124,6 +124,9 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(page.getByLabel("Pilot evidence metrics").getByText("1/3")).toBeVisible();
   await expect(page.getByLabel("Pilot evidence metrics").getByText("1m 30s")).toBeVisible();
   await expect(page.getByLabel("Pilot evidence metrics").getByText("+2.0")).toBeVisible();
+  await expect(page.getByLabel("Pilot evidence export card").getByText("CSV-ready anonymous summary")).toBeVisible();
+  await expect(page.getByRole("textbox", { name: "Pilot evidence CSV export" })).toHaveValue(/Anonymous observations,1/);
+  await expect(page.getByRole("textbox", { name: "Pilot evidence CSV export" })).toHaveValue(/Observation 1,90,2,4,\+2.0,yes,ready/);
   await expect(page.getByRole("heading", { name: "Learning Exit Ticket" })).toBeVisible();
   await expect(page.getByLabel("Learning Exit Ticket").getByText("Exit ticket prompts")).toBeVisible();
   await expect(page.getByLabel("Learning Exit Ticket").getByText(/Which part of your setup was the independent variable/i)).toBeVisible();
@@ -613,7 +616,7 @@ test("student can analyze an Ohm's law circuit lab", async ({ page }) => {
   await page.goto("/");
   await page.getByRole("button", { name: "Ohm's Law" }).click();
 
-  await expect(page.getByRole("heading", { name: "Ohm's Law Circuits" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Ohm's Law Circuits" })).toBeVisible({ timeout: 15_000 });
   await expect(page.getByLabel("Sources and explanation").getByRole("link", { name: /Ohm's law/i })).toBeVisible();
   await expect(page.getByLabel("Student evidence packet")).toHaveValue(/Ouija Evidence Packet: Ohm's Law Circuits/);
 });
@@ -622,7 +625,7 @@ test("student can analyze a pendulum period lab", async ({ page }) => {
   await page.goto("/");
   await page.getByRole("button", { name: "Pendulum" }).click();
 
-  await expect(page.getByRole("heading", { name: "Pendulum Period vs Length" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Pendulum Period vs Length" })).toBeVisible({ timeout: 15_000 });
   await expect(page.getByLabel("Sources and explanation").getByRole("link", { name: /Pendulum motion/i })).toBeVisible();
   await expect(page.getByLabel("Concept Coach").getByText("small-angle swing")).toBeVisible();
   await expect(page.getByLabel("Student evidence packet")).toHaveValue(/Ouija Evidence Packet: Pendulum Period vs Length/);

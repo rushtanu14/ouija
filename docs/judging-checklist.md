@@ -15,6 +15,7 @@
 - AIYES Development Journey gives judges a required-submission story from problem identification through constraints and hosted links.
 - Learning Impact Loop measures whether a run leaves the student ready to reason, watching flags, or needing fixes.
 - Student Pilot Study Kit gives judges a consent-safe 10-minute protocol for collecting anonymous UX and impact evidence without claiming fake completed user testing.
+- Pilot Evidence Tracker includes a CSV-ready anonymous export so the team can carry real pilot observations into Devpost or Composio-backed Sheets/Forms/Notion handoffs.
 - Pre-Lab Design Coach helps students plan variables, controls, repeats, source checks, table columns, and safety before collecting data.
 - Learning Exit Ticket asks the student to explain variables, graph pattern, and next step in their own words before writing.
 - Student Level Lens adapts the same run for middle-school pattern reading or high-school quantitative evidence, controls, repeats, and uncertainty.
@@ -36,6 +37,7 @@
 - AI Evaluation Harness scores classifier confidence, coverage, source grounding, pattern validation, repeat reliability, row validators, safety/integrity, and fallback boundaries.
 - Data Handling Ledger exposes what student data is used, where it is stored, retention, local snapshots, student controls, and the server-only API-key boundary.
 - Student Pilot Study Kit is included in the analysis schema, Evidence Packet, rubric fit, development journey, evaluation evidence, and Google Forms MCP preview.
+- Pilot Evidence Tracker export redacts direct contact details and keeps the pilot evidence path browser-local until the team intentionally copies or validates a consent-gated handoff.
 - MCP Integration Coach validates Composio-powered Search, Scholar claim checks, Browser source capture, DeepWiki public-source proof, Google Docs, Google Sheets, Google Drive, Google Classroom, Google Forms, Google Calendar, and Notion routes through `/api/mcp/export`, then prepares a scoped `/api/mcp/session` ticket while keeping `COMPOSIO_API_KEY`, auth config IDs where required, and raw MCP URLs server-side. Judge Mode shows the source-verification session before any write/export connector.
 - Grounding Audit scores citation visibility, source agreement, mixed-evidence boundaries, and student source use.
 - Result schema separates classification, expected result, citations, row checks, hints, and Claim Coach.

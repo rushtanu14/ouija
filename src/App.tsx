@@ -41,6 +41,7 @@ import { buildPasteExample, parsePastedTable } from "./lib/dataImport";
 import { buildEvidencePacket } from "./lib/evidencePacket";
 import { buildMcpIntegrationPlan } from "./lib/mcpIntegrationPlan";
 import {
+  buildPilotEvidenceExport,
   createInitialPilotEvidenceEntries,
   formatPilotEvidenceSeconds,
   normalizePilotEvidenceEntries,
@@ -2515,6 +2516,27 @@ function PilotEvidenceTrackerPanel({
   onEntryChange: (id: string, patch: Partial<Omit<PilotEvidenceEntry, "id" | "label">>) => void;
   onReset: () => void;
 }) {
+  const [copyStatus, setCopyStatus] = useState("");
+  const exportText = useMemo(() => buildPilotEvidenceExport(entries, summary), [entries, summary]);
+
+  useEffect(() => {
+    setCopyStatus("");
+  }, [exportText]);
+
+  async function copyPilotEvidence() {
+    if (!navigator.clipboard) {
+      setCopyStatus("Select the export text to copy.");
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(exportText);
+      setCopyStatus("Pilot evidence export copied.");
+    } catch {
+      setCopyStatus("Select the export text to copy.");
+    }
+  }
+
   return (
     <section
       className={`pilot-evidence-tracker pilot-evidence-tracker-${summary.status}`}
@@ -2651,6 +2673,28 @@ function PilotEvidenceTrackerPanel({
             </label>
           </article>
         ))}
+      </div>
+      <div className="pilot-evidence-export" aria-label="Pilot evidence export card">
+        <div className="pilot-evidence-export-header">
+          <div>
+            <p className="section-label">Pilot evidence export</p>
+            <strong>CSV-ready anonymous summary</strong>
+          </div>
+          <button type="button" onClick={() => void copyPilotEvidence()}>
+            <Copy size={16} />
+            Copy evidence
+          </button>
+        </div>
+        <textarea aria-label="Pilot evidence CSV export" readOnly value={exportText} />
+        <div className="pilot-evidence-export-note">
+          <span>Emails and phone-like strings are redacted automatically.</span>
+          <span>Review notes before sharing with Devpost, Sheets, Forms, or Notion.</span>
+        </div>
+        {copyStatus ? (
+          <p className="copy-status" role="status">
+            {copyStatus}
+          </p>
+        ) : null}
       </div>
       <div className="pilot-evidence-boundary">
         <strong>{summary.judgeTakeaway}</strong>

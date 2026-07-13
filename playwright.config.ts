@@ -10,7 +10,7 @@ export default defineConfig({
   },
   webServer: [
     {
-      command: "npm run dev:server",
+      command: "OUIJA_ANALYZE_RATE_LIMIT=1000 npm run dev:server",
       url: "http://127.0.0.1:8787/api/health",
       reuseExistingServer: !process.env.CI,
       timeout: 120_000

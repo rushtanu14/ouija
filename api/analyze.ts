@@ -2,7 +2,7 @@ import { analyzeExperiment, mergeEnrichment } from "../src/lib/analysis.js";
 import { enrichWithOpenAIWebSearch } from "../server/openaiGrounding.js";
 import { validateAnalyzeRequest } from "../server/requestValidation.js";
 import { apiAllowedHeaders, isAllowedOrigin, readRequestHeader, requestClientKey } from "../server/httpSecurity.js";
-import { consumeRateLimit } from "../server/rateLimit.js";
+import { consumeRateLimit, resolveAnalyzeRateLimit } from "../server/rateLimit.js";
 
 interface RequestLike {
   method?: string;
@@ -30,7 +30,7 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
     return;
   }
 
-  const requestLimit = process.env.OPENAI_API_KEY ? 20 : 120;
+  const requestLimit = resolveAnalyzeRateLimit();
   const limit = consumeRateLimit(`analyze:${requestClientKey(req.headers)}`, { limit: requestLimit, windowMs: 60_000 });
   if (!limit.allowed) {
     res.setHeader("Retry-After", String(limit.retryAfterSeconds));

@@ -30,3 +30,10 @@ export function consumeRateLimit(key: string, options: RateLimitOptions, now = D
 export function resetRateLimitsForTests() {
   buckets.clear();
 }
+
+export function resolveAnalyzeRateLimit(env: Partial<Pick<NodeJS.ProcessEnv, "OPENAI_API_KEY" | "OUIJA_ANALYZE_RATE_LIMIT">> = process.env) {
+  const configuredLimit = Number(env.OUIJA_ANALYZE_RATE_LIMIT);
+  if (Number.isInteger(configuredLimit) && configuredLimit > 0) return configuredLimit;
+
+  return env.OPENAI_API_KEY ? 20 : 120;
+}

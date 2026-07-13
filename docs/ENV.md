@@ -11,6 +11,7 @@ Generated from `server/index.ts`, `server/openaiGrounding.ts`, `server/mcpBridge
 | `HOST` | No | Host for the Express server. Defaults to `127.0.0.1` in development and `0.0.0.0` when `NODE_ENV=production`. | `127.0.0.1` |
 | `NODE_ENV` | No | Standard Node environment flag; affects default host selection. | `production` |
 | `OUIJA_ALLOWED_ORIGIN` | No | Comma-separated extra browser origins allowed by API CORS. The production origin and local Vite origin are allowed by default. Untrusted origins are not reflected. | `https://preview.example.com` |
+| `OUIJA_ANALYZE_RATE_LIMIT` | No | Optional positive integer override for `/api/analyze` requests per client key per minute. Use only for trusted classrooms, demos, or E2E harnesses. | `1000` |
 | `OUIJA_URL` | No | Base URL used by submission screenshot and walkthrough scripts. | capture: `http://127.0.0.1:5188`; walkthrough: `https://ouija-olive.vercel.app` |
 | `OUIJA_CAPTION_MS` | No | Milliseconds each walkthrough caption remains visible during `npm run record:walkthrough`. | `8500` |
 | `CI` | No | Used by Playwright config to decide whether to reuse an existing local server. | `true` |

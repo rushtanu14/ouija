@@ -11,7 +11,7 @@ const recordingDir = mkdtempSync(join(tmpdir(), "ouija-walkthrough-"));
 const outputPath = resolve(assetDir, "ouija-walkthrough.webm");
 const captionDurationMs = Number(process.env.OUIJA_CAPTION_MS ?? 6000);
 let captionIndex = 0;
-const captionTotal = 44;
+const captionTotal = 45;
 
 mkdirSync(assetDir, { recursive: true });
 
@@ -138,6 +138,19 @@ await caption(
   page,
   "Student Pilot Study Kit",
   "Ouija gives a consent-safe 10-minute pilot protocol with anonymous tasks, metrics, observer notes, and evidence to collect before claiming student impact."
+);
+
+await page.getByLabel("Time to graph Observation 1").fill("90");
+await page.getByLabel("Confidence before Observation 1").selectOption("2");
+await page.getByLabel("Confidence after Observation 1").selectOption("4");
+await page.getByLabel("Issue spotted Observation 1").selectOption("yes");
+await page.getByLabel("Exit ticket Observation 1").selectOption("ready");
+await page.getByLabel("Pilot note Observation 1").fill("Student found the graph warning before writing.");
+await page.getByRole("textbox", { name: "Pilot evidence CSV export" }).scrollIntoViewIfNeeded();
+await caption(
+  page,
+  "Pilot Evidence Export",
+  "Real pilot observations can become a CSV-ready anonymous summary for Devpost, Sheets, Forms, or Notion without claiming fake testing."
 );
 
 await page.getByRole("heading", { name: "Learning Exit Ticket" }).scrollIntoViewIfNeeded();

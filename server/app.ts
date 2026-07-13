@@ -7,7 +7,7 @@ import { buildRuntimeProof } from "../src/lib/runtimeProof";
 import { createMcpSessionTicket, getMcpBridgeStatus, validateMcpExportRequest } from "./mcpBridge";
 import { enrichWithOpenAIWebSearch } from "./openaiGrounding";
 import { validateAnalyzeRequest } from "./requestValidation";
-import { consumeRateLimit } from "./rateLimit";
+import { consumeRateLimit, resolveAnalyzeRateLimit } from "./rateLimit";
 import { isAllowedOrigin } from "./httpSecurity";
 
 interface AppOptions {
@@ -58,7 +58,7 @@ export function createApp(options: AppOptions = {}) {
   });
 
   app.post("/api/analyze", async (req, res) => {
-    const requestLimit = process.env.OPENAI_API_KEY ? 20 : 120;
+    const requestLimit = resolveAnalyzeRateLimit();
     const limit = consumeRateLimit(`analyze:${req.ip}`, { limit: requestLimit, windowMs: 60_000 });
     if (!limit.allowed) {
       res.setHeader("Retry-After", String(limit.retryAfterSeconds));

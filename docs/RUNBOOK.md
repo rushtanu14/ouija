@@ -74,7 +74,7 @@ Generated from `server/app.ts`, `api/health.ts`, and `api/evaluate.ts`.
 - `npm run test:e2e` runs Chromium, Firefox, WebKit, and mobile Safari projects.
 - `npm run build`, `npm audit --json`, and `git diff --check` remain required before release.
 
-Analysis throttling is intentionally mode-aware: deployments with `OPENAI_API_KEY` allow 20 analysis requests per client key per minute to protect paid web-search usage; credential-free deterministic deployments allow 120 per minute so classrooms and browser matrices sharing an address do not trip the cost-oriented budget. `/api/mcp/session` allows 10 session-ticket requests per client key per minute.
+Analysis throttling is intentionally mode-aware: deployments with `OPENAI_API_KEY` allow 20 analysis requests per client key per minute to protect paid web-search usage; credential-free deterministic deployments allow 120 per minute so classrooms and browser matrices sharing an address do not trip the cost-oriented budget. Trusted classroom, demo, or E2E environments can set `OUIJA_ANALYZE_RATE_LIMIT` to a positive integer override; do not raise it on public paid-enrichment deployments without a cost reason. `/api/mcp/session` allows 10 session-ticket requests per client key per minute.
 
 ## Rollback Procedure
 
