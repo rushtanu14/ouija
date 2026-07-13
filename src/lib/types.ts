@@ -228,8 +228,18 @@ export interface PilotEvidenceEntry {
   note: string;
 }
 
+export interface PilotEvidenceQualityCheck {
+  id: "observation-count" | "timing" | "confidence" | "issue-reflection" | "privacy";
+  label: string;
+  status: "pass" | "review" | "fail";
+  detail: string;
+}
+
 export interface PilotEvidenceSummary {
   status: "needs_evidence" | "collect_more" | "evidence_ready";
+  qualityStatus: "not_ready" | "review" | "submission_ready";
+  qualityScore: number;
+  qualityChecks: PilotEvidenceQualityCheck[];
   headline: string;
   observationCount: number;
   averageTimeToGraphSeconds: number | null;
@@ -237,6 +247,7 @@ export interface PilotEvidenceSummary {
   issueCaughtCount: number;
   reflectionReadyCount: number;
   noteCount: number;
+  directIdentifierRiskCount: number;
   judgeTakeaway: string;
 }
 

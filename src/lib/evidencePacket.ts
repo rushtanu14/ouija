@@ -236,6 +236,13 @@ export function buildEvidencePacket(
     "",
     "## Pilot Evidence Tracker",
     `- Status: ${pilotEvidenceSummary ? formatPilotEvidenceStatus(pilotEvidenceSummary.status) : "Needs evidence"}`,
+    `- Quality gate: ${pilotEvidenceSummary?.qualityScore ?? 0}/100 (${
+      pilotEvidenceSummary ? formatPilotEvidenceQualityStatus(pilotEvidenceSummary.qualityStatus) : "not ready"
+    })`,
+    "- Quality checks:",
+    ...(pilotEvidenceSummary?.qualityChecks ?? []).map(
+      (check) => `  - ${check.label}: ${check.status} - ${check.detail}`
+    ),
     `- Summary: ${pilotEvidenceSummary?.headline ?? "No pilot observations yet."}`,
     `- Anonymous observations: ${pilotEvidenceSummary?.observationCount ?? 0}`,
     `- Average time to first graph: ${formatPilotEvidenceSeconds(pilotEvidenceSummary?.averageTimeToGraphSeconds ?? null)}`,
@@ -243,6 +250,7 @@ export function buildEvidencePacket(
     `- Data or source issues spotted: ${pilotEvidenceSummary?.issueCaughtCount ?? 0}`,
     `- Exit tickets ready: ${pilotEvidenceSummary?.reflectionReadyCount ?? 0}`,
     `- Non-identifying observer notes: ${pilotEvidenceSummary?.noteCount ?? 0}`,
+    `- Direct identifier risks: ${pilotEvidenceSummary?.directIdentifierRiskCount ?? 0}`,
     "- Privacy boundary: Browser-local only; no names, contact info, grades, faces, or private classroom data.",
     `- Judge takeaway: ${
       pilotEvidenceSummary?.judgeTakeaway ??
@@ -447,6 +455,12 @@ function formatPilotEvidenceStatus(status: PilotEvidenceSummary["status"]) {
   if (status === "evidence_ready") return "Evidence ready";
   if (status === "collect_more") return "Collect more";
   return "Needs evidence";
+}
+
+function formatPilotEvidenceQualityStatus(status: PilotEvidenceSummary["qualityStatus"]) {
+  if (status === "submission_ready") return "Submission ready";
+  if (status === "review") return "Review before claiming";
+  return "Not ready";
 }
 
 function formatStudentImpactStatus(status: AnalyzeResult["studentImpactBrief"]["status"]) {

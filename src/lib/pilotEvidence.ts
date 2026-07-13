@@ -62,11 +62,19 @@ export function summarizePilotEvidence(entries: PilotEvidenceEntry[]): PilotEvid
   const issueCaughtCount = observations.filter((entry) => entry.issueCaught === "yes").length;
   const reflectionReadyCount = observations.filter((entry) => entry.reflectionReadiness === "ready").length;
   const noteCount = observations.filter((entry) => entry.note.trim().length > 0).length;
+  const directIdentifierRiskCount = observations.filter((entry) => hasDirectIdentifierRisk(entry.note)).length;
+  const qualityChecks = buildQualityChecks(observations);
+  const qualityScore = calculateQualityScore(qualityChecks, observationCount);
+  const qualityStatus: PilotEvidenceSummary["qualityStatus"] =
+    observationCount === 0 ? "not_ready" : qualityChecks.every((check) => check.status === "pass") ? "submission_ready" : "review";
   const status: PilotEvidenceSummary["status"] =
     observationCount === 0 ? "needs_evidence" : observationCount >= pilotEvidenceRowCount ? "evidence_ready" : "collect_more";
 
   return {
     status,
+    qualityStatus,
+    qualityScore,
+    qualityChecks,
     headline: buildHeadline(status, observationCount),
     observationCount,
     averageTimeToGraphSeconds,
@@ -74,7 +82,8 @@ export function summarizePilotEvidence(entries: PilotEvidenceEntry[]): PilotEvid
     issueCaughtCount,
     reflectionReadyCount,
     noteCount,
-    judgeTakeaway: buildJudgeTakeaway(status)
+    directIdentifierRiskCount,
+    judgeTakeaway: buildJudgeTakeaway(status, qualityStatus)
   };
 }
 
@@ -92,6 +101,8 @@ export function buildPilotEvidenceExport(entries: PilotEvidenceEntry[], summary:
   const header = [
     "Ouija Pilot Evidence Export",
     `Status,${formatCsvCell(summary.status)}`,
+    `Quality status,${formatCsvCell(summary.qualityStatus)}`,
+    `Quality score,${summary.qualityScore}`,
     `Summary,${formatCsvCell(summary.headline)}`,
     `Anonymous observations,${summary.observationCount}`,
     `Average time to first graph,${formatCsvCell(formatPilotEvidenceSeconds(summary.averageTimeToGraphSeconds))}`,
@@ -99,7 +110,12 @@ export function buildPilotEvidenceExport(entries: PilotEvidenceEntry[], summary:
     `Issues spotted,${summary.issueCaughtCount}`,
     `Exit tickets ready,${summary.reflectionReadyCount}`,
     `Non-identifying notes,${summary.noteCount}`,
+    `Direct identifier risks,${summary.directIdentifierRiskCount}`,
     "Privacy boundary,No names contact info grades faces or private classroom details. Review notes before sharing externally."
+  ];
+  const checks = [
+    "Quality checks",
+    ...summary.qualityChecks.map((check) => `${formatCsvCell(check.label)},${formatCsvCell(check.status)},${formatCsvCell(check.detail)}`)
   ];
   const rows = [
     "Observation,Time to graph seconds,Confidence before,Confidence after,Confidence delta,Issue spotted,Exit ticket readiness,Non-identifying note",
@@ -119,7 +135,7 @@ export function buildPilotEvidenceExport(entries: PilotEvidenceEntry[], summary:
     )
   ];
 
-  return [...header, "", ...rows].join("\n");
+  return [...header, "", ...checks, "", ...rows].join("\n");
 }
 
 function cleanNumberText(value: unknown) {
@@ -157,6 +173,84 @@ function average(values: number[]) {
   return values.reduce((sum, value) => sum + value, 0) / values.length;
 }
 
+function buildQualityChecks(observations: PilotEvidenceEntry[]): PilotEvidenceSummary["qualityChecks"] {
+  const observationCount = observations.length;
+  const timingCount = observations.filter((entry) => toPositiveNumber(entry.timeToGraphSeconds) !== null).length;
+  const confidencePairCount = observations.filter(
+    (entry) => toPositiveNumber(entry.confidenceBefore) !== null && toPositiveNumber(entry.confidenceAfter) !== null
+  ).length;
+  const issueReflectionCount = observations.filter((entry) => entry.issueCaught && entry.reflectionReadiness).length;
+  const directIdentifierRiskCount = observations.filter((entry) => hasDirectIdentifierRisk(entry.note)).length;
+
+  return [
+    {
+      id: "observation-count",
+      label: "Three anonymous observations",
+      status: observationCount >= pilotEvidenceRowCount ? "pass" : observationCount > 0 ? "review" : "fail",
+      detail:
+        observationCount >= pilotEvidenceRowCount
+          ? "Three anonymous student runs are logged."
+          : observationCount > 0
+            ? `${observationCount}/3 observations logged; collect three before claiming pilot evidence.`
+            : "No pilot observations have been logged yet."
+    },
+    {
+      id: "timing",
+      label: "Time-to-graph recorded",
+      status: timingCount === observationCount && observationCount > 0 ? "pass" : timingCount > 0 ? "review" : "fail",
+      detail:
+        timingCount === observationCount && observationCount > 0
+          ? "Every logged observation includes time to first graph."
+          : timingCount > 0
+            ? `${timingCount}/${observationCount} logged observations include timing.`
+            : "Record seconds from Analyze to graph/table understanding."
+    },
+    {
+      id: "confidence",
+      label: "Confidence before/after paired",
+      status: confidencePairCount === observationCount && observationCount > 0 ? "pass" : confidencePairCount > 0 ? "review" : "fail",
+      detail:
+        confidencePairCount === observationCount && observationCount > 0
+          ? "Every logged observation includes before/after confidence."
+          : confidencePairCount > 0
+            ? `${confidencePairCount}/${observationCount} observations include paired confidence ratings.`
+            : "Record before and after confidence for each anonymous run."
+    },
+    {
+      id: "issue-reflection",
+      label: "Issue and reflection signals",
+      status: issueReflectionCount === observationCount && observationCount > 0 ? "pass" : issueReflectionCount > 0 ? "review" : "fail",
+      detail:
+        issueReflectionCount === observationCount && observationCount > 0
+          ? "Every logged observation includes issue spotting and exit-ticket readiness."
+          : issueReflectionCount > 0
+            ? `${issueReflectionCount}/${observationCount} observations include both signals.`
+            : "Record whether the student spotted an issue and whether the exit ticket was ready."
+    },
+    {
+      id: "privacy",
+      label: "Privacy scan",
+      status: directIdentifierRiskCount === 0 && observationCount > 0 ? "pass" : directIdentifierRiskCount > 0 ? "review" : "fail",
+      detail:
+        directIdentifierRiskCount === 0 && observationCount > 0
+          ? "No email or phone-like strings detected in observer notes."
+          : directIdentifierRiskCount > 0
+            ? `${directIdentifierRiskCount} note${directIdentifierRiskCount === 1 ? "" : "s"} may contain direct identifiers; review before sharing.`
+            : "Add only non-identifying notes; no names, contact info, grades, faces, or private class details."
+    }
+  ];
+}
+
+function calculateQualityScore(checks: PilotEvidenceSummary["qualityChecks"], observationCount: number) {
+  const rawScore = checks.reduce((score, check) => {
+    if (check.status === "pass") return score + 20;
+    if (check.status === "review") return score + 10;
+    return score;
+  }, 0);
+  if (observationCount > 0 && observationCount < pilotEvidenceRowCount) return Math.min(rawScore, 80);
+  return rawScore;
+}
+
 function formatEntryDelta(entry: PilotEvidenceEntry) {
   const before = toPositiveNumber(entry.confidenceBefore);
   const after = toPositiveNumber(entry.confidenceAfter);
@@ -191,6 +285,10 @@ function redactSensitiveNote(note: string) {
     .slice(0, 160);
 }
 
+function hasDirectIdentifierRisk(note: string) {
+  return /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i.test(note) || /\b(?:\+?1[-.\s]?)?(?:\(?\d{3}\)?[-.\s]?)\d{3}[-.\s]?\d{4}\b/.test(note);
+}
+
 function formatCsvCell(value: string | number) {
   const text = String(value);
   if (!/[",\n]/.test(text)) return text;
@@ -205,9 +303,12 @@ function buildHeadline(status: PilotEvidenceSummary["status"], observationCount:
   return `${observationCount} anonymous observations logged for early pilot evidence.`;
 }
 
-function buildJudgeTakeaway(status: PilotEvidenceSummary["status"]) {
+function buildJudgeTakeaway(status: PilotEvidenceSummary["status"], qualityStatus: PilotEvidenceSummary["qualityStatus"]) {
   if (status === "needs_evidence") {
     return "Do not claim completed student testing yet; this tracker shows exactly what evidence still needs to be collected.";
+  }
+  if (qualityStatus === "review") {
+    return "Pilot observations exist, but the quality gate is still in review; finish timing, confidence, issue/reflection, and privacy checks before claiming submission-ready evidence.";
   }
   if (status === "collect_more") {
     return "Early pilot evidence is started, but judges should see it as a small anonymous sample, not a finished study.";

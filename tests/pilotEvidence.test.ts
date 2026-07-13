@@ -12,6 +12,15 @@ describe("pilot evidence tracker", () => {
     const summary = summarizePilotEvidence(createInitialPilotEvidenceEntries());
 
     expect(summary.status).toBe("needs_evidence");
+    expect(summary.qualityStatus).toBe("not_ready");
+    expect(summary.qualityScore).toBe(0);
+    expect(summary.qualityChecks.map((check) => check.id)).toEqual([
+      "observation-count",
+      "timing",
+      "confidence",
+      "issue-reflection",
+      "privacy"
+    ]);
     expect(summary.observationCount).toBe(0);
     expect(summary.headline).toContain("No pilot observations");
     expect(summary.judgeTakeaway).toContain("Do not claim completed student testing");
@@ -32,6 +41,9 @@ describe("pilot evidence tracker", () => {
     const summary = summarizePilotEvidence(entries);
 
     expect(summary.status).toBe("evidence_ready");
+    expect(summary.qualityStatus).toBe("submission_ready");
+    expect(summary.qualityScore).toBe(100);
+    expect(summary.qualityChecks.every((check) => check.status === "pass")).toBe(true);
     expect(summary.observationCount).toBe(3);
     expect(summary.averageTimeToGraphSeconds).toBe(120);
     expect(summary.averageConfidenceDelta).toBeCloseTo(1);
@@ -39,6 +51,27 @@ describe("pilot evidence tracker", () => {
     expect(summary.reflectionReadyCount).toBe(2);
     expect(summary.noteCount).toBe(1);
     expect(formatPilotEvidenceSeconds(summary.averageTimeToGraphSeconds)).toBe("2m");
+  });
+
+  it("keeps filled pilot rows in review when evidence quality is incomplete", () => {
+    const entries = createInitialPilotEvidenceEntries().map((entry, index) => ({
+      ...entry,
+      timeToGraphSeconds: String(60 + index * 20),
+      confidenceBefore: index === 0 ? "2" : "",
+      confidenceAfter: index === 0 ? "4" : "",
+      issueCaught: "" as const,
+      reflectionReadiness: "" as const,
+      note: index === 1 ? "Student can be reached at 555-123-4567." : ""
+    }));
+
+    const summary = summarizePilotEvidence(entries);
+
+    expect(summary.status).toBe("evidence_ready");
+    expect(summary.qualityStatus).toBe("review");
+    expect(summary.qualityScore).toBeLessThan(100);
+    expect(summary.directIdentifierRiskCount).toBe(1);
+    expect(summary.qualityChecks.find((check) => check.id === "privacy")?.status).toBe("review");
+    expect(summary.judgeTakeaway).toContain("quality gate");
   });
 
   it("normalizes stored rows and ignores unsupported values", () => {
@@ -77,6 +110,8 @@ describe("pilot evidence tracker", () => {
     const exported = buildPilotEvidenceExport(nextEntries, summary);
 
     expect(exported).toContain("Ouija Pilot Evidence Export");
+    expect(exported).toContain("Quality status,review");
+    expect(exported).toContain("Quality score,80");
     expect(exported).toContain("Anonymous observations,1");
     expect(exported).toContain("Observation 1,90,2,4,+2.0,yes,ready");
     expect(exported).toContain("[redacted email]");

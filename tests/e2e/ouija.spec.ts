@@ -114,6 +114,10 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(page.getByLabel("Pilot metrics").getByText("Time to first graph")).toBeVisible();
   await expect(page.getByRole("heading", { name: "Pilot Evidence Tracker" })).toBeVisible();
   await expect(page.locator(".pilot-evidence-summary").getByText("No pilot observations yet.", { exact: true })).toBeVisible();
+  await expect(page.getByLabel("Pilot evidence quality gate").getByText("Quality gate")).toBeVisible();
+  await expect(page.getByLabel("Pilot evidence quality gate").getByText("0/100")).toBeVisible();
+  await expect(page.getByLabel("Pilot evidence quality gate").getByText("Three anonymous observations")).toBeVisible();
+  await expect(page.getByLabel("Pilot evidence quality gate").getByText("Privacy scan")).toBeVisible();
   await expect(page.locator(".pilot-evidence-boundary").getByText("Do not claim completed student testing yet")).toBeVisible();
   await page.getByLabel("Time to graph Observation 1").fill("90");
   await page.getByLabel("Confidence before Observation 1").selectOption("2");
@@ -124,7 +128,11 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(page.getByLabel("Pilot evidence metrics").getByText("1/3")).toBeVisible();
   await expect(page.getByLabel("Pilot evidence metrics").getByText("1m 30s")).toBeVisible();
   await expect(page.getByLabel("Pilot evidence metrics").getByText("+2.0")).toBeVisible();
+  await expect(page.getByLabel("Pilot evidence quality gate").getByText("80/100")).toBeVisible();
+  await expect(page.getByLabel("Pilot evidence quality gate").getByText("Review before claiming")).toBeVisible();
   await expect(page.getByLabel("Pilot evidence export card").getByText("CSV-ready anonymous summary")).toBeVisible();
+  await expect(page.getByRole("textbox", { name: "Pilot evidence CSV export" })).toHaveValue(/Quality status,review/);
+  await expect(page.getByRole("textbox", { name: "Pilot evidence CSV export" })).toHaveValue(/Quality score,80/);
   await expect(page.getByRole("textbox", { name: "Pilot evidence CSV export" })).toHaveValue(/Anonymous observations,1/);
   await expect(page.getByRole("textbox", { name: "Pilot evidence CSV export" })).toHaveValue(/Observation 1,90,2,4,\+2.0,yes,ready/);
   await expect(page.getByRole("heading", { name: "Learning Exit Ticket" })).toBeVisible();
@@ -512,8 +520,8 @@ test("judge mode shows a top award radar with honest win gaps", async ({ page })
   await expect(page.getByLabel("Top Award Radar").getByText("Model Strategy, AI Architecture Map, and Technical Depth Proof are visible.")).toBeVisible();
   await expect(page.getByLabel("Top Award Radar").getByText("UX and design")).toBeVisible();
   await expect(page.locator(".top-award-grid").getByText("Impact evidence", { exact: true })).toBeVisible();
-  await expect(page.getByLabel("Top Award Radar").getByText("1/3 anonymous pilot observations logged")).toBeVisible();
-  await expect(page.getByLabel("Top award next moves").getByText("Collect 3 anonymous pilot observations before claiming user testing.")).toBeVisible();
+  await expect(page.getByLabel("Top Award Radar").getByText("quality gate 80/100")).toBeVisible();
+  await expect(page.getByLabel("Top award next moves").getByText("Complete the pilot evidence quality gate before claiming user testing.")).toBeVisible();
   await expect(page.getByLabel("Top award next moves").getByText("Confirm the 2-5 student team roster in the Devpost submission flow.")).toBeVisible();
 });
 

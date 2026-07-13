@@ -146,11 +146,17 @@ await page.getByLabel("Confidence after Observation 1").selectOption("4");
 await page.getByLabel("Issue spotted Observation 1").selectOption("yes");
 await page.getByLabel("Exit ticket Observation 1").selectOption("ready");
 await page.getByLabel("Pilot note Observation 1").fill("Student found the graph warning before writing.");
+await page.getByLabel("Pilot evidence quality gate").scrollIntoViewIfNeeded();
+await caption(
+  page,
+  "Pilot Evidence Quality Gate",
+  "Ouija scores pilot evidence quality before claims: observations, timing, paired confidence, issue and reflection signals, and privacy scan status."
+);
 await page.getByRole("textbox", { name: "Pilot evidence CSV export" }).scrollIntoViewIfNeeded();
 await caption(
   page,
   "Pilot Evidence Export",
-  "Real pilot observations can become a CSV-ready anonymous summary for Devpost, Sheets, Forms, or Notion without claiming fake testing."
+  "Real pilot observations can become a CSV-ready anonymous summary with quality checks for Devpost, Sheets, Forms, or Notion without claiming fake testing."
 );
 
 await page.getByRole("heading", { name: "Learning Exit Ticket" }).scrollIntoViewIfNeeded();

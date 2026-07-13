@@ -1310,7 +1310,7 @@ function TopAwardRadarPanel({
   const regressionReady = evaluationReport?.status === "pass";
   const runtimeReady = runtimeProof?.status === "fallback_ready" || runtimeProof?.status === "web_enriched_ready";
   const mcpRouteCount = mcpBridgeStatus?.toolkits.length ?? 0;
-  const pilotReady = pilotEvidenceSummary.status === "evidence_ready";
+  const pilotReady = pilotEvidenceSummary.qualityStatus === "submission_ready";
   const savedEvidenceReady = savedLabCount >= 2;
   const radarItems = [
     {
@@ -1340,7 +1340,9 @@ function TopAwardRadarPanel({
       status: pilotReady ? "Strong" : "Collect",
       detail: `${pilotEvidenceSummary.observationCount}/3 anonymous pilot observations logged; ${savedLabCount} saved lab snapshot${
         savedLabCount === 1 ? "" : "s"
-      } available; CSV-ready export is available in Pilot Evidence Tracker.`
+      } available; quality gate ${pilotEvidenceSummary.qualityScore}/100 (${formatPilotEvidenceQualityStatus(
+        pilotEvidenceSummary.qualityStatus
+      )}); CSV-ready export is available in Pilot Evidence Tracker.`
     },
     {
       label: "External blockers",
@@ -1361,14 +1363,14 @@ function TopAwardRadarPanel({
     },
     {
       label: "Remaining Gold risk",
-      value: pilotReady ? "Judge-dependent" : "Impact evidence",
+      value: pilotReady ? "Judge-dependent" : "Pilot quality gate",
       detail: pilotReady
         ? "Anonymous pilot evidence is ready, but final award outcome still depends on judges."
-        : "Collect real anonymous pilot observations before claiming completed user testing."
+        : "Complete the anonymous pilot evidence quality gate before claiming completed user testing."
     }
   ];
   const nextMoves = [
-    pilotReady ? "Use the logged pilot evidence in the demo." : "Collect 3 anonymous pilot observations before claiming user testing.",
+    pilotReady ? "Use the logged pilot evidence in the demo." : "Complete the pilot evidence quality gate before claiming user testing.",
     savedEvidenceReady ? "Show Progress Portfolio as repeated learning proof." : "Save at least 2 lab runs to show progress evidence.",
     "Confirm the 2-5 student team roster in the Devpost submission flow.",
     mcpRouteCount >= 14 ? "Use MCP dry-run proof as technical depth evidence." : "Open MCP status before the demo if route count is still loading.",
@@ -2864,6 +2866,29 @@ function PilotEvidenceTrackerPanel({
         </div>
         <span>{summary.headline}</span>
       </div>
+      <div
+        className={`pilot-evidence-quality pilot-evidence-quality-${summary.qualityStatus}`}
+        aria-label="Pilot evidence quality gate"
+      >
+        <div className="pilot-evidence-quality-summary">
+          <div>
+            <p className="section-label">Quality gate</p>
+            <strong>{summary.qualityScore}/100</strong>
+          </div>
+          <span>{formatPilotEvidenceQualityStatus(summary.qualityStatus)}</span>
+        </div>
+        <div className="pilot-evidence-quality-grid">
+          {summary.qualityChecks.map((check) => (
+            <article className={`pilot-evidence-quality-check pilot-evidence-quality-check-${check.status}`} key={check.id}>
+              <div>
+                <p className="section-label">{check.label}</p>
+                <strong>{formatPilotEvidenceQualityCheckStatus(check.status)}</strong>
+              </div>
+              <span>{check.detail}</span>
+            </article>
+          ))}
+        </div>
+      </div>
       <div className="pilot-evidence-metrics" aria-label="Pilot evidence metrics">
         <article>
           <p className="section-label">Observations</p>
@@ -3915,6 +3940,18 @@ function formatPilotEvidenceStatus(status: PilotEvidenceSummary["status"]) {
   if (status === "evidence_ready") return "Evidence ready";
   if (status === "collect_more") return "Collect more";
   return "Needs evidence";
+}
+
+function formatPilotEvidenceQualityStatus(status: PilotEvidenceSummary["qualityStatus"]) {
+  if (status === "submission_ready") return "Submission ready";
+  if (status === "review") return "Review before claiming";
+  return "Not ready";
+}
+
+function formatPilotEvidenceQualityCheckStatus(status: PilotEvidenceSummary["qualityChecks"][number]["status"]) {
+  if (status === "pass") return "Pass";
+  if (status === "review") return "Review";
+  return "Missing";
 }
 
 function formatStudentImpactStatus(status: StudentImpactBrief["status"]) {

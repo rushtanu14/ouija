@@ -34,6 +34,7 @@ describe("AIYES submission assets", () => {
     expect(deck).toContain("Canvas assignment-context");
     expect(deck).toContain("Gmail teacher-review draft");
     expect(deck).toContain("Gold/Silver/Bronze/Honorable Mention");
+    expect(deck).toContain("Pilot Evidence Tracker adds a 100-point quality gate");
     expect(deck).toContain("AIYES Values Fit");
     expect(deck).toContain("AIYES Development Journey");
     expect(deck).toContain("Technical Depth Proof");
@@ -70,6 +71,7 @@ describe("AIYES submission assets", () => {
     expect(copy).toContain("Canvas assignment-context");
     expect(copy).toContain("Gmail teacher-review draft");
     expect(copy).toContain("Gold/Silver/Bronze/Honorable Mention");
+    expect(copy).toContain("100-point quality gate");
     expect(copy).toContain("AIYES Values Fit");
     expect(copy).toContain("AIYES Development Journey");
     expect(copy).toContain("Technical Depth Proof");
@@ -91,6 +93,9 @@ describe("AIYES submission assets", () => {
     expect(assets).toContain("https://ouija-olive.vercel.app/submission/");
     expect(assets).toContain("https://ouija-olive.vercel.app/submission/devpost-pack.html");
     expect(assets).toContain("ouija-walkthrough.webm");
+    expect(assets).toContain("24,090,761 bytes");
+    expect(assets).toContain("1c3221d19508b61f7ddb86631a1d481549f2058188a349ba92b7c2828eb0e8f0");
+    expect(assets).not.toContain("59fb75c50692bcd6fb4ed7132b67543999fd59a6d18bd29e4565841beeb2d8a2");
     expect(hub).toContain("AIYES Track 1 Submission Hub");
     expect(hub).toContain("https://ouija-olive.vercel.app/?judge=1");
     expect(hub).toContain("/submission/devpost-pack.html");

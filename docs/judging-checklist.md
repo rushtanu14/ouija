@@ -15,7 +15,7 @@
 - AIYES Development Journey gives judges a required-submission story from problem identification through constraints and hosted links.
 - Learning Impact Loop measures whether a run leaves the student ready to reason, watching flags, or needing fixes.
 - Student Pilot Study Kit gives judges a consent-safe 10-minute protocol for collecting anonymous UX and impact evidence without claiming fake completed user testing.
-- Pilot Evidence Tracker includes a CSV-ready anonymous export so the team can carry real pilot observations into Devpost or Composio-backed Sheets/Forms/Notion handoffs.
+- Pilot Evidence Tracker includes a 100-point quality gate and CSV-ready anonymous export so the team can carry real pilot observations into Devpost or Composio-backed Sheets/Forms/Notion handoffs only after timing, confidence, issue/reflection, and privacy checks are visible.
 - Pre-Lab Design Coach helps students plan variables, controls, repeats, source checks, table columns, and safety before collecting data.
 - Learning Exit Ticket asks the student to explain variables, graph pattern, and next step in their own words before writing.
 - Student Level Lens adapts the same run for middle-school pattern reading or high-school quantitative evidence, controls, repeats, and uncertainty.
@@ -39,6 +39,7 @@
 - AI Evaluation Harness scores classifier confidence, coverage, source grounding, pattern validation, repeat reliability, row validators, safety/integrity, and fallback boundaries.
 - Data Handling Ledger exposes what student data is used, where it is stored, retention, local snapshots, student controls, and the server-only API-key boundary.
 - Student Pilot Study Kit is included in the analysis schema, Evidence Packet, rubric fit, development journey, evaluation evidence, and Google Forms MCP preview.
+- Pilot Evidence Tracker quality gate checks observation count, time-to-graph, paired confidence, issue/reflection signals, and privacy scan status before the export is treated as submission-ready.
 - Pilot Evidence Tracker export redacts direct contact details and keeps the pilot evidence path browser-local until the team intentionally copies or validates a consent-gated handoff.
 - MCP Integration Coach validates Composio-powered Search, Scholar claim checks, Semantic Scholar reference checks, Browser source capture, DeepWiki public-source proof, Canvas assignment context, Google Docs, Google Sheets, Google Drive, Google Classroom, Google Forms, Google Calendar, Gmail teacher-review draft, and Notion routes through `/api/mcp/export`, then prepares a scoped `/api/mcp/session` ticket while keeping `COMPOSIO_API_KEY`, auth config IDs where required, and raw MCP URLs server-side. Judge Mode shows the source-verification and Canvas assignment-context sessions before any write/export connector.
 - Grounding Audit scores citation visibility, source agreement, mixed-evidence boundaries, and student source use.
@@ -135,7 +136,7 @@
 - MCP Integration Coach appears near Progress Portfolio so judges can inspect the exact source-audit/export payload, Composio Search route, Scholar claim-check route, Semantic Scholar reference-check route, Browser source-capture route, DeepWiki source-proof route, Canvas assignment-context route, Google Classroom pre-lab checkpoint route, Google Forms readiness route, Google Calendar next-trial reminder route, credential boundary, Composio route, and server dry-run readiness matrix before any live connector is enabled.
 - Submission Hub keeps the external judging packet scannable instead of forcing evaluators to hunt through the README or Devpost copy.
 - AIYES Submission Gate separates passed app/deck/video/source/AI/UX requirements from the external Devpost roster and final-submit step.
-- Top Award Radar now maps the win target to the official AIYES Gold/Silver/Bronze/Honorable Mention certificate bands, so the team can aim for Gold-level evidence without pretending a literal first-place rank is guaranteed.
+- Top Award Radar now maps the win target to the official AIYES Gold/Silver/Bronze/Honorable Mention certificate bands and uses the pilot evidence quality gate as the remaining impact-evidence risk, so the team can aim for Gold-level evidence without pretending a literal first-place rank is guaranteed.
 - Desktop and mobile E2E checks verify no horizontal overflow.
 
 ## Remaining Submission Work
