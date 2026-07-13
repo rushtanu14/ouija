@@ -528,9 +528,11 @@ test("student mode keeps the core lab workflow focused before judge proof", asyn
   await expect(page.getByRole("heading", { name: "Evidence Packet" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Model Strategy" })).toHaveCount(0);
   await expect(page.getByRole("heading", { name: "AI Architecture Map" })).toHaveCount(0);
+  await expect(page.getByRole("heading", { name: "UX and Accessibility Proof" })).toHaveCount(0);
   await expect(page.getByRole("heading", { name: "Judge Brief" })).toHaveCount(0);
   await expect(page.getByRole("link", { name: "MCP Export" })).toHaveCount(0);
   await expect(page.getByRole("link", { name: "Architecture" })).toHaveCount(0);
+  await expect(page.getByRole("link", { name: "UX Proof" })).toHaveCount(0);
   await expect(page.getByRole("link", { name: "Award Radar" })).toHaveCount(0);
 
   await page.getByLabel("View mode").getByRole("button", { name: "Judge" }).click();
@@ -544,6 +546,15 @@ test("student mode keeps the core lab workflow focused before judge proof", asyn
   await expect(page.getByRole("heading", { name: "AIYES Development Journey" })).toBeVisible();
   await expect(page.getByRole("link", { name: "MCP Export" })).toBeVisible();
   await expect(page.getByRole("link", { name: "Architecture" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "UX Proof" })).toBeVisible();
+  await page.getByRole("link", { name: "UX Proof" }).click();
+  await expect(page.getByRole("heading", { name: "UX and Accessibility Proof" })).toBeVisible();
+  await expect(page.getByLabel("UX and Accessibility Proof").getByText("User Experience and Design")).toBeVisible();
+  await expect(page.getByLabel("UX and Accessibility Proof").getByText("Student-first workflow")).toBeVisible();
+  await expect(page.getByLabel("UX and Accessibility Proof").getByText("Responsive layout")).toBeVisible();
+  await expect(page.getByLabel("UX and Accessibility Proof").getByText("Accessible labels")).toBeVisible();
+  await expect(page.getByLabel("UX and Accessibility Proof").getByText("Clickable citations")).toBeVisible();
+  await expect(page.getByLabel("UX and Accessibility Proof").getByText("Integrity by design")).toBeVisible();
   await expect(page.getByRole("link", { name: "Award Radar" })).toBeVisible();
 
   await page.getByLabel("View mode").getByRole("button", { name: "Student" }).click();

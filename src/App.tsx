@@ -137,6 +137,7 @@ const judgeNavLinks = [
   { href: "#saved", label: "Saved Labs" },
   { href: "#progress", label: "Progress" },
   { href: "#architecture", label: "Architecture" },
+  { href: "#ux-proof", label: "UX Proof" },
   { href: "#mcp-export", label: "MCP Export" },
   { href: "#model-card", label: "Model Card" },
   { href: "#top-award", label: "Award Radar" },
@@ -615,6 +616,7 @@ export function App() {
               onValidateAction={validateMcpAction}
             />
             <EvaluationBenchPanel report={evaluationReport} />
+            <UxProofPanel result={result} evaluationReport={evaluationReport} />
             <ModelCardPanel result={result} />
             <TopAwardRadarPanel
               result={result}
@@ -1216,6 +1218,78 @@ function EvaluationBenchPanel({ report }: { report: EvaluationReport | null }) {
   );
 }
 
+function UxProofPanel({
+  result,
+  evaluationReport
+}: {
+  result: AnalyzeResult | null;
+  evaluationReport: EvaluationReport | null;
+}) {
+  const sourceCount = result?.sources.length ?? 0;
+  const reflectionPromptCount = result?.learningExitTicket.prompts.length ?? 0;
+  const checksPassed = evaluationReport ? `${evaluationReport.passed}/${evaluationReport.total}` : "Loading";
+  const proofItems = [
+    {
+      label: "Student-first workflow",
+      value: "Default Student mode",
+      detail: "Core graph, table, sources, and evidence packet stay visible before judge-only proof panels."
+    },
+    {
+      label: "Judge scan path",
+      value: "Dedicated Judge mode",
+      detail: "Demo Path, Architecture, Regression, MCP status, Award Radar, and Judge Brief are reachable from top navigation."
+    },
+    {
+      label: "Responsive layout",
+      value: "No-overflow guard",
+      detail: "Playwright checks desktop, mobile Safari, WebKit, Firefox, and Chromium layout behavior."
+    },
+    {
+      label: "Accessible labels",
+      value: "Named controls",
+      detail: "Analyze, sample chips, paste import, pilot inputs, copy actions, and proof panels use visible labels or ARIA labels."
+    },
+    {
+      label: "Clickable citations",
+      value: `${sourceCount} visible citation${sourceCount === 1 ? "" : "s"}`,
+      detail: "Sources are clickable cards with publisher, title, and use note."
+    },
+    {
+      label: "Integrity by design",
+      value: `${reflectionPromptCount} student prompts`,
+      detail: "Exit tickets, reflection drafts, and claim blanks keep final reasoning student-authored."
+    }
+  ];
+
+  return (
+    <section className="ux-proof-panel" id="ux-proof" aria-label="UX and Accessibility Proof">
+      <div className="panel-title">
+        <CheckCircle2 size={18} />
+        <h3>UX and Accessibility Proof</h3>
+      </div>
+      <div className="ux-proof-summary">
+        <div>
+          <p className="section-label">Official criterion</p>
+          <strong>User Experience and Design</strong>
+        </div>
+        <span>{checksPassed} checks</span>
+      </div>
+      <div className="ux-proof-grid">
+        {proofItems.map((item) => (
+          <article key={item.label}>
+            <p className="section-label">{item.label}</p>
+            <strong>{item.value}</strong>
+            <span>{item.detail}</span>
+          </article>
+        ))}
+      </div>
+      <p className="ux-proof-boundary">
+        UX proof is judge-visible, but the default student screen stays focused on doing the lab: describe, graph, check, reflect, and keep the final claim student-owned.
+      </p>
+    </section>
+  );
+}
+
 function TopAwardRadarPanel({
   result,
   evaluationReport,
@@ -1252,7 +1326,7 @@ function TopAwardRadarPanel({
     {
       label: "UX and design",
       status: "Strong",
-      detail: "Student mode keeps graph/table work first, Judge mode exposes proof, and E2E covers mobile no-overflow."
+      detail: "Student mode keeps graph/table work first, UX Proof exposes accessibility/responsive checks, and E2E covers mobile no-overflow."
     },
     {
       label: "Submission package",
@@ -1385,6 +1459,7 @@ function JudgeBriefPanel({ result }: { result: AnalyzeResult | null }) {
     "AI Architecture Map makes the system design readable as classifier, grounding, data audit, learning guard, and MCP bridge.",
     "Technical Depth Proof makes beyond-simple-API architecture evidence visible.",
     "AI Evaluation Harness scores model behavior and safeguards.",
+    "UX and Accessibility Proof maps the official UX/design criterion to student-first flow, responsive layout, labels, citations, and integrity prompts.",
     "Official Rubric Fit maps all three visible AIYES criteria.",
     "AIYES Values Fit maps democracy, diversity, connectivity, innovation, and ethical inclusion to concrete product evidence.",
     "AIYES Development Journey maps problem, data, model, build, testing, UX, ethics, impact, constraints, and submission proof.",
@@ -1504,6 +1579,7 @@ function ModelCardPanel({ result }: { result: AnalyzeResult | null }) {
     "AI Evaluation Harness scores classifier confidence, coverage, grounding, validators, safety, and fallback boundaries.",
     "Judge Demo Path reduces the live demo to problem fit, AI design, student workflow, evidence handoff, and submission proof.",
     "AI Architecture Map makes the classifier, grounding, data-audit, learning-guard, and MCP-bridge path visible as one system.",
+    "UX and Accessibility Proof shows student-first flow, judge navigation, responsive layout, accessible labels, clickable citations, and integrity-by-design.",
     "Official Rubric Fit maps problem relevance, AI design, and UX to concrete app evidence.",
     "AIYES Values Fit ties the app to AIYES values without changing the student's work into a generated report.",
     "AIYES Development Journey turns the required slide and video story into inspectable run evidence.",

@@ -58,6 +58,10 @@ The UX split that keeps Ouija practical for students while preserving judge proo
 
 The judge-visible system-design layer. It makes Ouija's AI path readable as intake, template classifier, grounding, data engine, learning guard, and evidence bridge, with explicit inputs, outputs, and evaluation contracts. It exists to strengthen AIYES Track 1 architecture clarity without adding more student-facing clutter.
 
+### UX and Accessibility Proof
+
+The judge-visible official User Experience and Design evidence layer. It stays hidden in default Student mode, then appears in Judge mode to show student-first workflow, judge scan path, responsive layout, accessible labels, clickable citations, and integrity-by-design prompts without cluttering the live lab workflow.
+
 ### Composio Browser Source Capture
 
 The newest MCP route in the server dry-run bridge. It adds `composio-browser-source-capture` for public source-page context capture through Composio Browser Tool (`BROWSER_TOOL_CREATE_TASK`, `BROWSER_TOOL_WATCH_TASK`). It is source-context support only; it must not browse private accounts, write the student's final claim, or run live without server-side credentials, allowed tools, and explicit consent.
@@ -100,6 +104,16 @@ The one-click judge packet at `https://ouija-olive.vercel.app/submission/`. It g
 - Ouija's first supported set should balance physics, chemistry, biology, and earth science instead of overfitting to physics.
 - Ouija should support table input first before adding CSV upload or photo/OCR input.
 - Ouija's internet search should ground expected results and explanations in referenced content instead of inventing them from the model alone.
+
+## UX and Accessibility Proof Checkpoint - 2026-07-13 UTC / 2026-07-12 PDT
+
+- Council verdict: Ouija works and is submittable/competitive for AIYES Track 1. First place/top-award outcome still cannot be guaranteed because judging, final Devpost submission, final 2-5 student roster, and actual anonymous student pilot observations are external.
+- Highest-leverage controllable gap: the official User Experience and Design criterion needed a compact proof surface instead of relying on judges to infer UX quality from feature breadth.
+- Added `UX and Accessibility Proof` in Judge mode. It maps the official criterion to student-first flow, judge navigation, responsive layout, named controls, clickable citations, and integrity prompts while keeping default Student mode focused on describe, graph, check, reflect, and student-owned claims.
+- Updated Top Award Radar, Judge Brief, AI Model Card, README, Devpost copy, AIYES brief, judging checklist, five-minute demo script, slide deck, Submission Hub, Devpost Submission Pack, public submission pages, and E2E tests to expose the UX proof clearly.
+- Production: `dpl_6JHHibi8Md7HSkGKuf9Lg19u8r2Y`, aliased to `https://ouija-olive.vercel.app`.
+- Verification: focused Playwright UX proof test (4 passed across Chromium, Firefox, WebKit, and mobile Safari), `npm run test` (15 files, 91 tests), `npm run build`, `npm run test:e2e` (40 passed), `npm audit --audit-level=moderate` (0 vulnerabilities), `git diff --check`, `npm run sync:public-submission`, production deploy, live `/api/evaluate` (200, score 100, 9/9 checks), live `/api/mcp/status` (200, `server_dry_run`, 13 routes, Semantic Scholar and Canvas present), live `/api/runtime-proof` (200, `fallback_ready`, 8 templates), hosted submission pages (200 with UX/MCP proof copy), and hosted desktop/mobile Playwright smoke for UX proof with no horizontal overflow and zero console errors.
+- Remaining loops: commit/push, actual Devpost submission, final team roster, optional live OpenAI/Composio credentials only with explicit approval and consent/server setup, optional DeepWiki indexing, and real anonymous pilot observations if the team wants true user-testing evidence.
 
 ## AI Architecture Map Checkpoint - 2026-07-13 UTC / 2026-07-12 PDT
 

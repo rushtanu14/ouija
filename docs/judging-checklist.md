@@ -23,6 +23,7 @@
 - Student Reflection Workspace proves those exit-ticket answers are student-authored drafts, not generated conclusions.
 - Progress Portfolio shows whether saved runs demonstrate learning trend, subject breadth, and a next portfolio action.
 - Portfolio Story Builder turns saved-run evidence into prompts for a student-written progress story.
+- UX and Accessibility Proof maps the official UX/design criterion to student-first flow, judge navigation, responsive layout, named controls, clickable citations, and integrity prompts.
 - MCP Integration Coach shows how the same student-owned evidence could move into a Composio Search source audit, Composio Scholar claim check, Semantic Scholar reference check, Composio Browser source capture, DeepWiki public-source proof, Canvas assignment-context import, and classroom tools, including a Google Classroom pre-lab checkpoint, Google Forms readiness check, and Google Calendar next-trial reminder, without sending data before consent. Composio Sessions Strategy separates read-only source verification and assignment-context bundles from later export sessions.
 - Judge Demo Path gives evaluators a direct route through problem fit, AI design, student workflow, evidence handoff, and submission proof.
 - Custom Lab Triage and Pattern Archetype Coach keep unsupported student experiments useful without claiming full V1 coverage, because they give students a concrete investigation planner plus comparison/trend/optimum/time-series graph guidance instead of a fake expected result.
@@ -114,6 +115,7 @@
 - Student Focus reduces overload in the default view by keeping next move, evidence check, repeat check, and before-claim guidance near the top while hiding judge-only proof panels.
 - Guided Lab Flow reduces cognitive load by showing identify, prepare, understand, check, plan, and claim stages.
 - Judge Demo Path reduces evaluator cognitive load by showing the intended five-step live walkthrough near the top of the analysis panel.
+- UX and Accessibility Proof gives judges a compact evidence card for navigation, responsive layout, labels, citations, and integrity-by-design.
 - AI Runtime Proof sits near the top of the analysis panel so evaluators can verify the runtime, tests, secret boundary, and MCP mode before the deeper Model Card.
 - Claim Coach converts analysis into a student-owned reasoning checklist instead of a generated final paragraph.
 - Evidence Packet exports the same reasoning scaffold with Judge Demo Path, Custom Lab Triage, Pattern Archetype Coach, Grounding Audit, AI Evaluation Harness, sources, safety coach, concept coach, pattern evidence, reliability coach, data, checks, next-trial plan, and blanks, not a completed report.

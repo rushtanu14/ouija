@@ -30,9 +30,10 @@ Ouija is a student-facing AI experiment interpreter for middle and high school s
 15. Save lab snapshots locally so a student can return to a checked run without sending data to an account system.
 16. Use Progress Portfolio and Portfolio Story Builder to show saved-run count, score trend, subject breadth, strongest run, student-authored progress prompts, and next portfolio action.
 17. Use MCP Integration Coach to validate Composio Search source-audit, Scholar claim-check, Semantic Scholar reference-check, Composio Browser source-capture, DeepWiki public-source proof, and Canvas assignment-context routes plus Google Docs, Google Sheets, Google Drive, Google Classroom, Google Forms, Google Calendar, and Notion handoffs through the server dry-run bridge. The Composio Sessions strategy separates read-only source verification and assignment-context sessions from later consent-gated export sessions without exposing credentials or sending student data during the public demo.
-18. Open AI Model Card for the architecture, grounding, evaluation, privacy, MCP-export boundary, and guardrail summary.
-19. Open Top Award Radar for the honest council verdict: Ouija is submittable and competitive, but not guaranteed to win; it names the remaining judge/team/submission gaps and next moves.
-20. Open Judge Brief for a compact Track 1 proof surface: submission hub, live app, judge view, hosted deck/video/source links, AIYES submission checklist, judge demo path, official rubric fit, learning impact, student pilot protocol, student reflection drafts, progress portfolio, MCP readiness plan, AI pipeline, model strategy, architecture map, evaluation, data-handling ethics, tests, and integrity constraints.
+18. Open UX and Accessibility Proof to show the official UX/design criterion through student-first flow, judge navigation, responsive layout, named controls, clickable citations, and integrity prompts.
+19. Open AI Model Card for the architecture, grounding, evaluation, privacy, MCP-export boundary, and guardrail summary.
+20. Open Top Award Radar for the honest council verdict: Ouija is submittable and competitive, but not guaranteed to win; it names the remaining judge/team/submission gaps and next moves.
+21. Open Judge Brief for a compact Track 1 proof surface: submission hub, live app, judge view, hosted deck/video/source links, AIYES submission checklist, judge demo path, official rubric fit, learning impact, student pilot protocol, student reflection drafts, progress portfolio, MCP readiness plan, AI pipeline, model strategy, architecture map, UX proof, evaluation, data-handling ethics, tests, and integrity constraints.
 
 Guided Lab Flow gives students one current next action and six stable stages so the interface feels like a lab workflow rather than separate AI outputs.
 
@@ -47,6 +48,8 @@ Judge Demo Path gives evaluators a five-step route through the live app: problem
 AI Runtime Proof exposes the live deployment's AI mode through the UI and `/api/runtime-proof`: template count, fallback or OpenAI web-search readiness, evaluation coverage, server-only key boundary, and MCP bridge mode without leaking secrets.
 
 AI Architecture Map makes the system design readable in Judge mode: student intake, template classifier, grounding layer, data engine, learning guard, and MCP evidence bridge are shown as one pipeline with inputs, outputs, and evaluation contracts.
+
+UX and Accessibility Proof maps the official User Experience and Design criterion to concrete product evidence: Student mode stays focused, Judge mode is navigable, desktop/mobile no-overflow is tested, controls are named, citations are clickable, and integrity prompts keep work student-authored.
 
 Claim Coach intentionally keeps blanks in the claim starter so students must write their own conclusion.
 

@@ -191,6 +191,7 @@ a {
 .progress-portfolio-panel,
 .mcp-integration-panel,
 .evaluation-panel,
+.ux-proof-panel,
 .top-award-radar,
 .judge-brief-panel,
 .settings-panel,
@@ -3905,6 +3906,7 @@ td input {
 .progress-portfolio-panel,
 .mcp-integration-panel,
 .evaluation-panel,
+.ux-proof-panel,
 .model-card-panel,
 .top-award-radar,
 .judge-brief-panel,
@@ -4070,6 +4072,70 @@ td input {
   background: #edf8f1;
   font-size: 11px;
   font-weight: 850;
+}
+
+.ux-proof-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-radius: 8px;
+  padding: 12px;
+  color: #173b74;
+  background: #eef5ff;
+}
+
+.ux-proof-summary strong {
+  display: block;
+  color: #173b74;
+  line-height: 1.2;
+}
+
+.ux-proof-summary > span {
+  flex: 0 0 auto;
+  border-radius: 8px;
+  padding: 7px 10px;
+  color: #1f5b3d;
+  background: #edf8f1;
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.ux-proof-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.ux-proof-grid article {
+  display: grid;
+  gap: 7px;
+  border: 1px solid #d9e5f2;
+  border-radius: 8px;
+  padding: 10px;
+  background: #fbfdff;
+}
+
+.ux-proof-grid strong {
+  color: #172439;
+  font-size: 15px;
+  line-height: 1.25;
+}
+
+.ux-proof-grid span,
+.ux-proof-boundary {
+  color: #536478;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.ux-proof-boundary {
+  margin: 0;
+  border-left: 4px solid #30a46c;
+  border-radius: 8px;
+  padding: 10px 12px;
+  background: #f3fbf6;
+  font-weight: 750;
 }
 
 .top-award-header {
@@ -5667,6 +5733,10 @@ td input {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .ux-proof-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .technical-depth-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -5900,6 +5970,15 @@ td input {
 
   .architecture-stage-grid,
   .architecture-contract-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ux-proof-summary {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .ux-proof-grid {
     grid-template-columns: 1fr;
   }
 
