@@ -90,6 +90,28 @@ describe("MCP integration plan", () => {
     expect(plan.dryRunChecks.find((check) => check.id === "least-privilege")?.detail).toContain("Composio Search");
     expect(plan.dryRunChecks.find((check) => check.id === "server-bridge")?.status).toBe("review");
     expect(plan.dryRunChecks.find((check) => check.id === "server-only")?.status).toBe("review");
+    expect(plan.sessionStrategy.status).toBe("dry_run_ready");
+    expect(plan.sessionStrategy.headline).toContain("dry-run validated");
+    expect(plan.sessionStrategy.sessionShape).toContain("MCP URL");
+    expect(plan.sessionStrategy.preloadTools).toContain("COMPOSIO_SEARCH_SCHOLAR");
+    expect(plan.sessionStrategy.preloadTools).toContain("BROWSER_TOOL_CREATE_TASK");
+    expect(plan.sessionStrategy.preloadTools).toContain("DEEPWIKI_MCP_ASK_QUESTION");
+    expect(plan.sessionStrategy.preloadTools).not.toContain("GOOGLEDOCS_CREATE_DOCUMENT");
+    expect(plan.sessionStrategy.preloadTools.length).toBeLessThan(20);
+    expect(plan.sessionStrategy.bundles).toHaveLength(2);
+    expect(plan.sessionStrategy.bundles[0]).toMatchObject({
+      id: "source-verification",
+      status: "safe_dry_run"
+    });
+    expect(plan.sessionStrategy.bundles[0].toolkits).toEqual(["Composio Search", "Composio Browser", "DeepWiki"]);
+    expect(plan.sessionStrategy.bundles[0].dataShared).toContain("citation URLs");
+    expect(plan.sessionStrategy.bundles[1]).toMatchObject({
+      id: "student-export",
+      status: "consent_required"
+    });
+    expect(plan.sessionStrategy.bundles[1].toolkits).toContain("Google Docs");
+    expect(plan.sessionStrategy.bundles[1].toolkits).toContain("Notion");
+    expect(plan.sessionStrategy.judgeTakeaway).toContain("not a vague integration list");
     expect(plan.executionBoundary).toContain("dry-run only");
     expect(plan.payloadPreview.title).toBe("Ouija Evidence Packet: Reaction Rate vs Temperature");
     expect(plan.payloadPreview.rowCount).toBe(4);
@@ -137,6 +159,8 @@ describe("MCP integration plan", () => {
     expect(plan.summary).toContain("ready to route");
     expect(plan.actions.every((action) => action.mode === "server_mcp")).toBe(true);
     expect(plan.readinessMatrix.every((connector) => connector.status === "ready")).toBe(true);
+    expect(plan.sessionStrategy.status).toBe("server_ready");
+    expect(plan.sessionStrategy.headline).toContain("server-side after consent");
     expect(plan.dryRunChecks.find((check) => check.id === "server-only")?.status).toBe("pass");
     expect(plan.executionBoundary).toContain("Express API");
     expect(plan.actions.find((action) => action.toolkit === "Google Sheets")?.composioCapability).toContain("append");

@@ -626,6 +626,27 @@ export interface McpIntegrationPayloadPreview {
   markdownExcerpt: string;
 }
 
+export interface McpSessionBundle {
+  id: "source-verification" | "student-export";
+  label: string;
+  status: "safe_dry_run" | "consent_required";
+  toolkits: McpIntegrationAction["toolkit"][];
+  tools: string[];
+  dataShared: string;
+  blockedUntil: string;
+}
+
+export interface McpSessionStrategy {
+  status: "dry_run_ready" | "server_ready";
+  headline: string;
+  sessionShape: string;
+  selectedToolkits: McpIntegrationAction["toolkit"][];
+  preloadTools: string[];
+  bundles: McpSessionBundle[];
+  docsBasis: string;
+  judgeTakeaway: string;
+}
+
 export interface McpIntegrationPlan {
   status: McpIntegrationStatus;
   summary: string;
@@ -634,6 +655,7 @@ export interface McpIntegrationPlan {
   actions: McpIntegrationAction[];
   readinessMatrix: McpConnectorReadiness[];
   dryRunChecks: McpDryRunCheck[];
+  sessionStrategy: McpSessionStrategy;
   executionBoundary: string;
   payloadPreview: McpIntegrationPayloadPreview;
   safeguards: string[];

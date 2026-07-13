@@ -5,6 +5,7 @@ import type {
   McpDryRunCheck,
   McpIntegrationAction,
   McpIntegrationPlan,
+  McpSessionStrategy,
   ProgressPortfolio,
   StudentDataRow
 } from "./types";
@@ -236,6 +237,7 @@ export function buildMcpIntegrationPlan({
       actions,
       result
     }),
+    sessionStrategy: buildSessionStrategy(actions, status),
     executionBoundary: buildExecutionBoundary(status),
     payloadPreview: {
       title,
@@ -268,7 +270,7 @@ export function buildMcpIntegrationPlan({
     },
     safeguards: buildSafeguards(status),
     judgeTakeaway:
-      "MCP Integration Coach connects Ouija to a real research-and-classroom handoff path with connector prerequisites, least-privilege scopes, server dry-runs, scoped session tickets, and consent gates visible to judges."
+      "MCP Integration Coach connects Ouija to a real research-and-classroom handoff path with Composio Sessions, connector prerequisites, least-privilege scopes, server dry-runs, scoped session tickets, and consent gates visible to judges."
   };
 }
 
@@ -313,6 +315,59 @@ function buildSafeguards(status: McpIntegrationPlan["status"]) {
       "Exported packets preserve the academic-integrity blanks instead of writing conclusions.",
       "Reflection drafts are exported only when the student typed them in the workspace."
   ];
+}
+
+function buildSessionStrategy(actions: McpIntegrationAction[], status: McpIntegrationPlan["status"]): McpSessionStrategy {
+  const sourceVerificationActionIds = [
+    "composio-search-source-audit",
+    "composio-scholar-claim-check",
+    "composio-browser-source-capture",
+    "deepwiki-source-proof"
+  ];
+  const sourceVerificationActions = actions.filter((action) => sourceVerificationActionIds.includes(action.id));
+  const studentExportActions = actions.filter((action) => !sourceVerificationActionIds.includes(action.id));
+  const sourceTools = uniqueTools(sourceVerificationActions);
+  const exportTools = uniqueTools(studentExportActions);
+
+  return {
+    status: status === "ready" ? "server_ready" : "dry_run_ready",
+    headline:
+      status === "ready"
+        ? "Composio Sessions can be created server-side after consent."
+        : "Composio Sessions are planned and dry-run validated before any live account connection.",
+    sessionShape:
+      "One scoped Composio session can expose selected toolkits, exact tool allowlists, and an MCP URL that remains server-side.",
+    selectedToolkits: uniqueToolkits(actions),
+    preloadTools: sourceTools,
+    bundles: [
+      {
+        id: "source-verification",
+        label: "Read-only source verification session",
+        status: "safe_dry_run",
+        toolkits: uniqueToolkits(sourceVerificationActions),
+        tools: sourceTools,
+        dataShared:
+          "Experiment title, variables, citation URLs, source-quality question, and public repository question only.",
+        blockedUntil:
+          "Live search/browser/source-proof calls wait for COMPOSIO_API_KEY, allowed tools, server authorization, and student-reviewed prompts."
+      },
+      {
+        id: "student-export",
+        label: "Student export session",
+        status: "consent_required",
+        toolkits: uniqueToolkits(studentExportActions),
+        tools: exportTools,
+        dataShared:
+          "Evidence packet, visible table rows, selected saved-run summary, and student-authored reflection drafts when present.",
+        blockedUntil:
+          "External writes stay blocked until the student or teacher reviews the payload and chooses the exact destination."
+      }
+    ],
+    docsBasis:
+      "Composio Sessions replace one-off MCP servers with a per-user session that can span selected toolkits, restrict tools, and expose a hosted MCP endpoint for server-side agents.",
+    judgeTakeaway:
+      "This is not a vague integration list: Ouija names the first safe read-only session, separates it from write/export sessions, keeps the tool list under control, and stops before live execution unless consent and server credentials exist."
+  };
 }
 
 function buildReadinessMatrix(actions: McpIntegrationAction[], configured: boolean): McpConnectorReadiness[] {
@@ -452,6 +507,20 @@ function extractSavedRunCount(portfolio: ProgressPortfolio) {
   const metric = portfolio.metrics.find((candidate) => candidate.id === "saved-runs");
   const match = metric?.value.match(/\d+/);
   return match ? Number(match[0]) : 0;
+}
+
+function uniqueToolkits(actions: McpIntegrationAction[]) {
+  return actions.reduce<McpIntegrationAction["toolkit"][]>((toolkits, action) => {
+    if (toolkits.includes(action.toolkit)) return toolkits;
+    return [...toolkits, action.toolkit];
+  }, []);
+}
+
+function uniqueTools(actions: McpIntegrationAction[]) {
+  return actions.reduce<string[]>((tools, action) => {
+    const nextTools = action.recommendedTools.filter((tool) => !tools.includes(tool));
+    return [...tools, ...nextTools];
+  }, []);
 }
 
 function buildMarkdownExcerpt(description: string, evidencePacket: string) {

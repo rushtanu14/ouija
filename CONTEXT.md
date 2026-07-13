@@ -58,6 +58,10 @@ The UX split that keeps Ouija practical for students while preserving judge proo
 
 The newest MCP route in the server dry-run bridge. It adds `composio-browser-source-capture` for public source-page context capture through Composio Browser Tool (`BROWSER_TOOL_CREATE_TASK`, `BROWSER_TOOL_WATCH_TASK`). It is source-context support only; it must not browse private accounts, write the student's final claim, or run live without server-side credentials, allowed tools, and explicit consent.
 
+### Composio Sessions Strategy
+
+The judge-visible MCP planning layer that turns Ouija's connector story into scoped sessions instead of a vague integration list. The first planned session is read-only source verification across Composio Search, Composio Browser, and DeepWiki public-source proof. Later student export sessions are consent-gated and can target Google Docs, Sheets, Drive, Classroom, Forms, Calendar, and Notion only after server-side credentials, allowed tools, auth config, and consent are in place.
+
 ### Pilot Evidence Tracker
 
 The browser-local student-testing evidence layer. It logs anonymous pilot observations for time to first graph, confidence before/after, issue spotting, exit-ticket readiness, and non-identifying notes. It starts empty with an explicit no-fake-testing warning and must not collect names, grades, faces, contact info, or private classroom details.
@@ -76,6 +80,17 @@ The one-click judge packet at `https://ouija-olive.vercel.app/submission/`. It g
 - Ouija's first supported set should balance physics, chemistry, biology, and earth science instead of overfitting to physics.
 - Ouija should support table input first before adding CSV upload or photo/OCR input.
 - Ouija's internet search should ground expected results and explanations in referenced content instead of inventing them from the model alone.
+
+## Composio Sessions Strategy Checkpoint - 2026-07-13 UTC / 2026-07-12 PDT
+
+- Council verdict: Ouija works and is submittable for AIYES Track 1, and the Composio/MCP story is stronger now because it shows a session architecture judges can inspect. First place/top-award outcome still cannot be guaranteed because judging, final Devpost submission, and the final 2-5 student roster are external.
+- Added `Composio Sessions Strategy` inside MCP Integration Coach. It separates the first read-only source verification session from later consent-gated export sessions and lists toolkits, tools, data shared, consent gates, and why raw MCP URLs stay server-side.
+- The first session bundles Composio Search source audit, Composio Scholar claim check, Composio Browser source capture, and DeepWiki public-source proof. Student export sessions remain behind Google Docs, Sheets, Drive, Classroom, Forms, Calendar, and Notion readiness/consent gates.
+- Updated Judge Brief, AI Model Card, MCP payload preview, README, API/env/runbook docs, Devpost copy, slide deck, demo script, Submission Hub, Devpost pack, and public submission assets so the submission story says `Composio Sessions` instead of a fake live connector claim.
+- Refreshed submission screenshots and walkthrough. New local walkthrough proof is 1440x900, 192.88 seconds, 17,890,513 bytes, SHA-256 `eee033b89da1862c87bd02ad37039476de7c9ab40dc6be1227f69ec417d77552`.
+- Production: `dpl_3Ce63H5z2bSUwxmFVENQXXBN2LL9`, aliased to `https://ouija-olive.vercel.app`.
+- Verification: `npm run test` (15 files, 86 tests), `npm run build`, `npm run test:e2e` (40 passed across Chromium, Firefox, WebKit, and mobile Safari), `npm audit --json` (0 vulnerabilities), `git diff --check`, focused Chromium/Firefox E2E for the long judge path, local capture/record/sync submission assets, official Composio docs check for Sessions as the preferred dynamic tool-access path, production deploy, live `/api/evaluate` (200, score 100), live `/api/mcp/status` (200, `server_dry_run`, Composio Sessions docs links), hosted submission/deck/Devpost/video checks, and hosted desktop/mobile Playwright smoke for Composio Session Strategy with no horizontal overflow and zero console errors.
+- Remaining loops: commit/push, actual Devpost submission, final team roster, optional live OpenAI/Composio credentials only with explicit approval and consent/server setup, and optional DeepWiki indexing if needed.
 
 ## Top Award Radar Checkpoint - 2026-07-12
 

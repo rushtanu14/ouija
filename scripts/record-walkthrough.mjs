@@ -281,10 +281,11 @@ await caption(
   "Ouija turns saved runs into prompts and blanks for a student-written progress story, not a generated essay."
 );
 await page.locator("#mcp-export").scrollIntoViewIfNeeded();
+await page.getByLabel("Composio Session Strategy").getByText("Read-only source verification session").waitFor();
 await caption(
   page,
   "MCP Integration Coach",
-  "Ouija validates Composio Search source-audit, Scholar claim-check, and Browser source-capture routes plus handoffs to Docs, Sheets, Drive, Classroom, Forms, Calendar, and Notion, then shows env vars, tools, scopes, data shared, dry-run checks, and consent gates."
+  "Ouija validates Composio Search source-audit, Scholar claim-check, Browser source-capture, and DeepWiki source-proof routes, then shows a Composio Sessions strategy: read-only verification first, export sessions only after consent."
 );
 await page.locator(".mcp-action-card").filter({ hasText: "Run Scholar claim check" }).getByRole("button", { name: "Validate route" }).click();
 await page.getByLabel("MCP export dry-run result").getByText("Dry-run passed", { exact: true }).waitFor();
@@ -303,7 +304,7 @@ await caption(
 );
 
 await page.locator("#evaluation").scrollIntoViewIfNeeded();
-await page.getByLabel("Deterministic Regression Suite").getByText("9/9 checks").waitFor();
+await page.getByLabel("Deterministic Regression Suite").getByText("9/9").waitFor();
 await caption(page, "Deterministic Regression Suite", "The live app runs nine checks: eight supported labs plus custom triage for the unsupported-lab boundary.");
 
 await page.locator("#judge").scrollIntoViewIfNeeded();

@@ -14,7 +14,7 @@ Open Ouija in the default Student view. Click `Reaction Rate`. Show that a norma
 
 Show Judge Demo Path: problem fit, AI design, student workflow, evidence handoff, and submission proof. This keeps the live walkthrough easy for judges to follow before you scroll into the deeper panels.
 
-Show AI Runtime Proof: fallback/web-search readiness, live evaluation coverage, server-only secret boundary, and MCP bridge mode. Mention that `/api/runtime-proof`, `/api/evaluate`, `/api/mcp/status`, and the consent-gated `/api/mcp/session` dry-run are public smoke checks.
+Show AI Runtime Proof: fallback/web-search readiness, live evaluation coverage, server-only secret boundary, and MCP bridge mode. Mention that `/api/runtime-proof`, `/api/evaluate`, `/api/mcp/status`, and the consent-gated Composio Sessions dry-run at `/api/mcp/session` are public smoke checks.
 
 ## 1:20-1:42 - Model Strategy And Technical Depth
 
@@ -72,7 +72,7 @@ Type an unsupported paper towel absorbency lab. Show that Ouija labels it as a l
 
 ## 4:50-4:56 - Saved Lab Snapshot, Progress Portfolio, Portfolio Story, And MCP Export
 
-Save two runs and show Saved Labs plus Progress Portfolio so judges see the workflow continues after one analysis and can measure saved-run trend, subject breadth, and the next portfolio action. Then show Portfolio Story Builder: saved-run evidence becomes prompts and blanks for a student-written progress story, not a generated essay. Then show MCP Integration Coach: Ouija validates Composio Search source-audit, Scholar claim-check, and Composio Browser source-capture routes plus Google Docs, Google Sheets, Google Drive, Google Classroom, Google Forms, Google Calendar, and Notion handoffs through a server dry-run, shows connector env vars/tools/scopes/data/checks, keeps Composio credentials server-side, can include pilot metrics and Pilot Evidence Tracker summaries in Forms/Sheets/Notion routes, and requires consent before source audit, Scholar check, Browser source capture, or export.
+Save two runs and show Saved Labs plus Progress Portfolio so judges see the workflow continues after one analysis and can measure saved-run trend, subject breadth, and the next portfolio action. Then show Portfolio Story Builder: saved-run evidence becomes prompts and blanks for a student-written progress story, not a generated essay. Then show MCP Integration Coach: Ouija validates Composio Search source-audit, Scholar claim-check, and Composio Browser source-capture routes plus Google Docs, Google Sheets, Google Drive, Google Classroom, Google Forms, Google Calendar, and Notion handoffs through a server dry-run, shows connector env vars/tools/scopes/data/checks, keeps Composio credentials server-side, and shows a Composio Sessions strategy: read-only source verification first, write/export sessions only after destination review and consent. Mention that pilot metrics and Pilot Evidence Tracker summaries can later flow to Forms/Sheets/Notion routes, but the public demo stops before live external writes.
 
 ## 4:56-4:58 - Deterministic Regression Suite
 

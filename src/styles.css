@@ -4609,6 +4609,91 @@ td input {
   text-decoration: none;
 }
 
+.mcp-session-strategy {
+  display: grid;
+  gap: 10px;
+  border: 1px solid #c9dcff;
+  border-radius: 8px;
+  padding: 12px;
+  background: #f7fbff;
+}
+
+.mcp-session-strategy-server_ready {
+  border-color: #b9e6c9;
+  background: #f4fbf6;
+}
+
+.mcp-session-strategy > div:first-child {
+  display: grid;
+  gap: 5px;
+}
+
+.mcp-session-strategy strong {
+  color: #172439;
+  line-height: 1.25;
+}
+
+.mcp-session-strategy span,
+.mcp-session-strategy small,
+.mcp-session-strategy p {
+  color: #607087;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.mcp-session-stat-grid,
+.mcp-session-bundle-grid {
+  display: grid;
+  gap: 8px;
+}
+
+.mcp-session-stat-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.mcp-session-bundle-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.mcp-session-stat-grid article,
+.mcp-session-bundle {
+  display: grid;
+  gap: 6px;
+  border: 1px solid #d9e5f2;
+  border-radius: 8px;
+  padding: 10px;
+  background: #ffffff;
+}
+
+.mcp-session-bundle {
+  border-left: 4px solid #2368ff;
+}
+
+.mcp-session-bundle-consent_required {
+  border-left-color: #d88726;
+}
+
+.mcp-session-bundle > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  align-items: center;
+}
+
+.mcp-session-bundle small,
+.mcp-session-bundle em {
+  color: #607087;
+  font-size: 11px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.mcp-session-bundle em {
+  color: #23543c;
+  font-style: normal;
+  font-weight: 700;
+}
+
 .mcp-action-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -5322,6 +5407,7 @@ td input {
 
   .mcp-action-grid,
   .mcp-readiness-grid,
+  .mcp-session-bundle-grid,
   .mcp-export-check-grid,
   .mcp-payload-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -5549,6 +5635,8 @@ td input {
 
   .mcp-action-grid,
   .mcp-readiness-grid,
+  .mcp-session-bundle-grid,
+  .mcp-session-stat-grid,
   .mcp-dry-run-checks,
   .mcp-export-check-grid,
   .mcp-payload-grid {

@@ -50,7 +50,7 @@ Generated from `server/app.ts`, `api/health.ts`, and `api/evaluate.ts`.
 | `GET /api/health` | `200` with `{ "ok": true, "service": "ouija-api" }` |
 | `GET /api/evaluate` | `200` with `score: 100`, `passed: 9`, and `total: 9` for the current evaluation suite. |
 | `GET /api/mcp/status` | `200` with `status: "server_dry_run"` unless live Composio env vars are configured. |
-| `POST /api/mcp/session` | `200` dry-run for a consent-gated packet; live mode creates a server-side Tool Router session and withholds raw MCP URLs. |
+| `POST /api/mcp/session` | `200` dry-run for a consent-gated packet; live mode creates a server-side Composio session and withholds raw MCP URLs. |
 | Hosted video | `https://ouija-olive.vercel.app/submission/assets/ouija-walkthrough.webm` returns `200` and a non-trivial `video/webm` asset. |
 | Hosted slide deck | `https://ouija-olive.vercel.app/submission/slide-deck.html` returns `200`. |
 <!-- AUTO-GENERATED:HEALTH:END -->

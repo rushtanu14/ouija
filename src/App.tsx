@@ -1346,7 +1346,8 @@ function JudgeBriefPanel({ result }: { result: AnalyzeResult | null }) {
     "Data Handling Ledger shows privacy, retention, and student controls.",
     "Spreadsheet paste/import flows into data checks.",
     "Evidence Packet exports a student-owned reasoning handoff.",
-    "MCP Integration Coach validates Composio Search source audits, Scholar claim checks, Browser source capture, DeepWiki public-source proof, plus Docs, Sheets, Drive, Classroom, Forms, Calendar, and Notion handoffs through a server dry-run and scoped session ticket without exposing credentials.",
+    "MCP Integration Coach validates Composio Search source audits, Scholar claim checks, Browser source capture, DeepWiki public-source proof, plus Docs, Sheets, Drive, Classroom, Forms, Calendar, and Notion handoffs through Composio Sessions, a server dry-run, and scoped session tickets without exposing credentials.",
+    "Composio Sessions Strategy separates a first read-only source verification session from later consent-gated export sessions.",
     "MCP Readiness Matrix shows exact connector env vars, tools, scopes, data shared, dry-run checks, and consent gates.",
     "Next Trial Planner gives adaptive measurement guidance.",
     "Progress Portfolio shows learning over multiple saved runs.",
@@ -1457,6 +1458,7 @@ function ModelCardPanel({ result }: { result: AnalyzeResult | null }) {
     "Progress Portfolio turns saved labs into repeated learning evidence for judges.",
     "Portfolio Story Builder gives prompts and blanks for a student-authored progress story.",
     "MCP Integration Coach keeps Composio credentials server-side, validates packets with /api/mcp/export, prepares session tickets with /api/mcp/session, and requires student consent before any source audit, Scholar claim check, Browser source capture, DeepWiki source proof, or export.",
+    "Composio Sessions Strategy separates a first read-only source verification session from later consent-gated export sessions.",
     "MCP Readiness Matrix makes connector tools, scopes, dry-run checks, and least-privilege boundaries inspectable.",
     "Pattern Evidence Engine quantifies whether the dataset supports the expected science pattern.",
     "Reliability Coach checks repeated trials, averages, and spread before students trust a claim.",
@@ -1715,6 +1717,39 @@ function McpIntegrationCoachPanel({
               </div>
             </div>
           ) : null}
+          <div className={`mcp-session-strategy mcp-session-strategy-${plan.sessionStrategy.status}`} aria-label="Composio Session Strategy">
+            <div>
+              <p className="section-label">Composio Sessions strategy</p>
+              <strong>{plan.sessionStrategy.headline}</strong>
+              <span>{plan.sessionStrategy.sessionShape}</span>
+            </div>
+            <div className="mcp-session-stat-grid">
+              <article>
+                <p className="section-label">Toolkits scoped</p>
+                <strong>{plan.sessionStrategy.selectedToolkits.length}</strong>
+              </article>
+              <article>
+                <p className="section-label">First-session tools</p>
+                <strong>{plan.sessionStrategy.preloadTools.length}</strong>
+              </article>
+            </div>
+            <div className="mcp-session-bundle-grid">
+              {plan.sessionStrategy.bundles.map((bundle) => (
+                <article className={`mcp-session-bundle mcp-session-bundle-${bundle.status}`} key={bundle.id}>
+                  <div>
+                    <p className="section-label">{bundle.status === "safe_dry_run" ? "Read-only first" : "Consent gate"}</p>
+                    <strong>{bundle.label}</strong>
+                  </div>
+                  <span>{bundle.toolkits.join(", ")}</span>
+                  <small>Tools: {bundle.tools.join(", ")}</small>
+                  <small>{bundle.dataShared}</small>
+                  <em>{bundle.blockedUntil}</em>
+                </article>
+              ))}
+            </div>
+            <small>{plan.sessionStrategy.docsBasis}</small>
+            <p>{plan.sessionStrategy.judgeTakeaway}</p>
+          </div>
           <div className="mcp-action-grid">
             {plan.actions.map((action) => (
               <article className="mcp-action-card" key={action.id}>
@@ -3446,6 +3481,13 @@ function formatMcpPayloadPreview(plan: McpIntegrationPlan) {
     "",
     "Actions:",
     ...plan.actions.map((action) => `- ${action.toolkit}: ${action.composioCapability} (${action.payloadSummary})`),
+    "",
+    "Composio Sessions strategy:",
+    plan.sessionStrategy.docsBasis,
+    ...plan.sessionStrategy.bundles.map(
+      (bundle) =>
+        `- ${bundle.label}: ${bundle.toolkits.join(", ")}; tools ${bundle.tools.join(", ")}; data ${bundle.dataShared}`
+    ),
     "",
     "MCP readiness matrix:",
     ...plan.readinessMatrix.map(
