@@ -35,7 +35,8 @@ Ouija is a student-facing AI experiment interpreter for middle and high school s
 20. Open Top Award Radar for the honest council verdict: Ouija is submittable and competitive, targets Gold-level evidence across the official AIYES award bands, but is not guaranteed to win; it names the remaining judge/team/submission gaps and next moves.
 21. Open Official AIYES Rules Snapshot to see the verified Devpost deadline, eligibility, Track 1 artifacts, judging criteria, award bands, source link, and team-roster caveat in one panel.
 22. Open AIYES Submission Gate to see Devpost requirements converted into pass, review, and external-step statuses for eligibility, Track 1 fit, deck, video, source/deploy link, problem/impact, AI design, and UX.
-23. Open Judge Brief for a compact Track 1 proof surface: submission hub, live app, judge view, hosted deck/video/source links, AIYES submission checklist, judge demo path, official rubric fit, learning impact, student pilot protocol, student reflection drafts, progress portfolio, MCP readiness plan, AI pipeline, model strategy, architecture map, UX proof, evaluation, data-handling ethics, tests, and integrity constraints.
+23. Open AIYES Demo Rehearsal to see the required video/live-demo story mapped to a 4:45 proof path under the 5-minute cap.
+24. Open Judge Brief for a compact Track 1 proof surface: submission hub, live app, judge view, hosted deck/video/source links, AIYES submission checklist, judge demo path, official rubric fit, learning impact, student pilot protocol, student reflection drafts, progress portfolio, MCP readiness plan, AI pipeline, model strategy, architecture map, UX proof, evaluation, data-handling ethics, tests, and integrity constraints.
 
 Guided Lab Flow gives students one current next action and six stable stages so the interface feels like a lab workflow rather than separate AI outputs.
 
@@ -97,9 +98,11 @@ AIYES Development Journey maps each run to the required Track 1 story: problem i
 
 Top Award Radar turns the internal council audit into a judge-visible card: it separates submittable evidence from top-award risk, anchors the win target to the official Gold/Silver/Bronze/Honorable Mention certificate bands, highlights quality-gated impact evidence, AI/model proof, UX/design, submission package readiness, and external blockers, then lists the next moves before judging.
 
-Official AIYES Rules Snapshot keeps the judge path tied to the current Devpost page: ages 13-18, students only, listed 2-5 team requirement with individual/team wording caveat, September 1 deadline, Track 1 artifacts, judging criteria, award bands, source link, July 14, 2026 verified date, and a snapshot that Devpost showed 75 participants at verification time.
+Official AIYES Rules Snapshot keeps the judge path tied to the current Devpost page: ages 13-18, students only, listed 2-5 team requirement with individual/team wording caveat, September 1 deadline, Track 1 artifacts, judging criteria, award bands, source link, July 14, 2026 verified date, and a snapshot that Devpost showed 71 participants at verification time.
 
 AIYES Submission Gate turns the live Devpost requirements into a judge-visible submittability audit: most app, deck, video, source, AI, impact, and UX items pass inside the product, while roster and final submit remain marked as external.
+
+AIYES Demo Rehearsal makes the required video walkthrough and live demo harder to fumble: Judge mode gives a 4:45 timed proof path through problem relevance, AI design, live student workflow, evaluation/integrity, and submission proof while preserving the no-final-lab-report boundary.
 
 Learning Impact Loop measures student readiness for each run through outcome, data quality, concept learning, integrity, whole-pattern evidence, repeat reliability, and next-trial metrics.
 

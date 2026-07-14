@@ -498,6 +498,7 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(page.getByLabel("Judge Brief").getByText("MCP Readiness Matrix shows exact connector env vars, tools, scopes, data shared, dry-run checks, and consent gates.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Next Trial Planner gives adaptive measurement guidance.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("AIYES submission checklist makes deck, video, source/deploy link, Devpost form pack, and team requirement status visible.")).toBeVisible();
+  await expect(page.getByLabel("Judge Brief").getByText("AIYES Demo Rehearsal maps the required video and live demo to a five-minute proof path.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Hosted deck and walkthrough are public.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Low-confidence labs show a boundary warning.")).toBeVisible();
 
@@ -551,11 +552,18 @@ test("judge mode shows a top award radar with honest win gaps", async ({ page })
   await expect(page.getByLabel("Official AIYES Rules Snapshot").getByText("Slide deck, 5-minute video, source/deploy link")).toBeVisible();
   await expect(page.getByLabel("Official AIYES Rules Snapshot").getByText("Problem, AI/model strategy, UX/design")).toBeVisible();
   await expect(page.getByLabel("Official AIYES Rules Snapshot").getByText("Gold / Silver / Bronze / Honorable Mention")).toBeVisible();
-  await expect(page.getByLabel("Official AIYES Rules Snapshot").getByText("75 participants visible")).toBeVisible();
+  await expect(page.getByLabel("Official AIYES Rules Snapshot").getByText("71 participants visible")).toBeVisible();
   await expect(page.getByLabel("Official AIYES Rules Snapshot").getByRole("link", { name: "Open official AIYES Devpost page" })).toHaveAttribute(
     "href",
     "https://ai-yes-competition-30441.devpost.com/"
   );
+  await page.getByRole("link", { name: "Demo Prep" }).click();
+  await expect(page.getByRole("heading", { name: "AIYES Demo Rehearsal" })).toBeVisible();
+  await expect(page.getByLabel("AIYES Demo Rehearsal").getByText("5-minute proof path")).toBeVisible();
+  await expect(page.getByLabel("AIYES Demo Rehearsal").getByText("4:45", { exact: true })).toBeVisible();
+  await expect(page.getByLabel("AIYES Demo Rehearsal").getByText("Problem relevance")).toBeVisible();
+  await expect(page.getByLabel("AIYES Demo Rehearsal").getByText("AI design")).toBeVisible();
+  await expect(page.getByLabel("AIYES Demo Rehearsal").getByText("Submission proof")).toBeVisible();
 
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth);
   expect(overflow).toBe(false);
@@ -578,6 +586,7 @@ test("student mode keeps the core lab workflow focused before judge proof", asyn
   await expect(page.getByRole("heading", { name: "UX and Accessibility Proof" })).toHaveCount(0);
   await expect(page.getByRole("heading", { name: "AIYES Submission Gate" })).toHaveCount(0);
   await expect(page.getByRole("heading", { name: "Official AIYES Rules Snapshot" })).toHaveCount(0);
+  await expect(page.getByRole("heading", { name: "AIYES Demo Rehearsal" })).toHaveCount(0);
   await expect(page.getByRole("heading", { name: "Judge Brief" })).toHaveCount(0);
   await expect(page.getByRole("link", { name: "MCP Export" })).toHaveCount(0);
   await expect(page.getByRole("link", { name: "Architecture" })).toHaveCount(0);
@@ -585,6 +594,7 @@ test("student mode keeps the core lab workflow focused before judge proof", asyn
   await expect(page.getByRole("link", { name: "Award Radar" })).toHaveCount(0);
   await expect(page.getByRole("link", { name: "Rules" })).toHaveCount(0);
   await expect(page.getByRole("link", { name: "Submit Gate" })).toHaveCount(0);
+  await expect(page.getByRole("link", { name: "Demo Prep" })).toHaveCount(0);
 
   await page.getByLabel("View mode").getByRole("button", { name: "Judge" }).click();
   await expect(page).toHaveURL(/judge=1/);
@@ -611,8 +621,8 @@ test("student mode keeps the core lab workflow focused before judge proof", asyn
   await page.getByRole("link", { name: "Rules" }).click();
   await expect(page.getByRole("heading", { name: "Official AIYES Rules Snapshot" })).toBeVisible();
   await expect(page.getByLabel("Official AIYES Rules Snapshot").getByText("Verified source")).toBeVisible();
-  await expect(page.getByLabel("Official AIYES Rules Snapshot").getByText("July 14, 2026 · 75 participants shown on Devpost")).toBeVisible();
-  await expect(page.getByLabel("Official AIYES Rules Snapshot").getByText("75 participants shown on Devpost")).toBeVisible();
+  await expect(page.getByLabel("Official AIYES Rules Snapshot").getByText("July 14, 2026 · 71 participants shown on Devpost")).toBeVisible();
+  await expect(page.getByLabel("Official AIYES Rules Snapshot").getByText("71 participants shown on Devpost")).toBeVisible();
   await expect(page.getByLabel("Official AIYES Rules Snapshot").getByText("Devpost metadata lists a 2-5 member team")).toBeVisible();
   await expect(page.getByRole("link", { name: "Submit Gate" })).toBeVisible();
   await page.getByRole("link", { name: "Submit Gate" }).click();
@@ -622,6 +632,12 @@ test("student mode keeps the core lab workflow focused before judge proof", asyn
   await expect(page.getByLabel("AIYES Submission Gate").getByText("Source or deploy link")).toBeVisible();
   await expect(page.getByLabel("AIYES Submission Gate").getByText("Eligibility")).toBeVisible();
   await expect(page.getByLabel("AIYES Submission Gate").getByText("final roster must be handled in Devpost")).toBeVisible();
+  await expect(page.getByRole("link", { name: "Demo Prep" })).toBeVisible();
+  await page.getByRole("link", { name: "Demo Prep" }).click();
+  await expect(page.getByRole("heading", { name: "AIYES Demo Rehearsal" })).toBeVisible();
+  await expect(page.getByLabel("AIYES Demo Rehearsal").getByText("Required video and live demo")).toBeVisible();
+  await expect(page.getByLabel("AIYES Demo Rehearsal").getByText("Source Scout plus the dry-run bridge")).toBeVisible();
+  await expect(page.getByLabel("AIYES Demo Rehearsal").getByText("do not present Ouija as writing a final lab report")).toBeVisible();
 
   await page.getByLabel("View mode").getByRole("button", { name: "Student" }).click();
   await expect(page.getByLabel("View mode").getByRole("button", { name: "Student" })).toHaveAttribute("aria-pressed", "true");

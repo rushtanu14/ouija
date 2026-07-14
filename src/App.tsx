@@ -104,7 +104,7 @@ const slideDeckUrl = "https://ouija-olive.vercel.app/submission/slide-deck.html"
 const walkthroughVideoUrl = "https://ouija-olive.vercel.app/submission/assets/ouija-walkthrough.webm";
 const officialAiyesDevpostUrl = "https://ai-yes-competition-30441.devpost.com/";
 const officialAiyesVerifiedDate = "July 14, 2026";
-const officialAiyesParticipantCount = "75 participants shown on Devpost at verification time";
+const officialAiyesParticipantCount = "71 participants shown on Devpost at verification time";
 
 interface SavedLab extends ProgressPortfolioSnapshot {
   description: string;
@@ -146,6 +146,7 @@ const judgeNavLinks = [
   { href: "#top-award", label: "Award Radar" },
   { href: "#aiyes-rules", label: "Rules" },
   { href: "#submission-gate", label: "Submit Gate" },
+  { href: "#demo-rehearsal", label: "Demo Prep" },
   { href: "#judge", label: "Judge Brief" },
   { href: "#settings", label: "Settings" }
 ];
@@ -633,6 +634,7 @@ export function App() {
             />
             <AiyesRulesSnapshotPanel />
             <SubmissionGatePanel evaluationReport={evaluationReport} runtimeProof={runtimeProof} mcpBridgeStatus={mcpBridgeStatus} />
+            <DemoRehearsalPanel evaluationReport={evaluationReport} runtimeProof={runtimeProof} mcpBridgeStatus={mcpBridgeStatus} />
             <JudgeBriefPanel result={result} />
           </>
         ) : null}
@@ -1446,7 +1448,7 @@ function AiyesRulesSnapshotPanel() {
     },
     {
       label: "Live page signal",
-      value: "75 participants visible",
+      value: "71 participants visible",
       detail: "The page was rechecked on July 14, 2026; treat the participant count as a snapshot, not a fixed contest total."
     },
     {
@@ -1590,6 +1592,104 @@ function SubmissionGatePanel({
   );
 }
 
+function DemoRehearsalPanel({
+  evaluationReport,
+  runtimeProof,
+  mcpBridgeStatus
+}: {
+  evaluationReport: EvaluationReport | null;
+  runtimeProof: RuntimeProof | null;
+  mcpBridgeStatus: McpBridgeStatus | null;
+}) {
+  const routeCount = mcpBridgeStatus?.toolkits.length ?? 0;
+  const rehearsalStats = [
+    {
+      label: "Target runtime",
+      value: "4:45",
+      detail: "Leaves 15 seconds under the AIYES 5-minute video/live-demo cap."
+    },
+    {
+      label: "Live proof",
+      value: runtimeProof ? formatRuntimeProofStatus(runtimeProof.status) : "Loading",
+      detail: "Open /api/runtime-proof before recording or submitting."
+    },
+    {
+      label: "Regression",
+      value: evaluationReport?.status === "pass" ? "9/9 passed" : "Review",
+      detail: "Open /api/evaluate before the final Devpost paste."
+    },
+    {
+      label: "MCP depth",
+      value: `${routeCount || 15} routes`,
+      detail: "Show Source Scout plus the dry-run bridge as technical depth proof."
+    }
+  ];
+  const rehearsalBeats = [
+    {
+      time: "0:00-0:30",
+      label: "Problem relevance",
+      detail: "Name middle/high school students, lab confusion, and the before/after benefit."
+    },
+    {
+      time: "0:30-1:20",
+      label: "AI design",
+      detail: "Show classifier, Model Strategy, Source Scout, and Architecture Map."
+    },
+    {
+      time: "1:20-2:30",
+      label: "Live student workflow",
+      detail: "Analyze a sample, edit table data, inspect the graph, and resolve a warning."
+    },
+    {
+      time: "2:30-3:40",
+      label: "Evaluation and integrity",
+      detail: "Show Regression, Pilot Evidence Quality Gate, Data Handling Ledger, and claim blanks."
+    },
+    {
+      time: "3:40-4:45",
+      label: "Submission proof",
+      detail: "Show deck, walkthrough, source/deploy links, Submission Hub, and external team-roster step."
+    }
+  ];
+
+  return (
+    <section className="demo-rehearsal-panel" id="demo-rehearsal" aria-label="AIYES Demo Rehearsal">
+      <div className="panel-title">
+        <Gauge size={18} />
+        <h3>AIYES Demo Rehearsal</h3>
+      </div>
+      <div className="demo-rehearsal-summary">
+        <div>
+          <p className="section-label">Required video and live demo</p>
+          <strong>5-minute proof path</strong>
+        </div>
+        <span>Track 1 ready</span>
+      </div>
+      <div className="demo-rehearsal-stats">
+        {rehearsalStats.map((stat) => (
+          <article key={stat.label}>
+            <p className="section-label">{stat.label}</p>
+            <strong>{stat.value}</strong>
+            <span>{stat.detail}</span>
+          </article>
+        ))}
+      </div>
+      <ol className="demo-rehearsal-beats">
+        {rehearsalBeats.map((beat) => (
+          <li key={beat.time}>
+            <span>{beat.time}</span>
+            <strong>{beat.label}</strong>
+            <small>{beat.detail}</small>
+          </li>
+        ))}
+      </ol>
+      <p className="demo-rehearsal-boundary">
+        Rehearsal boundary: demonstrate reasoning support and source-grounded checks; do not present Ouija as writing a final lab report or guaranteeing an award.
+      </p>
+    </section>
+  );
+}
+
 function JudgeBriefPanel({ result }: { result: AnalyzeResult | null }) {
   const readiness = result?.trackEvidence.readiness ?? "submittable";
   const score = result?.trackEvidence.score ?? 0;
@@ -1685,6 +1785,7 @@ function JudgeBriefPanel({ result }: { result: AnalyzeResult | null }) {
     "Progress Portfolio shows learning over multiple saved runs.",
     "Portfolio Story Builder turns saved runs into student-written progress evidence.",
     "AIYES submission checklist makes deck, video, source/deploy link, Devpost form pack, and team requirement status visible.",
+    "AIYES Demo Rehearsal maps the required video and live demo to a five-minute proof path.",
     "Deterministic Regression Suite runs nine internal behavior checks.",
     "Custom Lab Triage keeps unsupported labs useful without pretending full coverage.",
     "Hosted deck and walkthrough are public.",
