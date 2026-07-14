@@ -36,8 +36,9 @@ describe("AIYES submission assets", () => {
     expect(deck).toContain("Gmail teacher-review draft");
     expect(deck).toContain("Gold/Silver/Bronze/Honorable Mention");
     expect(deck).toContain("Official AIYES Rules Snapshot");
-    expect(deck).toContain("71-participant");
+    expect(deck).toContain("74-participant");
     expect(deck).toContain("AIYES Demo Rehearsal");
+    expect(deck).toContain("AIYES Judge Q&amp;A Prep");
     expect(deck).toContain("verified deadline, eligibility, Track 1 artifacts, judging criteria, award bands");
     expect(deck).toContain("Pilot Evidence Tracker adds a 100-point quality gate");
     expect(deck).toContain("AIYES Values Fit");
@@ -78,8 +79,9 @@ describe("AIYES submission assets", () => {
     expect(copy).toContain("Gmail teacher-review draft");
     expect(copy).toContain("Gold/Silver/Bronze/Honorable Mention");
     expect(copy).toContain("Official AIYES Rules Snapshot");
-    expect(copy).toContain("71-participant");
+    expect(copy).toContain("74-participant");
     expect(copy).toContain("AIYES Demo Rehearsal");
+    expect(copy).toContain("AIYES Judge Q&A Prep");
     expect(copy).toContain("verified Devpost deadline, eligibility, Track 1 artifacts, criteria, award bands");
     expect(copy).toContain("100-point quality gate");
     expect(copy).toContain("AIYES Values Fit");
@@ -119,7 +121,8 @@ describe("AIYES submission assets", () => {
     expect(hub).toContain("Google Slides deck draft");
     expect(hub).toContain("Official AIYES Rules Snapshot");
     expect(hub).toContain("AIYES Demo Rehearsal");
-    expect(hub).toContain("71-participant");
+    expect(hub).toContain("AIYES Judge Q&amp;A Prep");
+    expect(hub).toContain("74-participant");
     expect(hub).toContain("228.92 second walkthrough");
     expect(hub).toContain("1c3221d19508b61f7ddb86631a1d481549f2058188a349ba92b7c2828eb0e8f0");
     expect(pack).toContain("Devpost Submission Pack");

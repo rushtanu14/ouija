@@ -3994,6 +3994,7 @@ td input {
 .ux-proof-panel,
 .submission-gate-panel,
 .demo-rehearsal-panel,
+.judge-question-prep-panel,
 .model-card-panel,
 .aiyes-rules-snapshot,
 .top-award-radar,
@@ -4625,6 +4626,112 @@ td input {
   border-radius: 8px;
   padding: 10px 12px;
   background: #f3fbf6;
+  font-weight: 750;
+}
+
+.judge-question-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-radius: 8px;
+  padding: 12px;
+  color: #173b74;
+  background: #eef5ff;
+}
+
+.judge-question-summary strong {
+  display: block;
+  color: #173b74;
+  line-height: 1.2;
+}
+
+.judge-question-summary > span {
+  flex: 0 0 auto;
+  border-radius: 8px;
+  padding: 7px 10px;
+  color: #1f5b3d;
+  background: #edf8f1;
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.judge-question-stats {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.judge-question-stats article {
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+  border: 1px solid #d9e5f2;
+  border-radius: 8px;
+  padding: 10px;
+  background: #fbfdff;
+}
+
+.judge-question-stats strong {
+  min-width: 0;
+  color: #172439;
+  font-size: 15px;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.judge-question-stats span {
+  color: #536478;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.judge-question-list {
+  display: grid;
+  gap: 8px;
+}
+
+.judge-question-list article {
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 0.9fr) minmax(0, 1.2fr);
+  gap: 10px;
+  align-items: start;
+  min-width: 0;
+  border: 1px solid #d9e5f2;
+  border-left: 4px solid #2368ff;
+  border-radius: 8px;
+  padding: 10px;
+  background: #fbfdff;
+}
+
+.judge-question-list strong {
+  min-width: 0;
+  color: #172439;
+  line-height: 1.25;
+}
+
+.judge-question-list span {
+  min-width: 0;
+  color: #174ea6;
+  font-size: 12px;
+  font-weight: 850;
+  line-height: 1.35;
+}
+
+.judge-question-list p,
+.judge-question-boundary {
+  min-width: 0;
+  margin: 0;
+  color: #536478;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.judge-question-boundary {
+  border-left: 4px solid #d89124;
+  border-radius: 8px;
+  padding: 10px 12px;
+  background: #fff8ec;
   font-weight: 750;
 }
 
@@ -6225,6 +6332,14 @@ td input {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .judge-question-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .judge-question-list article {
+    grid-template-columns: 1fr;
+  }
+
   .aiyes-rules-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -6488,12 +6603,19 @@ td input {
     flex-direction: column;
   }
 
+  .judge-question-summary {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
   .submission-gate-grid {
     grid-template-columns: 1fr;
   }
 
   .demo-rehearsal-stats,
-  .demo-rehearsal-beats li {
+  .demo-rehearsal-beats li,
+  .judge-question-stats,
+  .judge-question-list article {
     grid-template-columns: 1fr;
   }
 

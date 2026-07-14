@@ -11,6 +11,7 @@ import {
   Gauge,
   LineChart as LineChartIcon,
   ListChecks,
+  MessageSquare,
   Save,
   Search,
   Settings,
@@ -104,7 +105,7 @@ const slideDeckUrl = "https://ouija-olive.vercel.app/submission/slide-deck.html"
 const walkthroughVideoUrl = "https://ouija-olive.vercel.app/submission/assets/ouija-walkthrough.webm";
 const officialAiyesDevpostUrl = "https://ai-yes-competition-30441.devpost.com/";
 const officialAiyesVerifiedDate = "July 14, 2026";
-const officialAiyesParticipantCount = "71 participants shown on Devpost at verification time";
+const officialAiyesParticipantCount = "74 participants shown on Devpost at verification time";
 
 interface SavedLab extends ProgressPortfolioSnapshot {
   description: string;
@@ -147,6 +148,7 @@ const judgeNavLinks = [
   { href: "#aiyes-rules", label: "Rules" },
   { href: "#submission-gate", label: "Submit Gate" },
   { href: "#demo-rehearsal", label: "Demo Prep" },
+  { href: "#judge-qa", label: "Q&A Prep" },
   { href: "#judge", label: "Judge Brief" },
   { href: "#settings", label: "Settings" }
 ];
@@ -635,6 +637,13 @@ export function App() {
             <AiyesRulesSnapshotPanel />
             <SubmissionGatePanel evaluationReport={evaluationReport} runtimeProof={runtimeProof} mcpBridgeStatus={mcpBridgeStatus} />
             <DemoRehearsalPanel evaluationReport={evaluationReport} runtimeProof={runtimeProof} mcpBridgeStatus={mcpBridgeStatus} />
+            <JudgeQuestionPrepPanel
+              result={result}
+              evaluationReport={evaluationReport}
+              runtimeProof={runtimeProof}
+              mcpBridgeStatus={mcpBridgeStatus}
+              pilotEvidenceSummary={pilotEvidenceSummary}
+            />
             <JudgeBriefPanel result={result} />
           </>
         ) : null}
@@ -1448,7 +1457,7 @@ function AiyesRulesSnapshotPanel() {
     },
     {
       label: "Live page signal",
-      value: "71 participants visible",
+      value: "74 participants visible",
       detail: "The page was rechecked on July 14, 2026; treat the participant count as a snapshot, not a fixed contest total."
     },
     {
@@ -1690,6 +1699,114 @@ function DemoRehearsalPanel({
   );
 }
 
+function JudgeQuestionPrepPanel({
+  result,
+  evaluationReport,
+  runtimeProof,
+  mcpBridgeStatus,
+  pilotEvidenceSummary
+}: {
+  result: AnalyzeResult | null;
+  evaluationReport: EvaluationReport | null;
+  runtimeProof: RuntimeProof | null;
+  mcpBridgeStatus: McpBridgeStatus | null;
+  pilotEvidenceSummary: PilotEvidenceSummary;
+}) {
+  const rubricScore = result?.officialRubricFit.score ?? 0;
+  const routeCount = mcpBridgeStatus?.toolkits.length ?? 0;
+  const proofStats = [
+    {
+      label: "Rubric defense",
+      value: result ? `${rubricScore}/100` : "Analyze first",
+      detail: "Point to AIYES Rubric Fit before answering criteria questions."
+    },
+    {
+      label: "Runtime proof",
+      value: runtimeProof ? formatRuntimeProofStatus(runtimeProof.status) : "Loading",
+      detail: "Show /api/runtime-proof if judges ask whether the app is real."
+    },
+    {
+      label: "Regression proof",
+      value: evaluationReport?.status === "pass" ? "9/9 passed" : "Review",
+      detail: "Show /api/evaluate for deterministic behavior checks."
+    },
+    {
+      label: "Evidence honesty",
+      value: `${pilotEvidenceSummary.qualityScore}/100`,
+      detail: "Treat pilot evidence as a quality-gated claim, not invented validation."
+    },
+    {
+      label: "MCP depth",
+      value: `${routeCount || 15} routes`,
+      detail: "Use Source Scout and dry-run routes as technical depth proof."
+    }
+  ];
+  const qaItems = [
+    {
+      question: "What student problem does Ouija solve?",
+      proof: "Open Student Impact Brief, Student Focus, and Learning Impact Loop.",
+      answer: "Students often collect lab data but struggle to connect variables, graph patterns, and evidence-backed claims."
+    },
+    {
+      question: "What makes this AI more than a chat wrapper?",
+      proof: "Open Model Strategy, AI Architecture Map, Source Scout, Pattern Evidence Engine, and Regression.",
+      answer: "Ouija classifies the experiment, grounds expected patterns, audits table data, checks method quality, and asks Socratic questions."
+    },
+    {
+      question: "How do you prevent academic dishonesty?",
+      proof: "Open Claim Coach, Evidence Packet, Data Handling Ledger, and the integrity guard.",
+      answer: "The app gives blanks, evidence checks, and next questions; it refuses to write final conclusions or complete lab reports."
+    },
+    {
+      question: "How do you know the UX works for students?",
+      proof: "Open Student mode, UX and Accessibility Proof, table/graph workflow, and mobile no-overflow checks.",
+      answer: "Student mode keeps the workflow focused, while Judge mode keeps proof visible without cluttering the student's workspace."
+    },
+    {
+      question: "What are you not claiming yet?",
+      proof: "Open Top Award Radar, Submission Gate, Pilot Evidence Quality Gate, and Rules Snapshot.",
+      answer: "Final judging, eligible roster, Devpost submit, live credentials, and real pilot observations remain external steps."
+    }
+  ];
+
+  return (
+    <section className="judge-question-prep-panel" id="judge-qa" aria-label="AIYES Judge Q&A Prep">
+      <div className="panel-title">
+        <MessageSquare size={18} />
+        <h3>AIYES Judge Q&A Prep</h3>
+      </div>
+      <div className="judge-question-summary">
+        <div>
+          <p className="section-label">Live judging defense</p>
+          <strong>Answer with proof, not promises</strong>
+        </div>
+        <span>Gold-level posture</span>
+      </div>
+      <div className="judge-question-stats">
+        {proofStats.map((stat) => (
+          <article key={stat.label}>
+            <p className="section-label">{stat.label}</p>
+            <strong>{stat.value}</strong>
+            <span>{stat.detail}</span>
+          </article>
+        ))}
+      </div>
+      <div className="judge-question-list">
+        {qaItems.map((item) => (
+          <article key={item.question}>
+            <strong>{item.question}</strong>
+            <span>{item.proof}</span>
+            <p>{item.answer}</p>
+          </article>
+        ))}
+      </div>
+      <p className="judge-question-boundary">
+        Q&A boundary: defend the working app, AI design, student UX, and integrity guard; do not promise a Gold result, fake pilot data, or claim live connector access without credentials and consent.
+      </p>
+    </section>
+  );
+}
+
 function JudgeBriefPanel({ result }: { result: AnalyzeResult | null }) {
   const readiness = result?.trackEvidence.readiness ?? "submittable";
   const score = result?.trackEvidence.score ?? 0;
@@ -1786,6 +1903,7 @@ function JudgeBriefPanel({ result }: { result: AnalyzeResult | null }) {
     "Portfolio Story Builder turns saved runs into student-written progress evidence.",
     "AIYES submission checklist makes deck, video, source/deploy link, Devpost form pack, and team requirement status visible.",
     "AIYES Demo Rehearsal maps the required video and live demo to a five-minute proof path.",
+    "AIYES Judge Q&A Prep turns likely judging questions into proof-backed answers and no-overclaim boundaries.",
     "Deterministic Regression Suite runs nine internal behavior checks.",
     "Custom Lab Triage keeps unsupported labs useful without pretending full coverage.",
     "Hosted deck and walkthrough are public.",
