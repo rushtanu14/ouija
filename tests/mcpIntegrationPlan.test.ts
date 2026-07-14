@@ -135,6 +135,26 @@ describe("MCP integration plan", () => {
     expect(plan.dryRunChecks.find((check) => check.id === "least-privilege")?.detail).toContain("Composio Search");
     expect(plan.dryRunChecks.find((check) => check.id === "server-bridge")?.status).toBe("review");
     expect(plan.dryRunChecks.find((check) => check.id === "server-only")?.status).toBe("review");
+    expect(plan.sourceScout).toMatchObject({
+      status: "discovered",
+      verifiedAt: "July 14, 2026",
+      activeToolkits: ["composio_search", "browser_tool"],
+      noAccountAuthToolkits: ["Composio Search", "Composio Browser Tool"]
+    });
+    expect(plan.sourceScout.queryPreview).toContain("Reaction Rate vs Temperature");
+    expect(plan.sourceScout.queryPreview).toMatch(/temperature/i);
+    expect(plan.sourceScout.queryPreview).toMatch(/reaction/i);
+    expect(plan.sourceScout.dataBoundary).toContain("do not send raw table rows");
+    expect(plan.sourceScout.steps.map((step) => step.id)).toEqual(["discover", "fetch", "scholar", "browser-fallback"]);
+    expect(plan.sourceScout.steps.flatMap((step) => step.tools)).toEqual([
+      "COMPOSIO_SEARCH_WEB",
+      "COMPOSIO_SEARCH_FETCH_URL_CONTENT",
+      "COMPOSIO_SEARCH_SCHOLAR",
+      "BROWSER_TOOL_CREATE_TASK",
+      "BROWSER_TOOL_WATCH_TASK"
+    ]);
+    expect(plan.sourceScout.outputContract).toContain("Return source-quality questions and citation notes, not a finished lab conclusion.");
+    expect(plan.sourceScout.judgeTakeaway).toContain("read-only evidence loop");
     expect(plan.sessionStrategy.status).toBe("dry_run_ready");
     expect(plan.sessionStrategy.headline).toContain("dry-run validated");
     expect(plan.sessionStrategy.sessionShape).toContain("MCP URL");
@@ -223,6 +243,7 @@ describe("MCP integration plan", () => {
     expect(plan.actions.every((action) => action.mode === "server_mcp")).toBe(true);
     expect(plan.readinessMatrix.every((connector) => connector.status === "ready")).toBe(true);
     expect(plan.sessionStrategy.status).toBe("server_ready");
+    expect(plan.sourceScout.status).toBe("server_ready");
     expect(plan.sessionStrategy.headline).toContain("server-side after consent");
     expect(plan.dryRunChecks.find((check) => check.id === "server-only")?.status).toBe("pass");
     expect(plan.executionBoundary).toContain("Express API");

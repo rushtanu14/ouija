@@ -103,7 +103,8 @@ const devpostPackUrl = "https://ouija-olive.vercel.app/submission/devpost-pack.h
 const slideDeckUrl = "https://ouija-olive.vercel.app/submission/slide-deck.html";
 const walkthroughVideoUrl = "https://ouija-olive.vercel.app/submission/assets/ouija-walkthrough.webm";
 const officialAiyesDevpostUrl = "https://ai-yes-competition-30441.devpost.com/";
-const officialAiyesVerifiedDate = "July 13, 2026";
+const officialAiyesVerifiedDate = "July 14, 2026";
+const officialAiyesParticipantCount = "75 participants shown on Devpost at verification time";
 
 interface SavedLab extends ProgressPortfolioSnapshot {
   description: string;
@@ -1444,6 +1445,11 @@ function AiyesRulesSnapshotPanel() {
       detail: "Online public submission; all hosted links should be checked again on submission day."
     },
     {
+      label: "Live page signal",
+      value: "75 participants visible",
+      detail: "The page was rechecked on July 14, 2026; treat the participant count as a snapshot, not a fixed contest total."
+    },
+    {
       label: "Track 1 artifacts",
       value: "Slide deck, 5-minute video, source/deploy link",
       detail: "Ouija has a hosted deck, walkthrough, public repo, live app, and one-click Submission Hub."
@@ -1471,7 +1477,9 @@ function AiyesRulesSnapshotPanel() {
           <p className="section-label">Verified source</p>
           <strong>AIYES Devpost page</strong>
         </div>
-        <span>{officialAiyesVerifiedDate}</span>
+        <span>
+          {officialAiyesVerifiedDate} · {officialAiyesParticipantCount}
+        </span>
       </div>
       <div className="aiyes-rules-grid">
         {rules.map((rule) => (
@@ -2044,6 +2052,37 @@ function McpIntegrationCoachPanel({
               </div>
             </div>
           ) : null}
+          <div className={`mcp-source-scout mcp-source-scout-${plan.sourceScout.status}`} aria-label="Composio Source Scout">
+            <div className="mcp-source-scout-header">
+              <div>
+                <p className="section-label">Composio Source Scout</p>
+                <strong>{plan.sourceScout.status === "server_ready" ? "Server-ready read-only loop" : "Discovered read-only loop"}</strong>
+                <span>Verified {plan.sourceScout.verifiedAt} through Composio tool discovery.</span>
+              </div>
+              <small>{plan.sourceScout.activeToolkits.join(" + ")}</small>
+            </div>
+            <div className="mcp-source-query">
+              <p className="section-label">Student-reviewed query</p>
+              <strong>{plan.sourceScout.queryPreview}</strong>
+              <span>{plan.sourceScout.dataBoundary}</span>
+            </div>
+            <div className="mcp-source-step-grid">
+              {plan.sourceScout.steps.map((step) => (
+                <article key={step.id}>
+                  <p className="section-label">{step.label}</p>
+                  <strong>{step.tools.join(", ")}</strong>
+                  <span>{step.detail}</span>
+                </article>
+              ))}
+            </div>
+            <div className="mcp-source-contract">
+              <p className="section-label">Output contract</p>
+              {plan.sourceScout.outputContract.map((item) => (
+                <span key={item}>{item}</span>
+              ))}
+            </div>
+            <em>{plan.sourceScout.judgeTakeaway}</em>
+          </div>
           <div className={`mcp-session-strategy mcp-session-strategy-${plan.sessionStrategy.status}`} aria-label="Composio Session Strategy">
             <div>
               <p className="section-label">Composio Sessions strategy</p>
@@ -3977,6 +4016,15 @@ function formatMcpPayloadPreview(plan: McpIntegrationPlan) {
     "",
     "Actions:",
     ...plan.actions.map((action) => `- ${action.toolkit}: ${action.composioCapability} (${action.payloadSummary})`),
+    "",
+    "Composio Source Scout:",
+    `Verified: ${plan.sourceScout.verifiedAt}`,
+    `Active toolkits: ${plan.sourceScout.activeToolkits.join(", ")}`,
+    `Query: ${plan.sourceScout.queryPreview}`,
+    `Data boundary: ${plan.sourceScout.dataBoundary}`,
+    ...plan.sourceScout.steps.map((step) => `- ${step.label}: ${step.tools.join(", ")} - ${step.detail}`),
+    ...plan.sourceScout.outputContract.map((item) => `- Contract: ${item}`),
+    plan.sourceScout.judgeTakeaway,
     "",
     "Composio Sessions strategy:",
     plan.sessionStrategy.docsBasis,

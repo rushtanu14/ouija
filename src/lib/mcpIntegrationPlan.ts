@@ -297,6 +297,7 @@ export function buildMcpIntegrationPlan({
       actions,
       result
     }),
+    sourceScout: buildSourceScout(result, status),
     sessionStrategy: buildSessionStrategy(actions, status),
     executionBoundary: buildExecutionBoundary(status),
     payloadPreview: {
@@ -335,6 +336,55 @@ export function buildMcpIntegrationPlan({
     safeguards: buildSafeguards(status),
     judgeTakeaway:
       "MCP Integration Coach connects Ouija to a real research, LMS-context, and classroom handoff path with Composio Sessions, connector prerequisites, least-privilege scopes, server dry-runs, scoped session tickets, and consent gates visible to judges."
+  };
+}
+
+function buildSourceScout(result: AnalyzeResult, status: McpIntegrationPlan["status"]): McpIntegrationPlan["sourceScout"] {
+  const independent = result.variables[0] ?? result.columns[0]?.label ?? "independent variable";
+  const dependent = result.variables[1] ?? result.columns[1]?.label ?? "dependent variable";
+
+  return {
+    status: status === "ready" ? "server_ready" : "discovered",
+    verifiedAt: "July 14, 2026",
+    activeToolkits: ["composio_search", "browser_tool"],
+    noAccountAuthToolkits: ["Composio Search", "Composio Browser Tool"],
+    queryPreview: `${result.classification.title} ${independent} ${dependent} expected results middle school high school lab`,
+    dataBoundary:
+      "Send the experiment title, variable names, current citation URLs, and a source-quality question only; do not send raw table rows, saved reflections, names, emails, or final claims.",
+    steps: [
+      {
+        id: "discover",
+        label: "Discover candidate sources",
+        tools: ["COMPOSIO_SEARCH_WEB"],
+        detail: "Find public classroom-safe pages for the experiment topic and variables before trusting the expected pattern."
+      },
+      {
+        id: "fetch",
+        label: "Fetch readable page text",
+        tools: ["COMPOSIO_SEARCH_FETCH_URL_CONTENT"],
+        detail: "Pull bounded text from the selected source pages so Ouija can check what the page actually says."
+      },
+      {
+        id: "scholar",
+        label: "Check scholarly context",
+        tools: ["COMPOSIO_SEARCH_SCHOLAR"],
+        detail: "Compare the expected pattern against scholarly snippets when a high-school lab needs stronger grounding."
+      },
+      {
+        id: "browser-fallback",
+        label: "Capture dynamic source pages",
+        tools: ["BROWSER_TOOL_CREATE_TASK", "BROWSER_TOOL_WATCH_TASK"],
+        detail: "Use a browser task only for public pages that normal text fetch cannot read."
+      }
+    ],
+    outputContract: [
+      "Shortlist source links with why each source is useful.",
+      "Mark agreement, disagreement, or mixed evidence before showing an expected-result claim.",
+      "Return source-quality questions and citation notes, not a finished lab conclusion.",
+      "Keep all live source lookups server-side behind consent and the allowed-tool list."
+    ],
+    judgeTakeaway:
+      "Source Scout turns Composio from a generic export badge into a read-only evidence loop: search, fetch, scholarly check, browser fallback, then student-reviewed citation notes."
   };
 }
 

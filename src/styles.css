@@ -5225,6 +5225,96 @@ td input {
   text-decoration: none;
 }
 
+.mcp-source-scout {
+  display: grid;
+  gap: 10px;
+  border: 1px solid #c8dfd4;
+  border-radius: 8px;
+  padding: 12px;
+  background: #f6fbf8;
+}
+
+.mcp-source-scout-server_ready {
+  border-color: #9ed8b6;
+  background: #f2faf5;
+}
+
+.mcp-source-scout-header,
+.mcp-source-query {
+  display: grid;
+  gap: 5px;
+}
+
+.mcp-source-scout-header {
+  grid-template-columns: minmax(0, 1fr) max-content;
+  align-items: start;
+}
+
+.mcp-source-scout-header strong,
+.mcp-source-query strong,
+.mcp-source-step-grid strong {
+  color: #172439;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.mcp-source-scout-header span,
+.mcp-source-scout-header small,
+.mcp-source-query span,
+.mcp-source-step-grid span,
+.mcp-source-contract span,
+.mcp-source-scout em {
+  color: #607087;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.mcp-source-scout-header small {
+  border-radius: 999px;
+  padding: 5px 8px;
+  background: #ffffff;
+  color: #23543c;
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
+.mcp-source-step-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.mcp-source-step-grid article {
+  display: grid;
+  gap: 5px;
+  border: 1px solid #d9e8df;
+  border-radius: 8px;
+  padding: 10px;
+  background: #ffffff;
+}
+
+.mcp-source-contract {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.mcp-source-contract .section-label {
+  flex-basis: 100%;
+}
+
+.mcp-source-contract span {
+  border-radius: 999px;
+  padding: 5px 8px;
+  background: #ffffff;
+}
+
+.mcp-source-scout em {
+  color: #23543c;
+  font-style: normal;
+  font-weight: 800;
+}
+
 .mcp-session-strategy {
   display: grid;
   gap: 10px;
@@ -6045,6 +6135,7 @@ td input {
   .mcp-action-grid,
   .mcp-readiness-grid,
   .mcp-session-bundle-grid,
+  .mcp-source-step-grid,
   .mcp-export-check-grid,
   .mcp-payload-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -6328,6 +6419,8 @@ td input {
   .mcp-readiness-grid,
   .mcp-session-bundle-grid,
   .mcp-session-stat-grid,
+  .mcp-source-scout-header,
+  .mcp-source-step-grid,
   .mcp-dry-run-checks,
   .mcp-export-check-grid,
   .mcp-payload-grid {

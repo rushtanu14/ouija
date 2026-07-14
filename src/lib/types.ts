@@ -665,6 +665,25 @@ export interface McpIntegrationPayloadPreview {
   markdownExcerpt: string;
 }
 
+export interface McpSourceScoutStep {
+  id: "discover" | "fetch" | "scholar" | "browser-fallback";
+  label: string;
+  tools: string[];
+  detail: string;
+}
+
+export interface McpSourceScout {
+  status: "discovered" | "server_ready";
+  verifiedAt: string;
+  activeToolkits: string[];
+  noAccountAuthToolkits: string[];
+  queryPreview: string;
+  dataBoundary: string;
+  steps: McpSourceScoutStep[];
+  outputContract: string[];
+  judgeTakeaway: string;
+}
+
 export interface McpSessionBundle {
   id: "source-verification" | "assignment-context" | "student-export";
   label: string;
@@ -694,6 +713,7 @@ export interface McpIntegrationPlan {
   actions: McpIntegrationAction[];
   readinessMatrix: McpConnectorReadiness[];
   dryRunChecks: McpDryRunCheck[];
+  sourceScout: McpSourceScout;
   sessionStrategy: McpSessionStrategy;
   executionBoundary: string;
   payloadPreview: McpIntegrationPayloadPreview;

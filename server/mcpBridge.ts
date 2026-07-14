@@ -61,6 +61,10 @@ export function getMcpBridgeStatus(env: EnvMap = process.env): McpBridgeStatus {
         url: "https://docs.composio.dev/docs/migration-guide/mcp-servers-to-sessions"
       },
       {
+        label: "Composio Search toolkit",
+        url: "https://docs.composio.dev/toolkits/composio_search"
+      },
+      {
         label: "Composio Browser Tool",
         url: "https://docs.composio.dev/toolkits/browser_tool"
       },

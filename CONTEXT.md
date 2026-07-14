@@ -117,6 +117,17 @@ The one-click judge packet at `https://ouija-olive.vercel.app/submission/`. It g
 - Ouija should support table input first before adding CSV upload or photo/OCR input.
 - Ouija's internet search should ground expected results and explanations in referenced content instead of inventing them from the model alone.
 
+## Composio Source Scout And AIYES Snapshot Checkpoint - 2026-07-14 PDT
+
+- Council verdict: Ouija remains submittable and Gold-competitive for AIYES Track 1, but no app change can guarantee first place because judging, final Devpost submission, eligible team roster, and real anonymous pilot observations are external.
+- Highest-leverage controllable gap after the Google Slides route: the app already had many Composio/MCP routes, so the useful improvement was not another export badge. It was making the read-only source-verification path judge-visible and grounding it in actual Composio tool discovery.
+- Added `Composio Source Scout` inside MCP Integration Coach. It shows a verified read-only Composio Search/Browser chain: `COMPOSIO_SEARCH_WEB`, `COMPOSIO_SEARCH_FETCH_URL_CONTENT`, `COMPOSIO_SEARCH_SCHOLAR`, then `BROWSER_TOOL_CREATE_TASK`/`BROWSER_TOOL_WATCH_TASK` for public dynamic pages. The card names the student-reviewed query, output contract, and data boundary: no raw table rows, saved reflections, identifiers, or final claims.
+- Refreshed `Official AIYES Rules Snapshot` to the July 14, 2026 Devpost check, including the 75-participant snapshot, September 1, 2026 12:00 PM PDT deadline, ages 13-18/student-only eligibility, listed 2-5 team requirement plus individual/team wording caveat, Track 1 artifacts, judging criteria, award bands, and source link.
+- Updated README, API docs, AIYES brief, Devpost copy, judging checklist, five-minute script, slide deck, submission hub, Devpost pack, public submission pages, typed MCP plan/tests, and E2E coverage.
+- Production: `dpl_9DkhhjaGjQQPW4cjyWRSqp7ojyj7`, aliased to `https://ouija-olive.vercel.app`.
+- Verification: official AIYES/Devpost page rechecked on 2026-07-14; Composio discovery found active no-auth `composio_search` and `browser_tool` toolkits; focused MCP/API/serverless tests (3 files, 50 tests); focused Chromium Source Scout/rules E2E (3 passed); `npm run test` (15 files, 98 tests); `npm run build`; `npm run test:e2e` (40 passed); `npm audit --audit-level=moderate` (0 vulnerabilities); `git diff --check`; `npm run sync:public-submission`; production deploy; live `/api/mcp/status` (200, `server_dry_run`, 15 routes, Composio Search docs link, Search tools present); live `/api/runtime-proof` (200, `fallback_ready`, `server_dry_run`, `9/9`); live `/api/evaluate` (200, score `100`); hosted submission hub/Devpost pack/slide deck (200 with Source Scout, July 14, and participant snapshot copy); hosted desktop/mobile Playwright smoke confirmed Source Scout, rules snapshot, no horizontal overflow, and zero console/page errors.
+- Remaining loops: actual Devpost submission, final eligible student roster/form behavior, real anonymous pilot observations, optional live OpenAI/Composio credentials only with explicit approval and consent/server setup, and optional DeepWiki indexing.
+
 ## Official AIYES Rules Snapshot Checkpoint - 2026-07-13 PDT
 
 - Council verdict: Ouija works, is submittable, and is Gold-competitive for AIYES Track 1, but no app change can guarantee Gold or first place because judging, final Devpost submit, team roster, and real pilot observations remain external.
