@@ -82,9 +82,13 @@ The read-only classroom context route. It adds `canvas-assignment-context` throu
 
 The consent-gated teacher-feedback route. It adds `gmail-teacher-review-draft` through Gmail draft creation (`GMAIL_CREATE_EMAIL_DRAFT`) so a future consented session can prepare an unsent teacher-review email asking for feedback on variables, controls, source trust, safety, data flags, and claim blanks. It must not send email automatically, read inbox content, delete messages, collect direct identifiers by default, or write the student's final conclusion.
 
+### Google Slides Submission Deck Draft
+
+The consent-gated AIYES presentation route. It adds `google-slides-submission-deck` through Composio's Google Slides toolkit (`GOOGLESLIDES_CREATE_SLIDES_MARKDOWN`, `GOOGLESLIDES_CREATE_PRESENTATION`, `GOOGLESLIDES_PRESENTATIONS_BATCH_UPDATE`) so a future consented session can turn the student-owned evidence packet, citations, proof links, and blank claim starter into an editable deck draft. It must not submit the presentation, share it publicly, or write the student's final conclusion or reflection answers.
+
 ### Composio Sessions Strategy
 
-The judge-visible MCP planning layer that turns Ouija's connector story into scoped sessions instead of a vague integration list. The first planned session is read-only source verification across Composio Search, Semantic Scholar, Composio Browser, and DeepWiki public-source proof. A separate read-only assignment context session targets Canvas lab prompts/rubrics. Later student export sessions are consent-gated and can target Google Docs, Sheets, Drive, Classroom, Forms, Calendar, Gmail draft, and Notion only after server-side credentials, allowed tools, auth config, and consent are in place.
+The judge-visible MCP planning layer that turns Ouija's connector story into scoped sessions instead of a vague integration list. The first planned session is read-only source verification across Composio Search, Semantic Scholar, Composio Browser, and DeepWiki public-source proof. A separate read-only assignment context session targets Canvas lab prompts/rubrics. Later student export sessions are consent-gated and can target Google Docs, Google Slides, Sheets, Drive, Classroom, Forms, Calendar, Gmail draft, and Notion only after server-side credentials, allowed tools, auth config, and consent are in place.
 
 ### Pilot Evidence Tracker
 
@@ -112,6 +116,16 @@ The one-click judge packet at `https://ouija-olive.vercel.app/submission/`. It g
 - Ouija's first supported set should balance physics, chemistry, biology, and earth science instead of overfitting to physics.
 - Ouija should support table input first before adding CSV upload or photo/OCR input.
 - Ouija's internet search should ground expected results and explanations in referenced content instead of inventing them from the model alone.
+
+## Official AIYES Rules Snapshot Checkpoint - 2026-07-13 PDT
+
+- Council verdict: Ouija works, is submittable, and is Gold-competitive for AIYES Track 1, but no app change can guarantee Gold or first place because judging, final Devpost submit, team roster, and real pilot observations remain external.
+- Highest-leverage controllable gap after the pilot evidence quality gate: judges needed the current official AIYES constraints visible inside Judge mode instead of scattered across docs.
+- Added `Official AIYES Rules Snapshot` in Judge mode with verified source date, Devpost source link, ages 13-18/student-only eligibility, listed 2-5 team requirement plus individual/team wording caveat, September 1, 2026 12:00 PM PDT deadline, Track 1 artifacts, judging criteria, and Gold/Silver/Bronze/Honorable Mention award bands.
+- Added Judge navigation, responsive styles, desktop overflow protection for narrow Judge-mode cards, E2E coverage, README/Devpost/brief/deck/script/checklist/submission-hub/submission-pack updates, public asset sync, and stale walkthrough-label tests.
+- Production: `dpl_7mgvygcDqGr2WtekRNa8WycGEVm5`, aliased to `https://ouija-olive.vercel.app`.
+- Verification: official AIYES/Devpost page rechecked on 2026-07-13; focused static and Chromium E2E checks; `npm run test` (15 files, 95 tests); `npm run build`; `npm run test:e2e` (40 passed); `npm audit --audit-level=moderate` (0 vulnerabilities); `git diff --check`; production deploy; live `/api/evaluate` (200, score 100); live `/api/runtime-proof` (200, `fallback_ready`, `server_dry_run`); live `/api/mcp/status` (200, `server_dry_run`, 14 routes); hosted submission pages (200 with rules snapshot and current video proof); hosted desktop browser smoke confirming rules snapshot content, Devpost source link, no horizontal overflow, and zero console errors.
+- Remaining loops: actual Devpost submission, final eligible student roster/form behavior, real anonymous pilot observations, optional live OpenAI/Composio credentials only with explicit approval and consent/server setup, and optional DeepWiki indexing.
 
 ## Gold Award Framing Checkpoint - 2026-07-13 UTC / 2026-07-12 PDT
 

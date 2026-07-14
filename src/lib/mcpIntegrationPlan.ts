@@ -121,6 +121,21 @@ export const MCP_CONNECTOR_CATALOG: McpConnectorCatalogItem[] = [
     recommendedTools: ["GOOGLEDOCS_CREATE_DOCUMENT_MARKDOWN", "GOOGLEDOCS_CREATE_DOCUMENT"]
   },
   {
+    id: "google-slides-submission-deck",
+    toolkit: "Google Slides",
+    toolkitSlug: "googleslides",
+    envSuffix: "GOOGLE_SLIDES",
+    label: "Draft submission slide deck",
+    studentValue: "Turns the judge-ready evidence and reflection prompts into an editable AIYES deck draft for the student team.",
+    composioCapability: "create a Google Slides presentation from Markdown, then let the student revise and rehearse the deck",
+    safetyNote: "Slides export should create a presentation draft and proof links; it must not write the student's final claim, conclusion, or reflection answers.",
+    requiredScopes: ["presentation create/update", "markdown-to-slides draft", "student edit before sharing"],
+    dataShared: "Deck outline, evidence packet excerpt, citations, hosted proof links, blank claim starter, and student-authored reflections when present.",
+    consentGate: "Student reviews the deck outline and destination account before a Google Slides draft can be created.",
+    docsUrl: "https://docs.composio.dev/toolkits/googleslides",
+    recommendedTools: ["GOOGLESLIDES_CREATE_SLIDES_MARKDOWN", "GOOGLESLIDES_CREATE_PRESENTATION", "GOOGLESLIDES_PRESENTATIONS_BATCH_UPDATE"]
+  },
+  {
     id: "google-sheets-data-log",
     toolkit: "Google Sheets",
     toolkitSlug: "googlesheets",
@@ -307,6 +322,7 @@ export function buildMcpIntegrationPlan({
         "Pilot Evidence Tracker summary",
         "Learning Exit Ticket prompts",
         "Google Forms readiness prompts",
+        "Google Slides submission deck outline",
         "Google Calendar next-trial reminder",
         "Gmail teacher-review draft prompt",
         "Composio session ticket scope",
@@ -345,8 +361,8 @@ function buildSafeguards(status: McpIntegrationPlan["status"]) {
     status === "ready"
       ? "Live MCP mode keeps Composio, Google Workspace, Notion, and Calendar execution on the server after consent."
       : status === "server_dry_run"
-      ? "Server dry-run mode validates Composio packets but does not call Composio Search, Semantic Scholar, Composio Browser, DeepWiki, Canvas, Google Classroom, Google Workspace, Gmail, Notion, or Calendar APIs."
-      : "Preview mode does not call Composio Search, Semantic Scholar, Composio Browser, DeepWiki, Canvas, Google Classroom, Google Workspace, Gmail, or Notion APIs.";
+      ? "Server dry-run mode validates Composio packets but does not call Composio Search, Semantic Scholar, Composio Browser, DeepWiki, Canvas, Google Classroom, Google Workspace, Google Slides, Gmail, Notion, or Calendar APIs."
+      : "Preview mode does not call Composio Search, Semantic Scholar, Composio Browser, DeepWiki, Canvas, Google Classroom, Google Workspace, Google Slides, Gmail, or Notion APIs.";
 
   return [
     firstLine,
@@ -361,6 +377,7 @@ function buildSafeguards(status: McpIntegrationPlan["status"]) {
       "Canvas assignment context is read-only and must not submit work, message a class, or alter grades.",
       "Google Classroom handoff creates a teacher-review checkpoint, not an auto-submitted assignment.",
       "Google Forms handoff creates student prompts, not completed answers.",
+      "Google Slides handoff creates an editable deck draft, not a submitted presentation or completed conclusion.",
       "Google Calendar handoff schedules a next-trial reminder, not a generated result.",
       "Gmail handoff creates an unsent teacher-review draft only; no automatic send, inbox read, or delete route is enabled.",
       "Exported packets preserve the academic-integrity blanks instead of writing conclusions.",
@@ -560,6 +577,9 @@ function buildPayloadSummary(
     return `Canvas read-only import for ${result.classification.title}: fetch the selected assignment prompt, rubric criteria, due date, and attached lab-material metadata before planning variables.`;
   }
   if (connector.id === "google-docs-evidence-packet") return `${title} with source trail, checks, and integrity boundary`;
+  if (connector.id === "google-slides-submission-deck") {
+    return `AIYES submission deck draft for ${title}: turn evidence, citations, proof links, and blank claim starter into editable Google Slides Markdown.`;
+  }
   if (connector.id === "google-sheets-data-log") return `${rowCount} rows across ${result.columns.length} columns: ${formatColumnList(result)}`;
   if (connector.id === "google-drive-portfolio-archive") {
     return `${savedRunCount} saved run${savedRunCount === 1 ? "" : "s"}, ${sourceCount} citation${sourceCount === 1 ? "" : "s"}, hosted submission links`;

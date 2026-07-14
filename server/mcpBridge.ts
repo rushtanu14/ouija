@@ -71,6 +71,10 @@ export function getMcpBridgeStatus(env: EnvMap = process.env): McpBridgeStatus {
       {
         label: "Google Calendar toolkit",
         url: "https://docs.composio.dev/toolkits/googlecalendar"
+      },
+      {
+        label: "Google Slides toolkit",
+        url: "https://docs.composio.dev/toolkits/googleslides"
       }
     ]
   };

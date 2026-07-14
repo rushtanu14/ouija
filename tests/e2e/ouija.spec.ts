@@ -278,7 +278,7 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(
     page
       .getByLabel("AI Model Card")
-      .getByText("MCP Integration Coach keeps Composio credentials server-side, validates packets with /api/mcp/export, prepares session tickets with /api/mcp/session, and requires student consent before any source audit, Scholar claim check, Semantic Scholar reference check, Browser source capture, DeepWiki source proof, Canvas assignment import, Gmail teacher-review draft, or export.")
+      .getByText("MCP Integration Coach keeps Composio credentials server-side, validates packets with /api/mcp/export, prepares session tickets with /api/mcp/session, and requires student consent before any source audit, Scholar claim check, Semantic Scholar reference check, Browser source capture, DeepWiki source proof, Canvas assignment import, Google Slides deck draft, Gmail teacher-review draft, or export.")
   ).toBeVisible();
   await expect(page.getByLabel("AI Model Card").getByText("Composio Sessions Strategy separates read-only source verification and Canvas assignment-context sessions from later consent-gated export sessions.")).toBeVisible();
   await expect(page.getByLabel("AI Model Card").getByText("MCP Readiness Matrix makes connector tools, scopes, dry-run checks, and least-privilege boundaries inspectable.")).toBeVisible();
@@ -347,6 +347,14 @@ test("student can analyze a sample experiment, edit table data, and see citation
   ).toBeVisible();
   await expect(page.locator(".mcp-action-card").filter({ hasText: "Google Docs" }).getByText("Google Docs", { exact: true })).toBeVisible();
   await expect(page.getByLabel("MCP Integration Coach").getByText("Create evidence packet doc")).toBeVisible();
+  await expect(page.locator(".mcp-action-card").filter({ hasText: "Google Slides" }).getByText("Google Slides", { exact: true })).toBeVisible();
+  await expect(page.getByLabel("MCP Integration Coach").getByText("Draft submission slide deck")).toBeVisible();
+  await expect(
+    page
+      .locator(".mcp-action-card")
+      .filter({ hasText: "Draft submission slide deck" })
+      .getByText("create a Google Slides presentation from Markdown, then let the student revise and rehearse the deck")
+  ).toBeVisible();
   await expect(page.locator(".mcp-action-card").filter({ hasText: "Google Sheets" }).getByText("Google Sheets", { exact: true })).toBeVisible();
   await expect(
     page.locator(".mcp-action-card").filter({ hasText: "Google Sheets" }).getByText("append spreadsheet rows and update worksheets", {
@@ -361,12 +369,14 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(page.locator(".mcp-action-card").filter({ hasText: "Google Calendar" }).getByText("Google Calendar", { exact: true })).toBeVisible();
   await expect(page.getByLabel("MCP Integration Coach").getByText("Schedule next trial reminder")).toBeVisible();
   await expect(page.locator(".mcp-action-card").filter({ hasText: "Notion" }).getByText("Notion", { exact: true })).toBeVisible();
-  await expect(page.getByLabel("MCP Readiness Matrix").getByText("14 connector routes checked")).toBeVisible();
+  await expect(page.getByLabel("MCP Readiness Matrix").getByText("15 connector routes checked")).toBeVisible();
   await expect(page.getByLabel("MCP Readiness Matrix").getByText("COMPOSIO_SEARCH_ALLOWED_TOOLS")).toHaveCount(2);
   await expect(page.getByLabel("MCP Readiness Matrix").getByText("COMPOSIO_SEMANTIC_SCHOLAR_ALLOWED_TOOLS")).toBeVisible();
   await expect(page.getByLabel("MCP Readiness Matrix").getByText("COMPOSIO_BROWSER_ALLOWED_TOOLS")).toBeVisible();
   await expect(page.getByLabel("MCP Readiness Matrix").getByText("COMPOSIO_DEEPWIKI_ALLOWED_TOOLS")).toBeVisible();
   await expect(page.getByLabel("MCP Readiness Matrix").getByText("COMPOSIO_CANVAS_AUTH_CONFIG_ID")).toBeVisible();
+  await expect(page.getByLabel("MCP Readiness Matrix").getByText("COMPOSIO_GOOGLE_SLIDES_AUTH_CONFIG_ID")).toBeVisible();
+  await expect(page.getByLabel("MCP Readiness Matrix").getByText("GOOGLESLIDES_CREATE_SLIDES_MARKDOWN")).toBeVisible();
   await expect(page.getByLabel("MCP Readiness Matrix").getByText("COMPOSIO_GOOGLE_FORMS_AUTH_CONFIG_ID")).toBeVisible();
   await expect(page.getByLabel("MCP dry-run checks").getByText("Payload completeness")).toBeVisible();
   await expect(page.getByLabel("MCP dry-run checks").getByText("Least privilege")).toBeVisible();
@@ -381,6 +391,7 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(page.getByLabel("MCP payload preview")).toHaveValue(/Composio Browser: create and watch a browser task/);
   await expect(page.getByLabel("MCP payload preview")).toHaveValue(/DeepWiki: read the public GitHub repo/);
   await expect(page.getByLabel("MCP payload preview")).toHaveValue(/Canvas: read Canvas courses/);
+  await expect(page.getByLabel("MCP payload preview")).toHaveValue(/Google Slides: create a Google Slides presentation from Markdown/);
   await expect(page.getByLabel("MCP payload preview")).toHaveValue(/Google Sheets: append spreadsheet rows/);
   await expect(page.getByLabel("MCP payload preview")).toHaveValue(/Google Classroom: create coursework draft/);
   await expect(page.getByLabel("MCP payload preview")).toHaveValue(/Google Forms: create Google Forms draft/);
@@ -472,7 +483,7 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(
     page
       .getByLabel("Judge Brief")
-      .getByText("MCP Integration Coach validates Composio Search source audits, Scholar claim checks, Semantic Scholar reference checks, Browser source capture, DeepWiki public-source proof, Canvas assignment-context imports, plus Docs, Sheets, Drive, Classroom, Forms, Calendar, Gmail teacher-review drafts, and Notion handoffs through Composio Sessions, a server dry-run, and scoped session tickets without exposing credentials.")
+      .getByText("MCP Integration Coach validates Composio Search source audits, Scholar claim checks, Semantic Scholar reference checks, Browser source capture, DeepWiki public-source proof, Canvas assignment-context imports, plus Docs, Slides, Sheets, Drive, Classroom, Forms, Calendar, Gmail teacher-review drafts, and Notion handoffs through Composio Sessions, a server dry-run, and scoped session tickets without exposing credentials.")
   ).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Composio Sessions Strategy separates read-only source verification and Canvas assignment-context sessions from later consent-gated export sessions.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("MCP Readiness Matrix shows exact connector env vars, tools, scopes, data shared, dry-run checks, and consent gates.")).toBeVisible();
@@ -523,6 +534,21 @@ test("judge mode shows a top award radar with honest win gaps", async ({ page })
   await expect(page.getByLabel("Top Award Radar").getByText("quality gate 80/100")).toBeVisible();
   await expect(page.getByLabel("Top award next moves").getByText("Complete the pilot evidence quality gate before claiming user testing.")).toBeVisible();
   await expect(page.getByLabel("Top award next moves").getByText("Confirm the 2-5 student team roster in the Devpost submission flow.")).toBeVisible();
+
+  await page.getByRole("link", { name: "Rules" }).click();
+  await expect(page.getByRole("heading", { name: "Official AIYES Rules Snapshot" })).toBeVisible();
+  await expect(page.getByLabel("Official AIYES Rules Snapshot").getByText("Ages 13-18, students only")).toBeVisible();
+  await expect(page.getByLabel("Official AIYES Rules Snapshot").getByText("Sep 1, 2026 at 12:00 PM PDT")).toBeVisible();
+  await expect(page.getByLabel("Official AIYES Rules Snapshot").getByText("Slide deck, 5-minute video, source/deploy link")).toBeVisible();
+  await expect(page.getByLabel("Official AIYES Rules Snapshot").getByText("Problem, AI/model strategy, UX/design")).toBeVisible();
+  await expect(page.getByLabel("Official AIYES Rules Snapshot").getByText("Gold / Silver / Bronze / Honorable Mention")).toBeVisible();
+  await expect(page.getByLabel("Official AIYES Rules Snapshot").getByRole("link", { name: "Open official AIYES Devpost page" })).toHaveAttribute(
+    "href",
+    "https://ai-yes-competition-30441.devpost.com/"
+  );
+
+  const overflow = await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth);
+  expect(overflow).toBe(false);
 });
 
 test("student mode keeps the core lab workflow focused before judge proof", async ({ page }) => {
@@ -541,11 +567,13 @@ test("student mode keeps the core lab workflow focused before judge proof", asyn
   await expect(page.getByRole("heading", { name: "AI Architecture Map" })).toHaveCount(0);
   await expect(page.getByRole("heading", { name: "UX and Accessibility Proof" })).toHaveCount(0);
   await expect(page.getByRole("heading", { name: "AIYES Submission Gate" })).toHaveCount(0);
+  await expect(page.getByRole("heading", { name: "Official AIYES Rules Snapshot" })).toHaveCount(0);
   await expect(page.getByRole("heading", { name: "Judge Brief" })).toHaveCount(0);
   await expect(page.getByRole("link", { name: "MCP Export" })).toHaveCount(0);
   await expect(page.getByRole("link", { name: "Architecture" })).toHaveCount(0);
   await expect(page.getByRole("link", { name: "UX Proof" })).toHaveCount(0);
   await expect(page.getByRole("link", { name: "Award Radar" })).toHaveCount(0);
+  await expect(page.getByRole("link", { name: "Rules" })).toHaveCount(0);
   await expect(page.getByRole("link", { name: "Submit Gate" })).toHaveCount(0);
 
   await page.getByLabel("View mode").getByRole("button", { name: "Judge" }).click();
@@ -555,11 +583,12 @@ test("student mode keeps the core lab workflow focused before judge proof", asyn
   await expect(page.getByRole("heading", { name: "AI Architecture Map" })).toBeVisible();
   await expect(page.getByLabel("AI Architecture Map").getByText("Classifier -> grounding -> data audit -> learning guard -> MCP bridge")).toBeVisible();
   await expect(page.getByLabel("AI Architecture Map").getByText("Not a chat wrapper")).toBeVisible();
-  await expect(page.getByLabel("AI Architecture Map").getByText("14 MCP routes")).toBeVisible();
+  await expect(page.getByLabel("AI Architecture Map").getByText("15 MCP routes")).toBeVisible();
   await expect(page.getByRole("heading", { name: "AIYES Development Journey" })).toBeVisible();
   await expect(page.getByRole("link", { name: "MCP Export" })).toBeVisible();
   await expect(page.getByRole("link", { name: "Architecture" })).toBeVisible();
   await expect(page.getByRole("link", { name: "UX Proof" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Rules" })).toBeVisible();
   await page.getByRole("link", { name: "UX Proof" }).click();
   await expect(page.getByRole("heading", { name: "UX and Accessibility Proof" })).toBeVisible();
   await expect(page.getByLabel("UX and Accessibility Proof").getByText("User Experience and Design")).toBeVisible();
@@ -569,6 +598,11 @@ test("student mode keeps the core lab workflow focused before judge proof", asyn
   await expect(page.getByLabel("UX and Accessibility Proof").getByText("Clickable citations")).toBeVisible();
   await expect(page.getByLabel("UX and Accessibility Proof").getByText("Integrity by design")).toBeVisible();
   await expect(page.getByRole("link", { name: "Award Radar" })).toBeVisible();
+  await page.getByRole("link", { name: "Rules" }).click();
+  await expect(page.getByRole("heading", { name: "Official AIYES Rules Snapshot" })).toBeVisible();
+  await expect(page.getByLabel("Official AIYES Rules Snapshot").getByText("Verified source")).toBeVisible();
+  await expect(page.getByLabel("Official AIYES Rules Snapshot").getByText("July 13, 2026")).toBeVisible();
+  await expect(page.getByLabel("Official AIYES Rules Snapshot").getByText("Devpost metadata lists a 2-5 member team")).toBeVisible();
   await expect(page.getByRole("link", { name: "Submit Gate" })).toBeVisible();
   await page.getByRole("link", { name: "Submit Gate" }).click();
   await expect(page.getByRole("heading", { name: "AIYES Submission Gate" })).toBeVisible();

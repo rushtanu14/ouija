@@ -43,6 +43,7 @@ describe("MCP integration plan", () => {
       "deepwiki-source-proof",
       "canvas-assignment-context",
       "google-docs-evidence-packet",
+      "google-slides-submission-deck",
       "google-sheets-data-log",
       "google-drive-portfolio-archive",
       "google-classroom-prelab-checkpoint",
@@ -74,6 +75,11 @@ describe("MCP integration plan", () => {
     expect(plan.actions.find((action) => action.id === "canvas-assignment-context")?.payloadSummary).toContain("Canvas read-only import");
     expect(plan.actions.find((action) => action.id === "canvas-assignment-context")?.recommendedTools).toContain("CANVAS_GET_ASSIGNMENT_RUBRIC");
     expect(plan.actions.find((action) => action.id === "google-docs-evidence-packet")?.toolkit).toBe("Google Docs");
+    expect(plan.actions.find((action) => action.id === "google-slides-submission-deck")?.toolkit).toBe("Google Slides");
+    expect(plan.actions.find((action) => action.id === "google-slides-submission-deck")?.payloadSummary).toContain("AIYES submission deck draft");
+    expect(plan.actions.find((action) => action.id === "google-slides-submission-deck")?.recommendedTools).toContain(
+      "GOOGLESLIDES_CREATE_SLIDES_MARKDOWN"
+    );
     expect(plan.actions.find((action) => action.id === "google-sheets-data-log")?.payloadSummary).toContain("4 rows");
     expect(plan.actions.find((action) => action.id === "google-classroom-prelab-checkpoint")?.toolkit).toBe("Google Classroom");
     expect(plan.actions.find((action) => action.id === "google-classroom-prelab-checkpoint")?.payloadSummary).toContain("Pre-lab");
@@ -86,7 +92,7 @@ describe("MCP integration plan", () => {
     expect(plan.actions.find((action) => action.id === "gmail-teacher-review-draft")?.payloadSummary).toContain("Teacher review draft");
     expect(plan.actions.find((action) => action.id === "gmail-teacher-review-draft")?.recommendedTools).toEqual(["GMAIL_CREATE_EMAIL_DRAFT"]);
     expect(plan.actions.every((action) => action.requiresConsent)).toBe(true);
-    expect(plan.readinessMatrix).toHaveLength(14);
+    expect(plan.readinessMatrix).toHaveLength(15);
     expect(plan.readinessMatrix.every((connector) => connector.status === "needs_server_setup")).toBe(true);
     expect(plan.readinessMatrix.find((connector) => connector.toolkit === "Composio Search")?.requiredEnv).toEqual(["COMPOSIO_SEARCH_ALLOWED_TOOLS"]);
     expect(plan.readinessMatrix.find((connector) => connector.toolkit === "Composio Search")?.recommendedTools).toContain("COMPOSIO_SEARCH_SCHOLAR");
@@ -111,6 +117,13 @@ describe("MCP integration plan", () => {
       "COMPOSIO_SEARCH_ALLOWED_TOOLS"
     ]);
     expect(plan.readinessMatrix.find((connector) => connector.toolkit === "Google Forms")?.requiredEnv).toContain("COMPOSIO_GOOGLE_FORMS_AUTH_CONFIG_ID");
+    expect(plan.readinessMatrix.find((connector) => connector.toolkit === "Google Slides")?.requiredEnv).toEqual([
+      "COMPOSIO_GOOGLE_SLIDES_AUTH_CONFIG_ID",
+      "COMPOSIO_GOOGLE_SLIDES_ALLOWED_TOOLS"
+    ]);
+    expect(plan.readinessMatrix.find((connector) => connector.toolkit === "Google Slides")?.recommendedTools).toContain(
+      "GOOGLESLIDES_CREATE_SLIDES_MARKDOWN"
+    );
     expect(plan.readinessMatrix.find((connector) => connector.toolkit === "Google Calendar")?.recommendedTools).toContain("GOOGLECALENDAR_CREATE_EVENT");
     expect(plan.readinessMatrix.find((connector) => connector.toolkit === "Gmail")?.requiredEnv).toEqual([
       "COMPOSIO_GMAIL_AUTH_CONFIG_ID",
@@ -150,6 +163,7 @@ describe("MCP integration plan", () => {
       status: "consent_required"
     });
     expect(plan.sessionStrategy.bundles[2].toolkits).toContain("Google Docs");
+    expect(plan.sessionStrategy.bundles[2].toolkits).toContain("Google Slides");
     expect(plan.sessionStrategy.bundles[2].toolkits).toContain("Gmail");
     expect(plan.sessionStrategy.bundles[2].toolkits).toContain("Notion");
     expect(plan.sessionStrategy.judgeTakeaway).toContain("not a vague integration list");
@@ -168,13 +182,14 @@ describe("MCP integration plan", () => {
     expect(plan.payloadPreview.includedSections).toContain("Canvas assignment prompt and rubric context");
     expect(plan.payloadPreview.includedSections).toContain("Pattern Archetype Coach source question");
     expect(plan.payloadPreview.includedSections).toContain("Google Forms readiness prompts");
+    expect(plan.payloadPreview.includedSections).toContain("Google Slides submission deck outline");
     expect(plan.payloadPreview.includedSections).toContain("Google Calendar next-trial reminder");
     expect(plan.payloadPreview.includedSections).toContain("Gmail teacher-review draft prompt");
     expect(plan.payloadPreview.includedSections).toContain("Composio session ticket scope");
     expect(plan.payloadPreview.includedSections).toContain("Student Reflection Drafts");
     expect(plan.payloadPreview.includedSections).toContain("Portfolio Story Builder prompts");
     expect(plan.payloadPreview.markdownExcerpt).toContain("## Student Description");
-    expect(plan.safeguards).toContain("Preview mode does not call Composio Search, Semantic Scholar, Composio Browser, DeepWiki, Canvas, Google Classroom, Google Workspace, Gmail, or Notion APIs.");
+    expect(plan.safeguards).toContain("Preview mode does not call Composio Search, Semantic Scholar, Composio Browser, DeepWiki, Canvas, Google Classroom, Google Workspace, Google Slides, Gmail, or Notion APIs.");
     expect(plan.safeguards).toContain("Scoped Composio sessions are prepared server-side and raw MCP URLs are withheld from browser responses.");
     expect(plan.safeguards).toContain("Composio Search source audits use topic and variable terms only; students review the query before live lookup.");
     expect(plan.safeguards).toContain("Composio Scholar claim checks compare the expected pattern against scholarly snippets without writing the student's final claim.");
@@ -183,6 +198,7 @@ describe("MCP integration plan", () => {
     expect(plan.safeguards).toContain("DeepWiki source proof uses the public GitHub repo only and does not receive student lab data.");
     expect(plan.safeguards).toContain("Canvas assignment context is read-only and must not submit work, message a class, or alter grades.");
     expect(plan.safeguards).toContain("Google Calendar handoff schedules a next-trial reminder, not a generated result.");
+    expect(plan.safeguards).toContain("Google Slides handoff creates an editable deck draft, not a submitted presentation or completed conclusion.");
     expect(plan.safeguards).toContain("Gmail handoff creates an unsent teacher-review draft only; no automatic send, inbox read, or delete route is enabled.");
     expect(plan.safeguards).toContain("Reflection drafts are exported only when the student typed them in the workspace.");
     expect(plan.privacyBoundary).toContain("Student chooses");
@@ -219,6 +235,7 @@ describe("MCP integration plan", () => {
     expect(plan.actions.find((action) => action.toolkit === "Canvas")?.composioCapability).toContain("assignments, rubrics");
     expect(plan.actions.find((action) => action.toolkit === "Google Classroom")?.composioCapability).toContain("create coursework draft");
     expect(plan.actions.find((action) => action.toolkit === "Google Forms")?.composioCapability).toContain("Forms draft");
+    expect(plan.actions.find((action) => action.toolkit === "Google Slides")?.composioCapability).toContain("Google Slides presentation");
     expect(plan.actions.find((action) => action.toolkit === "Google Calendar")?.composioCapability).toContain("calendar event");
     expect(plan.actions.find((action) => action.toolkit === "Gmail")?.composioCapability).toContain("unsent Gmail draft");
     expect(plan.payloadPreview.savedRunCount).toBe(0);

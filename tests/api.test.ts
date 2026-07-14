@@ -249,7 +249,7 @@ describe("Composio MCP bridge API", () => {
     expect(response.body.mode).toBe("server_dry_run");
     expect(response.body.apiKeyConfigured).toBe(false);
     expect(response.body.missingEnv).toContain("COMPOSIO_API_KEY");
-    expect(response.body.toolkits).toHaveLength(14);
+    expect(response.body.toolkits).toHaveLength(15);
     expect(response.body.missingEnv.filter((value: string) => value === "COMPOSIO_SEARCH_ALLOWED_TOOLS")).toHaveLength(1);
     expect(response.body.missingEnv.filter((value: string) => value === "COMPOSIO_BROWSER_ALLOWED_TOOLS")).toHaveLength(1);
     expect(response.body.missingEnv.filter((value: string) => value === "COMPOSIO_DEEPWIKI_ALLOWED_TOOLS")).toHaveLength(1);
@@ -283,6 +283,12 @@ describe("Composio MCP bridge API", () => {
     );
     expect(response.body.toolkits.find((toolkit: { toolkit: string }) => toolkit.toolkit === "Google Calendar")?.recommendedTools).toContain(
       "GOOGLECALENDAR_CREATE_EVENT"
+    );
+    expect(response.body.toolkits.find((toolkit: { actionId: string }) => toolkit.actionId === "google-slides-submission-deck")?.toolkitSlug).toBe(
+      "googleslides"
+    );
+    expect(response.body.toolkits.find((toolkit: { actionId: string }) => toolkit.actionId === "google-slides-submission-deck")?.recommendedTools).toContain(
+      "GOOGLESLIDES_CREATE_SLIDES_MARKDOWN"
     );
     expect(response.body.toolkits.find((toolkit: { actionId: string }) => toolkit.actionId === "gmail-teacher-review-draft")?.toolkitSlug).toBe("gmail");
     expect(response.body.toolkits.find((toolkit: { actionId: string }) => toolkit.actionId === "gmail-teacher-review-draft")?.recommendedTools).toEqual([
@@ -528,6 +534,37 @@ describe("Composio MCP bridge API", () => {
     expect(response.body.target.toolkitSlug).toBe("gmail");
     expect(response.body.target.authConfigEnv).toBe("COMPOSIO_GMAIL_AUTH_CONFIG_ID");
     expect(response.body.target.recommendedTools).toEqual(["GMAIL_CREATE_EMAIL_DRAFT"]);
+    expect(response.body.summary).toContain("no Composio");
+  });
+
+  it("validates a Google Slides submission deck draft packet", async () => {
+    clearComposioEnv();
+    const app = createApp();
+    const result = analyzeExperiment({
+      description: "Projectile launch angle and measured range."
+    });
+    const packet = buildEvidencePacket(result, result.rows, "Projectile launch angle and measured range.");
+
+    const response = await request(app)
+      .post("/api/mcp/export")
+      .send({
+        actionId: "google-slides-submission-deck",
+        consent: true,
+        payload: {
+          title: `Ouija Evidence Packet: ${result.classification.title}`,
+          description: "Projectile launch angle and measured range.",
+          evidencePacket: packet,
+          rows: result.rows,
+          sources: result.sources
+        }
+      })
+      .expect(200);
+
+    expect(response.body.status).toBe("dry_run");
+    expect(response.body.toolkit).toBe("Google Slides");
+    expect(response.body.target.toolkitSlug).toBe("googleslides");
+    expect(response.body.target.authConfigEnv).toBe("COMPOSIO_GOOGLE_SLIDES_AUTH_CONFIG_ID");
+    expect(response.body.target.recommendedTools).toContain("GOOGLESLIDES_CREATE_SLIDES_MARKDOWN");
     expect(response.body.summary).toContain("no Composio");
   });
 
@@ -929,6 +966,70 @@ describe("Composio MCP bridge API", () => {
     expect(body.toolkits.enable).toEqual(["gmail"]);
     expect(body.auth_configs?.gmail).toBe("ac_gmail_secret");
     expect(body.tools.gmail.enable).toEqual(["GMAIL_CREATE_EMAIL_DRAFT"]);
+  });
+
+  it("creates a live Google Slides deck session server-side without exposing credentials", async () => {
+    const result = analyzeExperiment({
+      description: "Projectile launch angle and measured range."
+    });
+    const packet = buildEvidencePacket(result, result.rows, "Projectile launch angle and measured range.");
+    const fetchCalls: Array<{ url: string; init?: RequestInit }> = [];
+    const fetchMock = async (url: string, init?: RequestInit) => {
+      fetchCalls.push({ url, init });
+      return {
+        ok: true,
+        json: async () => ({
+          session_id: "trs_slides123456",
+          mcp: {
+            url: "https://app.composio.dev/tool_router/v3/trs_slides123456/mcp"
+          }
+        })
+      } as Response;
+    };
+
+    const response = await createMcpSessionTicket(
+      {
+        actionId: "google-slides-submission-deck",
+        consent: true,
+        payload: {
+          title: `Ouija Evidence Packet: ${result.classification.title}`,
+          description: "Projectile launch angle and measured range.",
+          evidencePacket: packet,
+          rows: result.rows,
+          sources: result.sources
+        }
+      },
+      {
+        COMPOSIO_API_KEY: "ak_test_secret",
+        COMPOSIO_LIVE_EXPORTS: "true",
+        COMPOSIO_SESSION_USER_ID: "ouija-demo-student",
+        COMPOSIO_GOOGLE_SLIDES_AUTH_CONFIG_ID: "ac_slides_secret",
+        COMPOSIO_GOOGLE_SLIDES_ALLOWED_TOOLS: "GOOGLESLIDES_CREATE_SLIDES_MARKDOWN",
+        MCP_SESSION_AUTH_TOKEN: "server-only-token"
+      },
+      fetchMock,
+      "Bearer server-only-token"
+    );
+
+    expect(response.statusCode).toBe(200);
+    expect("sessionPlan" in response.body).toBe(true);
+    if (!("sessionPlan" in response.body)) {
+      throw new Error("Expected a Google Slides session response.");
+    }
+    expect(response.body.status).toBe("created");
+    expect(response.body.sessionPlan.enabledToolkit).toBe("googleslides");
+    expect(response.body.sessionPlan.enabledTools).toEqual(["GOOGLESLIDES_CREATE_SLIDES_MARKDOWN"]);
+    expect(JSON.stringify(response.body)).not.toContain("ac_slides_secret");
+    expect(JSON.stringify(response.body)).not.toContain("https://app.composio.dev/tool_router");
+    expect(fetchCalls).toHaveLength(1);
+    const body = JSON.parse(fetchCalls[0].init?.body as string) as {
+      toolkits: { enable: string[] };
+      auth_configs?: Record<string, string>;
+      tools: Record<string, { enable: string[] }>;
+    };
+    expect(body.toolkits.enable).toEqual(["googleslides"]);
+    expect(body.auth_configs?.googleslides).toBe("ac_slides_secret");
+    expect(body.tools.googleslides.enable).toEqual(["GOOGLESLIDES_CREATE_SLIDES_MARKDOWN"]);
   });
 
   it("rejects MCP dry-runs without explicit consent", async () => {

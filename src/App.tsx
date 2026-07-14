@@ -102,6 +102,8 @@ const submissionHubUrl = "https://ouija-olive.vercel.app/submission/";
 const devpostPackUrl = "https://ouija-olive.vercel.app/submission/devpost-pack.html";
 const slideDeckUrl = "https://ouija-olive.vercel.app/submission/slide-deck.html";
 const walkthroughVideoUrl = "https://ouija-olive.vercel.app/submission/assets/ouija-walkthrough.webm";
+const officialAiyesDevpostUrl = "https://ai-yes-competition-30441.devpost.com/";
+const officialAiyesVerifiedDate = "July 13, 2026";
 
 interface SavedLab extends ProgressPortfolioSnapshot {
   description: string;
@@ -141,6 +143,7 @@ const judgeNavLinks = [
   { href: "#mcp-export", label: "MCP Export" },
   { href: "#model-card", label: "Model Card" },
   { href: "#top-award", label: "Award Radar" },
+  { href: "#aiyes-rules", label: "Rules" },
   { href: "#submission-gate", label: "Submit Gate" },
   { href: "#judge", label: "Judge Brief" },
   { href: "#settings", label: "Settings" }
@@ -627,6 +630,7 @@ export function App() {
               pilotEvidenceSummary={pilotEvidenceSummary}
               savedLabCount={savedLabs.length}
             />
+            <AiyesRulesSnapshotPanel />
             <SubmissionGatePanel evaluationReport={evaluationReport} runtimeProof={runtimeProof} mcpBridgeStatus={mcpBridgeStatus} />
             <JudgeBriefPanel result={result} />
           </>
@@ -1427,6 +1431,67 @@ function TopAwardRadarPanel({
   );
 }
 
+function AiyesRulesSnapshotPanel() {
+  const rules = [
+    {
+      label: "Eligibility",
+      value: "Ages 13-18, students only",
+      detail: "Devpost metadata lists a 2-5 member team; the overview also mentions individual or team participation, so verify the final form before submit."
+    },
+    {
+      label: "Deadline",
+      value: "Sep 1, 2026 at 12:00 PM PDT",
+      detail: "Online public submission; all hosted links should be checked again on submission day."
+    },
+    {
+      label: "Track 1 artifacts",
+      value: "Slide deck, 5-minute video, source/deploy link",
+      detail: "Ouija has a hosted deck, walkthrough, public repo, live app, and one-click Submission Hub."
+    },
+    {
+      label: "Judging criteria",
+      value: "Problem, AI/model strategy, UX/design",
+      detail: "Student Impact Brief, Model Strategy, AI Architecture Map, Technical Depth Proof, UX Proof, and Rubric Fit map directly to these criteria."
+    },
+    {
+      label: "Award format",
+      value: "Gold / Silver / Bronze / Honorable Mention",
+      detail: "Ouija targets Gold-level evidence, but the final outcome is judge-dependent and should not be pitched as guaranteed first place."
+    }
+  ];
+
+  return (
+    <section className="aiyes-rules-snapshot" id="aiyes-rules" aria-label="Official AIYES Rules Snapshot">
+      <div className="panel-title">
+        <FileText size={18} />
+        <h3>Official AIYES Rules Snapshot</h3>
+      </div>
+      <div className="aiyes-rules-summary">
+        <div>
+          <p className="section-label">Verified source</p>
+          <strong>AIYES Devpost page</strong>
+        </div>
+        <span>{officialAiyesVerifiedDate}</span>
+      </div>
+      <div className="aiyes-rules-grid">
+        {rules.map((rule) => (
+          <article key={rule.label}>
+            <p className="section-label">{rule.label}</p>
+            <strong>{rule.value}</strong>
+            <span>{rule.detail}</span>
+          </article>
+        ))}
+      </div>
+      <div className="aiyes-rules-source">
+        <span>Use this as the day-of-submission rules check before pasting the Devpost form.</span>
+        <a href={officialAiyesDevpostUrl} target="_blank" rel="noreferrer">
+          Open official AIYES Devpost page
+        </a>
+      </div>
+    </section>
+  );
+}
+
 function SubmissionGatePanel({
   evaluationReport,
   runtimeProof,
@@ -1605,7 +1670,7 @@ function JudgeBriefPanel({ result }: { result: AnalyzeResult | null }) {
     "Data Handling Ledger shows privacy, retention, and student controls.",
     "Spreadsheet paste/import flows into data checks.",
     "Evidence Packet exports a student-owned reasoning handoff.",
-    "MCP Integration Coach validates Composio Search source audits, Scholar claim checks, Semantic Scholar reference checks, Browser source capture, DeepWiki public-source proof, Canvas assignment-context imports, plus Docs, Sheets, Drive, Classroom, Forms, Calendar, Gmail teacher-review drafts, and Notion handoffs through Composio Sessions, a server dry-run, and scoped session tickets without exposing credentials.",
+    "MCP Integration Coach validates Composio Search source audits, Scholar claim checks, Semantic Scholar reference checks, Browser source capture, DeepWiki public-source proof, Canvas assignment-context imports, plus Docs, Slides, Sheets, Drive, Classroom, Forms, Calendar, Gmail teacher-review drafts, and Notion handoffs through Composio Sessions, a server dry-run, and scoped session tickets without exposing credentials.",
     "Composio Sessions Strategy separates read-only source verification and Canvas assignment-context sessions from later consent-gated export sessions.",
     "MCP Readiness Matrix shows exact connector env vars, tools, scopes, data shared, dry-run checks, and consent gates.",
     "Next Trial Planner gives adaptive measurement guidance.",
@@ -1719,7 +1784,7 @@ function ModelCardPanel({ result }: { result: AnalyzeResult | null }) {
     "Data Handling Ledger makes student data flow, retention, and controls inspectable.",
     "Progress Portfolio turns saved labs into repeated learning evidence for judges.",
     "Portfolio Story Builder gives prompts and blanks for a student-authored progress story.",
-    "MCP Integration Coach keeps Composio credentials server-side, validates packets with /api/mcp/export, prepares session tickets with /api/mcp/session, and requires student consent before any source audit, Scholar claim check, Semantic Scholar reference check, Browser source capture, DeepWiki source proof, Canvas assignment import, Gmail teacher-review draft, or export.",
+    "MCP Integration Coach keeps Composio credentials server-side, validates packets with /api/mcp/export, prepares session tickets with /api/mcp/session, and requires student consent before any source audit, Scholar claim check, Semantic Scholar reference check, Browser source capture, DeepWiki source proof, Canvas assignment import, Google Slides deck draft, Gmail teacher-review draft, or export.",
     "Composio Sessions Strategy separates read-only source verification and Canvas assignment-context sessions from later consent-gated export sessions.",
     "MCP Readiness Matrix makes connector tools, scopes, dry-run checks, and least-privilege boundaries inspectable.",
     "Pattern Evidence Engine quantifies whether the dataset supports the expected science pattern.",

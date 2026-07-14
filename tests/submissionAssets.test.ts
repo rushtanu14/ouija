@@ -32,8 +32,11 @@ describe("AIYES submission assets", () => {
     expect(deck).toContain("Semantic Scholar reference-check");
     expect(deck).toContain("Composio Browser source-capture");
     expect(deck).toContain("Canvas assignment-context");
+    expect(deck).toContain("Google Slides");
     expect(deck).toContain("Gmail teacher-review draft");
     expect(deck).toContain("Gold/Silver/Bronze/Honorable Mention");
+    expect(deck).toContain("Official AIYES Rules Snapshot");
+    expect(deck).toContain("verified deadline, eligibility, Track 1 artifacts, judging criteria, award bands");
     expect(deck).toContain("Pilot Evidence Tracker adds a 100-point quality gate");
     expect(deck).toContain("AIYES Values Fit");
     expect(deck).toContain("AIYES Development Journey");
@@ -69,8 +72,11 @@ describe("AIYES submission assets", () => {
     expect(copy).toContain("Composio Browser source capture");
     expect(copy).toContain("DeepWiki public-source proof");
     expect(copy).toContain("Canvas assignment-context");
+    expect(copy).toContain("Google Slides");
     expect(copy).toContain("Gmail teacher-review draft");
     expect(copy).toContain("Gold/Silver/Bronze/Honorable Mention");
+    expect(copy).toContain("Official AIYES Rules Snapshot");
+    expect(copy).toContain("verified Devpost deadline, eligibility, Track 1 artifacts, criteria, award bands");
     expect(copy).toContain("100-point quality gate");
     expect(copy).toContain("AIYES Values Fit");
     expect(copy).toContain("AIYES Development Journey");
@@ -105,14 +111,21 @@ describe("AIYES submission assets", () => {
     expect(hub).toContain("/api/evaluate");
     expect(hub).toContain("/api/runtime-proof");
     expect(hub).toContain("/api/mcp/status");
-    expect(hub).toContain("14 routes");
+    expect(hub).toContain("15 routes");
+    expect(hub).toContain("Google Slides deck draft");
+    expect(hub).toContain("Official AIYES Rules Snapshot");
+    expect(hub).toContain("228.92 second walkthrough");
+    expect(hub).toContain("1c3221d19508b61f7ddb86631a1d481549f2058188a349ba92b7c2828eb0e8f0");
     expect(pack).toContain("Devpost Submission Pack");
+    expect(pack).toContain("Verified Devpost snapshot");
+    expect(pack).toContain("3:48 video demo");
     expect(pack).toContain("DeepWiki public repo audit");
     expect(pack).toContain("Canvas read-only import");
     expect(pack).toContain("Gmail draft");
     expect(pack).toContain("Team Roster Worksheet");
     expect(pack).toContain("https://ouija-olive.vercel.app/?judge=1");
     expect(`${copy}\n${assets}\n${hub}\n${pack}`).not.toMatch(/TODO|TBD|placeholder|use the repository URL|use the final recorded/i);
+    expect(`${hub}\n${pack}`).not.toMatch(/3:21|147\.76|15,333,631|f130cebc/i);
     expect(`${copy}\n${assets}\n${hub}\n${pack}`).not.toMatch(/upload the walkthrough video|finalize the video walkthrough URL/i);
   });
 

@@ -193,6 +193,7 @@ a {
 .evaluation-panel,
 .ux-proof-panel,
 .submission-gate-panel,
+.aiyes-rules-snapshot,
 .top-award-radar,
 .judge-brief-panel,
 .settings-panel,
@@ -3993,6 +3994,7 @@ td input {
 .ux-proof-panel,
 .submission-gate-panel,
 .model-card-panel,
+.aiyes-rules-snapshot,
 .top-award-radar,
 .judge-brief-panel,
 .settings-panel {
@@ -4344,6 +4346,95 @@ td input {
   line-height: 1.4;
 }
 
+.aiyes-rules-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-radius: 8px;
+  padding: 12px;
+  color: #173b74;
+  background: #eef5ff;
+}
+
+.aiyes-rules-summary strong {
+  display: block;
+  color: #173b74;
+  line-height: 1.2;
+}
+
+.aiyes-rules-summary > span {
+  flex: 0 0 auto;
+  border-radius: 8px;
+  padding: 7px 10px;
+  color: #1f5b3d;
+  background: #edf8f1;
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.aiyes-rules-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+  min-width: 0;
+}
+
+.aiyes-rules-grid article {
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+  border: 1px solid #d9e5f2;
+  border-radius: 8px;
+  padding: 10px;
+  background: #fbfdff;
+}
+
+.aiyes-rules-grid .section-label,
+.aiyes-rules-grid strong,
+.aiyes-rules-grid span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.aiyes-rules-grid strong {
+  color: #172439;
+  font-size: 15px;
+  line-height: 1.25;
+}
+
+.aiyes-rules-grid span {
+  color: #536478;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.aiyes-rules-source {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-left: 4px solid #2368ff;
+  border-radius: 8px;
+  padding: 10px 12px;
+  background: #f8fbff;
+}
+
+.aiyes-rules-source span {
+  color: #536478;
+  font-size: 12px;
+  font-weight: 750;
+  line-height: 1.4;
+}
+
+.aiyes-rules-source a {
+  flex: 0 0 auto;
+  color: #174ea6;
+  font-size: 12px;
+  font-weight: 850;
+  text-decoration: none;
+}
+
 .submission-gate-summary {
   display: flex;
   align-items: center;
@@ -4375,15 +4466,24 @@ td input {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 8px;
+  min-width: 0;
 }
 
 .submission-gate-item {
   display: grid;
   gap: 8px;
+  min-width: 0;
   border: 1px solid #d9e5f2;
   border-radius: 8px;
   padding: 10px;
   background: #fbfdff;
+}
+
+.submission-gate-item .section-label,
+.submission-gate-item strong,
+.submission-gate-item span {
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .submission-gate-item strong {
@@ -5926,6 +6026,10 @@ td input {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .aiyes-rules-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .technical-depth-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -6180,6 +6284,16 @@ td input {
   }
 
   .submission-gate-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .aiyes-rules-summary,
+  .aiyes-rules-source {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .aiyes-rules-grid {
     grid-template-columns: 1fr;
   }
 

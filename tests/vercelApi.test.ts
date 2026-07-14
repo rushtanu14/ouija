@@ -198,7 +198,7 @@ describe("Vercel API functions", () => {
 
     expect(response.statusCode).toBe(200);
     expect(response.body.status).toBe("server_dry_run");
-    expect(response.body.toolkits).toHaveLength(14);
+    expect(response.body.toolkits).toHaveLength(15);
     expect(response.body.toolkits.find((toolkit: { actionId: string }) => toolkit.actionId === "composio-search-source-audit")?.toolkitSlug).toBe("composio_search");
     expect(response.body.toolkits.find((toolkit: { actionId: string }) => toolkit.actionId === "composio-scholar-claim-check")?.toolkitSlug).toBe("composio_search");
     expect(response.body.toolkits.find((toolkit: { actionId: string }) => toolkit.actionId === "composio-scholar-claim-check")?.recommendedTools).toEqual([
@@ -224,6 +224,12 @@ describe("Vercel API functions", () => {
       "DEEPWIKI_MCP_READ_WIKI_CONTENTS"
     );
     expect(response.body.toolkits.find((toolkit: { toolkit: string }) => toolkit.toolkit === "Google Calendar")?.toolkitSlug).toBe("googlecalendar");
+    expect(response.body.toolkits.find((toolkit: { actionId: string }) => toolkit.actionId === "google-slides-submission-deck")?.toolkitSlug).toBe(
+      "googleslides"
+    );
+    expect(response.body.toolkits.find((toolkit: { actionId: string }) => toolkit.actionId === "google-slides-submission-deck")?.recommendedTools).toContain(
+      "GOOGLESLIDES_CREATE_SLIDES_MARKDOWN"
+    );
     expect(response.body.toolkits.find((toolkit: { actionId: string }) => toolkit.actionId === "gmail-teacher-review-draft")?.toolkitSlug).toBe("gmail");
     expect(response.body.toolkits.find((toolkit: { actionId: string }) => toolkit.actionId === "gmail-teacher-review-draft")?.recommendedTools).toEqual([
       "GMAIL_CREATE_EMAIL_DRAFT"
@@ -440,6 +446,37 @@ describe("Vercel API functions", () => {
     expect(response.body.status).toBe("dry_run");
     expect(response.body.toolkit).toBe("Gmail");
     expect(response.body.target.recommendedTools).toEqual(["GMAIL_CREATE_EMAIL_DRAFT"]);
+  });
+
+  it("validates a Google Slides deck draft route through the serverless export function", () => {
+    clearComposioEnv();
+    const result = analyzeExperiment({
+      description: "Projectile launch angle and measured range."
+    });
+    const response = createMockResponse();
+
+    mcpExportHandler(
+      {
+        method: "POST",
+        body: {
+          actionId: "google-slides-submission-deck",
+          consent: true,
+          payload: {
+            title: `Ouija Evidence Packet: ${result.classification.title}`,
+            description: "Projectile launch angle and measured range.",
+            evidencePacket: buildEvidencePacket(result, result.rows, "Projectile launch angle and measured range."),
+            rows: result.rows,
+            sources: result.sources
+          }
+        }
+      },
+      response.res
+    );
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body.status).toBe("dry_run");
+    expect(response.body.toolkit).toBe("Google Slides");
+    expect(response.body.target.recommendedTools).toContain("GOOGLESLIDES_CREATE_SLIDES_MARKDOWN");
   });
 });
 
