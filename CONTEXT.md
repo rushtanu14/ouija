@@ -117,6 +117,17 @@ The one-click judge packet at `https://ouija-olive.vercel.app/submission/`. It g
 - Ouija should support table input first before adding CSV upload or photo/OCR input.
 - Ouija's internet search should ground expected results and explanations in referenced content instead of inventing them from the model alone.
 
+## AIYES Walkthrough Proof Refresh - 2026-07-14 PDT
+
+- Council verdict: Ouija still works, is submittable, and is Gold-competitive for AIYES Track 1, but cannot be guaranteed first place/Gold because judging, final Devpost submission, eligible team roster, and real anonymous pilot observations remain external.
+- Highest-leverage controllable gap after Judge Q&A Prep: the required walkthrough video still carried the older 3:48 proof path and did not visibly include the newest Official AIYES Rules Snapshot, AIYES Demo Rehearsal, and AIYES Judge Q&A Prep surfaces.
+- Regenerated `docs/assets/ouija-walkthrough.webm` and synced `public/submission/assets/ouija-walkthrough.webm` so the hosted video now includes the Q&A proof section, rules snapshot, and demo rehearsal while staying under the five-minute cap.
+- Video proof: 1440x900, 243.24 seconds, 25,445,715 bytes, SHA-256 `4bf155eb2b3e5936f96b2cdbf9998b5521d839f7aca34afe68e2d0700aa89817`; visual frame check confirmed `AIYES JUDGE Q&A PREP` at caption 43/55.
+- Stabilized the Playwright race test by stubbing deterministic `/api/analyze` responses and using a direct textarea locator for the Firefox pilot-note path, removing the flaky server-delay dependency.
+- Production: `dpl_2zGHbeqSJsxr3y8yz8BR41v9z4X8`, aliased to `https://ouija-olive.vercel.app`.
+- Verification: `npm run record:walkthrough`; `ffprobe`; SHA-256 check; proof-frame extraction; `npm run sync:public-submission`; focused `tests/submissionAssets.test.ts` (3 passed); focused Playwright reruns for the prior Firefox/WebKit/mobile failures; `npm run test` (15 files, 98 tests); `npm run build`; `npm run test:e2e` (40 passed); `npm audit --audit-level=moderate` (0 vulnerabilities); `git diff --check`; production deploy; live `/api/mcp/status` (200, `server_dry_run`, 15 routes and Composio Search proof); live `/api/runtime-proof` (200, `fallback_ready`, `9/9`); live `/api/evaluate` (200, score `100`); hosted submission hub/Devpost pack/slide deck (200 with refreshed proof labels); hosted walkthrough HEAD (200, `content-length: 25445715`); hosted desktop/mobile Playwright smoke confirmed Reaction Rate, AIYES Judge Q&A Prep, rules snapshot, no horizontal overflow, and zero console errors.
+- Remaining loops: actual Devpost submission, final eligible student roster/form behavior, real anonymous pilot observations, optional live OpenAI/Composio credentials only with explicit approval and consent/server setup, and optional DeepWiki indexing.
+
 ## AIYES Judge Q&A Prep And Rules Snapshot Refresh - 2026-07-14 PDT
 
 - Council verdict: Ouija still works, is submittable, and is Gold-competitive for AIYES Track 1, but cannot be guaranteed to win because judging, final Devpost submission, eligible team roster, and real anonymous pilot observations remain external.

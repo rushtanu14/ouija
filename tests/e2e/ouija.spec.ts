@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { analyzeExperiment } from "../../src/lib/analysis";
 
 test("student can analyze a sample experiment, edit table data, and see citations", async ({ page }) => {
   test.setTimeout(120_000);
@@ -124,7 +125,9 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await page.getByLabel("Confidence after Observation 1").selectOption("4");
   await page.getByLabel("Issue spotted Observation 1").selectOption("yes");
   await page.getByLabel("Exit ticket Observation 1").selectOption("ready");
-  await page.getByLabel("Pilot note Observation 1").fill("Student found the graph warning before writing.");
+  const pilotNoteObservationOne = page.locator('textarea[aria-label="Pilot note Observation 1"]');
+  await expect(pilotNoteObservationOne).toBeVisible();
+  await pilotNoteObservationOne.fill("Student found the graph warning before writing.");
   await expect(page.getByLabel("Pilot evidence metrics").getByText("1/3")).toBeVisible();
   await expect(page.getByLabel("Pilot evidence metrics").getByText("1m 30s")).toBeVisible();
   await expect(page.getByLabel("Pilot evidence metrics").getByText("+2.0")).toBeVisible();
@@ -738,17 +741,22 @@ test("sample chip analysis wins over a slower initial analysis", async ({ page }
 
   await page.route("**/api/analyze", async (route) => {
     const body = JSON.parse(route.request().postData() ?? "{}") as { description?: string };
-    if (!delayedInitial && body.description?.includes("launch angle")) {
+    if (!delayedInitial && /different angles|launch angle/i.test(body.description ?? "")) {
       delayedInitial = true;
       await new Promise((resolve) => setTimeout(resolve, 600));
     }
-    await route.continue();
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify(analyzeExperiment({ description: body.description ?? "" }))
+    });
   });
 
   await page.goto("/");
   await page.getByRole("button", { name: "Reaction Rate" }).click();
-  await expect(page.getByRole("heading", { name: "Reaction Rate vs Temperature" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Reaction Rate vs Temperature" })).toBeVisible({ timeout: 15_000 });
   await page.waitForTimeout(800);
+  expect(delayedInitial).toBe(true);
   await expect(page.getByRole("heading", { name: "Reaction Rate vs Temperature" })).toBeVisible();
 });
 

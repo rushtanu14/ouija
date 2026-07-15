@@ -11,7 +11,7 @@ const recordingDir = mkdtempSync(join(tmpdir(), "ouija-walkthrough-"));
 const outputPath = resolve(assetDir, "ouija-walkthrough.webm");
 const captionDurationMs = Number(process.env.OUIJA_CAPTION_MS ?? 4000);
 let captionIndex = 0;
-const captionTotal = 51;
+const captionTotal = 55;
 
 mkdirSync(assetDir, { recursive: true });
 
@@ -294,6 +294,30 @@ await caption(
   page,
   "AIYES Submission Gate",
   "The required Devpost items are now visible as pass, review, or external: app, deck, video, source, impact, AI design, UX, and the external roster/final-submit step."
+);
+
+await page.locator("#aiyes-rules").scrollIntoViewIfNeeded();
+await page.getByLabel("Official AIYES Rules Snapshot").getByText("74 participants visible").waitFor();
+await caption(
+  page,
+  "Official AIYES Rules Snapshot",
+  "The live judge path shows the July 14 Devpost snapshot: student eligibility, deadline, Track 1 artifacts, judging criteria, award bands, 74 participants, source link, and roster caveat."
+);
+
+await page.locator("#demo-rehearsal").scrollIntoViewIfNeeded();
+await page.getByLabel("AIYES Demo Rehearsal").getByText("4:45", { exact: true }).waitFor();
+await caption(
+  page,
+  "AIYES Demo Rehearsal",
+  "The required video and live demo are rehearsed as a 4:45 proof path through problem relevance, AI design, live workflow, evaluation, integrity, and submission proof."
+);
+
+await page.locator("#judge-qa").scrollIntoViewIfNeeded();
+await page.getByLabel("AIYES Judge Q&A Prep").getByText("Answer with proof, not promises").waitFor();
+await caption(
+  page,
+  "AIYES Judge Q&A Prep",
+  "Likely judge questions now point to proof surfaces for problem relevance, AI depth, academic integrity, UX, evidence limits, and external claims."
 );
 
 for (const sample of ["Projectile Motion", "Pendulum", "Ohm's Law", "Reaction Rate", "Enzyme Activity", "Plant Light", "Density Layers", "Water Filtration"]) {
