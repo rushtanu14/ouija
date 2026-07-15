@@ -442,7 +442,7 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(page.getByLabel("AIYES Submission Checklist").getByText("Devpost form pack")).toBeVisible();
   await expect(page.getByLabel("AIYES Submission Checklist").getByText("Student team", { exact: true })).toBeVisible();
   await expect(page.getByLabel("AIYES Submission Checklist").getByText("External step", { exact: true })).toBeVisible();
-  await expect(page.getByLabel("AIYES Submission Checklist").getByText("2-5 student team")).toBeVisible();
+  await expect(page.getByLabel("AIYES Submission Checklist").getByText("2-5 anonymous student slots")).toBeVisible();
   await expect(page.getByLabel("Hosted submission links").getByRole("link", { name: /Submission hub/i })).toHaveAttribute(
     "href",
     "https://ouija-olive.vercel.app/submission/"
@@ -522,7 +522,18 @@ test("student can analyze a sample experiment, edit table data, and see citation
 });
 
 test("judge mode shows a top award radar with honest win gaps", async ({ page }) => {
+  test.setTimeout(120_000);
   await page.addInitScript(() => window.localStorage.clear());
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: {
+        writeText: async (text: string) => {
+          (window as typeof window & { __teamReadinessClipboard?: string }).__teamReadinessClipboard = text;
+        }
+      }
+    });
+  });
   await page.goto("/?judge=1");
 
   await page.getByRole("button", { name: "Reaction Rate" }).click();
@@ -547,7 +558,7 @@ test("judge mode shows a top award radar with honest win gaps", async ({ page })
   await expect(page.locator(".top-award-grid").getByText("Impact evidence", { exact: true })).toBeVisible();
   await expect(page.getByLabel("Top Award Radar").getByText("quality gate 80/100")).toBeVisible();
   await expect(page.getByLabel("Top award next moves").getByText("Complete the pilot evidence quality gate before claiming user testing.")).toBeVisible();
-  await expect(page.getByLabel("Top award next moves").getByText("Confirm the 2-5 student team roster in the Devpost submission flow.")).toBeVisible();
+  await expect(page.getByLabel("Top award next moves").getByText("Use Team Readiness Worksheet, then confirm the final roster in Devpost.")).toBeVisible();
 
   await page.getByRole("link", { name: "Rules" }).click();
   await expect(page.getByRole("heading", { name: "Official AIYES Rules Snapshot" })).toBeVisible();
@@ -561,6 +572,30 @@ test("judge mode shows a top award radar with honest win gaps", async ({ page })
     "href",
     "https://ai-yes-competition-30441.devpost.com/"
   );
+  await page.getByRole("link", { name: "Team" }).click();
+  await expect(page.getByRole("heading", { name: "AIYES Team Readiness Worksheet" })).toBeVisible();
+  await expect(page.getByLabel("AIYES Team Readiness Worksheet").getByText("2-5 student roster prep")).toBeVisible();
+  await expect(page.getByLabel("AIYES Team Readiness Worksheet").getByText("Prep needed")).toBeVisible();
+  await expect(page.getByLabel("AIYES Team Readiness Worksheet").getByText("0/2 anonymous slots ready")).toBeVisible();
+  await expect(page.getByRole("textbox", { name: "Team readiness worksheet" })).toHaveValue(/Included anonymous slots: 2\/5/);
+  await page.getByLabel("Age 13-18 student check Member 1").check();
+  await page.getByLabel("Guardian/teacher okay Member 1").check();
+  await page.getByLabel("Devpost account ready Member 1").check();
+  await page.getByLabel("Age 13-18 student check Member 2").check();
+  await page.getByLabel("Guardian/teacher okay Member 2").check();
+  await page.getByLabel("Devpost account ready Member 2").check();
+  await expect(page.getByLabel("AIYES Team Readiness Worksheet").getByText("Roster worksheet ready")).toBeVisible();
+  await expect(page.getByLabel("AIYES Team Readiness Worksheet").getByText("2/2 anonymous slots ready")).toBeVisible();
+  await expect(page.getByRole("textbox", { name: "Team readiness worksheet" })).toHaveValue(/No names, emails, grades, faces, contact details/);
+  await expect(page.getByRole("textbox", { name: "Team readiness worksheet" })).toHaveValue(/Final roster entry still happens on Devpost/);
+  await page.getByRole("button", { name: "Copy team summary" }).click();
+  await expect(page.getByRole("status").getByText("Team readiness summary copied.")).toBeVisible();
+  const copiedTeamReadinessSummary = await page.evaluate(() => {
+    return (window as typeof window & { __teamReadinessClipboard?: string }).__teamReadinessClipboard;
+  });
+  expect(copiedTeamReadinessSummary).toContain("Ready anonymous slots: 2/2");
+  expect(copiedTeamReadinessSummary).toContain("No names, emails, grades, faces, contact details");
+  expect(copiedTeamReadinessSummary).not.toMatch(/@|phone|address/i);
   await page.getByRole("link", { name: "Demo Prep" }).click();
   await expect(page.getByRole("heading", { name: "AIYES Demo Rehearsal" })).toBeVisible();
   await expect(page.getByLabel("AIYES Demo Rehearsal").getByText("5-minute proof path")).toBeVisible();
@@ -598,6 +633,7 @@ test("student mode keeps the core lab workflow focused before judge proof", asyn
   await expect(page.getByRole("heading", { name: "Official AIYES Rules Snapshot" })).toHaveCount(0);
   await expect(page.getByRole("heading", { name: "AIYES Demo Rehearsal" })).toHaveCount(0);
   await expect(page.getByRole("heading", { name: "AIYES Judge Q&A Prep" })).toHaveCount(0);
+  await expect(page.getByRole("heading", { name: "AIYES Team Readiness Worksheet" })).toHaveCount(0);
   await expect(page.getByRole("heading", { name: "Judge Brief" })).toHaveCount(0);
   await expect(page.getByRole("link", { name: "MCP Export" })).toHaveCount(0);
   await expect(page.getByRole("link", { name: "Architecture" })).toHaveCount(0);
@@ -605,6 +641,7 @@ test("student mode keeps the core lab workflow focused before judge proof", asyn
   await expect(page.getByRole("link", { name: "Award Radar" })).toHaveCount(0);
   await expect(page.getByRole("link", { name: "Rules" })).toHaveCount(0);
   await expect(page.getByRole("link", { name: "Submit Gate" })).toHaveCount(0);
+  await expect(page.getByRole("link", { name: "Team" })).toHaveCount(0);
   await expect(page.getByRole("link", { name: "Demo Prep" })).toHaveCount(0);
   await expect(page.getByRole("link", { name: "Q&A Prep" })).toHaveCount(0);
 
@@ -630,6 +667,7 @@ test("student mode keeps the core lab workflow focused before judge proof", asyn
   await expect(page.getByLabel("UX and Accessibility Proof").getByText("Clickable citations")).toBeVisible();
   await expect(page.getByLabel("UX and Accessibility Proof").getByText("Integrity by design")).toBeVisible();
   await expect(page.getByRole("link", { name: "Award Radar" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Team" })).toBeVisible();
   await page.getByRole("link", { name: "Rules" }).click();
   await expect(page.getByRole("heading", { name: "Official AIYES Rules Snapshot" })).toBeVisible();
   await expect(page.getByLabel("Official AIYES Rules Snapshot").getByText("Verified source")).toBeVisible();
@@ -643,7 +681,11 @@ test("student mode keeps the core lab workflow focused before judge proof", asyn
   await expect(page.getByLabel("AIYES Submission Gate").getByText("Track 1 fit")).toBeVisible();
   await expect(page.getByLabel("AIYES Submission Gate").getByText("Source or deploy link")).toBeVisible();
   await expect(page.getByLabel("AIYES Submission Gate").getByText("Eligibility")).toBeVisible();
-  await expect(page.getByLabel("AIYES Submission Gate").getByText("final roster must be handled in Devpost")).toBeVisible();
+  await expect(page.getByLabel("AIYES Submission Gate").getByText("Team Readiness Worksheet handles local prep")).toBeVisible();
+  await page.getByRole("link", { name: "Team" }).click();
+  await expect(page.getByRole("heading", { name: "AIYES Team Readiness Worksheet" })).toBeVisible();
+  await expect(page.getByLabel("AIYES Team Readiness Worksheet").getByText("No PII")).toBeVisible();
+  await expect(page.getByRole("textbox", { name: "Team readiness worksheet" })).toHaveValue(/Final roster entry still happens on Devpost/);
   await expect(page.getByRole("link", { name: "Demo Prep" })).toBeVisible();
   await page.getByRole("link", { name: "Demo Prep" }).click();
   await expect(page.getByRole("heading", { name: "AIYES Demo Rehearsal" })).toBeVisible();

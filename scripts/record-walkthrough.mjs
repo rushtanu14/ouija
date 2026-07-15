@@ -11,7 +11,7 @@ const recordingDir = mkdtempSync(join(tmpdir(), "ouija-walkthrough-"));
 const outputPath = resolve(assetDir, "ouija-walkthrough.webm");
 const captionDurationMs = Number(process.env.OUIJA_CAPTION_MS ?? 4000);
 let captionIndex = 0;
-const captionTotal = 55;
+const captionTotal = 56;
 
 mkdirSync(assetDir, { recursive: true });
 
@@ -293,7 +293,15 @@ await page.getByLabel("AIYES Submission Gate").getByText("Submittability audit")
 await caption(
   page,
   "AIYES Submission Gate",
-  "The required Devpost items are now visible as pass, review, or external: app, deck, video, source, impact, AI design, UX, and the external roster/final-submit step."
+  "The required Devpost items are visible as pass, review, or external: app, deck, video, source, impact, AI design, UX, and the roster/final-submit boundary."
+);
+
+await page.locator("#team-readiness").scrollIntoViewIfNeeded();
+await page.getByLabel("AIYES Team Readiness Worksheet").getByText("2-5 student roster prep").waitFor();
+await caption(
+  page,
+  "AIYES Team Readiness Worksheet",
+  "The listed 2-5 student roster requirement becomes anonymous local prep: roles, age/student eligibility, guardian or teacher okay, Devpost account readiness, and no personal details in Ouija."
 );
 
 await page.locator("#aiyes-rules").scrollIntoViewIfNeeded();

@@ -20,6 +20,7 @@ import {
   Trash2,
   TrendingUp,
   Trophy,
+  Users,
   Workflow
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -147,6 +148,7 @@ const judgeNavLinks = [
   { href: "#top-award", label: "Award Radar" },
   { href: "#aiyes-rules", label: "Rules" },
   { href: "#submission-gate", label: "Submit Gate" },
+  { href: "#team-readiness", label: "Team" },
   { href: "#demo-rehearsal", label: "Demo Prep" },
   { href: "#judge-qa", label: "Q&A Prep" },
   { href: "#judge", label: "Judge Brief" },
@@ -636,6 +638,7 @@ export function App() {
             />
             <AiyesRulesSnapshotPanel />
             <SubmissionGatePanel evaluationReport={evaluationReport} runtimeProof={runtimeProof} mcpBridgeStatus={mcpBridgeStatus} />
+            <AiyesTeamReadinessPanel />
             <DemoRehearsalPanel evaluationReport={evaluationReport} runtimeProof={runtimeProof} mcpBridgeStatus={mcpBridgeStatus} />
             <JudgeQuestionPrepPanel
               result={result}
@@ -1388,7 +1391,7 @@ function TopAwardRadarPanel({
   const nextMoves = [
     pilotReady ? "Use the logged pilot evidence in the demo." : "Complete the pilot evidence quality gate before claiming user testing.",
     savedEvidenceReady ? "Show Progress Portfolio as repeated learning proof." : "Save at least 2 lab runs to show progress evidence.",
-    "Confirm the 2-5 student team roster in the Devpost submission flow.",
+    "Use Team Readiness Worksheet, then confirm the final roster in Devpost.",
     mcpRouteCount >= 14 ? "Use MCP dry-run proof as technical depth evidence." : "Open MCP status before the demo if route count is still loading.",
     "Optional: enable live OpenAI/Composio only with explicit credentials, consent, and server-side setup."
   ];
@@ -1527,7 +1530,7 @@ function SubmissionGatePanel({
     {
       label: "Eligibility",
       status: "External",
-      detail: "AIYES page lists ages 13-18, students only, and a 2-5 member team; final roster must be handled in Devpost."
+      detail: "AIYES page lists ages 13-18, students only, and a 2-5 member team; Team Readiness Worksheet handles local prep, then Devpost finalizes the roster."
     },
     {
       label: "Track 1 fit",
@@ -1601,6 +1604,186 @@ function SubmissionGatePanel({
   );
 }
 
+interface TeamReadinessSlot {
+  included: boolean;
+  role: string;
+  eligible: boolean;
+  consentReady: boolean;
+  devpostReady: boolean;
+}
+
+const teamRoleOptions = [
+  "AI/model lead",
+  "Science content lead",
+  "UX/demo lead",
+  "Testing evidence lead",
+  "Submission lead"
+];
+
+function createInitialTeamSlots(): TeamReadinessSlot[] {
+  return teamRoleOptions.map((role, index) => ({
+    included: index < 2,
+    role,
+    eligible: false,
+    consentReady: false,
+    devpostReady: false
+  }));
+}
+
+function AiyesTeamReadinessPanel() {
+  const [slots, setSlots] = useState<TeamReadinessSlot[]>(createInitialTeamSlots);
+  const [copyStatus, setCopyStatus] = useState("");
+  const includedSlots = slots.filter((slot) => slot.included);
+  const readySlots = includedSlots.filter((slot) => slot.eligible && slot.consentReady && slot.devpostReady);
+  const roleCoverage = new Set(includedSlots.map((slot) => slot.role)).size;
+  const hasValidRosterSize = includedSlots.length >= 2 && includedSlots.length <= 5;
+  const worksheetReady = hasValidRosterSize && readySlots.length === includedSlots.length;
+  const worksheetStatus = worksheetReady ? "Roster worksheet ready" : "Prep needed";
+  const worksheetSummary = [
+    "AIYES Team Readiness Worksheet",
+    `Included anonymous slots: ${includedSlots.length}/5`,
+    `Ready anonymous slots: ${readySlots.length}/${includedSlots.length || 0}`,
+    `Unique roles covered: ${roleCoverage}`,
+    `Roster size check: ${hasValidRosterSize ? "2-5 student slots selected" : "select 2-5 student slots"}`,
+    "No names, emails, grades, faces, contact details, or private classroom data belong in Ouija.",
+    "Final roster entry still happens on Devpost."
+  ].join("\n");
+
+  const updateSlot = (index: number, update: Partial<TeamReadinessSlot>) => {
+    setSlots((currentSlots) =>
+      currentSlots.map((slot, slotIndex) => (slotIndex === index ? { ...slot, ...update } : slot))
+    );
+  };
+
+  useEffect(() => {
+    setCopyStatus("");
+  }, [worksheetSummary]);
+
+  async function copyWorksheetSummary() {
+    if (!navigator.clipboard) {
+      setCopyStatus("Select the worksheet text to copy.");
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(worksheetSummary);
+      setCopyStatus("Team readiness summary copied.");
+    } catch {
+      setCopyStatus("Select the worksheet text to copy.");
+    }
+  }
+
+  return (
+    <section className="team-readiness-panel" id="team-readiness" aria-label="AIYES Team Readiness Worksheet">
+      <div className="panel-title">
+        <Users size={18} />
+        <h3>AIYES Team Readiness Worksheet</h3>
+      </div>
+      <div className="team-readiness-summary">
+        <div>
+          <p className="section-label">2-5 student roster prep</p>
+          <strong>{worksheetStatus}</strong>
+        </div>
+        <span>{readySlots.length}/{includedSlots.length || 0} anonymous slots ready</span>
+      </div>
+      <div className="team-readiness-stats">
+        <article>
+          <p className="section-label">Roster size</p>
+          <strong>{includedSlots.length}/5 selected</strong>
+          <span>{hasValidRosterSize ? "Matches the listed 2-5 member range." : "Select at least 2 anonymous slots before submit."}</span>
+        </article>
+        <article>
+          <p className="section-label">Role coverage</p>
+          <strong>{roleCoverage} roles</strong>
+          <span>Spread AI, science, UX, testing, and submission work before the demo.</span>
+        </article>
+        <article>
+          <p className="section-label">Privacy boundary</p>
+          <strong>No PII</strong>
+          <span>Use anonymous slots here; enter real roster details only in Devpost.</span>
+        </article>
+      </div>
+      <div className="team-slot-grid" aria-label="Anonymous roster slots">
+        {slots.map((slot, index) => {
+          const slotNumber = index + 1;
+          const slotReady = slot.included && slot.eligible && slot.consentReady && slot.devpostReady;
+
+          return (
+            <article className={`team-slot-card ${slotReady ? "team-slot-card-ready" : ""}`} key={`member-${slotNumber}`}>
+              <label>
+                <input
+                  type="checkbox"
+                  aria-label={`Include Member ${slotNumber}`}
+                  checked={slot.included}
+                  onChange={(event) => updateSlot(index, { included: event.target.checked })}
+                />
+                <span>Include Member {slotNumber}</span>
+              </label>
+              <select
+                aria-label={`Role Member ${slotNumber}`}
+                value={slot.role}
+                disabled={!slot.included}
+                onChange={(event) => updateSlot(index, { role: event.target.value })}
+              >
+                {teamRoleOptions.map((role) => (
+                  <option key={role} value={role}>
+                    {role}
+                  </option>
+                ))}
+              </select>
+              <label>
+                <input
+                  type="checkbox"
+                  aria-label={`Age 13-18 student check Member ${slotNumber}`}
+                  checked={slot.eligible}
+                  disabled={!slot.included}
+                  onChange={(event) => updateSlot(index, { eligible: event.target.checked })}
+                />
+                <span>Age 13-18 student check</span>
+              </label>
+              <label>
+                <input
+                  type="checkbox"
+                  aria-label={`Guardian/teacher okay Member ${slotNumber}`}
+                  checked={slot.consentReady}
+                  disabled={!slot.included}
+                  onChange={(event) => updateSlot(index, { consentReady: event.target.checked })}
+                />
+                <span>Guardian/teacher okay for submission</span>
+              </label>
+              <label>
+                <input
+                  type="checkbox"
+                  aria-label={`Devpost account ready Member ${slotNumber}`}
+                  checked={slot.devpostReady}
+                  disabled={!slot.included}
+                  onChange={(event) => updateSlot(index, { devpostReady: event.target.checked })}
+                />
+                <span>Devpost account or invite ready</span>
+              </label>
+            </article>
+          );
+        })}
+      </div>
+      <div className="team-readiness-copy">
+        <textarea aria-label="Team readiness worksheet" readOnly value={worksheetSummary} />
+        <button type="button" onClick={() => void copyWorksheetSummary()}>
+          <Copy size={16} />
+          Copy team summary
+        </button>
+      </div>
+      {copyStatus ? (
+        <p className="copy-status" role="status">
+          {copyStatus}
+        </p>
+      ) : null}
+      <p className="team-readiness-boundary">
+        Boundary: this worksheet reduces the AIYES roster risk without collecting personal information. Devpost remains the source of truth for the final team.
+      </p>
+    </section>
+  );
+}
+
 function DemoRehearsalPanel({
   evaluationReport,
   runtimeProof,
@@ -1657,7 +1840,7 @@ function DemoRehearsalPanel({
     {
       time: "3:40-4:45",
       label: "Submission proof",
-      detail: "Show deck, walkthrough, source/deploy links, Submission Hub, and external team-roster step."
+      detail: "Show deck, walkthrough, source/deploy links, Submission Hub, Team Readiness Worksheet, and external Devpost roster step."
     }
   ];
 
@@ -1859,7 +2042,7 @@ function JudgeBriefPanel({ result }: { result: AnalyzeResult | null }) {
     {
       label: "Student team",
       status: "External step",
-      detail: "Devpost lists a required 2-5 student team; final submission still needs the team roster handled on Devpost."
+      detail: "Team Readiness Worksheet prepares 2-5 anonymous student slots, roles, and readiness checks; final roster still happens on Devpost."
     }
   ];
   const proofItems = [
@@ -1902,6 +2085,7 @@ function JudgeBriefPanel({ result }: { result: AnalyzeResult | null }) {
     "Progress Portfolio shows learning over multiple saved runs.",
     "Portfolio Story Builder turns saved runs into student-written progress evidence.",
     "AIYES submission checklist makes deck, video, source/deploy link, Devpost form pack, and team requirement status visible.",
+    "AIYES Team Readiness Worksheet turns the listed 2-5 student team requirement into anonymous local role, eligibility, consent, and Devpost-account checks.",
     "AIYES Demo Rehearsal maps the required video and live demo to a five-minute proof path.",
     "AIYES Judge Q&A Prep turns likely judging questions into proof-backed answers and no-overclaim boundaries.",
     "Deterministic Regression Suite runs nine internal behavior checks.",
@@ -1957,7 +2141,7 @@ function JudgeBriefPanel({ result }: { result: AnalyzeResult | null }) {
           <li key={item}>{item}</li>
         ))}
       </ul>
-      <p className="judge-open-loop">External loop: submit on Devpost and handle the listed 2-5 member team requirement.</p>
+      <p className="judge-open-loop">External loop: submit on Devpost and finalize the listed 2-5 member team roster.</p>
     </section>
   );
 }

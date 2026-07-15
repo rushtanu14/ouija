@@ -117,6 +117,18 @@ The one-click judge packet at `https://ouija-olive.vercel.app/submission/`. It g
 - Ouija should support table input first before adding CSV upload or photo/OCR input.
 - Ouija's internet search should ground expected results and explanations in referenced content instead of inventing them from the model alone.
 
+## AIYES Team Readiness Worksheet Checkpoint - 2026-07-15
+
+- Council verdict: Ouija still works, is submittable, and is Gold-competitive for AIYES Track 1, but cannot be guaranteed first place/Gold because judging, final Devpost submission, final eligible roster behavior, and real anonymous pilot observations remain external.
+- Highest-leverage controllable gap after the 76-participant refresh: the app honestly marked the listed 2-5 student team requirement as external, but did not help the team prepare that requirement inside the judge workflow.
+- Added `AIYES Team Readiness Worksheet` in Judge mode with anonymous Member 1-5 slots, role coverage, age/student eligibility checks, guardian/teacher okay checks, Devpost account/invite readiness, a copyable no-PII worksheet summary, and a clear boundary that final roster entry still happens on Devpost.
+- Updated Top Award Radar, AIYES Submission Gate, Demo Rehearsal, Judge Brief, README, AIYES brief, slide deck, Devpost copy, submission hub, Devpost pack, five-minute script, judging checklist, public submission pages, E2E coverage, submission asset tests, and walkthrough recording script.
+- Regenerated `docs/assets/ouija-walkthrough.webm` and synced `public/submission/assets/ouija-walkthrough.webm`; proof-frame check at `/tmp/ouija-team-proof/frame-168.png` confirmed `AIYES TEAM READINESS WORKSHEET` at caption `41/56`.
+- Video proof: 1440x900, 236.84 seconds, 23,141,674 bytes, SHA-256 `339afb649cae9a5b6ac3a666434ef136e038e93c8f4123b5323b37ca9bb2c1cd`.
+- Production: `dpl_61TwVjfaKNPxsbphggewKnc6kXjF`, aliased to `https://ouija-olive.vercel.app`.
+- Verification: current AIYES/Devpost search rechecked on 2026-07-15 and still showed 76 participants; focused submission asset test (3 passed); focused Team/award E2E (8 passed); first broad E2E rerun (4 passed); `npm run test` (15 files, 98 tests); `npm run build`; `npm run test:e2e` (40 passed); `npm audit --audit-level=moderate` (0 vulnerabilities); `git diff --check`; `npm run record:walkthrough`; `ffprobe`; SHA-256 check; proof-frame extraction; `npm run sync:public-submission`; production deploy; live `/api/mcp/status` (200, `server_dry_run`, 15 routes and Composio Search proof); live `/api/runtime-proof` (200, `fallback_ready`, `9/9`); live `/api/evaluate` (200, score `100`); hosted walkthrough HEAD (200, `content-length: 23141674`); hosted submission pages contain Team Readiness, 76-participant proof, and final hash; hosted desktop/mobile Playwright smoke confirmed Team Readiness, No PII boundary, no horizontal overflow, and zero console errors.
+- Remaining loops: actual Devpost submission, final eligible student roster/form behavior, real anonymous pilot observations, optional live OpenAI/Composio credentials only with explicit approval and consent/server setup, and optional DeepWiki indexing.
+
 ## AIYES Rules Snapshot 76-Participant Refresh - 2026-07-15
 
 - Council verdict: Ouija still works, is submittable, and is Gold-competitive for AIYES Track 1, but cannot be guaranteed first place/Gold because judging, final Devpost submission, eligible team roster, and real anonymous pilot observations remain external.

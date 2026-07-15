@@ -136,6 +136,7 @@
 - MCP Integration Coach appears near Progress Portfolio so judges can inspect the Source Scout receipt, exact source-audit/export payload, Composio Search route, Scholar claim-check route, Semantic Scholar reference-check route, Browser source-capture route, DeepWiki source-proof route, Canvas assignment-context route, Google Slides deck-draft route, Google Classroom pre-lab checkpoint route, Google Forms readiness route, Google Calendar next-trial reminder route, credential boundary, Composio route, and server dry-run readiness matrix before any live connector is enabled.
 - Submission Hub keeps the external judging packet scannable instead of forcing evaluators to hunt through the README or Devpost copy.
 - AIYES Submission Gate separates passed app/deck/video/source/AI/UX requirements from the external Devpost roster and final-submit step.
+- AIYES Team Readiness Worksheet prepares the listed 2-5 student roster with anonymous role, eligibility, consent, and Devpost-account checks while keeping personal details out of Ouija.
 - AIYES Demo Rehearsal maps the required video walkthrough and live demo to a 4:45 path under the five-minute cap.
 - AIYES Judge Q&A Prep maps likely judging questions to proof surfaces and no-overclaim boundaries before the team answers live.
 - Official AIYES Rules Snapshot shows the July 15, 2026 verified Devpost deadline, eligibility, Track 1 artifacts, judging criteria, award bands, 76-participant snapshot, source link, and team-roster caveat in Judge mode.
@@ -147,9 +148,9 @@
 - Submit the hosted Submission Hub, live demo, slide deck, and video walkthrough on Devpost.
 - Use `https://ouija-olive.vercel.app/submission/` as the one-click judge packet.
 - Use `https://ouija-olive.vercel.app/?judge=1` for judge walkthroughs and `https://ouija-olive.vercel.app` for the student default view.
-- Handle the live Devpost page's listed 2-5 member team requirement; the overview text also says participants may work individually, so verify the submission form behavior before final submit.
+- Use AIYES Team Readiness Worksheet for anonymous 2-5 member prep, then handle the live Devpost page's final team roster requirement; the overview text also says participants may work individually, so verify the submission form behavior before final submit.
 - Optionally configure a real OpenAI API key for one web-search-enriched demo and live Composio credentials for classroom exports.
 - Use `/api/runtime-proof`, `/api/evaluate`, `/api/mcp/status`, and a consent-gated `/api/mcp/session` dry-run as quick public smoke checks after each deploy.
-- In Judge mode, verify Official AIYES Rules Snapshot, AIYES Submission Gate, AIYES Demo Rehearsal, AIYES Judge Q&A Prep, and Judge Brief show the verified deadline, Track 1 artifacts, slide presentation, video walkthrough, submission hub, source/deployment, judging criteria, award bands, timed demo path, proof-backed live answers, and the external 2-5 student team step.
+- In Judge mode, verify Official AIYES Rules Snapshot, AIYES Submission Gate, AIYES Team Readiness Worksheet, AIYES Demo Rehearsal, AIYES Judge Q&A Prep, and Judge Brief show the verified deadline, Track 1 artifacts, slide presentation, video walkthrough, submission hub, source/deployment, judging criteria, award bands, anonymous roster prep, timed demo path, proof-backed live answers, and the external Devpost final-submit step.
 - Present or export `docs/aiyes-slide-deck.html`.
 - Paste `docs/devpost-submission-copy.md` into Devpost.
