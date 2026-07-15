@@ -138,7 +138,7 @@
 - AIYES Submission Gate separates passed app/deck/video/source/AI/UX requirements from the external Devpost roster and final-submit step.
 - AIYES Demo Rehearsal maps the required video walkthrough and live demo to a 4:45 path under the five-minute cap.
 - AIYES Judge Q&A Prep maps likely judging questions to proof surfaces and no-overclaim boundaries before the team answers live.
-- Official AIYES Rules Snapshot shows the July 14, 2026 verified Devpost deadline, eligibility, Track 1 artifacts, judging criteria, award bands, 74-participant snapshot, source link, and team-roster caveat in Judge mode.
+- Official AIYES Rules Snapshot shows the July 15, 2026 verified Devpost deadline, eligibility, Track 1 artifacts, judging criteria, award bands, 76-participant snapshot, source link, and team-roster caveat in Judge mode.
 - Top Award Radar now maps the win target to the official AIYES Gold/Silver/Bronze/Honorable Mention certificate bands and uses the pilot evidence quality gate as the remaining impact-evidence risk, so the team can aim for Gold-level evidence without pretending a literal first-place rank is guaranteed.
 - Desktop and mobile E2E checks verify no horizontal overflow.
 

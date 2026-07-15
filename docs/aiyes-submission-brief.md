@@ -32,7 +32,7 @@ Ouija connects four pieces in one workflow:
 - AIYES Rubric Fit that maps every run to the official problem/relevance, AI technical design/model strategy, and UX/design criteria.
 - AIYES Values Fit that maps every run to democracy, diversity, connectivity, innovation, and ethical inclusion using concrete product evidence.
 - AIYES Development Journey that maps every run to the required Track 1 story: problem, data, model, app build, testing, UX, ethics, impact, constraints, and submission proof.
-- Official AIYES Rules Snapshot that pins Judge mode to the July 14, 2026 verified Devpost deadline, eligibility, Track 1 artifacts, judging criteria, award bands, source link, 74-participant snapshot, and team-roster caveat.
+- Official AIYES Rules Snapshot that pins Judge mode to the July 15, 2026 verified Devpost deadline, eligibility, Track 1 artifacts, judging criteria, award bands, source link, 76-participant snapshot, and team-roster caveat.
 - AIYES Demo Rehearsal that maps the required Track 1 video walkthrough and live demo to a 4:45 proof path: problem relevance, AI design, live student workflow, evaluation/integrity, and submission proof.
 - AIYES Judge Q&A Prep that maps likely live judging questions to app proof surfaces while naming no-overclaim boundaries for awards, pilot data, and live connector access.
 - Submission Hub that gives judges one hosted URL for the live app, judge view, deck, walkthrough, source, screenshots, and live proof endpoints.

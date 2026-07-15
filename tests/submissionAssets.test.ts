@@ -36,7 +36,7 @@ describe("AIYES submission assets", () => {
     expect(deck).toContain("Gmail teacher-review draft");
     expect(deck).toContain("Gold/Silver/Bronze/Honorable Mention");
     expect(deck).toContain("Official AIYES Rules Snapshot");
-    expect(deck).toContain("74-participant");
+    expect(deck).toContain("76-participant");
     expect(deck).toContain("AIYES Demo Rehearsal");
     expect(deck).toContain("AIYES Judge Q&amp;A Prep");
     expect(deck).toContain("verified deadline, eligibility, Track 1 artifacts, judging criteria, award bands");
@@ -79,7 +79,7 @@ describe("AIYES submission assets", () => {
     expect(copy).toContain("Gmail teacher-review draft");
     expect(copy).toContain("Gold/Silver/Bronze/Honorable Mention");
     expect(copy).toContain("Official AIYES Rules Snapshot");
-    expect(copy).toContain("74-participant");
+    expect(copy).toContain("76-participant");
     expect(copy).toContain("AIYES Demo Rehearsal");
     expect(copy).toContain("AIYES Judge Q&A Prep");
     expect(copy).toContain("verified Devpost deadline, eligibility, Track 1 artifacts, criteria, award bands");
@@ -105,8 +105,8 @@ describe("AIYES submission assets", () => {
     expect(assets).toContain("https://ouija-olive.vercel.app/submission/");
     expect(assets).toContain("https://ouija-olive.vercel.app/submission/devpost-pack.html");
     expect(assets).toContain("ouija-walkthrough.webm");
-    expect(assets).toContain("25,445,715 bytes");
-    expect(assets).toContain("4bf155eb2b3e5936f96b2cdbf9998b5521d839f7aca34afe68e2d0700aa89817");
+    expect(assets).toContain("22,224,667 bytes");
+    expect(assets).toContain("6facd5c0a636461b364523f78315f99da71d02a0b9d8ed74d0b438e1d05b15c2");
     expect(assets).not.toContain("59fb75c50692bcd6fb4ed7132b67543999fd59a6d18bd29e4565841beeb2d8a2");
     expect(hub).toContain("AIYES Track 1 Submission Hub");
     expect(hub).toContain("https://ouija-olive.vercel.app/?judge=1");
@@ -122,12 +122,12 @@ describe("AIYES submission assets", () => {
     expect(hub).toContain("Official AIYES Rules Snapshot");
     expect(hub).toContain("AIYES Demo Rehearsal");
     expect(hub).toContain("AIYES Judge Q&amp;A Prep");
-    expect(hub).toContain("74-participant");
-    expect(hub).toContain("243.24 second walkthrough");
-    expect(hub).toContain("4bf155eb2b3e5936f96b2cdbf9998b5521d839f7aca34afe68e2d0700aa89817");
+    expect(hub).toContain("76-participant");
+    expect(hub).toContain("232.20 second walkthrough");
+    expect(hub).toContain("6facd5c0a636461b364523f78315f99da71d02a0b9d8ed74d0b438e1d05b15c2");
     expect(pack).toContain("Devpost Submission Pack");
     expect(pack).toContain("Verified Devpost snapshot");
-    expect(pack).toContain("4:03 video demo");
+    expect(pack).toContain("3:52 video demo");
     expect(pack).toContain("DeepWiki public repo audit");
     expect(pack).toContain("Canvas read-only import");
     expect(pack).toContain("Gmail draft");

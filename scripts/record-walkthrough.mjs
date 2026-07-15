@@ -297,11 +297,11 @@ await caption(
 );
 
 await page.locator("#aiyes-rules").scrollIntoViewIfNeeded();
-await page.getByLabel("Official AIYES Rules Snapshot").getByText("74 participants visible").waitFor();
+await page.getByLabel("Official AIYES Rules Snapshot").getByText("76 participants visible").waitFor();
 await caption(
   page,
   "Official AIYES Rules Snapshot",
-  "The live judge path shows the July 14 Devpost snapshot: student eligibility, deadline, Track 1 artifacts, judging criteria, award bands, 74 participants, source link, and roster caveat."
+  "The live judge path shows the July 15 Devpost snapshot: student eligibility, deadline, Track 1 artifacts, judging criteria, award bands, 76 participants, source link, and roster caveat."
 );
 
 await page.locator("#demo-rehearsal").scrollIntoViewIfNeeded();

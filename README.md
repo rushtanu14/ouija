@@ -99,7 +99,7 @@ AIYES Development Journey maps each run to the required Track 1 story: problem i
 
 Top Award Radar turns the internal council audit into a judge-visible card: it separates submittable evidence from top-award risk, anchors the win target to the official Gold/Silver/Bronze/Honorable Mention certificate bands, highlights quality-gated impact evidence, AI/model proof, UX/design, submission package readiness, and external blockers, then lists the next moves before judging.
 
-Official AIYES Rules Snapshot keeps the judge path tied to the current Devpost page: ages 13-18, students only, listed 2-5 team requirement with individual/team wording caveat, September 1 deadline, Track 1 artifacts, judging criteria, award bands, source link, July 14, 2026 verified date, and a snapshot that Devpost showed 74 participants at verification time.
+Official AIYES Rules Snapshot keeps the judge path tied to the current Devpost page: ages 13-18, students only, listed 2-5 team requirement with individual/team wording caveat, September 1 deadline, Track 1 artifacts, judging criteria, award bands, source link, July 15, 2026 verified date, and a snapshot that Devpost showed 76 participants at verification time.
 
 AIYES Submission Gate turns the live Devpost requirements into a judge-visible submittability audit: most app, deck, video, source, AI, impact, and UX items pass inside the product, while roster and final submit remain marked as external.
 
