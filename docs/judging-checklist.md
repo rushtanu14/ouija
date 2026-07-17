@@ -8,7 +8,7 @@
 - Run Snapshot gives a first-scroll readout of rubric fit, evaluation status, learning impact, data flags, expected pattern, and current action.
 - Student Impact Brief gives judges a first-scroll answer for target user, lab-reasoning pain point, before/after student benefit, evidence basis, and remaining proof gap.
 - Student/Judge views keep the default app practical for students while `?judge=1` exposes the full judge proof stack.
-- Submission Hub gives judges one hosted route for live app, judge view, deck, walkthrough, source, screenshots, and proof endpoints.
+- Submission Hub gives judges one hosted route for live app, judge view, deck, walkthrough, source, GitHub source ZIP fallback, screenshots, and proof endpoints.
 - Practical science behavior is visible: students see whether the whole graph supports the expected pattern and whether repeated trials have enough count, average, and spread to support a claim.
 - AIYES Rubric Fit gives judges concrete problem/relevance evidence for each analyzed run.
 - AIYES Values Fit gives judges concrete mission evidence for student agency, access, connected evidence, practical innovation, and ethical inclusion.
@@ -151,6 +151,6 @@
 - Use AIYES Team Readiness Worksheet for anonymous 2-5 member prep, then handle the live Devpost page's final team roster requirement; the overview text also says participants may work individually, so verify the submission form behavior before final submit.
 - Optionally configure a real OpenAI API key for one web-search-enriched demo and live Composio credentials for classroom exports.
 - Use `/api/runtime-proof`, `/api/evaluate`, `/api/mcp/status`, and a consent-gated `/api/mcp/session` dry-run as quick public smoke checks after each deploy.
-- In Judge mode, verify Official AIYES Rules Snapshot, AIYES Submission Gate, AIYES Team Readiness Worksheet, AIYES Demo Rehearsal, AIYES Judge Q&A Prep, and Judge Brief show the verified deadline, Track 1 artifacts, slide presentation, video walkthrough, submission hub, source/deployment, judging criteria, award bands, anonymous roster prep, timed demo path, proof-backed live answers, and the external Devpost final-submit step.
+- In Judge mode, verify Official AIYES Rules Snapshot, AIYES Submission Gate, AIYES Team Readiness Worksheet, AIYES Demo Rehearsal, AIYES Judge Q&A Prep, and Judge Brief show the verified deadline, Track 1 artifacts, slide presentation, video walkthrough, submission hub, source/deployment, source ZIP fallback, judging criteria, award bands, anonymous roster prep, timed demo path, proof-backed live answers, and the external Devpost final-submit step.
 - Present or export `docs/aiyes-slide-deck.html`.
 - Paste `docs/devpost-submission-copy.md` into Devpost.

@@ -24,7 +24,7 @@ Ouija connects four pieces in one workflow:
 - Model Strategy that exposes candidate ranking, matched signals, fallback logic, validators, and risk controls.
 - AI Architecture Map that shows the classifier, grounding, data-audit, learning-guard, and MCP evidence bridge as one inspectable system.
 - UX and Accessibility Proof that maps the official UX/design criterion to student-first flow, judge navigation, responsive layout, labeled controls, clickable citations, and integrity prompts.
-- AIYES Submission Gate that converts live Devpost requirements into pass, review, and external statuses for eligibility, Track 1 fit, deck, video, source/deploy link, impact, AI design, and UX.
+- AIYES Submission Gate that converts live Devpost requirements into pass, review, and external statuses for eligibility, Track 1 fit, deck, video, source/deploy link, source ZIP fallback, impact, AI design, and UX.
 - AIYES Team Readiness Worksheet that converts the listed 2-5 student team requirement into anonymous local role, eligibility, consent, and Devpost-account checks without collecting names or contact details in Ouija.
 - Top Award Radar that targets Gold-level evidence across the official AIYES Gold/Silver/Bronze/Honorable Mention award bands while refusing to guarantee a literal first-place rank and treating pilot evidence quality as a visible remaining risk.
 - Technical Depth Proof that condenses decision trace, evaluation harness, grounding quality, expected-pattern engine, privacy, and integrity into one judge-readable panel.
@@ -36,7 +36,7 @@ Ouija connects four pieces in one workflow:
 - Official AIYES Rules Snapshot that pins Judge mode to the July 17, 2026 verified Devpost deadline, eligibility, Track 1 artifacts, judging criteria, award bands, source link, 84-participant snapshot, and team-roster caveat.
 - AIYES Demo Rehearsal that maps the required Track 1 video walkthrough and live demo to a 4:45 proof path: problem relevance, AI design, live student workflow, evaluation/integrity, and submission proof.
 - AIYES Judge Q&A Prep that maps likely live judging questions to app proof surfaces while naming no-overclaim boundaries for awards, pilot data, and live connector access.
-- Submission Hub that gives judges one hosted URL for the live app, judge view, deck, walkthrough, source, screenshots, and live proof endpoints.
+- Submission Hub that gives judges one hosted URL for the live app, judge view, deck, walkthrough, source, GitHub source ZIP fallback, screenshots, and live proof endpoints.
 - Student Impact Brief that makes the target user, lab-reasoning pain point, before/after benefit, evidence basis, and remaining proof gap visible near the top of each run.
 - Pre-Lab Design Coach that turns the match into variables, controls, repeats, table columns, a source task, safety gate, and blank hypothesis starter before data collection.
 - Learning Impact Loop that scores student readiness and shows outcome, data-quality, concept-learning, integrity, pattern-evidence, repeat-reliability, and next-trial metrics.

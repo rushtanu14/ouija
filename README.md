@@ -34,7 +34,7 @@ Ouija is a student-facing AI experiment interpreter for middle and high school s
 19. Open AI Model Card for the architecture, grounding, evaluation, privacy, MCP-export boundary, and guardrail summary.
 20. Open Top Award Radar for the honest council verdict: Ouija is submittable and competitive, targets Gold-level evidence across the official AIYES award bands, but is not guaranteed to win; it names the remaining judge/team/submission gaps and next moves.
 21. Open Official AIYES Rules Snapshot to see the verified Devpost deadline, eligibility, Track 1 artifacts, judging criteria, award bands, source link, and team-roster caveat in one panel.
-22. Open AIYES Submission Gate to see Devpost requirements converted into pass, review, and external-step statuses for eligibility, Track 1 fit, deck, video, source/deploy link, problem/impact, AI design, and UX.
+22. Open AIYES Submission Gate to see Devpost requirements converted into pass, review, and external-step statuses for eligibility, Track 1 fit, deck, video, source/deploy link, source ZIP fallback, problem/impact, AI design, and UX.
 23. Open AIYES Team Readiness Worksheet to prepare the listed 2-5 student roster using anonymous local role, eligibility, consent, and Devpost-account checks without collecting personal information in Ouija.
 24. Open AIYES Demo Rehearsal to see the required video/live-demo story mapped to a 4:45 proof path under the 5-minute cap.
 25. Open AIYES Judge Q&A Prep to rehearse likely judge questions with proof-backed answers and no-overclaim boundaries.
@@ -102,7 +102,7 @@ Top Award Radar turns the internal council audit into a judge-visible card: it s
 
 Official AIYES Rules Snapshot keeps the judge path tied to the current Devpost page: ages 13-18, students only, listed 2-5 team requirement with individual/team wording caveat, September 1 deadline, Track 1 artifacts, judging criteria, award bands, source link, July 17, 2026 verified date, and a snapshot that Devpost showed 84 participants at verification time.
 
-AIYES Submission Gate turns the live Devpost requirements into a judge-visible submittability audit: most app, deck, video, source, AI, impact, and UX items pass inside the product, while roster and final submit remain marked as external.
+AIYES Submission Gate turns the live Devpost requirements into a judge-visible submittability audit: most app, deck, video, source, source ZIP fallback, AI, impact, and UX items pass inside the product, while roster and final submit remain marked as external.
 
 AIYES Team Readiness Worksheet turns the listed 2-5 student team requirement into anonymous local preparation: students mark role coverage, age/student eligibility, guardian or teacher okay, and Devpost account/invite readiness without entering names, emails, grades, faces, or contact details. Devpost remains the source of truth for the final roster.
 

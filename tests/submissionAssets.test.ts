@@ -108,6 +108,7 @@ describe("AIYES submission assets", () => {
     expect(copy).toContain("https://ouija-olive.vercel.app/submission/devpost-pack.html");
     expect(copy).toContain("https://ouija-olive.vercel.app/submission/assets/ouija-walkthrough.webm");
     expect(copy).toContain("https://github.com/rushtanu14/ouija");
+    expect(assets).toContain("https://github.com/rushtanu14/ouija/archive/refs/heads/main.zip");
     expect(assets).toContain("https://github.com/rushtanu14/ouija");
     expect(assets).toContain("https://ouija-olive.vercel.app/submission/");
     expect(assets).toContain("https://ouija-olive.vercel.app/submission/devpost-pack.html");
@@ -121,6 +122,8 @@ describe("AIYES submission assets", () => {
     expect(hub).toContain("/submission/slide-deck.html");
     expect(hub).toContain("/submission/assets/ouija-walkthrough.webm");
     expect(hub).toContain("https://github.com/rushtanu14/ouija");
+    expect(hub).toContain("https://github.com/rushtanu14/ouija/archive/refs/heads/main.zip");
+    expect(hub).toContain("Source ZIP fallback");
     expect(hub).toContain("/api/evaluate");
     expect(hub).toContain("/api/runtime-proof");
     expect(hub).toContain("/api/mcp/status");
@@ -136,6 +139,8 @@ describe("AIYES submission assets", () => {
     expect(hub).toContain("fdc7f98e8580caf8ed3767a5b46d5a922a52e08732874a6c2ad2b545ec70b4ab");
     expect(pack).toContain("Devpost Submission Pack");
     expect(pack).toContain("Verified Devpost snapshot");
+    expect(pack).toContain("GitHub source archive");
+    expect(pack).toContain("source-code package fallback");
     expect(pack).toContain("4:38 video demo");
     expect(pack).toContain("DeepWiki indexing receipt");
     expect(pack).toContain("must be indexed before live architecture proof");

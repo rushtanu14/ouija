@@ -98,6 +98,7 @@ const initialPrompt = SAMPLE_PROMPTS[0].text;
 const savedLabsKey = "ouija:saved-labs";
 const pilotEvidenceKey = "ouija:pilot-evidence";
 const sourceCodeUrl = "https://github.com/rushtanu14/ouija";
+const sourceArchiveUrl = "https://github.com/rushtanu14/ouija/archive/refs/heads/main.zip";
 const liveDemoUrl = "https://ouija-olive.vercel.app";
 const judgeDemoUrl = "https://ouija-olive.vercel.app/?judge=1";
 const submissionHubUrl = "https://ouija-olive.vercel.app/submission/";
@@ -1550,7 +1551,12 @@ function SubmissionGatePanel({
     {
       label: "Source or deploy link",
       status: "Pass",
-      detail: "Public GitHub source, live app, Judge view, Submission Hub, and Devpost pack are all hosted."
+      detail: "Public GitHub source, GitHub source ZIP fallback, live app, Judge view, Submission Hub, and Devpost pack are all hosted."
+    },
+    {
+      label: "Devpost ZIP fallback",
+      status: "Pass",
+      detail: "Devpost metadata can require a ZIP upload; the GitHub main-branch source archive is ready as the source-code ZIP fallback."
     },
     {
       label: "Problem and impact",
@@ -2001,6 +2007,7 @@ function JudgeBriefPanel({ result }: { result: AnalyzeResult | null }) {
     { label: "Submission hub", value: "Hosted" },
     { label: "Devpost pack", value: "Hosted" },
     { label: "Source code", value: "Public" },
+    { label: "Source ZIP", value: "Ready" },
     { label: "MCP export", value: "Server dry-run" },
     { label: "Integrity", value: "Guarded" }
   ];
@@ -2008,6 +2015,7 @@ function JudgeBriefPanel({ result }: { result: AnalyzeResult | null }) {
     { label: "Submission hub", href: submissionHubUrl },
     { label: "Devpost pack", href: devpostPackUrl },
     { label: "Source code", href: sourceCodeUrl },
+    { label: "Source ZIP", href: sourceArchiveUrl },
     { label: "Live demo", href: liveDemoUrl },
     { label: "Judge view", href: judgeDemoUrl },
     { label: "Slide deck", href: slideDeckUrl },
@@ -2027,12 +2035,12 @@ function JudgeBriefPanel({ result }: { result: AnalyzeResult | null }) {
     {
       label: "Source or deployment",
       status: "Ready",
-      detail: "Public GitHub source and deployed Vercel app are listed separately for judge verification."
+      detail: "Public GitHub source, main-branch ZIP archive, and deployed Vercel app are listed separately for judge verification."
     },
     {
       label: "Submission hub",
       status: "Ready",
-      detail: "Single hosted page gathers live app, judge view, deck, video, source, and proof endpoints."
+      detail: "Single hosted page gathers live app, judge view, deck, video, source, source ZIP fallback, and proof endpoints."
     },
     {
       label: "Devpost form pack",
@@ -2062,7 +2070,7 @@ function JudgeBriefPanel({ result }: { result: AnalyzeResult | null }) {
     "Student Pilot Study Kit prepares a consent-safe 10-minute protocol for collecting UX and impact evidence.",
     "Pilot Evidence Tracker logs anonymous browser-local observations without letting the team claim fake completed testing.",
     "Pilot Evidence Export gives the team a CSV-ready, redacted handoff for Devpost or classroom tools.",
-    "Submission Hub gives judges one URL for live app, judge view, deck, video, source, Devpost pack, and proof endpoints.",
+    "Submission Hub gives judges one URL for live app, judge view, deck, video, source, source ZIP fallback, Devpost pack, and proof endpoints.",
     "Pre-Lab Design Coach helps students plan variables, controls, repeats, sources, and safety before collecting data.",
     "Learning Exit Ticket proves students must explain variables, patterns, and next steps themselves.",
     "Student Reflection Workspace captures student-authored exit-ticket drafts.",
@@ -2084,7 +2092,7 @@ function JudgeBriefPanel({ result }: { result: AnalyzeResult | null }) {
     "Next Trial Planner gives adaptive measurement guidance.",
     "Progress Portfolio shows learning over multiple saved runs.",
     "Portfolio Story Builder turns saved runs into student-written progress evidence.",
-    "AIYES submission checklist makes deck, video, source/deploy link, Devpost form pack, and team requirement status visible.",
+    "AIYES submission checklist makes deck, video, source/deploy link, source ZIP fallback, Devpost form pack, and team requirement status visible.",
     "AIYES Team Readiness Worksheet turns the listed 2-5 student team requirement into anonymous local role, eligibility, consent, and Devpost-account checks.",
     "AIYES Demo Rehearsal maps the required video and live demo to a five-minute proof path.",
     "AIYES Judge Q&A Prep turns likely judging questions into proof-backed answers and no-overclaim boundaries.",

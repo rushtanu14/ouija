@@ -492,7 +492,7 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(page.getByLabel("Judge Brief").getByText("Student Impact Brief states the target user, lab-reasoning problem, before/after benefit, evidence basis, and remaining proof gap.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Learning Impact Loop measures the student's outcome for each run.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Pilot Evidence Tracker logs anonymous browser-local observations without letting the team claim fake completed testing.")).toBeVisible();
-  await expect(page.getByLabel("Judge Brief").getByText("Submission Hub gives judges one URL for live app, judge view, deck, video, source, Devpost pack, and proof endpoints.")).toBeVisible();
+  await expect(page.getByLabel("Judge Brief").getByText("Submission Hub gives judges one URL for live app, judge view, deck, video, source, source ZIP fallback, Devpost pack, and proof endpoints.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Pre-Lab Design Coach helps students plan variables, controls, repeats, sources, and safety before collecting data.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Learning Exit Ticket proves students must explain variables, patterns, and next steps themselves.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Student Reflection Workspace captures student-authored exit-ticket drafts.")).toBeVisible();
@@ -515,7 +515,7 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(page.getByLabel("Judge Brief").getByText("Composio Sessions Strategy separates read-only source verification and Canvas assignment-context sessions from later consent-gated export sessions.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("MCP Readiness Matrix shows exact connector env vars, tools, scopes, data shared, dry-run checks, and consent gates.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Next Trial Planner gives adaptive measurement guidance.")).toBeVisible();
-  await expect(page.getByLabel("Judge Brief").getByText("AIYES submission checklist makes deck, video, source/deploy link, Devpost form pack, and team requirement status visible.")).toBeVisible();
+  await expect(page.getByLabel("Judge Brief").getByText("AIYES submission checklist makes deck, video, source/deploy link, source ZIP fallback, Devpost form pack, and team requirement status visible.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("AIYES Demo Rehearsal maps the required video and live demo to a five-minute proof path.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("AIYES Judge Q&A Prep turns likely judging questions into proof-backed answers and no-overclaim boundaries.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Hosted deck and walkthrough are public.")).toBeVisible();
@@ -695,6 +695,8 @@ test("student mode keeps the core lab workflow focused before judge proof", asyn
   await expect(page.getByLabel("AIYES Submission Gate").getByText("Submittability audit")).toBeVisible();
   await expect(page.getByLabel("AIYES Submission Gate").getByText("Track 1 fit")).toBeVisible();
   await expect(page.getByLabel("AIYES Submission Gate").getByText("Source or deploy link")).toBeVisible();
+  await expect(page.getByLabel("AIYES Submission Gate").getByText("Devpost ZIP fallback")).toBeVisible();
+  await expect(page.getByLabel("AIYES Submission Gate").getByText("GitHub main-branch source archive")).toBeVisible();
   await expect(page.getByLabel("AIYES Submission Gate").getByText("Eligibility")).toBeVisible();
   await expect(page.getByLabel("AIYES Submission Gate").getByText("Team Readiness Worksheet handles local prep")).toBeVisible();
   await page.getByRole("link", { name: "Team" }).click();
