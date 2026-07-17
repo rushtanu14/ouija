@@ -40,7 +40,7 @@ Show AIYES Development Journey: the run maps the required development story from
 
 ## 2:34-2:42 - Top Award Radar
 
-Show Top Award Radar, UX and Accessibility Proof, Official AIYES Rules Snapshot, AIYES Submission Gate, AIYES Team Readiness Worksheet, AIYES Demo Rehearsal, and AIYES Judge Q&A Prep: Ouija is submittable and competitive, but it does not pretend first place is guaranteed. Point to the official Gold/Silver/Bronze/Honorable Mention award bands, the Gold-level evidence target, July 16 verified deadline, 83-participant snapshot, eligibility, Track 1 artifacts, judging criteria, problem relevance, AI/model strategy, student-first UX, responsive/no-overflow proof, deck/video/source readiness, anonymous 2-5 roster prep, the 4:45 demo path, proof-backed judge answers, the pilot evidence quality gate, and the external Devpost/final-submit/judging blockers.
+Show Top Award Radar, UX and Accessibility Proof, Official AIYES Rules Snapshot, AIYES Submission Gate, AIYES Team Readiness Worksheet, AIYES Demo Rehearsal, and AIYES Judge Q&A Prep: Ouija is submittable and competitive, but it does not pretend first place is guaranteed. Point to the official Gold/Silver/Bronze/Honorable Mention award bands, the Gold-level evidence target, July 17 verified deadline, 84-participant snapshot, eligibility, Track 1 artifacts, judging criteria, problem relevance, AI/model strategy, student-first UX, responsive/no-overflow proof, deck/video/source readiness, anonymous 2-5 roster prep, the 4:45 demo path, proof-backed judge answers, the pilot evidence quality gate, and the external Devpost/final-submit/judging blockers.
 
 ## 2:42-2:56 - Pre-Lab, Student Level Lens, Concept Mastery, Learning Impact, Pilot Evidence, Exit Ticket, And Reflection Workspace
 

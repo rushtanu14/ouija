@@ -633,20 +633,20 @@ function buildPayloadSummary(
   title: string
 ) {
   if (connector.id === "composio-search-source-audit") {
-    return `Source audit query for ${title} with ${sourceCount} citation${sourceCount === 1 ? "" : "s"}, ${result.customLabTriage.patternArchetype.label.toLowerCase()}, and variables: ${formatColumnList(result)}`;
+    return `Source audit query for ${title}: which classroom-safe sources explain the variable relationship using ${formatColumnList(result)}? Consent-scoped metadata only: ${sourceCount} citation${sourceCount === 1 ? "" : "s"} and ${result.customLabTriage.patternArchetype.label.toLowerCase()}.`;
   }
   if (connector.id === "composio-scholar-claim-check") {
-    return `Scholar query for ${result.classification.title}: ${result.expectedResult.pattern}`;
+    return `Scholar query for ${title}: what scholarly context should the student review before trusting the expected pattern?`;
   }
   if (connector.id === "semanticscholar-reference-check") {
-    return `Semantic Scholar query for ${result.classification.title}: compare ${result.expectedResult.pattern.toLowerCase()} against paper metadata and abstracts before trusting advanced references.`;
+    return `Semantic Scholar query for ${title}: which paper metadata and abstracts help evaluate source quality before advanced references are trusted?`;
   }
   if (connector.id === "composio-browser-source-capture") {
     const sourceLabel = result.sources[0]?.title ?? "student-reviewed source";
-    return `Browser source-capture task for ${sourceLabel}: verify page context before trusting the expected pattern.`;
+    return `Browser source-capture task for ${sourceLabel}: does this public page explain source context, limits, and citation quality?`;
   }
   if (connector.id === "deepwiki-source-proof") {
-    return `DeepWiki source-proof question for rushtanu14/ouija: verify the MCP bridge, academic-integrity boundary, evaluation suite, and submission artifact claims from public code/docs.`;
+    return `DeepWiki source-proof question for rushtanu14/ouija: does public code/docs verify the MCP bridge, academic-integrity boundary, evaluation suite, and submission artifact claims?`;
   }
   if (connector.id === "canvas-assignment-context") {
     return `Canvas read-only import for ${result.classification.title}: fetch the selected assignment prompt, rubric criteria, due date, and attached lab-material metadata before planning variables.`;

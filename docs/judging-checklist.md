@@ -139,7 +139,7 @@
 - AIYES Team Readiness Worksheet prepares the listed 2-5 student roster with anonymous role, eligibility, consent, and Devpost-account checks while keeping personal details out of Ouija.
 - AIYES Demo Rehearsal maps the required video walkthrough and live demo to a 4:45 path under the five-minute cap.
 - AIYES Judge Q&A Prep maps likely judging questions to proof surfaces and no-overclaim boundaries before the team answers live.
-- Official AIYES Rules Snapshot shows the July 16, 2026 verified Devpost deadline, eligibility, Track 1 artifacts, judging criteria, award bands, 83-participant snapshot, source link, and team-roster caveat in Judge mode.
+- Official AIYES Rules Snapshot shows the July 17, 2026 verified Devpost deadline, eligibility, Track 1 artifacts, judging criteria, award bands, 84-participant snapshot, source link, and team-roster caveat in Judge mode.
 - Top Award Radar now maps the win target to the official AIYES Gold/Silver/Bronze/Honorable Mention certificate bands and uses the pilot evidence quality gate as the remaining impact-evidence risk, so the team can aim for Gold-level evidence without pretending a literal first-place rank is guaranteed.
 - Desktop and mobile E2E checks verify no horizontal overflow.
 

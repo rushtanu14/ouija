@@ -105,8 +105,8 @@ const devpostPackUrl = "https://ouija-olive.vercel.app/submission/devpost-pack.h
 const slideDeckUrl = "https://ouija-olive.vercel.app/submission/slide-deck.html";
 const walkthroughVideoUrl = "https://ouija-olive.vercel.app/submission/assets/ouija-walkthrough.webm";
 const officialAiyesDevpostUrl = "https://ai-yes-competition-30441.devpost.com/";
-const officialAiyesVerifiedDate = "July 16, 2026";
-const officialAiyesParticipantCount = "83 participants shown on Devpost at verification time";
+const officialAiyesVerifiedDate = "July 17, 2026";
+const officialAiyesParticipantCount = "84 participants shown on Devpost at verification time";
 
 interface SavedLab extends ProgressPortfolioSnapshot {
   description: string;
@@ -1460,8 +1460,8 @@ function AiyesRulesSnapshotPanel() {
     },
     {
       label: "Live page signal",
-      value: "83 participants visible",
-      detail: "The page was rechecked on July 16, 2026; treat the participant count as a snapshot, not a fixed contest total."
+      value: "84 participants visible",
+      detail: "The page was rechecked on July 17, 2026; treat the participant count as a snapshot, not a fixed contest total."
     },
     {
       label: "Track 1 artifacts",

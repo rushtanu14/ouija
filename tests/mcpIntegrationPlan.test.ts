@@ -240,6 +240,76 @@ describe("MCP integration plan", () => {
     expect(plan.judgeTakeaway).toContain("scoped session tickets");
   });
 
+  it("keeps read-only source-audit payloads free of raw student data and final claims", () => {
+    const description = [
+      "Maya Chen is testing whether temperature changes reaction rate.",
+      "Contact: maya.chen@example.com.",
+      "Final claim: I proved hot water always wins."
+    ].join(" ");
+    const result = analyzeExperiment({ description });
+    const rows = result.rows.map((row, index) => ({
+      ...row,
+      studentName: index === 0 ? "Maya Chen" : "Jordan Patel",
+      email: index === 0 ? "maya.chen@example.com" : "jordan.patel@example.com",
+      rawNotebookRow: `raw-trial-999-${index}`,
+      savedReflection: "My saved reflection says the final answer is already done.",
+      finalClaim: "I proved hot water always wins."
+    }));
+    const evidencePacket = [
+      buildEvidencePacket(result, rows, description),
+      "Saved reflection: My saved reflection says the final answer is already done.",
+      "Final claim: I proved hot water always wins.",
+      "Raw row: raw-trial-999"
+    ].join("\n");
+    const portfolio = buildProgressPortfolio([
+      {
+        id: "saved-run-sensitive",
+        title: "Maya Chen private saved reflection",
+        subject: result.classification.subject,
+        savedAt: "2026-07-03T12:00:00.000Z",
+        score: result.trackEvidence.score,
+        readiness: result.trackEvidence.readiness,
+        issueCount: 0
+      }
+    ]);
+
+    const plan = buildMcpIntegrationPlan({
+      result,
+      rows,
+      description,
+      evidencePacket,
+      portfolio,
+      configured: true
+    });
+    const readOnlySourceActionIds = [
+      "composio-search-source-audit",
+      "composio-scholar-claim-check",
+      "semanticscholar-reference-check",
+      "composio-browser-source-capture",
+      "deepwiki-source-proof"
+    ];
+    const readOnlySourceActions = plan.actions.filter((action) => readOnlySourceActionIds.includes(action.id));
+    const readOnlySourceBundle = plan.sessionStrategy.bundles.find((bundle) => bundle.id === "source-verification");
+    const sourceAuditPayload = JSON.stringify({
+      sourceScout: plan.sourceScout,
+      actions: readOnlySourceActions,
+      bundle: readOnlySourceBundle,
+      preloadTools: plan.sessionStrategy.preloadTools
+    });
+
+    expect(readOnlySourceActions).toHaveLength(5);
+    expect(readOnlySourceActions.every((action) => action.requiresConsent)).toBe(true);
+    expect(readOnlySourceActions.every((action) => action.payloadSummary.includes("?"))).toBe(true);
+    expect(readOnlySourceBundle?.dataShared).toBe(
+      "Experiment title, variables, citation URLs, academic search query, source-quality question, and public repository question only."
+    );
+    expect(sourceAuditPayload).toContain("source-quality question");
+    expect(sourceAuditPayload).toContain("Consent-scoped metadata only");
+    expect(sourceAuditPayload).toContain("citation URLs");
+    expect(sourceAuditPayload).not.toMatch(/Maya Chen|maya\.chen@example\.com|jordan\.patel@example\.com/);
+    expect(sourceAuditPayload).not.toMatch(/raw-trial-999|My saved reflection says|the final answer is already done|I proved hot water always wins/);
+  });
+
   it("marks the same workflow ready only when a server-side MCP bridge is configured", () => {
     const result = analyzeExperiment({
       description: "Projectile launch angle and measured range."
