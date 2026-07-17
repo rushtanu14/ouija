@@ -44,6 +44,7 @@ describe("AIYES submission assets", () => {
     expect(deck).toContain("AIYES Judge Q&amp;A Prep");
     expect(deck).toContain("verified deadline, eligibility, Track 1 artifacts, judging criteria, award bands");
     expect(deck).toContain("Pilot Evidence Tracker adds a 100-point quality gate");
+    expect(deck).toContain("success thresholds and stop rules");
     expect(deck).toContain("AIYES Values Fit");
     expect(deck).toContain("AIYES Development Journey");
     expect(deck).toContain("Technical Depth Proof");
@@ -89,6 +90,7 @@ describe("AIYES submission assets", () => {
     expect(copy).toContain("AIYES Judge Q&A Prep");
     expect(copy).toContain("verified Devpost deadline, eligibility, Track 1 artifacts, criteria, award bands");
     expect(copy).toContain("100-point quality gate");
+    expect(copy).toContain("run script, success thresholds, consent stop rules");
     expect(copy).toContain("AIYES Values Fit");
     expect(copy).toContain("AIYES Development Journey");
     expect(copy).toContain("Technical Depth Proof");
@@ -110,8 +112,8 @@ describe("AIYES submission assets", () => {
     expect(assets).toContain("https://ouija-olive.vercel.app/submission/");
     expect(assets).toContain("https://ouija-olive.vercel.app/submission/devpost-pack.html");
     expect(assets).toContain("ouija-walkthrough.webm");
-    expect(assets).toContain("24,454,583 bytes");
-    expect(assets).toContain("22e078c89d3310b19b4c963c1fb103e25af701fb9f037a4e29e497ae0acfe03e");
+    expect(assets).toContain("23,795,526 bytes");
+    expect(assets).toContain("7f1516f9d3da6dc857f2af35d371e1fbc36ac2784485f359be88404b24b66b5b");
     expect(assets).not.toContain("59fb75c50692bcd6fb4ed7132b67543999fd59a6d18bd29e4565841beeb2d8a2");
     expect(hub).toContain("AIYES Track 1 Submission Hub");
     expect(hub).toContain("https://ouija-olive.vercel.app/?judge=1");
@@ -130,11 +132,11 @@ describe("AIYES submission assets", () => {
     expect(hub).toContain("AIYES Demo Rehearsal");
     expect(hub).toContain("AIYES Judge Q&amp;A Prep");
     expect(hub).toContain("83-participant");
-    expect(hub).toContain("246.92 second walkthrough");
-    expect(hub).toContain("22e078c89d3310b19b4c963c1fb103e25af701fb9f037a4e29e497ae0acfe03e");
+    expect(hub).toContain("235.68 second walkthrough");
+    expect(hub).toContain("7f1516f9d3da6dc857f2af35d371e1fbc36ac2784485f359be88404b24b66b5b");
     expect(pack).toContain("Devpost Submission Pack");
     expect(pack).toContain("Verified Devpost snapshot");
-    expect(pack).toContain("4:07 video demo");
+    expect(pack).toContain("3:56 video demo");
     expect(pack).toContain("DeepWiki indexing receipt");
     expect(pack).toContain("must be indexed before live architecture proof");
     expect(pack).toContain("Canvas read-only import");

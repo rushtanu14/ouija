@@ -73,6 +73,7 @@ describe("Vercel API functions", () => {
     expect(response.body.impactSnapshot.metrics).toHaveLength(7);
     expect(response.body.studentPilotStudyKit.status).toBe("ready_to_pilot");
     expect(response.body.studentPilotStudyKit.evidenceToCollect).toContain("Time to first graph");
+    expect(response.body.studentPilotStudyKit.protocol.analysisPlan).toContain("counts and averages only");
     expect(response.body.learningExitTicket.status).toBe("ready");
     expect(response.body.learningExitTicket.prompts).toHaveLength(3);
     expect(response.body.expectedComparison.points.length).toBeGreaterThan(0);

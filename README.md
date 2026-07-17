@@ -112,7 +112,7 @@ AIYES Judge Q&A Prep makes the live judging defense explicit: likely questions a
 
 Learning Impact Loop measures student readiness for each run through outcome, data quality, concept learning, integrity, whole-pattern evidence, repeat reliability, and next-trial metrics.
 
-Student Pilot Study Kit prepares a consent-safe 10-minute student pilot protocol for each run, including tasks, UX/impact metrics, observer checklist, and evidence to collect before submission.
+Student Pilot Study Kit prepares a consent-safe 10-minute student pilot protocol for each run, including a research question, three-session sample plan, run script, success thresholds, consent stop rules, UX/impact metrics, observer checklist, and evidence to collect before submission.
 
 Pilot Evidence Tracker turns that protocol into browser-local, anonymous evidence capture: time to first graph, confidence before/after, data or source issues spotted, exit-ticket readiness, and non-identifying observer notes. It starts empty and explicitly says not to claim completed student testing until observations are collected. A 100-point quality gate checks three observations, timing, paired confidence, issue/reflection signals, and privacy scan status before evidence is treated as submission-ready. A copyable CSV-ready export summarizes counts, quality checks, and direct-contact redaction before the team moves pilot evidence into Devpost, Sheets, Forms, or Notion.
 

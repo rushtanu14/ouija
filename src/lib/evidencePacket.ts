@@ -220,6 +220,16 @@ export function buildEvidencePacket(
     `- Consent boundary: ${result.studentPilotStudyKit.consentBoundary}`,
     `- Pre prompt: ${result.studentPilotStudyKit.prePrompt}`,
     `- Post prompt: ${result.studentPilotStudyKit.postPrompt}`,
+    "- Pilot protocol:",
+    `  - Research question: ${result.studentPilotStudyKit.protocol.researchQuestion}`,
+    `  - Sample plan: ${result.studentPilotStudyKit.protocol.samplePlan}`,
+    "  - Run script:",
+    ...result.studentPilotStudyKit.protocol.runScript.map((step) => `    - ${step}`),
+    "  - Success thresholds:",
+    ...result.studentPilotStudyKit.protocol.successThresholds.map((threshold) => `    - ${threshold}`),
+    "  - Consent stop rules:",
+    ...result.studentPilotStudyKit.protocol.consentStopRules.map((rule) => `    - ${rule}`),
+    `  - Analysis plan: ${result.studentPilotStudyKit.protocol.analysisPlan}`,
     "- Pilot tasks:",
     ...result.studentPilotStudyKit.tasks.map(
       (task) => `  - ${task.label}: ${task.instruction} Success signal: ${task.successSignal}`

@@ -107,6 +107,8 @@ describe("POST /api/analyze", () => {
     expect(response.body.studentPilotStudyKit.status).toBe("ready_to_pilot");
     expect(response.body.studentPilotStudyKit.metrics).toHaveLength(4);
     expect(response.body.studentPilotStudyKit.consentBoundary).toContain("No names");
+    expect(response.body.studentPilotStudyKit.protocol.researchQuestion).toContain("graph-backed next step");
+    expect(response.body.studentPilotStudyKit.protocol.successThresholds).toContain("At least 3 anonymous observations are logged.");
     expect(response.body.learningExitTicket.status).toBe("ready");
     expect(response.body.learningExitTicket.prompts).toHaveLength(3);
     expect(response.body.learningExitTicket.prompts[0].studentPrompt).toContain("independent variable");

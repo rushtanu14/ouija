@@ -179,6 +179,15 @@ export interface StudentPilotMetric {
   detail: string;
 }
 
+export interface StudentPilotProtocol {
+  researchQuestion: string;
+  samplePlan: string;
+  runScript: string[];
+  successThresholds: string[];
+  consentStopRules: string[];
+  analysisPlan: string;
+}
+
 export interface StudentPilotStudyKit {
   status: "ready_to_pilot" | "needs_review";
   summary: string;
@@ -186,6 +195,7 @@ export interface StudentPilotStudyKit {
   consentBoundary: string;
   prePrompt: string;
   postPrompt: string;
+  protocol: StudentPilotProtocol;
   tasks: StudentPilotTask[];
   metrics: StudentPilotMetric[];
   observerChecklist: string[];

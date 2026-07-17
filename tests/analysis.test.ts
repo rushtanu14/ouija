@@ -116,6 +116,11 @@ describe("fallback analysis", () => {
     expect(result.studentPilotStudyKit.status).toBe("ready_to_pilot");
     expect(result.studentPilotStudyKit.summary).toContain("10-minute student pilot");
     expect(result.studentPilotStudyKit.consentBoundary).toContain("No names");
+    expect(result.studentPilotStudyKit.protocol.researchQuestion).toContain("without receiving a finished conclusion");
+    expect(result.studentPilotStudyKit.protocol.samplePlan).toContain("three anonymous student sessions");
+    expect(result.studentPilotStudyKit.protocol.runScript).toHaveLength(5);
+    expect(result.studentPilotStudyKit.protocol.successThresholds).toContain("Average time to first graph is under 2 minutes.");
+    expect(result.studentPilotStudyKit.protocol.consentStopRules).toContain("Stop if the student tries to use Ouija as a final lab-report writer.");
     expect(result.studentPilotStudyKit.tasks.map((task) => task.id)).toEqual(["classify", "graph-check", "reflect"]);
     expect(result.studentPilotStudyKit.metrics.map((metric) => metric.id)).toEqual([
       "time-to-graph",

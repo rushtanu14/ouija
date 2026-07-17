@@ -2745,6 +2745,31 @@ function buildStudentPilotStudyKit(
     prePrompt: `Before using Ouija, ask the student: What do you expect to happen between ${xLabel} and ${yLabel}, and why?`,
     postPrompt:
       "After using Ouija, ask the student to explain the variable, graph pattern, and next measurement in their own words without copying a conclusion.",
+    protocol: {
+      researchQuestion: `Can a middle/high school student use Ouija to move from a ${template.shortName.toLowerCase()} description to a graph-backed next step without receiving a finished conclusion?`,
+      samplePlan: "Run three anonymous student sessions before claiming pilot evidence; use one lab per student and do not store names, grades, faces, emails, or class identifiers.",
+      runScript: [
+        "Ask the pre-prompt before opening Ouija.",
+        "Have the student describe or select the lab, then start the timer at Analyze.",
+        "Stop the timer when the student can point to the graph/table and explain the expected pattern.",
+        "Have the student complete the exit ticket and say what they would repeat, fix, or measure next.",
+        "Record only anonymous metrics and one non-identifying observer note in the Pilot Evidence Tracker."
+      ],
+      successThresholds: [
+        "At least 3 anonymous observations are logged.",
+        "Average time to first graph is under 2 minutes.",
+        "Average confidence increases by at least 1 point.",
+        "At least 2 of 3 students spot a data/source/method signal or explain why the sample is clean.",
+        "At least 2 of 3 exit tickets are marked ready."
+      ],
+      consentStopRules: [
+        "Stop if the student or guardian/teacher does not consent.",
+        "Stop if a note includes names, contact info, grades, faces, school IDs, or private classroom details.",
+        "Stop if the student tries to use Ouija as a final lab-report writer."
+      ],
+      analysisPlan:
+        "Compare before/after confidence, time to graph, issue spotting, and exit-ticket readiness; report counts and averages only, and keep quotes permission-based."
+    },
     tasks: [
       {
         id: "classify",

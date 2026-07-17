@@ -14,7 +14,7 @@
 - AIYES Values Fit gives judges concrete mission evidence for student agency, access, connected evidence, practical innovation, and ethical inclusion.
 - AIYES Development Journey gives judges a required-submission story from problem identification through constraints and hosted links.
 - Learning Impact Loop measures whether a run leaves the student ready to reason, watching flags, or needing fixes.
-- Student Pilot Study Kit gives judges a consent-safe 10-minute protocol for collecting anonymous UX and impact evidence without claiming fake completed user testing.
+- Student Pilot Study Kit gives judges a consent-safe 10-minute protocol with a research question, run script, success thresholds, consent stop rules, and anonymous UX/impact evidence without claiming fake completed user testing.
 - Pilot Evidence Tracker includes a 100-point quality gate and CSV-ready anonymous export so the team can carry real pilot observations into Devpost or Composio-backed Sheets/Forms/Notion handoffs only after timing, confidence, issue/reflection, and privacy checks are visible.
 - Pre-Lab Design Coach helps students plan variables, controls, repeats, source checks, table columns, and safety before collecting data.
 - Learning Exit Ticket asks the student to explain variables, graph pattern, and next step in their own words before writing.

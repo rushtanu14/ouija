@@ -134,10 +134,11 @@ await caption(
 );
 
 await page.getByRole("heading", { name: "Student Pilot Study Kit" }).scrollIntoViewIfNeeded();
+await page.getByLabel("Pilot Protocol").getByText("Success thresholds").waitFor();
 await caption(
   page,
   "Student Pilot Study Kit",
-  "Ouija gives a consent-safe 10-minute pilot protocol with anonymous tasks, metrics, observer notes, and evidence to collect before claiming student impact."
+  "Ouija gives a consent-safe 10-minute pilot protocol with a research question, run script, success thresholds, stop rules, metrics, observer notes, and evidence to collect before claiming student impact."
 );
 
 await page.getByLabel("Time to graph Observation 1").fill("90");

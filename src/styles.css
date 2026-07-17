@@ -1616,6 +1616,58 @@ a:focus-visible {
   line-height: 1.25;
 }
 
+.pilot-protocol {
+  display: grid;
+  gap: 9px;
+  border: 1px solid #c8d8ea;
+  border-radius: 8px;
+  padding: 12px;
+  background: #f7fbff;
+}
+
+.pilot-protocol-summary {
+  display: grid;
+  gap: 5px;
+}
+
+.pilot-protocol-summary strong,
+.pilot-protocol-grid strong {
+  color: #172439;
+  line-height: 1.3;
+}
+
+.pilot-protocol-summary span,
+.pilot-protocol-grid li {
+  color: #536478;
+  font-size: 13px;
+  font-weight: 650;
+  line-height: 1.4;
+}
+
+.pilot-protocol-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.pilot-protocol-grid article {
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+  border: 1px solid #d9e5f2;
+  border-radius: 8px;
+  padding: 10px;
+  background: #fff;
+}
+
+.pilot-protocol-grid ol,
+.pilot-protocol-grid ul {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding-left: 18px;
+}
+
 .pilot-task-list {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -6636,6 +6688,7 @@ td input {
   }
 
   .pilot-prompt-grid,
+  .pilot-protocol-grid,
   .pilot-task-list,
   .pilot-metric-grid,
   .pilot-evidence-grid,

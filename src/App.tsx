@@ -3294,6 +3294,43 @@ function StudentPilotStudyKitPanel({ kit }: { kit: StudentPilotStudyKit }) {
           <strong>{kit.postPrompt}</strong>
         </article>
       </div>
+      <div className="pilot-protocol" aria-label="Pilot Protocol">
+        <div className="pilot-protocol-summary">
+          <p className="section-label">Pilot protocol</p>
+          <strong>{kit.protocol.researchQuestion}</strong>
+          <span>{kit.protocol.samplePlan}</span>
+        </div>
+        <div className="pilot-protocol-grid">
+          <article>
+            <p className="section-label">Run script</p>
+            <ol>
+              {kit.protocol.runScript.map((step) => (
+                <li key={step}>{step}</li>
+              ))}
+            </ol>
+          </article>
+          <article>
+            <p className="section-label">Success thresholds</p>
+            <ul>
+              {kit.protocol.successThresholds.map((threshold) => (
+                <li key={threshold}>{threshold}</li>
+              ))}
+            </ul>
+          </article>
+          <article>
+            <p className="section-label">Consent stop rules</p>
+            <ul>
+              {kit.protocol.consentStopRules.map((rule) => (
+                <li key={rule}>{rule}</li>
+              ))}
+            </ul>
+          </article>
+          <article>
+            <p className="section-label">Analysis plan</p>
+            <strong>{kit.protocol.analysisPlan}</strong>
+          </article>
+        </div>
+      </div>
       <div className="pilot-task-list" aria-label="Pilot tasks">
         {kit.tasks.map((task) => (
           <article key={task.id}>

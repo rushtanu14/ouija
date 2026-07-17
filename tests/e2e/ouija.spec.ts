@@ -111,6 +111,10 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(page.getByLabel("Student Pilot Study Kit").getByText("10-minute pilot")).toBeVisible();
   await expect(page.getByLabel("Student Pilot Study Kit").getByText("Ready to pilot")).toBeVisible();
   await expect(page.getByLabel("Student Pilot Study Kit").getByText("No names")).toBeVisible();
+  await expect(page.getByLabel("Pilot Protocol").getByText("Pilot protocol")).toBeVisible();
+  await expect(page.getByLabel("Pilot Protocol").getByText("without receiving a finished conclusion")).toBeVisible();
+  await expect(page.getByLabel("Pilot Protocol").getByText("At least 3 anonymous observations are logged.")).toBeVisible();
+  await expect(page.getByLabel("Pilot Protocol").getByText("Stop if the student tries to use Ouija as a final lab-report writer.")).toBeVisible();
   await expect(page.getByLabel("Pilot tasks").getByText("Confirm the lab match")).toBeVisible();
   await expect(page.getByLabel("Pilot metrics").getByText("Time to first graph")).toBeVisible();
   await expect(page.getByRole("heading", { name: "Pilot Evidence Tracker" })).toBeVisible();
@@ -206,6 +210,8 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(page.getByLabel("Student evidence packet")).toHaveValue(/Grounding Audit/);
   await expect(page.getByLabel("Student evidence packet")).toHaveValue(/Expected Overlay/);
   await expect(page.getByLabel("Student evidence packet")).toHaveValue(/Learning Impact Loop/);
+  await expect(page.getByLabel("Student evidence packet")).toHaveValue(/Pilot protocol/);
+  await expect(page.getByLabel("Student evidence packet")).toHaveValue(/At least 3 anonymous observations are logged/);
   await expect(page.getByLabel("Student evidence packet")).toHaveValue(/Pilot Evidence Tracker/);
   await expect(page.getByLabel("Student evidence packet")).toHaveValue(/Anonymous observations: 1/);
   await expect(page.getByLabel("Student evidence packet")).toHaveValue(/Average confidence shift: \+2.0 points/);

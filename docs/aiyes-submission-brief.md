@@ -40,7 +40,7 @@ Ouija connects four pieces in one workflow:
 - Student Impact Brief that makes the target user, lab-reasoning pain point, before/after benefit, evidence basis, and remaining proof gap visible near the top of each run.
 - Pre-Lab Design Coach that turns the match into variables, controls, repeats, table columns, a source task, safety gate, and blank hypothesis starter before data collection.
 - Learning Impact Loop that scores student readiness and shows outcome, data-quality, concept-learning, integrity, pattern-evidence, repeat-reliability, and next-trial metrics.
-- Student Pilot Study Kit that prepares anonymous 10-minute student-testing tasks, UX/impact metrics, observer notes, and evidence to collect before submission.
+- Student Pilot Study Kit that prepares anonymous 10-minute student-testing protocol with a research question, run script, success thresholds, consent stop rules, UX/impact metrics, observer notes, and evidence to collect before submission.
 - Pilot Evidence Tracker quality gate and export that turn anonymous observations into a 100-point readiness score plus copyable CSV-ready summary with direct-contact redaction before Devpost, Sheets, Forms, or Notion handoff.
 - Learning Exit Ticket that asks students to explain variables, graph pattern, and next step themselves before writing.
 - Student Level Lens that adapts the same run for middle-school pattern reading or high-school quantitative reasoning, controls, repeats, and uncertainty.

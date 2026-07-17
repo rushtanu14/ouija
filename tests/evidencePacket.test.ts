@@ -57,6 +57,10 @@ describe("buildEvidencePacket", () => {
     expect(packet).toContain("Student outcome:");
     expect(packet).toContain("Evidence loop:");
     expect(packet).toContain("## Student Pilot Study Kit");
+    expect(packet).toContain("Pilot protocol:");
+    expect(packet).toContain("Research question:");
+    expect(packet).toContain("At least 3 anonymous observations are logged.");
+    expect(packet).toContain("Stop if the student tries to use Ouija as a final lab-report writer.");
     expect(packet).toContain("Pilot tasks:");
     expect(packet).toContain("Time to first graph");
     expect(packet).toContain("No names");
