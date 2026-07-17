@@ -5651,6 +5651,76 @@ td input {
   background: #ffffff;
 }
 
+.mcp-source-receipts {
+  display: grid;
+  gap: 8px;
+}
+
+.mcp-source-receipts > .section-label {
+  margin: 0;
+}
+
+.mcp-source-receipt {
+  display: grid;
+  gap: 6px;
+  border: 1px solid #d9e8df;
+  border-radius: 8px;
+  padding: 10px;
+  background: #ffffff;
+}
+
+.mcp-source-receipt-verified {
+  border-color: #a8d9bd;
+  background: #f9fffb;
+}
+
+.mcp-source-receipt-needs_indexing {
+  border-color: #f1cf8a;
+  background: #fffaf0;
+}
+
+.mcp-source-receipt > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.mcp-source-receipt strong {
+  color: #172439;
+  line-height: 1.25;
+}
+
+.mcp-source-receipt > div span {
+  border-radius: 999px;
+  padding: 4px 7px;
+  background: #eef5ff;
+  color: #24446e;
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.mcp-source-receipt-needs_indexing > div span {
+  background: #fff0ce;
+  color: #684814;
+}
+
+.mcp-source-receipt p,
+.mcp-source-receipt small,
+.mcp-source-receipt em {
+  margin: 0;
+  color: #607087;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.mcp-source-receipt em {
+  color: #23543c;
+  font-style: normal;
+  font-weight: 800;
+}
+
 .mcp-source-contract {
   display: flex;
   flex-wrap: wrap;

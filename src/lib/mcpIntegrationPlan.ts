@@ -345,9 +345,9 @@ function buildSourceScout(result: AnalyzeResult, status: McpIntegrationPlan["sta
 
   return {
     status: status === "ready" ? "server_ready" : "discovered",
-    verifiedAt: "July 14, 2026",
-    activeToolkits: ["composio_search", "browser_tool"],
-    noAccountAuthToolkits: ["Composio Search", "Composio Browser Tool"],
+    verifiedAt: "July 15, 2026",
+    activeToolkits: ["composio_search", "browser_tool", "deepwiki_mcp"],
+    noAccountAuthToolkits: ["Composio Search", "Composio Browser Tool", "DeepWiki MCP"],
     queryPreview: `${result.classification.title} ${independent} ${dependent} expected results middle school high school lab`,
     dataBoundary:
       "Send the experiment title, variable names, current citation URLs, and a source-quality question only; do not send raw table rows, saved reflections, names, emails, or final claims.",
@@ -375,6 +375,31 @@ function buildSourceScout(result: AnalyzeResult, status: McpIntegrationPlan["sta
         label: "Capture dynamic source pages",
         tools: ["BROWSER_TOOL_CREATE_TASK", "BROWSER_TOOL_WATCH_TASK"],
         detail: "Use a browser task only for public pages that normal text fetch cannot read."
+      }
+    ],
+    proofReceipts: [
+      {
+        id: "aiyes-rules-search",
+        label: "Official AIYES rules search",
+        status: "verified",
+        toolkit: "Composio Search",
+        tools: ["COMPOSIO_SEARCH_WEB"],
+        evidence:
+          "July 15 no-auth Composio Search returned the official Devpost and AIYES pages for ages 13-18, Track 1, 2-5 team, September 1 2026 deadline, deck, video, and source/deploy requirements.",
+        boundary:
+          "Search query only; no student table rows, saved reflections, names, emails, or final claims leave Ouija.",
+        nextStep: "Refresh this receipt before final Devpost submission so the rules snapshot stays current."
+      },
+      {
+        id: "deepwiki-index-check",
+        label: "DeepWiki public repo check",
+        status: "needs_indexing",
+        toolkit: "DeepWiki MCP",
+        tools: ["DEEPWIKI_MCP_ASK_QUESTION"],
+        evidence:
+          "July 15 no-auth DeepWiki call returned: Repository not found. Visit https://deepwiki.com to index it. Requested repo: rushtanu14/ouija.",
+        boundary: "Public repository question only; no student lab data, browser-local notes, credentials, or private accounts are sent.",
+        nextStep: "Index rushtanu14/ouija on DeepWiki before claiming live DeepWiki architecture proof."
       }
     ],
     outputContract: [

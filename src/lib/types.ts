@@ -672,6 +672,17 @@ export interface McpSourceScoutStep {
   detail: string;
 }
 
+export interface McpSourceProofReceipt {
+  id: "aiyes-rules-search" | "deepwiki-index-check";
+  label: string;
+  status: "verified" | "needs_indexing";
+  toolkit: string;
+  tools: string[];
+  evidence: string;
+  boundary: string;
+  nextStep: string;
+}
+
 export interface McpSourceScout {
   status: "discovered" | "server_ready";
   verifiedAt: string;
@@ -680,6 +691,7 @@ export interface McpSourceScout {
   queryPreview: string;
   dataBoundary: string;
   steps: McpSourceScoutStep[];
+  proofReceipts: McpSourceProofReceipt[];
   outputContract: string[];
   judgeTakeaway: string;
 }

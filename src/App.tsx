@@ -105,8 +105,8 @@ const devpostPackUrl = "https://ouija-olive.vercel.app/submission/devpost-pack.h
 const slideDeckUrl = "https://ouija-olive.vercel.app/submission/slide-deck.html";
 const walkthroughVideoUrl = "https://ouija-olive.vercel.app/submission/assets/ouija-walkthrough.webm";
 const officialAiyesDevpostUrl = "https://ai-yes-competition-30441.devpost.com/";
-const officialAiyesVerifiedDate = "July 15, 2026";
-const officialAiyesParticipantCount = "76 participants shown on Devpost at verification time";
+const officialAiyesVerifiedDate = "July 16, 2026";
+const officialAiyesParticipantCount = "83 participants shown on Devpost at verification time";
 
 interface SavedLab extends ProgressPortfolioSnapshot {
   description: string;
@@ -1460,8 +1460,8 @@ function AiyesRulesSnapshotPanel() {
     },
     {
       label: "Live page signal",
-      value: "76 participants visible",
-      detail: "The page was rechecked on July 15, 2026; treat the participant count as a snapshot, not a fixed contest total."
+      value: "83 participants visible",
+      detail: "The page was rechecked on July 16, 2026; treat the participant count as a snapshot, not a fixed contest total."
     },
     {
       label: "Track 1 artifacts",
@@ -2475,6 +2475,23 @@ function McpIntegrationCoachPanel({
                   <p className="section-label">{step.label}</p>
                   <strong>{step.tools.join(", ")}</strong>
                   <span>{step.detail}</span>
+                </article>
+              ))}
+            </div>
+            <div className="mcp-source-receipts" aria-label="Composio live source proof receipts">
+              <p className="section-label">Live source proof receipts</p>
+              {plan.sourceScout.proofReceipts.map((receipt) => (
+                <article className={`mcp-source-receipt mcp-source-receipt-${receipt.status}`} key={receipt.id}>
+                  <div>
+                    <strong>{receipt.label}</strong>
+                    <span>{receipt.status === "verified" ? "Verified" : "Needs indexing"}</span>
+                  </div>
+                  <small>
+                    {receipt.toolkit}: {receipt.tools.join(", ")}
+                  </small>
+                  <p>{receipt.evidence}</p>
+                  <em>{receipt.boundary}</em>
+                  <small>{receipt.nextStep}</small>
                 </article>
               ))}
             </div>
@@ -4426,6 +4443,13 @@ function formatMcpPayloadPreview(plan: McpIntegrationPlan) {
     `Query: ${plan.sourceScout.queryPreview}`,
     `Data boundary: ${plan.sourceScout.dataBoundary}`,
     ...plan.sourceScout.steps.map((step) => `- ${step.label}: ${step.tools.join(", ")} - ${step.detail}`),
+    ...plan.sourceScout.proofReceipts.flatMap((receipt) => [
+      `- Receipt ${receipt.label}: ${receipt.status.replaceAll("_", " ")}`,
+      `  - Toolkit: ${receipt.toolkit} (${receipt.tools.join(", ")})`,
+      `  - Evidence: ${receipt.evidence}`,
+      `  - Boundary: ${receipt.boundary}`,
+      `  - Next step: ${receipt.nextStep}`
+    ]),
     ...plan.sourceScout.outputContract.map((item) => `- Contract: ${item}`),
     plan.sourceScout.judgeTakeaway,
     "",

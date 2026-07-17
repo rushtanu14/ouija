@@ -297,12 +297,19 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(page.locator(".mcp-summary").getByText("Server dry-run", { exact: true })).toBeVisible();
   await expect(page.getByLabel("MCP server bridge").getByText("Server dry-run", { exact: true })).toBeVisible();
   await expect(page.getByLabel("Composio Source Scout").getByText("Discovered read-only loop")).toBeVisible();
-  await expect(page.getByLabel("Composio Source Scout").getByText("Verified July 14, 2026 through Composio tool discovery.")).toBeVisible();
-  await expect(page.getByLabel("Composio Source Scout").getByText("composio_search + browser_tool")).toBeVisible();
-  await expect(page.getByLabel("Composio Source Scout").getByText("COMPOSIO_SEARCH_WEB")).toBeVisible();
-  await expect(page.getByLabel("Composio Source Scout").getByText("COMPOSIO_SEARCH_FETCH_URL_CONTENT")).toBeVisible();
+  await expect(page.getByLabel("Composio Source Scout").getByText("Verified July 15, 2026 through Composio tool discovery.")).toBeVisible();
+  await expect(page.getByLabel("Composio Source Scout").getByText("composio_search + browser_tool + deepwiki_mcp")).toBeVisible();
+  await expect(page.getByLabel("Composio Source Scout").getByText("COMPOSIO_SEARCH_WEB", { exact: true })).toBeVisible();
+  await expect(page.getByLabel("Composio Source Scout").getByText("COMPOSIO_SEARCH_FETCH_URL_CONTENT", { exact: true })).toBeVisible();
   await expect(page.getByLabel("Composio Source Scout").getByText("BROWSER_TOOL_CREATE_TASK, BROWSER_TOOL_WATCH_TASK")).toBeVisible();
   await expect(page.getByLabel("Composio Source Scout").getByText("do not send raw table rows")).toBeVisible();
+  await expect(page.getByLabel("Composio live source proof receipts").getByText("Official AIYES rules search")).toBeVisible();
+  await expect(page.getByLabel("Composio live source proof receipts").getByText("Verified", { exact: true })).toBeVisible();
+  await expect(page.getByLabel("Composio live source proof receipts").getByText("official Devpost and AIYES pages")).toBeVisible();
+  await expect(page.getByLabel("Composio live source proof receipts").getByText("DeepWiki public repo check")).toBeVisible();
+  await expect(page.getByLabel("Composio live source proof receipts").getByText("Needs indexing")).toBeVisible();
+  await expect(page.getByLabel("Composio live source proof receipts").getByText("Repository not found")).toBeVisible();
+  await expect(page.getByLabel("Composio live source proof receipts").getByText("Index rushtanu14/ouija")).toBeVisible();
   await expect(page.getByLabel("Composio Session Strategy").getByText("Composio Sessions are planned and dry-run validated")).toBeVisible();
   await expect(page.getByLabel("Composio Session Strategy").getByText("Read-only source verification session")).toBeVisible();
   await expect(page.getByLabel("Composio Session Strategy").getByText("Student export session")).toBeVisible();
@@ -400,6 +407,8 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(page.getByLabel("MCP payload preview")).toHaveValue(/Semantic Scholar: search Semantic Scholar papers/);
   await expect(page.getByLabel("MCP payload preview")).toHaveValue(/Composio Browser: create and watch a browser task/);
   await expect(page.getByLabel("MCP payload preview")).toHaveValue(/Composio Source Scout/);
+  await expect(page.getByLabel("MCP payload preview")).toHaveValue(/Receipt Official AIYES rules search: verified/);
+  await expect(page.getByLabel("MCP payload preview")).toHaveValue(/Receipt DeepWiki public repo check: needs indexing/);
   await expect(page.getByLabel("MCP payload preview")).toHaveValue(/COMPOSIO_SEARCH_FETCH_URL_CONTENT/);
   await expect(page.getByLabel("MCP payload preview")).toHaveValue(/DeepWiki: read the public GitHub repo/);
   await expect(page.getByLabel("MCP payload preview")).toHaveValue(/Canvas: read Canvas courses/);
@@ -567,7 +576,7 @@ test("judge mode shows a top award radar with honest win gaps", async ({ page })
   await expect(page.getByLabel("Official AIYES Rules Snapshot").getByText("Slide deck, 5-minute video, source/deploy link")).toBeVisible();
   await expect(page.getByLabel("Official AIYES Rules Snapshot").getByText("Problem, AI/model strategy, UX/design")).toBeVisible();
   await expect(page.getByLabel("Official AIYES Rules Snapshot").getByText("Gold / Silver / Bronze / Honorable Mention")).toBeVisible();
-  await expect(page.getByLabel("Official AIYES Rules Snapshot").getByText("76 participants visible")).toBeVisible();
+  await expect(page.getByLabel("Official AIYES Rules Snapshot").getByText("83 participants visible")).toBeVisible();
   await expect(page.getByLabel("Official AIYES Rules Snapshot").getByRole("link", { name: "Open official AIYES Devpost page" })).toHaveAttribute(
     "href",
     "https://ai-yes-competition-30441.devpost.com/"
@@ -671,8 +680,8 @@ test("student mode keeps the core lab workflow focused before judge proof", asyn
   await page.getByRole("link", { name: "Rules" }).click();
   await expect(page.getByRole("heading", { name: "Official AIYES Rules Snapshot" })).toBeVisible();
   await expect(page.getByLabel("Official AIYES Rules Snapshot").getByText("Verified source")).toBeVisible();
-  await expect(page.getByLabel("Official AIYES Rules Snapshot").getByText("July 15, 2026 · 76 participants shown on Devpost")).toBeVisible();
-  await expect(page.getByLabel("Official AIYES Rules Snapshot").getByText("76 participants shown on Devpost")).toBeVisible();
+  await expect(page.getByLabel("Official AIYES Rules Snapshot").getByText("July 16, 2026 · 83 participants shown on Devpost")).toBeVisible();
+  await expect(page.getByLabel("Official AIYES Rules Snapshot").getByText("83 participants shown on Devpost")).toBeVisible();
   await expect(page.getByLabel("Official AIYES Rules Snapshot").getByText("Devpost metadata lists a 2-5 member team")).toBeVisible();
   await expect(page.getByRole("link", { name: "Submit Gate" })).toBeVisible();
   await page.getByRole("link", { name: "Submit Gate" }).click();

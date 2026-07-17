@@ -305,11 +305,11 @@ await caption(
 );
 
 await page.locator("#aiyes-rules").scrollIntoViewIfNeeded();
-await page.getByLabel("Official AIYES Rules Snapshot").getByText("76 participants visible").waitFor();
+await page.getByLabel("Official AIYES Rules Snapshot").getByText("83 participants visible").waitFor();
 await caption(
   page,
   "Official AIYES Rules Snapshot",
-  "The live judge path shows the July 15 Devpost snapshot: student eligibility, deadline, Track 1 artifacts, judging criteria, award bands, 76 participants, source link, and roster caveat."
+  "The live judge path shows the July 16 Devpost snapshot: student eligibility, deadline, Track 1 artifacts, judging criteria, award bands, 83 participants, source link, and roster caveat."
 );
 
 await page.locator("#demo-rehearsal").scrollIntoViewIfNeeded();
@@ -367,7 +367,7 @@ await page.getByLabel("Composio Session Strategy").getByText("Read-only source v
 await caption(
   page,
   "MCP Integration Coach",
-  "Ouija validates Composio Search source-audit, Scholar claim-check, Browser source-capture, and DeepWiki source-proof routes, then shows a Composio Sessions strategy: read-only verification first, export sessions only after consent."
+  "Ouija shows live source proof receipts: Composio Search found the official AIYES source, while DeepWiki needs the public repo indexed before live architecture proof is claimed."
 );
 await page.locator(".mcp-action-card").filter({ hasText: "Run Scholar claim check" }).getByRole("button", { name: "Validate route" }).click();
 await page.getByLabel("MCP export dry-run result").getByText("Dry-run passed", { exact: true }).waitFor();

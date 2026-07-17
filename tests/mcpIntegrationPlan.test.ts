@@ -137,9 +137,9 @@ describe("MCP integration plan", () => {
     expect(plan.dryRunChecks.find((check) => check.id === "server-only")?.status).toBe("review");
     expect(plan.sourceScout).toMatchObject({
       status: "discovered",
-      verifiedAt: "July 14, 2026",
-      activeToolkits: ["composio_search", "browser_tool"],
-      noAccountAuthToolkits: ["Composio Search", "Composio Browser Tool"]
+      verifiedAt: "July 15, 2026",
+      activeToolkits: ["composio_search", "browser_tool", "deepwiki_mcp"],
+      noAccountAuthToolkits: ["Composio Search", "Composio Browser Tool", "DeepWiki MCP"]
     });
     expect(plan.sourceScout.queryPreview).toContain("Reaction Rate vs Temperature");
     expect(plan.sourceScout.queryPreview).toMatch(/temperature/i);
@@ -153,6 +153,21 @@ describe("MCP integration plan", () => {
       "BROWSER_TOOL_CREATE_TASK",
       "BROWSER_TOOL_WATCH_TASK"
     ]);
+    expect(plan.sourceScout.proofReceipts).toHaveLength(2);
+    expect(plan.sourceScout.proofReceipts[0]).toMatchObject({
+      id: "aiyes-rules-search",
+      status: "verified",
+      toolkit: "Composio Search"
+    });
+    expect(plan.sourceScout.proofReceipts[0].evidence).toContain("official Devpost");
+    expect(plan.sourceScout.proofReceipts[0].boundary).toContain("no student table rows");
+    expect(plan.sourceScout.proofReceipts[1]).toMatchObject({
+      id: "deepwiki-index-check",
+      status: "needs_indexing",
+      toolkit: "DeepWiki MCP"
+    });
+    expect(plan.sourceScout.proofReceipts[1].evidence).toContain("Repository not found");
+    expect(plan.sourceScout.proofReceipts[1].nextStep).toContain("Index rushtanu14/ouija");
     expect(plan.sourceScout.outputContract).toContain("Return source-quality questions and citation notes, not a finished lab conclusion.");
     expect(plan.sourceScout.judgeTakeaway).toContain("read-only evidence loop");
     expect(plan.sessionStrategy.status).toBe("dry_run_ready");
