@@ -45,6 +45,14 @@ const prohibitedClaimRules: ClaimRule[] = [
   {
     category: "final lab report claim",
     pattern: /\b(?:writes?|generates?|creates?|completes?|finishes?|produces?)\b.{0,80}\b(?:final\s+)?lab\s+report\b/gi
+  },
+  {
+    category: "stale pilot export privacy copy",
+    pattern: /\b(?:direct-contact redaction|automatic direct-contact redaction|csv-ready,\s+redacted handoff|emails and phone-like strings are redacted automatically|non-identifying observer notes|non-identifying note)\b/gi
+  },
+  {
+    category: "stale external grounding gate copy",
+    pattern: /\b(?:OpenAI web search can enrich citations server-side when configured|When\s+`OPENAI_API_KEY`\s+is configured|optional web-search grounding)\b/gi
   }
 ];
 

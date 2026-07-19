@@ -112,7 +112,7 @@ export function buildPilotEvidenceExport(entries: PilotEvidenceEntry[], summary:
     `Exit tickets ready,${summary.reflectionReadyCount}`,
     `Observer notes recorded,${summary.noteCount}`,
     `Direct identifier risks,${summary.directIdentifierRiskCount}`,
-    `Privacy boundary,${formatCsvCell(`${PRIVACY_REVIEW_COPY} Raw observer notes stay browser-local and are not included in exports.`)}`
+    `Privacy boundary,${formatCsvCell(`${PRIVACY_REVIEW_COPY} Raw observer notes stay browser-local. Exports contain structured metrics and aggregate privacy-risk counts only; no raw or redacted note column is included.`)}`
   ];
   const checks = [
     "Quality checks",

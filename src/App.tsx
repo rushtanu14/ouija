@@ -2117,7 +2117,7 @@ function JudgeBriefPanel({ result }: { result: AnalyzeResult | null }) {
     "Learning Impact Loop measures the student's outcome for each run.",
     "Student Pilot Study Kit prepares a consent-safe 10-minute protocol for collecting UX and impact evidence.",
     "Pilot Evidence Tracker logs anonymous browser-local observations without letting the team claim fake completed testing.",
-    "Pilot Evidence Export gives the team a CSV-ready, redacted handoff for Devpost or classroom tools.",
+    "Pilot Evidence Export gives the team a CSV-ready handoff of structured metrics and aggregate privacy-risk counts only.",
     "Submission Hub gives judges one URL for live app, judge view, deck, video, source, source ZIP fallback, Devpost pack, and proof endpoints.",
     "Pre-Lab Design Coach helps students plan variables, controls, repeats, sources, and safety before collecting data.",
     "Learning Exit Ticket proves students must explain variables, patterns, and next steps themselves.",
@@ -2239,7 +2239,7 @@ function ModelCardPanel({ result }: { result: AnalyzeResult | null }) {
     "AIYES Development Journey turns the required slide and video story into inspectable run evidence.",
     "Student Impact Brief makes real-world relevance visible before the deeper proof stack.",
     "Learning Impact Loop turns analysis into measurable student readiness and next-trial evidence.",
-    "Student Pilot Study Kit defines anonymous student-testing tasks, metrics, observer notes, and evidence to collect.",
+    "Student Pilot Study Kit defines anonymous student-testing tasks, metrics, browser-local observer notes, and evidence to collect.",
     "Pilot Evidence Tracker summarizes anonymous time-to-graph, confidence shift, issue spotting, and exit-ticket readiness without collecting student identifiers.",
     "Pre-Lab Design Coach turns classification into variables, controls, repeats, source checks, and safety before data collection.",
     "Learning Exit Ticket converts the AI feedback into student reflection prompts judges can inspect.",
@@ -3231,7 +3231,7 @@ function TechnicalDepthProofPanel({ result }: { result: AnalyzeResult }) {
         ))}
       </div>
       <p className="technical-depth-boundary">
-        Fallback mode is still AI strategy proof: the classifier, validators, overlays, audits, and eval suite run deterministically without exposing keys, while OpenAI web search can enrich citations server-side when configured.
+        Fallback mode is still AI strategy proof: the classifier, validators, overlays, audits, and eval suite run deterministically without exposing keys. OpenAI web search is available only for explicit per-run opt-in when `OUIJA_EXTERNAL_GROUNDING_ENABLED=true`, a server key exists, and the app is running in non-production development mode; public production stays deterministic fallback-only.
       </p>
     </section>
   );
@@ -3667,7 +3667,7 @@ function PilotEvidenceTrackerPanel({
               </select>
             </label>
             <label className="pilot-evidence-note">
-              <span>Non-identifying note</span>
+              <span>Local observer note</span>
               <textarea
                 aria-label={`Pilot note ${entry.label}`}
                 maxLength={160}
@@ -3693,8 +3693,8 @@ function PilotEvidenceTrackerPanel({
         </div>
         <textarea aria-label="Pilot evidence CSV export" readOnly value={exportText} />
         <div className="pilot-evidence-export-note">
-          <span>Emails and phone-like strings are redacted automatically.</span>
-          <span>Review notes before sharing with Devpost, Sheets, Forms, or Notion.</span>
+          <span>Raw notes stay browser-local; exports include structured metrics and aggregate privacy-risk counts only.</span>
+          <span>No raw or redacted note column is shared with Devpost, Sheets, Forms, or Notion.</span>
         </div>
         {copyStatus ? (
           <p className="copy-status" role="status">
@@ -3704,7 +3704,7 @@ function PilotEvidenceTrackerPanel({
       </div>
       <div className="pilot-evidence-boundary">
         <strong>{summary.judgeTakeaway}</strong>
-        <span>Browser-local only. Export routes can summarize counts later; they should not send raw student identifiers.</span>
+        <span>Browser-local only. Export routes summarize structured metrics and aggregate privacy-risk counts; they do not send raw or redacted observer notes.</span>
       </div>
     </section>
   );

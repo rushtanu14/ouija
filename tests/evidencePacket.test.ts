@@ -92,6 +92,9 @@ describe("buildEvidencePacket", () => {
     expect(packet).toContain("Pilot tasks:");
     expect(packet).toContain("Time to first graph");
     expect(packet).toContain("No names");
+    expect(packet).toContain("explicit per-run opt-in");
+    expect(packet).toContain("OUIJA_EXTERNAL_GROUNDING_ENABLED=true");
+    expect(packet).toContain("Public production stays deterministic fallback-only");
     expect(packet).toContain("## Learning Exit Ticket");
     expect(packet).toContain("Exit ticket prompt:");
     expect(packet).toContain("Teacher signal:");
@@ -122,6 +125,7 @@ describe("buildEvidencePacket", () => {
     expect(packet).toContain("I can claim that ___");
     expect(packet).toContain("write your own conclusion");
     expect(packet).not.toContain("therefore");
+    expect(packet).not.toContain("OpenAI web search can enrich citations server-side when configured");
   });
 
   it("includes warnings when imported or edited data needs review", () => {
@@ -182,5 +186,32 @@ describe("buildEvidencePacket", () => {
     expect(packet).toContain("Student draft: I would repeat the hottest trial");
     expect(packet).toContain("Reflection status: ready for review");
     expect(packet).not.toContain("Ouija draft:");
+  });
+
+  it("describes pilot evidence notes as local-only aggregate export data", () => {
+    const result = analyzeExperiment({
+      description: "temperature changes reaction rate for a tablet"
+    });
+
+    const packet = buildEvidencePacket(result, result.rows, "temperature changes reaction rate for a tablet", {}, {
+      status: "evidence_ready",
+      qualityStatus: "review",
+      qualityScore: 80,
+      qualityChecks: [],
+      observationCount: 1,
+      averageTimeToGraphSeconds: 90,
+      averageConfidenceDelta: 2,
+      issueCaughtCount: 1,
+      reflectionReadyCount: 1,
+      noteCount: 1,
+      directIdentifierRiskCount: 1,
+      headline: "1 anonymous observation logged.",
+      judgeTakeaway: "Keep collecting evidence."
+    });
+
+    expect(packet).toContain("Browser-local observer notes recorded: 1");
+    expect(packet).toContain("aggregate privacy-risk counts only");
+    expect(packet).toContain("no raw or redacted note column");
+    expect(packet).not.toContain("Non-identifying observer notes");
   });
 });

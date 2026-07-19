@@ -147,6 +147,9 @@ describe("pilot evidence tracker", () => {
     expect(exported).toContain("Anonymous observations,1");
     expect(exported).toContain("Observation 1,90,2,4,'+2.0,yes,ready");
     expect(exported).toContain("Observer notes recorded,1");
+    expect(exported).toContain("Raw observer notes stay browser-local");
+    expect(exported).toContain("structured metrics and aggregate privacy-risk counts only");
+    expect(exported).toContain("no raw or redacted note column");
     expect(exported).not.toContain("Non-identifying note");
     expect(exported).not.toContain("[redacted email]");
     expect(exported).not.toContain("[redacted phone]");

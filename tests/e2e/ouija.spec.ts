@@ -292,7 +292,7 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(page.getByLabel("AI Model Card").getByText("AIYES Values Fit ties the app to AIYES values without changing the student's work into a generated report.")).toBeVisible();
   await expect(page.getByLabel("AI Model Card").getByText("AIYES Development Journey turns the required slide and video story into inspectable run evidence.")).toBeVisible();
   await expect(page.getByLabel("AI Model Card").getByText("Learning Impact Loop turns analysis into measurable student readiness and next-trial evidence.")).toBeVisible();
-  await expect(page.getByLabel("AI Model Card").getByText("Student Pilot Study Kit defines anonymous student-testing tasks, metrics, observer notes, and evidence to collect.")).toBeVisible();
+  await expect(page.getByLabel("AI Model Card").getByText("Student Pilot Study Kit defines anonymous student-testing tasks, metrics, browser-local observer notes, and evidence to collect.")).toBeVisible();
   await expect(page.getByLabel("AI Model Card").getByText("Pilot Evidence Tracker summarizes anonymous time-to-graph, confidence shift, issue spotting, and exit-ticket readiness without collecting student identifiers.")).toBeVisible();
   await expect(page.getByLabel("AI Model Card").getByText("Pre-Lab Design Coach turns classification into variables, controls, repeats, source checks, and safety before data collection.")).toBeVisible();
   await expect(page.getByLabel("AI Model Card").getByText("Learning Exit Ticket converts the AI feedback into student reflection prompts judges can inspect.")).toBeVisible();

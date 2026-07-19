@@ -57,6 +57,7 @@ describe("AIYES submission assets", () => {
   it("includes Devpost-ready copy and asset instructions", () => {
     const copy = read("docs/devpost-submission-copy.md");
     const assets = read("docs/submission-assets.md");
+    const brief = read("docs/aiyes-submission-brief.md");
     const hub = read("docs/submission-hub.html");
     const pack = read("docs/devpost-submission-pack.html");
 
@@ -91,6 +92,10 @@ describe("AIYES submission assets", () => {
     expect(copy).toContain("AIYES Judge Q&A Prep");
     expect(copy).toContain("verified Devpost deadline, eligibility, Track 1 artifacts, criteria, award bands");
     expect(copy).toContain("100-point quality gate");
+    expect(copy).toContain("raw notes stay browser-local");
+    expect(copy).toContain("no raw or redacted note column");
+    expect(copy).toContain("explicit per-run opt-in");
+    expect(copy).toContain("public production deployments stay deterministic fallback-only");
     expect(copy).toContain("run script, success thresholds, consent stop rules");
     expect(copy).toContain("AIYES Values Fit");
     expect(copy).toContain("AIYES Development Journey");
@@ -152,8 +157,13 @@ describe("AIYES submission assets", () => {
     expect(pack).toContain("AIYES Team Readiness Worksheet");
     expect(pack).toContain("2-5 anonymous slots");
     expect(pack).toContain("https://ouija-olive.vercel.app/?judge=1");
-    expect(`${copy}\n${assets}\n${hub}\n${pack}`).not.toMatch(/TODO|TBD|placeholder|use the repository URL|use the final recorded/i);
+    expect(brief).toContain("raw notes stay browser-local");
+    expect(brief).toContain("no raw or redacted note column");
+    expect(brief).toContain("explicit per-run opt-in");
+    expect(brief).toContain("Public production stays deterministic fallback-only");
+    expect(`${copy}\n${assets}\n${brief}\n${hub}\n${pack}`).not.toMatch(/TODO|TBD|placeholder|use the repository URL|use the final recorded/i);
     expect(`${hub}\n${pack}`).not.toMatch(/3:21|147\.76|15,333,631|f130cebc/i);
+    expect(`${copy}\n${assets}\n${brief}\n${hub}\n${pack}`).not.toMatch(/direct-contact redaction|automatic direct-contact redaction|OpenAI web search can enrich citations server-side when configured|When `OPENAI_API_KEY` is configured|optional web-search grounding/i);
     expect(`${copy}\n${assets}\n${hub}\n${pack}`).not.toMatch(/upload the walkthrough video|finalize the video walkthrough URL/i);
   });
 
