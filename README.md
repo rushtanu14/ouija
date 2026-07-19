@@ -170,7 +170,7 @@ The repo includes `vercel.json` and serverless API adapters under `api/` so Verc
 
 Production deployment: https://ouija-olive.vercel.app
 
-Latest verified deployment: `dpl_7oM2fGSNjC3znq5QQ9JDT9kLZ8nS` (July 18, 2026 Source Scout refresh).
+The production alias reflects the July 18, 2026 Source Scout refresh after `main` deployments pass.
 
 ## AI Grounding
 
