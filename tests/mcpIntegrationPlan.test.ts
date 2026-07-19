@@ -137,7 +137,7 @@ describe("MCP integration plan", () => {
     expect(plan.dryRunChecks.find((check) => check.id === "server-only")?.status).toBe("review");
     expect(plan.sourceScout).toMatchObject({
       status: "discovered",
-      verifiedAt: "July 15, 2026",
+      verifiedAt: "July 18, 2026",
       activeToolkits: ["composio_search", "browser_tool", "deepwiki_mcp"],
       noAccountAuthToolkits: ["Composio Search", "Composio Browser Tool", "DeepWiki MCP"]
     });
@@ -153,21 +153,32 @@ describe("MCP integration plan", () => {
       "BROWSER_TOOL_CREATE_TASK",
       "BROWSER_TOOL_WATCH_TASK"
     ]);
-    expect(plan.sourceScout.proofReceipts).toHaveLength(2);
+    expect(plan.sourceScout.proofReceipts).toHaveLength(3);
     expect(plan.sourceScout.proofReceipts[0]).toMatchObject({
       id: "aiyes-rules-search",
       status: "verified",
       toolkit: "Composio Search"
     });
-    expect(plan.sourceScout.proofReceipts[0].evidence).toContain("official Devpost");
+    expect(plan.sourceScout.proofReceipts[0].evidence).toContain("official Devpost and AIYES pages");
     expect(plan.sourceScout.proofReceipts[0].boundary).toContain("no student table rows");
+    expect(plan.sourceScout.proofReceipts[0].links.map((link) => link.url)).toContain("https://ai-yes-competition-30441.devpost.com/");
     expect(plan.sourceScout.proofReceipts[1]).toMatchObject({
+      id: "classroom-lab-source-search",
+      status: "verified",
+      toolkit: "Composio Search"
+    });
+    expect(plan.sourceScout.proofReceipts[1].evidence).toContain("projectile motion range vs angle");
+    expect(plan.sourceScout.proofReceipts[1].evidence).toContain("reaction rate vs temperature");
+    expect(plan.sourceScout.proofReceipts[1].links.map((link) => link.label)).toContain("PhET projectile simulation");
+    expect(plan.sourceScout.proofReceipts[1].links.map((link) => link.label)).toContain("Water filtration");
+    expect(plan.sourceScout.proofReceipts[2]).toMatchObject({
       id: "deepwiki-index-check",
       status: "needs_indexing",
       toolkit: "DeepWiki MCP"
     });
-    expect(plan.sourceScout.proofReceipts[1].evidence).toContain("Repository not found");
-    expect(plan.sourceScout.proofReceipts[1].nextStep).toContain("Index rushtanu14/ouija");
+    expect(plan.sourceScout.proofReceipts[2].evidence).toContain("Repository not found");
+    expect(plan.sourceScout.proofReceipts[2].nextStep).toContain("Index rushtanu14/ouija");
+    expect(plan.sourceScout.proofReceipts[2].links.map((link) => link.url)).toContain("https://github.com/rushtanu14/ouija");
     expect(plan.sourceScout.outputContract).toContain("Return source-quality questions and citation notes, not a finished lab conclusion.");
     expect(plan.sourceScout.judgeTakeaway).toContain("read-only evidence loop");
     expect(plan.sessionStrategy.status).toBe("dry_run_ready");

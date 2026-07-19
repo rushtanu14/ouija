@@ -106,8 +106,8 @@ const devpostPackUrl = "https://ouija-olive.vercel.app/submission/devpost-pack.h
 const slideDeckUrl = "https://ouija-olive.vercel.app/submission/slide-deck.html";
 const walkthroughVideoUrl = "https://ouija-olive.vercel.app/submission/assets/ouija-walkthrough.webm";
 const officialAiyesDevpostUrl = "https://ai-yes-competition-30441.devpost.com/";
-const officialAiyesVerifiedDate = "July 17, 2026";
-const officialAiyesParticipantCount = "84 participants shown on Devpost at verification time";
+const officialAiyesVerifiedDate = "July 18, 2026";
+const officialAiyesParticipantCount = "86 participants shown on Devpost at verification time";
 
 interface SavedLab extends ProgressPortfolioSnapshot {
   description: string;
@@ -1461,8 +1461,8 @@ function AiyesRulesSnapshotPanel() {
     },
     {
       label: "Live page signal",
-      value: "84 participants visible",
-      detail: "The page was rechecked on July 17, 2026; treat the participant count as a snapshot, not a fixed contest total."
+      value: "86 participants visible",
+      detail: "The page was rechecked on July 18, 2026; treat the participant count as a snapshot, not a fixed contest total."
     },
     {
       label: "Track 1 artifacts",
@@ -2498,6 +2498,13 @@ function McpIntegrationCoachPanel({
                     {receipt.toolkit}: {receipt.tools.join(", ")}
                   </small>
                   <p>{receipt.evidence}</p>
+                  <div className="mcp-source-links" aria-label={`${receipt.label} links`}>
+                    {receipt.links.map((link) => (
+                      <a href={link.url} key={link.url} target="_blank" rel="noreferrer">
+                        {link.label}
+                      </a>
+                    ))}
+                  </div>
                   <em>{receipt.boundary}</em>
                   <small>{receipt.nextStep}</small>
                 </article>
@@ -4492,6 +4499,7 @@ function formatMcpPayloadPreview(plan: McpIntegrationPlan) {
       `- Receipt ${receipt.label}: ${receipt.status.replaceAll("_", " ")}`,
       `  - Toolkit: ${receipt.toolkit} (${receipt.tools.join(", ")})`,
       `  - Evidence: ${receipt.evidence}`,
+      ...receipt.links.map((link) => `  - Link: ${link.label} - ${link.url}`),
       `  - Boundary: ${receipt.boundary}`,
       `  - Next step: ${receipt.nextStep}`
     ]),

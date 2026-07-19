@@ -303,15 +303,25 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(page.locator(".mcp-summary").getByText("Server dry-run", { exact: true })).toBeVisible();
   await expect(page.getByLabel("MCP server bridge").getByText("Server dry-run", { exact: true })).toBeVisible();
   await expect(page.getByLabel("Composio Source Scout").getByText("Discovered read-only loop")).toBeVisible();
-  await expect(page.getByLabel("Composio Source Scout").getByText("Verified July 15, 2026 through Composio tool discovery.")).toBeVisible();
+  await expect(page.getByLabel("Composio Source Scout").getByText("Verified July 18, 2026 through Composio tool discovery.")).toBeVisible();
   await expect(page.getByLabel("Composio Source Scout").getByText("composio_search + browser_tool + deepwiki_mcp")).toBeVisible();
   await expect(page.getByLabel("Composio Source Scout").getByText("COMPOSIO_SEARCH_WEB", { exact: true })).toBeVisible();
   await expect(page.getByLabel("Composio Source Scout").getByText("COMPOSIO_SEARCH_FETCH_URL_CONTENT", { exact: true })).toBeVisible();
   await expect(page.getByLabel("Composio Source Scout").getByText("BROWSER_TOOL_CREATE_TASK, BROWSER_TOOL_WATCH_TASK")).toBeVisible();
   await expect(page.getByLabel("Composio Source Scout").getByText("do not send raw table rows")).toBeVisible();
   await expect(page.getByLabel("Composio live source proof receipts").getByText("Official AIYES rules search")).toBeVisible();
-  await expect(page.getByLabel("Composio live source proof receipts").getByText("Verified", { exact: true })).toBeVisible();
+  await expect(
+    page.locator(".mcp-source-receipt").filter({ hasText: "Official AIYES rules search" }).getByText("Verified", { exact: true })
+  ).toBeVisible();
   await expect(page.getByLabel("Composio live source proof receipts").getByText("official Devpost and AIYES pages")).toBeVisible();
+  await expect(page.getByRole("link", { name: "Devpost rules" })).toHaveAttribute("href", "https://ai-yes-competition-30441.devpost.com/");
+  await expect(page.getByLabel("Composio live source proof receipts").getByText("Classroom lab source search")).toBeVisible();
+  await expect(page.getByLabel("Composio live source proof receipts").getByText("projectile motion range vs angle")).toBeVisible();
+  await expect(page.getByRole("link", { name: "PhET projectile simulation" })).toHaveAttribute("href", "https://phet.colorado.edu/en/simulations/projectile-motion");
+  await expect(page.getByRole("link", { name: "Water filtration" })).toHaveAttribute(
+    "href",
+    "https://wardsworld.wardsci.com/chemistry/essential-activities-for-essential-earth-science-lessons-clearing-the-water"
+  );
   await expect(page.getByLabel("Composio live source proof receipts").getByText("DeepWiki public repo check")).toBeVisible();
   await expect(page.getByLabel("Composio live source proof receipts").getByText("Needs indexing")).toBeVisible();
   await expect(page.getByLabel("Composio live source proof receipts").getByText("Repository not found")).toBeVisible();
@@ -575,14 +585,14 @@ test("judge mode shows a top award radar with honest win gaps", async ({ page })
   await expect(page.getByLabel("Top award next moves").getByText("Complete the pilot evidence quality gate before claiming user testing.")).toBeVisible();
   await expect(page.getByLabel("Top award next moves").getByText("Use Team Readiness Worksheet, then confirm the final roster in Devpost.")).toBeVisible();
 
-  await page.getByRole("link", { name: "Rules" }).click();
+  await page.getByRole("link", { name: "Rules", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Official AIYES Rules Snapshot" })).toBeVisible();
   await expect(page.getByLabel("Official AIYES Rules Snapshot").getByText("Ages 13-18, students only")).toBeVisible();
   await expect(page.getByLabel("Official AIYES Rules Snapshot").getByText("Sep 1, 2026 at 12:00 PM PDT")).toBeVisible();
   await expect(page.getByLabel("Official AIYES Rules Snapshot").getByText("Slide deck, 5-minute video, source/deploy link")).toBeVisible();
   await expect(page.getByLabel("Official AIYES Rules Snapshot").getByText("Problem, AI/model strategy, UX/design")).toBeVisible();
   await expect(page.getByLabel("Official AIYES Rules Snapshot").getByText("Gold / Silver / Bronze / Honorable Mention")).toBeVisible();
-  await expect(page.getByLabel("Official AIYES Rules Snapshot").getByText("84 participants visible")).toBeVisible();
+  await expect(page.getByLabel("Official AIYES Rules Snapshot").getByText("86 participants visible")).toBeVisible();
   await expect(page.getByLabel("Official AIYES Rules Snapshot").getByRole("link", { name: "Open official AIYES Devpost page" })).toHaveAttribute(
     "href",
     "https://ai-yes-competition-30441.devpost.com/"
@@ -654,7 +664,7 @@ test("student mode keeps the core lab workflow focused before judge proof", asyn
   await expect(page.getByRole("link", { name: "Architecture" })).toHaveCount(0);
   await expect(page.getByRole("link", { name: "UX Proof" })).toHaveCount(0);
   await expect(page.getByRole("link", { name: "Award Radar" })).toHaveCount(0);
-  await expect(page.getByRole("link", { name: "Rules" })).toHaveCount(0);
+  await expect(page.getByRole("link", { name: "Rules", exact: true })).toHaveCount(0);
   await expect(page.getByRole("link", { name: "Submit Gate" })).toHaveCount(0);
   await expect(page.getByRole("link", { name: "Team" })).toHaveCount(0);
   await expect(page.getByRole("link", { name: "Demo Prep" })).toHaveCount(0);
@@ -672,7 +682,7 @@ test("student mode keeps the core lab workflow focused before judge proof", asyn
   await expect(page.getByRole("link", { name: "MCP Export" })).toBeVisible();
   await expect(page.getByRole("link", { name: "Architecture" })).toBeVisible();
   await expect(page.getByRole("link", { name: "UX Proof" })).toBeVisible();
-  await expect(page.getByRole("link", { name: "Rules" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Rules", exact: true })).toBeVisible();
   await page.getByRole("link", { name: "UX Proof" }).click();
   await expect(page.getByRole("heading", { name: "UX and Accessibility Proof" })).toBeVisible();
   await expect(page.getByLabel("UX and Accessibility Proof").getByText("User Experience and Design")).toBeVisible();
@@ -683,11 +693,11 @@ test("student mode keeps the core lab workflow focused before judge proof", asyn
   await expect(page.getByLabel("UX and Accessibility Proof").getByText("Integrity by design")).toBeVisible();
   await expect(page.getByRole("link", { name: "Award Radar" })).toBeVisible();
   await expect(page.getByRole("link", { name: "Team" })).toBeVisible();
-  await page.getByRole("link", { name: "Rules" }).click();
+  await page.getByRole("link", { name: "Rules", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Official AIYES Rules Snapshot" })).toBeVisible();
   await expect(page.getByLabel("Official AIYES Rules Snapshot").getByText("Verified source")).toBeVisible();
-  await expect(page.getByLabel("Official AIYES Rules Snapshot").getByText("July 17, 2026 · 84 participants shown on Devpost")).toBeVisible();
-  await expect(page.getByLabel("Official AIYES Rules Snapshot").getByText("84 participants shown on Devpost")).toBeVisible();
+  await expect(page.getByLabel("Official AIYES Rules Snapshot").getByText("July 18, 2026 · 86 participants shown on Devpost")).toBeVisible();
+  await expect(page.getByLabel("Official AIYES Rules Snapshot").getByText("86 participants shown on Devpost")).toBeVisible();
   await expect(page.getByLabel("Official AIYES Rules Snapshot").getByText("Devpost metadata lists a 2-5 member team")).toBeVisible();
   await expect(page.getByRole("link", { name: "Submit Gate" })).toBeVisible();
   await page.getByRole("link", { name: "Submit Gate" }).click();

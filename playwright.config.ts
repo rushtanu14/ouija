@@ -14,7 +14,7 @@ export default defineConfig({
   },
   webServer: [
     {
-      command: `PORT=${e2eApiPort} OUIJA_ANALYZE_RATE_LIMIT=1000 npm run dev:server`,
+      command: `PORT=${e2eApiPort} OUIJA_ANALYZE_RATE_LIMIT=1000 npm run serve:api`,
       url: `http://127.0.0.1:${e2eApiPort}/api/health`,
       reuseExistingServer: false,
       timeout: 120_000

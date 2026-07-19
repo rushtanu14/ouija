@@ -682,8 +682,13 @@ export interface McpSourceScoutStep {
   detail: string;
 }
 
+export interface McpSourceProofLink {
+  label: string;
+  url: string;
+}
+
 export interface McpSourceProofReceipt {
-  id: "aiyes-rules-search" | "deepwiki-index-check";
+  id: "aiyes-rules-search" | "classroom-lab-source-search" | "deepwiki-index-check";
   label: string;
   status: "verified" | "needs_indexing";
   toolkit: string;
@@ -691,6 +696,7 @@ export interface McpSourceProofReceipt {
   evidence: string;
   boundary: string;
   nextStep: string;
+  links: McpSourceProofLink[];
 }
 
 export interface McpSourceScout {

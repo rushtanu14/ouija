@@ -345,7 +345,7 @@ function buildSourceScout(result: AnalyzeResult, status: McpIntegrationPlan["sta
 
   return {
     status: status === "ready" ? "server_ready" : "discovered",
-    verifiedAt: "July 15, 2026",
+    verifiedAt: "July 18, 2026",
     activeToolkits: ["composio_search", "browser_tool", "deepwiki_mcp"],
     noAccountAuthToolkits: ["Composio Search", "Composio Browser Tool", "DeepWiki MCP"],
     queryPreview: `${result.classification.title} ${independent} ${dependent} expected results middle school high school lab`,
@@ -385,10 +385,54 @@ function buildSourceScout(result: AnalyzeResult, status: McpIntegrationPlan["sta
         toolkit: "Composio Search",
         tools: ["COMPOSIO_SEARCH_WEB"],
         evidence:
-          "July 15 no-auth Composio Search returned the official Devpost and AIYES pages for ages 13-18, Track 1, 2-5 team, September 1 2026 deadline, deck, video, and source/deploy requirements.",
+          "July 18 no-auth Composio Search returned the official Devpost and AIYES pages, matching the live Track 1 requirements: ages 13-18, students only, 2-5 team, September 1 2026 deadline, slide deck, video up to 5 minutes, source/deploy link, and problem/AI/UX judging criteria.",
         boundary:
           "Search query only; no student table rows, saved reflections, names, emails, or final claims leave Ouija.",
-        nextStep: "Refresh this receipt before final Devpost submission so the rules snapshot stays current."
+        nextStep: "Refresh this receipt before final Devpost submission so the rules snapshot stays current.",
+        links: [
+          {
+            label: "Devpost rules",
+            url: "https://ai-yes-competition-30441.devpost.com/"
+          },
+          {
+            label: "AIYES competition",
+            url: "https://aiyes.org/competition"
+          }
+        ]
+      },
+      {
+        id: "classroom-lab-source-search",
+        label: "Classroom lab source search",
+        status: "verified",
+        toolkit: "Composio Search",
+        tools: ["COMPOSIO_SEARCH_WEB"],
+        evidence:
+          "July 18 no-auth Composio Search found classroom-safe references for Ouija's supported science demos, including projectile motion range vs angle, reaction rate vs temperature, enzyme activity, and water filtration/turbidity source discovery.",
+        boundary:
+          "Source Scout shares only lab titles, variables, citation URLs, and source-quality questions; raw rows, reflection drafts, identifiers, and final claims stay out of the research session.",
+        nextStep: "Use COMPOSIO_SEARCH_FETCH_URL_CONTENT on student-selected URLs before treating a source as evidence for the expected pattern.",
+        links: [
+          {
+            label: "Projectile motion",
+            url: "https://www.pasco.com/resources/lab-experiments/1044"
+          },
+          {
+            label: "PhET projectile simulation",
+            url: "https://phet.colorado.edu/en/simulations/projectile-motion"
+          },
+          {
+            label: "Reaction rates",
+            url: "https://learnlattice.org/resources/grade-8-reaction-rates-temperature/"
+          },
+          {
+            label: "Enzyme activity",
+            url: "https://www.sciencebuddies.org/science-fair-projects/project-ideas/BioChem_p011/biotechnology-techniques/enzyme-catalyzed-reactions-what-affects-their-rates"
+          },
+          {
+            label: "Water filtration",
+            url: "https://wardsworld.wardsci.com/chemistry/essential-activities-for-essential-earth-science-lessons-clearing-the-water"
+          }
+        ]
       },
       {
         id: "deepwiki-index-check",
@@ -399,7 +443,17 @@ function buildSourceScout(result: AnalyzeResult, status: McpIntegrationPlan["sta
         evidence:
           "July 15 no-auth DeepWiki call returned: Repository not found. Visit https://deepwiki.com to index it. Requested repo: rushtanu14/ouija.",
         boundary: "Public repository question only; no student lab data, browser-local notes, credentials, or private accounts are sent.",
-        nextStep: "Index rushtanu14/ouija on DeepWiki before claiming live DeepWiki architecture proof."
+        nextStep: "Index rushtanu14/ouija on DeepWiki before claiming live DeepWiki architecture proof.",
+        links: [
+          {
+            label: "DeepWiki",
+            url: "https://deepwiki.com"
+          },
+          {
+            label: "Ouija source",
+            url: "https://github.com/rushtanu14/ouija"
+          }
+        ]
       }
     ],
     outputContract: [

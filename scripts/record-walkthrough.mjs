@@ -35,7 +35,7 @@ await caption(
   "Students need help connecting experiment setup, table data, sources, and their own conclusion without turning the lab into a chatbot-written report."
 );
 
-await page.getByRole("button", { name: "Reaction Rate" }).click();
+await page.getByRole("button", { name: "Reaction Rate", exact: true }).click();
 await page.getByRole("heading", { name: "Reaction Rate vs Temperature" }).waitFor();
 await caption(page, "Input and classification", "A normal student description becomes a classified science experiment with concepts, variables, and confidence.");
 
@@ -85,6 +85,9 @@ await caption(
   "The same lab switches from middle-school pattern reading to high-school quantitative evidence, controls, repeats, and uncertainty."
 );
 
+await page.getByRole("button", { name: "Reaction Rate", exact: true }).click();
+await page.getByRole("heading", { name: "Reaction Rate vs Temperature" }).waitFor();
+await page.getByLabel("Learning level").getByRole("button", { name: "High" }).click();
 await page.getByRole("heading", { name: "Concept Mastery Check" }).scrollIntoViewIfNeeded();
 await page
   .getByLabel("Concept Mastery Check")
@@ -306,11 +309,11 @@ await caption(
 );
 
 await page.locator("#aiyes-rules").scrollIntoViewIfNeeded();
-await page.getByLabel("Official AIYES Rules Snapshot").getByText("84 participants visible").waitFor();
+await page.getByLabel("Official AIYES Rules Snapshot").getByText("86 participants visible").waitFor();
 await caption(
   page,
   "Official AIYES Rules Snapshot",
-  "The live judge path shows the July 17 Devpost snapshot: student eligibility, deadline, Track 1 artifacts, judging criteria, award bands, 84 participants, source link, and roster caveat."
+  "The live judge path shows the July 18 Devpost snapshot: student eligibility, deadline, Track 1 artifacts, judging criteria, award bands, 86 participants, source link, and roster caveat."
 );
 
 await page.locator("#demo-rehearsal").scrollIntoViewIfNeeded();
@@ -368,7 +371,7 @@ await page.getByLabel("Composio Session Strategy").getByText("Read-only source v
 await caption(
   page,
   "MCP Integration Coach",
-  "Ouija shows live source proof receipts: Composio Search found the official AIYES source, while DeepWiki needs the public repo indexed before live architecture proof is claimed."
+  "Ouija shows live source proof receipts: Composio Search found the official AIYES source and classroom lab references, while DeepWiki needs the public repo indexed before live architecture proof is claimed."
 );
 await page.locator(".mcp-action-card").filter({ hasText: "Run Scholar claim check" }).getByRole("button", { name: "Validate route" }).click();
 await page.getByLabel("MCP export dry-run result").getByText("Dry-run passed", { exact: true }).waitFor();
