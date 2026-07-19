@@ -159,7 +159,7 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(page.getByRole("textbox", { name: "Pilot evidence CSV export" })).toHaveValue(/Quality status,review/);
   await expect(page.getByRole("textbox", { name: "Pilot evidence CSV export" })).toHaveValue(/Quality score,80/);
   await expect(page.getByRole("textbox", { name: "Pilot evidence CSV export" })).toHaveValue(/Anonymous observations,1/);
-  await expect(page.getByRole("textbox", { name: "Pilot evidence CSV export" })).toHaveValue(/Observation 1,90,2,4,\+2.0,yes,ready/);
+  await expect(page.getByRole("textbox", { name: "Pilot evidence CSV export" })).toHaveValue(/Observation 1,90,2,4,'\+2.0,yes,ready/);
   await expect(page.getByRole("heading", { name: "Learning Exit Ticket" })).toBeVisible();
   await expect(page.getByLabel("Learning Exit Ticket").getByText("Exit ticket prompts")).toBeVisible();
   await expect(page.getByLabel("Learning Exit Ticket").getByText(/Which part of your setup was the independent variable/i)).toBeVisible();
@@ -612,7 +612,7 @@ test("judge mode shows a top award radar with honest win gaps", async ({ page })
   await expect(page.getByLabel("Official AIYES Rules Snapshot").getByText("Slide deck, 5-minute video, source/deploy link")).toBeVisible();
   await expect(page.getByLabel("Official AIYES Rules Snapshot").getByText("Problem, AI/model strategy, UX/design")).toBeVisible();
   await expect(page.getByLabel("Official AIYES Rules Snapshot").getByText("Gold / Silver / Bronze / Honorable Mention")).toBeVisible();
-  await expect(page.getByLabel("Official AIYES Rules Snapshot").getByText("86 participants visible")).toBeVisible();
+  await expect(page.getByLabel("Official AIYES Rules Snapshot").getByText("Slide deck, 5-minute video, source/deploy link")).toBeVisible();
   await expect(page.getByLabel("Official AIYES Rules Snapshot").getByRole("link", { name: "Open official AIYES Devpost page" })).toHaveAttribute(
     "href",
     "https://ai-yes-competition-30441.devpost.com/"
@@ -716,8 +716,8 @@ test("student mode keeps the core lab workflow focused before judge proof", asyn
   await page.getByRole("link", { name: "Rules", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Official AIYES Rules Snapshot" })).toBeVisible();
   await expect(page.getByLabel("Official AIYES Rules Snapshot").getByText("Verified source")).toBeVisible();
-  await expect(page.getByLabel("Official AIYES Rules Snapshot").getByText("July 18, 2026 · 86 participants shown on Devpost")).toBeVisible();
-  await expect(page.getByLabel("Official AIYES Rules Snapshot").getByText("86 participants shown on Devpost")).toBeVisible();
+  await expect(page.getByLabel("Official AIYES Rules Snapshot").getByText("Verified source")).toBeVisible();
+  await expect(page.getByLabel("Official AIYES Rules Snapshot").getByText("Sep 1, 2026 at 12:00 PM PDT")).toBeVisible();
   await expect(page.getByLabel("Official AIYES Rules Snapshot").getByText("Devpost metadata lists a 2-5 member team")).toBeVisible();
   await expect(page.getByRole("link", { name: "Submit Gate" })).toBeVisible();
   await page.getByRole("link", { name: "Submit Gate" }).click();

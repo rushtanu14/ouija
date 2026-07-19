@@ -77,6 +77,61 @@ afterEach(() => {
 });
 
 describe("Vercel API functions", () => {
+  it("uses shared no-store security headers and JSON error envelopes", async () => {
+    const cases = [
+      {
+        method: "POST",
+        handler: healthHandler,
+        error: "Use GET /api/health to check the Ouija API."
+      },
+      {
+        method: "POST",
+        handler: evaluateHandler,
+        error: "Use GET /api/evaluate to run the Ouija deterministic regression suite."
+      },
+      {
+        method: "POST",
+        handler: runtimeProofHandler,
+        error: "Use GET /api/runtime-proof to inspect Ouija runtime proof."
+      },
+      {
+        method: "POST",
+        handler: mcpStatusHandler,
+        error: "Use GET /api/mcp/status to inspect Composio MCP readiness."
+      },
+      {
+        method: "GET",
+        handler: analyzeHandler,
+        error: "Use POST /api/analyze to analyze a student experiment."
+      },
+      {
+        method: "GET",
+        handler: mcpExportHandler,
+        error: "Use POST /api/mcp/export to dry-run a consent-gated Composio MCP packet."
+      },
+      {
+        method: "GET",
+        handler: mcpSessionHandler,
+        error: "Use POST /api/mcp/session with execution preview or create."
+      }
+    ];
+
+    for (const testCase of cases) {
+      const response = createMockResponse();
+
+      await testCase.handler({ method: testCase.method }, response.res);
+
+      expect(response.statusCode).toBe(405);
+      expect(response.headers["Cache-Control"]).toBe("no-store");
+      expect(response.headers["X-Content-Type-Options"]).toBe("nosniff");
+      expect(response.headers["Referrer-Policy"]).toBe("no-referrer");
+      expect(response.body).toEqual({
+        ok: false,
+        error: testCase.error
+      });
+    }
+  });
+
   it("returns health status from the serverless health function", () => {
     const response = createMockResponse();
 
@@ -391,6 +446,7 @@ describe("Vercel API functions", () => {
       );
 
       expect(forbiddenResponse.statusCode, `${testCase.actionId} forbidden: ${JSON.stringify(forbiddenResponse.body)}`).toBe(400);
+      expect(forbiddenResponse.body.ok).toBe(false);
       expect(forbiddenResponse.body.error).toBe("MCP payload fields are not allowed for this action.");
       expect(JSON.stringify(forbiddenResponse.body)).not.toContain("observer noted");
       expect(JSON.stringify(forbiddenResponse.body)).not.toContain("final claim");

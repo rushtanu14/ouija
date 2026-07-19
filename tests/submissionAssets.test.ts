@@ -1,8 +1,62 @@
+import { execFileSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import { existsSync, readFileSync, statSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
 function read(path: string) {
   return readFileSync(path, "utf8");
+}
+
+interface AssetManifest {
+  version: number;
+  assets: Array<{
+    relativePath: string;
+    bytes: number;
+    sha256: string;
+    width?: number;
+    height?: number;
+    durationSeconds?: number;
+  }>;
+}
+
+function sha256(path: string) {
+  return createHash("sha256").update(readFileSync(path)).digest("hex");
+}
+
+function pngDimensions(path: string) {
+  const bytes = readFileSync(path);
+  return {
+    width: bytes.readUInt32BE(16),
+    height: bytes.readUInt32BE(20)
+  };
+}
+
+function videoMetadata(path: string) {
+  try {
+    const output = execFileSync(
+      "ffprobe",
+      [
+        "-v",
+        "error",
+        "-select_streams",
+        "v:0",
+        "-show_entries",
+        "stream=width,height:format=duration",
+        "-of",
+        "json",
+        path
+      ],
+      { encoding: "utf8" }
+    );
+    const parsed = JSON.parse(output) as { streams?: Array<{ width?: number; height?: number }>; format?: { duration?: string } };
+    return {
+      width: parsed.streams?.[0]?.width,
+      height: parsed.streams?.[0]?.height,
+      durationSeconds: Number(parsed.format?.duration)
+    };
+  } catch {
+    throw new Error("ffprobe is required to verify docs/assets/asset-manifest.json video metadata.");
+  }
 }
 
 describe("AIYES submission assets", () => {
@@ -39,7 +93,6 @@ describe("AIYES submission assets", () => {
     expect(deck).toContain("Gmail teacher-review draft");
     expect(deck).toContain("Gold/Silver/Bronze/Honorable Mention");
     expect(deck).toContain("Official AIYES Rules Snapshot");
-    expect(deck).toContain("86-participant");
     expect(deck).toContain("AIYES Team Readiness Worksheet");
     expect(deck).toContain("AIYES Demo Rehearsal");
     expect(deck).toContain("AIYES Judge Q&amp;A Prep");
@@ -60,6 +113,7 @@ describe("AIYES submission assets", () => {
     const brief = read("docs/aiyes-submission-brief.md");
     const hub = read("docs/submission-hub.html");
     const pack = read("docs/devpost-submission-pack.html");
+    const deck = read("docs/aiyes-slide-deck.html");
 
     expect(copy).toContain("Project Title");
     expect(copy).toContain("Ouija");
@@ -86,7 +140,6 @@ describe("AIYES submission assets", () => {
     expect(copy).toContain("Gmail teacher-review draft");
     expect(copy).toContain("Gold/Silver/Bronze/Honorable Mention");
     expect(copy).toContain("Official AIYES Rules Snapshot");
-    expect(copy).toContain("86-participant");
     expect(copy).toContain("AIYES Team Readiness Worksheet");
     expect(copy).toContain("AIYES Demo Rehearsal");
     expect(copy).toContain("AIYES Judge Q&A Prep");
@@ -141,7 +194,6 @@ describe("AIYES submission assets", () => {
     expect(hub).toContain("AIYES Team Readiness Worksheet");
     expect(hub).toContain("AIYES Demo Rehearsal");
     expect(hub).toContain("AIYES Judge Q&amp;A Prep");
-    expect(hub).toContain("86-participant");
     expect(hub).toContain("238.00 second walkthrough");
     expect(hub).toContain("73653219da2e69d998cc337920af8a77b7d35d52ba2d525151d620479618dcb2");
     expect(pack).toContain("Devpost Submission Pack");
@@ -161,6 +213,7 @@ describe("AIYES submission assets", () => {
     expect(brief).toContain("no raw or redacted note column");
     expect(brief).toContain("explicit per-run opt-in");
     expect(brief).toContain("Public production stays deterministic fallback-only");
+    expect(`${copy}\n${assets}\n${brief}\n${hub}\n${pack}\n${deck}`).not.toMatch(/\b\d+[- ]?participant|participant snapshot|participants shown/i);
     expect(`${copy}\n${assets}\n${brief}\n${hub}\n${pack}`).not.toMatch(/TODO|TBD|placeholder|use the repository URL|use the final recorded/i);
     expect(`${hub}\n${pack}`).not.toMatch(/3:21|147\.76|15,333,631|f130cebc/i);
     expect(`${copy}\n${assets}\n${brief}\n${hub}\n${pack}`).not.toMatch(/direct-contact redaction|automatic direct-contact redaction|OpenAI web search can enrich citations server-side when configured|When `OPENAI_API_KEY` is configured|optional web-search grounding/i);
@@ -175,5 +228,46 @@ describe("AIYES submission assets", () => {
     expect(read("public/submission/index.html")).toContain("AIYES Track 1 Submission Hub");
     expect(read("public/submission/devpost-pack.html")).toContain("Devpost Submission Pack");
     expect(statSync("public/submission/assets/ouija-walkthrough.webm").size).toBeGreaterThan(100_000);
+  });
+
+  it("keeps the API source example schema current", () => {
+    const api = read("docs/API.md");
+
+    expect(api).toContain('"confidence": "built-in"');
+  });
+
+  it("verifies the canonical docs asset manifest against actual binaries and public mirrors", () => {
+    const manifest = JSON.parse(read("docs/assets/asset-manifest.json")) as AssetManifest;
+
+    expect(manifest.version).toBe(1);
+    expect(manifest.assets.map((asset) => asset.relativePath).sort()).toEqual([
+      "docs/assets/ouija-custom-triage.png",
+      "docs/assets/ouija-demo-desktop.png",
+      "docs/assets/ouija-demo-mobile.png",
+      "docs/assets/ouija-walkthrough.webm",
+      "docs/assets/ouija-warning-state.png"
+    ]);
+
+    for (const asset of manifest.assets) {
+      expect(existsSync(asset.relativePath), asset.relativePath).toBe(true);
+      expect(statSync(asset.relativePath).size).toBe(asset.bytes);
+      expect(sha256(asset.relativePath)).toBe(asset.sha256);
+
+      if (asset.relativePath.endsWith(".png")) {
+        expect(pngDimensions(asset.relativePath)).toEqual({ width: asset.width, height: asset.height });
+      }
+
+      if (asset.relativePath.endsWith(".webm")) {
+        const actualVideo = videoMetadata(asset.relativePath);
+        expect(actualVideo.width).toBe(asset.width);
+        expect(actualVideo.height).toBe(asset.height);
+        expect(actualVideo.durationSeconds).toBeCloseTo(asset.durationSeconds ?? 0, 2);
+      }
+
+      const publicMirror = asset.relativePath.replace("docs/assets/", "public/submission/assets/");
+      expect(existsSync(publicMirror), publicMirror).toBe(true);
+      expect(statSync(publicMirror).size).toBe(asset.bytes);
+      expect(sha256(publicMirror)).toBe(asset.sha256);
+    }
   });
 });

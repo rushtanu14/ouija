@@ -113,7 +113,6 @@ const slideDeckUrl = "https://ouija-olive.vercel.app/submission/slide-deck.html"
 const walkthroughVideoUrl = "https://ouija-olive.vercel.app/submission/assets/ouija-walkthrough.webm";
 const officialAiyesDevpostUrl = "https://ai-yes-competition-30441.devpost.com/";
 const officialAiyesVerifiedDate = "July 18, 2026";
-const officialAiyesParticipantCount = "86 participants shown on Devpost at verification time";
 
 interface SavedLab extends ProgressPortfolioSnapshot {
   description: string;
@@ -1685,11 +1684,6 @@ function AiyesRulesSnapshotPanel() {
       detail: "Online public submission; all hosted links should be checked again on submission day."
     },
     {
-      label: "Live page signal",
-      value: "86 participants visible",
-      detail: "The page was rechecked on July 18, 2026; treat the participant count as a snapshot, not a fixed contest total."
-    },
-    {
       label: "Track 1 artifacts",
       value: "Slide deck, 5-minute video, source/deploy link",
       detail: "Ouija has a hosted deck, walkthrough, public repo, live app, and one-click Submission Hub."
@@ -1718,7 +1712,7 @@ function AiyesRulesSnapshotPanel() {
           <strong>AIYES Devpost page</strong>
         </div>
         <span>
-          {officialAiyesVerifiedDate} · {officialAiyesParticipantCount}
+          {officialAiyesVerifiedDate} · stable rules snapshot
         </span>
       </div>
       <div className="aiyes-rules-grid">

@@ -46,7 +46,8 @@ Generated from `server/app.ts` and `api/*.ts`.
         "publisher": "Physics Classroom",
         "title": "Projectile Motion",
         "url": "https://www.physicsclassroom.com/",
-        "note": "Projectile range pattern."
+        "note": "Projectile range pattern.",
+        "confidence": "built-in"
       }
     ]
   }

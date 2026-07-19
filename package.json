@@ -12,6 +12,7 @@
     "capture:submission": "node scripts/capture-submission-assets.mjs",
     "record:walkthrough": "node scripts/record-walkthrough.mjs",
     "sync:public-submission": "node scripts/sync-public-submission-assets.mjs",
+    "assets:manifest": "node scripts/generate-asset-manifest.mjs",
     "build": "tsc --noEmit && vite build",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",

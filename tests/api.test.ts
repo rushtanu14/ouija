@@ -67,6 +67,32 @@ afterEach(() => {
 });
 
 describe("POST /api/analyze", () => {
+  it("uses shared no-store security headers and JSON error envelopes", async () => {
+    const app = createApp();
+
+    const cases = [
+      { method: "post" as const, path: "/api/health", error: "Use GET /api/health to check the Ouija API." },
+      { method: "post" as const, path: "/api/evaluate", error: "Use GET /api/evaluate to run the Ouija deterministic regression suite." },
+      { method: "post" as const, path: "/api/runtime-proof", error: "Use GET /api/runtime-proof to inspect Ouija runtime proof." },
+      { method: "post" as const, path: "/api/mcp/status", error: "Use GET /api/mcp/status to inspect Composio MCP readiness." },
+      { method: "get" as const, path: "/api/analyze", error: "Use POST /api/analyze to analyze a student experiment." },
+      { method: "get" as const, path: "/api/mcp/export", error: "Use POST /api/mcp/export to dry-run a consent-gated Composio MCP packet." },
+      { method: "get" as const, path: "/api/mcp/session", error: "Use POST /api/mcp/session with execution preview or create." }
+    ];
+
+    for (const testCase of cases) {
+      const response = await request(app)[testCase.method](testCase.path).expect(405);
+
+      expect(response.headers["cache-control"]).toBe("no-store");
+      expect(response.headers["x-content-type-options"]).toBe("nosniff");
+      expect(response.headers["referrer-policy"]).toBe("no-referrer");
+      expect(response.body).toEqual({
+        ok: false,
+        error: testCase.error
+      });
+    }
+  });
+
   it("does not expose provider errors to students", async () => {
     process.env.OPENAI_API_KEY = "sk-test";
     process.env.OUIJA_EXTERNAL_GROUNDING_ENABLED = "true";
@@ -448,6 +474,7 @@ describe("Composio MCP bridge API", () => {
         });
 
       expect(forbiddenResponse.status, `${testCase.actionId} forbidden: ${JSON.stringify(forbiddenResponse.body)}`).toBe(400);
+      expect(forbiddenResponse.body.ok).toBe(false);
       expect(forbiddenResponse.body.error).toBe("MCP payload fields are not allowed for this action.");
       expect(JSON.stringify(forbiddenResponse.body)).not.toContain("observer noted");
       expect(JSON.stringify(forbiddenResponse.body)).not.toContain("final claim");
