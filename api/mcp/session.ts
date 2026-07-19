@@ -24,7 +24,7 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
   }
 
   if (req.method !== "POST") {
-    res.status(405).json({ error: "Use POST /api/mcp/session to prepare a scoped Composio MCP session." });
+    res.status(405).json({ error: "Use POST /api/mcp/session with execution preview or create." });
     return;
   }
 

@@ -71,6 +71,8 @@ import type {
   LearningImpactSnapshot,
   McpBridgeExportRequest,
   McpBridgeExportResponse,
+  McpBridgePayload,
+  McpBridgeSessionRequest,
   McpBridgeSessionResponse,
   McpBridgeStatus,
   McpIntegrationActionId,
@@ -363,16 +365,13 @@ export function App() {
       const payload: McpBridgeExportRequest = {
         actionId,
         consent: true,
-        payload: {
-          title: mcpIntegrationPlan.payloadPreview.title,
-          description,
-          evidencePacket,
-          rows,
-          sources: result.sources,
-          reflectionAnswers
-        }
+        payload: buildMcpBridgePayload(actionId, result, rows, evidencePacket, mcpIntegrationPlan, reflectionAnswers)
       };
-      const [exportResponse, sessionResponse] = await Promise.all([requestMcpExport(payload), requestMcpSession(payload)]);
+      const sessionPayload: McpBridgeSessionRequest = {
+        ...payload,
+        execution: "preview"
+      };
+      const [exportResponse, sessionResponse] = await Promise.all([requestMcpExport(payload), requestMcpSession(sessionPayload)]);
       setMcpExportResult(exportResponse);
       setMcpSessionResult(sessionResponse);
       setMcpExportStatus("idle");
@@ -380,6 +379,137 @@ export function App() {
       setMcpExportStatus("error");
       setMcpExportError(exportError instanceof Error ? exportError.message : "Unable to validate this MCP packet.");
     }
+  }
+
+  function buildMcpBridgePayload(
+    actionId: McpIntegrationActionId,
+    currentResult: AnalyzeResult,
+    currentRows: StudentDataRow[],
+    currentEvidencePacket: string,
+    plan: McpIntegrationPlan,
+    currentReflectionAnswers: StudentReflectionAnswers
+  ): McpBridgePayload {
+    const title = plan.payloadPreview.title;
+    const sourceUrls = currentResult.sources.map((source) => source.url);
+    const variables = currentResult.variables;
+    const sourceQuery = `${currentResult.classification.title} ${variables.join(" ")} source quality`;
+    const setupChecks = currentResult.preLabDesignCoach.setupChecks.map((check) => `${check.label}: ${check.detail}`);
+    const reflectionPrompts = currentResult.learningExitTicket.prompts.map((prompt) => prompt.studentPrompt);
+
+    if (
+      actionId === "composio-search-source-audit"
+      || actionId === "composio-scholar-claim-check"
+      || actionId === "semanticscholar-reference-check"
+      || actionId === "composio-browser-source-capture"
+      || actionId === "deepwiki-source-proof"
+    ) {
+      return {
+        category: "source",
+        title,
+        query: sourceQuery,
+        variables,
+        sourceUrls
+      };
+    }
+
+    if (actionId === "canvas-assignment-context") {
+      return {
+        category: "assignment_context",
+        title,
+        query: "Import selected Canvas lab prompt, due date, file metadata, and rubric criteria only.",
+        variables,
+        sourceUrls
+      };
+    }
+
+    if (actionId === "google-docs-evidence-packet") {
+      return {
+        category: "document_export",
+        title,
+        markdown: currentEvidencePacket,
+        sourceUrls
+      };
+    }
+
+    if (actionId === "google-slides-submission-deck") {
+      return {
+        category: "deck_export",
+        title,
+        outline: [
+          "Problem and student user",
+          "AI workflow and evidence boundaries",
+          "Expected pattern and citation notes",
+          "Student-owned next claim draft",
+          ...Object.values(currentReflectionAnswers).filter((answer) => answer.trim().length > 0).slice(0, 3)
+        ],
+        sourceUrls
+      };
+    }
+
+    if (actionId === "google-sheets-data-log") {
+      return {
+        category: "table_export",
+        title,
+        columns: currentResult.columns.map((column) => column.key),
+        rows: currentRows
+      };
+    }
+
+    if (actionId === "google-drive-portfolio-archive") {
+      return {
+        category: "portfolio_archive",
+        title,
+        summary: `${plan.payloadPreview.savedRunCount} student-supplied saved run${plan.payloadPreview.savedRunCount === 1 ? "" : "s"} with ${plan.payloadPreview.sourceCount} citation${plan.payloadPreview.sourceCount === 1 ? "" : "s"}.`,
+        artifactUrls: sourceUrls
+      };
+    }
+
+    if (actionId === "google-classroom-prelab-checkpoint") {
+      return {
+        category: "classroom_checkpoint",
+        title,
+        setupChecks,
+        variablePlan: currentResult.preLabDesignCoach.variablePlan,
+        sourceUrls
+      };
+    }
+
+    if (actionId === "google-forms-readiness-check") {
+      return {
+        category: "readiness_form",
+        title,
+        prompts: reflectionPrompts,
+        setupChecks
+      };
+    }
+
+    if (actionId === "google-calendar-next-trial-reminder") {
+      return {
+        category: "calendar_reminder",
+        title,
+        reminderTitle: `Next trial: ${currentResult.classification.title}`,
+        nextAction: currentResult.nextTrialPlan.nextMeasurement,
+        dueWindow: "Next lab block"
+      };
+    }
+
+    if (actionId === "gmail-teacher-review-draft") {
+      return {
+        category: "teacher_review_draft",
+        title,
+        subject: `Review request: ${currentResult.classification.title}`,
+        body: "Please review my variables, controls, source trust, safety checks, and evidence plan before I write my final claim.",
+        sourceUrls
+      };
+    }
+
+    return {
+      category: "learning_record",
+      title,
+      status: currentResult.trackEvidence.readiness,
+      nextAction: currentResult.nextTrialPlan.nextMeasurement,
+      reflectionPrompts
+    };
   }
 
   return (
@@ -2707,7 +2837,8 @@ function McpIntegrationCoachPanel({
                 {exportResult.toolkit} via {exportResult.target.toolkitSlug}: {exportResult.target.recommendedTools.join(", ")}
               </small>
               <small>
-                Payload: {exportResult.sanitizedPayload.rowCount} rows, {exportResult.sanitizedPayload.sourceCount} sources
+                Payload: {exportResult.sanitizedPayload.payloadCategory.replaceAll("_", " ")}, {exportResult.sanitizedPayload.fieldCount} fields,{" "}
+                {exportResult.sanitizedPayload.sourceCount} sources
               </small>
               <div className="mcp-export-check-grid">
                 {exportResult.checks.map((check) => (
@@ -4575,6 +4706,7 @@ function formatMcpExportStatus(status: McpBridgeExportResponse["status"]) {
 
 function formatMcpSessionStatus(status: McpBridgeSessionResponse["status"]) {
   if (status === "created") return "Session created";
+  if (status === "ready") return "Preview ready";
   if (status === "blocked") return "Blocked";
   return "Session dry-run";
 }

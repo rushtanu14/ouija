@@ -8,6 +8,7 @@ import { analyzeExperiment } from "../src/lib/analysis";
 import { buildEvidencePacket } from "../src/lib/evidencePacket";
 import { MCP_CONNECTOR_CATALOG } from "../src/lib/mcpIntegrationPlan";
 import { createMcpSessionTicket } from "../server/mcpBridge";
+import type { McpBridgePayload } from "../src/lib/types";
 
 const originalKey = process.env.OPENAI_API_KEY;
 const originalExternalGroundingEnabled = process.env.OUIJA_EXTERNAL_GROUNDING_ENABLED;
@@ -24,6 +25,15 @@ const composioEnvKeys = [
   ])
 ];
 const originalComposioEnv = new Map(composioEnvKeys.map((key) => [key, process.env[key]]));
+
+const forbiddenMcpFields = {
+  rows: [{ id: "row-1", measurement: 42 }],
+  evidencePacket: "Claim: ___",
+  reflections: { exit: "student reflection" },
+  reflectionAnswers: { exit: "student reflection" },
+  pilotNotes: "observer noted a direct identifier",
+  finalClaim: "This is the student's final claim."
+};
 
 afterEach(() => {
   restoreEnv("OPENAI_API_KEY", originalKey);
@@ -366,20 +376,14 @@ describe("Composio MCP bridge API", () => {
     const result = analyzeExperiment({
       description: "Projectile launch angle and measured range."
     });
-    const packet = buildEvidencePacket(result, result.rows, "Projectile launch angle and measured range.");
+    const payload = mcpPayload("google-calendar-next-trial-reminder", result);
 
     const response = await request(app)
       .post("/api/mcp/export")
       .send({
         actionId: "google-calendar-next-trial-reminder",
         consent: true,
-        payload: {
-          title: `Ouija Evidence Packet: ${result.classification.title}`,
-          description: "Projectile launch angle and measured range.",
-          evidencePacket: packet,
-          rows: result.rows,
-          sources: result.sources
-        }
+        payload
       })
       .expect(200);
 
@@ -388,30 +392,124 @@ describe("Composio MCP bridge API", () => {
     expect(response.body.summary).toContain("no Composio");
     expect(response.body.target.toolkitSlug).toBe("googlecalendar");
     expect(response.body.target.authConfigEnv).toBe("COMPOSIO_GOOGLE_CALENDAR_AUTH_CONFIG_ID");
-    expect(response.body.sanitizedPayload.rowCount).toBe(result.rows.length);
+    expect(response.body.sanitizedPayload).toEqual({
+      title: payload.title,
+      payloadCategory: "calendar_reminder",
+      fieldCount: 4,
+      sourceCount: 0
+    });
     expect(response.body.checks.find((check: { id: string }) => check.id === "consent")?.status).toBe("pass");
     expect(response.body.checks.find((check: { id: string }) => check.id === "credentials")?.status).toBe("review");
   });
 
-  it("rejects malformed MCP rows and unsafe source URLs", async () => {
+  it("rejects forbidden source-route fields instead of silently trimming overbroad payloads", async () => {
     clearComposioEnv();
     const app = createApp();
     const response = await request(app)
       .post("/api/mcp/export")
       .send({
-        actionId: "google-calendar-next-trial-reminder",
+        actionId: "composio-search-source-audit",
         consent: true,
         payload: {
-          title: "Evidence packet",
-          description: "Projectile motion lab",
-          evidencePacket: "Claim: ___",
-          rows: ["not-a-row"],
-          sources: [{ id: "bad", title: "Bad", url: "javascript:alert(1)", publisher: "Bad", confidence: "web", note: "Bad" }]
+          ...mcpPayload("composio-search-source-audit", analyzeExperiment({ description: "Projectile launch angle and measured range." })),
+          ...forbiddenMcpFields
         }
       })
       .expect(400);
 
-    expect(response.body.error).toContain("valid MCP export action");
+    expect(response.body.error).toBe("MCP payload fields are not allowed for this action.");
+    expect(JSON.stringify(response.body)).not.toContain("observer noted");
+    expect(JSON.stringify(response.body)).not.toContain("final claim");
+  });
+
+  it("accepts only category-specific route payloads and keeps source routes metadata-only", async () => {
+    clearComposioEnv();
+    const app = createApp();
+    const result = analyzeExperiment({
+      description: "Projectile launch angle and measured range."
+    });
+
+    const cases: Array<{ actionId: Parameters<typeof mcpPayload>[0]; category: McpBridgePayload["category"] }> = [
+      { actionId: "composio-search-source-audit", category: "source" },
+      { actionId: "composio-scholar-claim-check", category: "source" },
+      { actionId: "semanticscholar-reference-check", category: "source" },
+      { actionId: "composio-browser-source-capture", category: "source" },
+      { actionId: "deepwiki-source-proof", category: "source" },
+      { actionId: "canvas-assignment-context", category: "assignment_context" },
+      { actionId: "google-docs-evidence-packet", category: "document_export" },
+      { actionId: "google-slides-submission-deck", category: "deck_export" },
+      { actionId: "google-sheets-data-log", category: "table_export" },
+      { actionId: "google-drive-portfolio-archive", category: "portfolio_archive" },
+      { actionId: "google-classroom-prelab-checkpoint", category: "classroom_checkpoint" },
+      { actionId: "google-forms-readiness-check", category: "readiness_form" },
+      { actionId: "google-calendar-next-trial-reminder", category: "calendar_reminder" },
+      { actionId: "gmail-teacher-review-draft", category: "teacher_review_draft" },
+      { actionId: "notion-learning-record", category: "learning_record" }
+    ];
+
+    for (const testCase of cases) {
+      const response = await request(app)
+        .post("/api/mcp/export")
+        .send({
+          actionId: testCase.actionId,
+          consent: true,
+          payload: mcpPayload(testCase.actionId, result)
+        });
+
+      expect(response.status, `${testCase.actionId}: ${JSON.stringify(response.body)}`).toBe(200);
+      expect(response.body.status).toBe("dry_run");
+      expect(response.body.sanitizedPayload.payloadCategory).toBe(testCase.category);
+      expect(JSON.stringify(response.body.sanitizedPayload)).not.toMatch(/pilotNotes|finalClaim|reflectionAnswers|evidencePacket/);
+    }
+
+    const sourceResponse = await request(app)
+      .post("/api/mcp/export")
+      .send({
+        actionId: "composio-search-source-audit",
+        consent: true,
+        payload: mcpPayload("composio-search-source-audit", result)
+      })
+      .expect(200);
+
+    expect(sourceResponse.body.sanitizedPayload).toMatchObject({
+      payloadCategory: "source",
+      sourceCount: result.sources.length
+    });
+    expect(JSON.stringify(sourceResponse.body.sanitizedPayload)).not.toMatch(/row|reflection|Claim|conclusion/i);
+  });
+
+  it("requires browser session calls to stay preview-only without bearer authorization", async () => {
+    const result = analyzeExperiment({ description: "Projectile launch angle and measured range." });
+    const fetchCalls: string[] = [];
+    const response = await createMcpSessionTicket(
+      {
+        actionId: "google-calendar-next-trial-reminder",
+        consent: true,
+        execution: "preview",
+        payload: mcpPayload("google-calendar-next-trial-reminder", result)
+      },
+      {
+        COMPOSIO_API_KEY: "ak_test_secret",
+        COMPOSIO_LIVE_EXPORTS: "true",
+        COMPOSIO_SESSION_USER_ID: "ouija-demo-student",
+        COMPOSIO_GOOGLE_CALENDAR_AUTH_CONFIG_ID: "ac_calendar_secret",
+        COMPOSIO_GOOGLE_CALENDAR_ALLOWED_TOOLS: "GOOGLECALENDAR_CREATE_EVENT",
+        MCP_SESSION_AUTH_TOKEN: "server-only-token"
+      },
+      async (url) => {
+        fetchCalls.push(url);
+        throw new Error("preview must not call Composio");
+      }
+    );
+
+    expect(response.statusCode).toBe(200);
+    expect("sessionPlan" in response.body).toBe(true);
+    if (!("sessionPlan" in response.body)) {
+      throw new Error("Expected a session preview response.");
+    }
+    expect(response.body.status).toBe("ready");
+    expect(response.body.sessionPlan.mcpUrlIssued).toBe(false);
+    expect(fetchCalls).toHaveLength(0);
   });
 
   it("validates a Composio Search source-audit packet without requiring an account auth config", async () => {
@@ -420,20 +518,13 @@ describe("Composio MCP bridge API", () => {
     const result = analyzeExperiment({
       description: "Projectile launch angle and measured range."
     });
-    const packet = buildEvidencePacket(result, result.rows, "Projectile launch angle and measured range.");
 
     const response = await request(app)
       .post("/api/mcp/export")
       .send({
         actionId: "composio-search-source-audit",
         consent: true,
-        payload: {
-          title: `Ouija Evidence Packet: ${result.classification.title}`,
-          description: "Projectile launch angle and measured range.",
-          evidencePacket: packet,
-          rows: result.rows,
-          sources: result.sources
-        }
+        payload: mcpPayload("composio-search-source-audit", result)
       })
       .expect(200);
 
@@ -451,20 +542,13 @@ describe("Composio MCP bridge API", () => {
     const result = analyzeExperiment({
       description: "Projectile launch angle and measured range."
     });
-    const packet = buildEvidencePacket(result, result.rows, "Projectile launch angle and measured range.");
 
     const response = await request(app)
       .post("/api/mcp/export")
       .send({
         actionId: "composio-scholar-claim-check",
         consent: true,
-        payload: {
-          title: `Ouija Evidence Packet: ${result.classification.title}`,
-          description: "Projectile launch angle and measured range.",
-          evidencePacket: packet,
-          rows: result.rows,
-          sources: result.sources
-        }
+        payload: mcpPayload("composio-scholar-claim-check", result)
       })
       .expect(200);
 
@@ -482,20 +566,13 @@ describe("Composio MCP bridge API", () => {
     const result = analyzeExperiment({
       description: "Projectile launch angle and measured range."
     });
-    const packet = buildEvidencePacket(result, result.rows, "Projectile launch angle and measured range.");
 
     const response = await request(app)
       .post("/api/mcp/export")
       .send({
         actionId: "composio-browser-source-capture",
         consent: true,
-        payload: {
-          title: `Ouija Evidence Packet: ${result.classification.title}`,
-          description: "Projectile launch angle and measured range.",
-          evidencePacket: packet,
-          rows: result.rows,
-          sources: result.sources
-        }
+        payload: mcpPayload("composio-browser-source-capture", result)
       })
       .expect(200);
 
@@ -513,20 +590,13 @@ describe("Composio MCP bridge API", () => {
     const result = analyzeExperiment({
       description: "Projectile launch angle and measured range."
     });
-    const packet = buildEvidencePacket(result, result.rows, "Projectile launch angle and measured range.");
 
     const response = await request(app)
       .post("/api/mcp/export")
       .send({
         actionId: "semanticscholar-reference-check",
         consent: true,
-        payload: {
-          title: `Ouija Evidence Packet: ${result.classification.title}`,
-          description: "Projectile launch angle and measured range.",
-          evidencePacket: packet,
-          rows: result.rows,
-          sources: result.sources
-        }
+        payload: mcpPayload("semanticscholar-reference-check", result)
       })
       .expect(200);
 
@@ -544,20 +614,13 @@ describe("Composio MCP bridge API", () => {
     const result = analyzeExperiment({
       description: "Projectile launch angle and measured range."
     });
-    const packet = buildEvidencePacket(result, result.rows, "Projectile launch angle and measured range.");
 
     const response = await request(app)
       .post("/api/mcp/export")
       .send({
         actionId: "canvas-assignment-context",
         consent: true,
-        payload: {
-          title: `Ouija Evidence Packet: ${result.classification.title}`,
-          description: "Projectile launch angle and measured range.",
-          evidencePacket: packet,
-          rows: result.rows,
-          sources: result.sources
-        }
+        payload: mcpPayload("canvas-assignment-context", result)
       })
       .expect(200);
 
@@ -575,20 +638,13 @@ describe("Composio MCP bridge API", () => {
     const result = analyzeExperiment({
       description: "Projectile launch angle and measured range."
     });
-    const packet = buildEvidencePacket(result, result.rows, "Projectile launch angle and measured range.");
 
     const response = await request(app)
       .post("/api/mcp/export")
       .send({
         actionId: "gmail-teacher-review-draft",
         consent: true,
-        payload: {
-          title: `Ouija Evidence Packet: ${result.classification.title}`,
-          description: "Projectile launch angle and measured range.",
-          evidencePacket: packet,
-          rows: result.rows,
-          sources: result.sources
-        }
+        payload: mcpPayload("gmail-teacher-review-draft", result)
       })
       .expect(200);
 
@@ -606,20 +662,13 @@ describe("Composio MCP bridge API", () => {
     const result = analyzeExperiment({
       description: "Projectile launch angle and measured range."
     });
-    const packet = buildEvidencePacket(result, result.rows, "Projectile launch angle and measured range.");
 
     const response = await request(app)
       .post("/api/mcp/export")
       .send({
         actionId: "google-slides-submission-deck",
         consent: true,
-        payload: {
-          title: `Ouija Evidence Packet: ${result.classification.title}`,
-          description: "Projectile launch angle and measured range.",
-          evidencePacket: packet,
-          rows: result.rows,
-          sources: result.sources
-        }
+        payload: mcpPayload("google-slides-submission-deck", result)
       })
       .expect(200);
 
@@ -637,20 +686,13 @@ describe("Composio MCP bridge API", () => {
     const result = analyzeExperiment({
       description: "Projectile launch angle and measured range."
     });
-    const packet = buildEvidencePacket(result, result.rows, "Projectile launch angle and measured range.");
 
     const response = await request(app)
       .post("/api/mcp/export")
       .send({
         actionId: "deepwiki-source-proof",
         consent: true,
-        payload: {
-          title: `Ouija Evidence Packet: ${result.classification.title}`,
-          description: "Projectile launch angle and measured range.",
-          evidencePacket: packet,
-          rows: result.rows,
-          sources: result.sources
-        }
+        payload: mcpPayload("deepwiki-source-proof", result)
       })
       .expect(200);
 
@@ -668,20 +710,14 @@ describe("Composio MCP bridge API", () => {
     const result = analyzeExperiment({
       description: "Projectile launch angle and measured range."
     });
-    const packet = buildEvidencePacket(result, result.rows, "Projectile launch angle and measured range.");
 
     const response = await request(app)
       .post("/api/mcp/session")
       .send({
         actionId: "google-calendar-next-trial-reminder",
         consent: true,
-        payload: {
-          title: `Ouija Evidence Packet: ${result.classification.title}`,
-          description: "Projectile launch angle and measured range.",
-          evidencePacket: packet,
-          rows: result.rows,
-          sources: result.sources
-        }
+        execution: "preview",
+        payload: mcpPayload("google-calendar-next-trial-reminder", result)
       })
       .expect(200);
 
@@ -701,13 +737,8 @@ describe("Composio MCP bridge API", () => {
       {
         actionId: "google-calendar-next-trial-reminder",
         consent: true,
-        payload: {
-          title: `Ouija Evidence Packet: ${result.classification.title}`,
-          description: "Projectile launch angle and measured range.",
-          evidencePacket: buildEvidencePacket(result, result.rows, "Projectile launch angle and measured range."),
-          rows: result.rows,
-          sources: result.sources
-        }
+        execution: "create",
+        payload: mcpPayload("google-calendar-next-trial-reminder", result)
       },
       {
         COMPOSIO_API_KEY: "ak_test_secret",
@@ -734,13 +765,8 @@ describe("Composio MCP bridge API", () => {
       {
         actionId: "google-calendar-next-trial-reminder",
         consent: true,
-        payload: {
-          title: `Ouija Evidence Packet: ${result.classification.title}`,
-          description: "Projectile launch angle and measured range.",
-          evidencePacket: buildEvidencePacket(result, result.rows, "Projectile launch angle and measured range."),
-          rows: result.rows,
-          sources: result.sources
-        }
+        execution: "create",
+        payload: mcpPayload("google-calendar-next-trial-reminder", result)
       },
       {
         COMPOSIO_API_KEY: "ak_test_secret",
@@ -760,6 +786,42 @@ describe("Composio MCP bridge API", () => {
     expect(response.body).toEqual({ error: "Composio session creation was unavailable." });
   });
 
+  it("does not reflect upstream Composio error details to the client", async () => {
+    const result = analyzeExperiment({ description: "Projectile launch angle and measured range." });
+    const response = await createMcpSessionTicket(
+      {
+        actionId: "google-calendar-next-trial-reminder",
+        consent: true,
+        execution: "create",
+        payload: mcpPayload("google-calendar-next-trial-reminder", result)
+      },
+      {
+        COMPOSIO_API_KEY: "ak_test_secret",
+        COMPOSIO_LIVE_EXPORTS: "true",
+        COMPOSIO_SESSION_USER_ID: "ouija-demo-student",
+        COMPOSIO_GOOGLE_CALENDAR_AUTH_CONFIG_ID: "ac_calendar_secret",
+        COMPOSIO_GOOGLE_CALENDAR_ALLOWED_TOOLS: "GOOGLECALENDAR_CREATE_EVENT",
+        MCP_SESSION_AUTH_TOKEN: "server-only-token"
+      },
+      async () =>
+        ({
+          ok: false,
+          status: 500,
+          json: async () => ({
+            error: {
+              message: "upstream leaked ak_test_secret and ac_calendar_secret"
+            }
+          })
+        }) as Response,
+      "Bearer server-only-token"
+    );
+
+    expect(response.statusCode).toBe(502);
+    expect(response.body).toEqual({ error: "Composio session creation was unavailable." });
+    expect(JSON.stringify(response.body)).not.toContain("ak_test_secret");
+    expect(JSON.stringify(response.body)).not.toContain("ac_calendar_secret");
+  });
+
   it("does not reflect untrusted origins in CORS", async () => {
     clearComposioEnv();
     const app = createApp();
@@ -772,7 +834,6 @@ describe("Composio MCP bridge API", () => {
     const result = analyzeExperiment({
       description: "Projectile launch angle and measured range."
     });
-    const packet = buildEvidencePacket(result, result.rows, "Projectile launch angle and measured range.");
     const fetchCalls: Array<{ url: string; init?: RequestInit }> = [];
     const fetchMock = async (url: string, init?: RequestInit) => {
       fetchCalls.push({ url, init });
@@ -791,13 +852,8 @@ describe("Composio MCP bridge API", () => {
       {
         actionId: "google-calendar-next-trial-reminder",
         consent: true,
-        payload: {
-          title: `Ouija Evidence Packet: ${result.classification.title}`,
-          description: "Projectile launch angle and measured range.",
-          evidencePacket: packet,
-          rows: result.rows,
-          sources: result.sources
-        }
+        execution: "create",
+        payload: mcpPayload("google-calendar-next-trial-reminder", result)
       },
       {
         COMPOSIO_API_KEY: "ak_test_secret",
@@ -843,7 +899,6 @@ describe("Composio MCP bridge API", () => {
     const result = analyzeExperiment({
       description: "Projectile launch angle and measured range."
     });
-    const packet = buildEvidencePacket(result, result.rows, "Projectile launch angle and measured range.");
     const fetchCalls: Array<{ url: string; init?: RequestInit }> = [];
     const fetchMock = async (url: string, init?: RequestInit) => {
       fetchCalls.push({ url, init });
@@ -862,13 +917,8 @@ describe("Composio MCP bridge API", () => {
       {
         actionId: "composio-search-source-audit",
         consent: true,
-        payload: {
-          title: `Ouija Evidence Packet: ${result.classification.title}`,
-          description: "Projectile launch angle and measured range.",
-          evidencePacket: packet,
-          rows: result.rows,
-          sources: result.sources
-        }
+        execution: "create",
+        payload: mcpPayload("composio-search-source-audit", result)
       },
       {
         COMPOSIO_API_KEY: "ak_test_secret",
@@ -910,7 +960,6 @@ describe("Composio MCP bridge API", () => {
     const result = analyzeExperiment({
       description: "Projectile launch angle and measured range."
     });
-    const packet = buildEvidencePacket(result, result.rows, "Projectile launch angle and measured range.");
     const fetchCalls: Array<{ url: string; init?: RequestInit }> = [];
     const fetchMock = async (url: string, init?: RequestInit) => {
       fetchCalls.push({ url, init });
@@ -929,13 +978,8 @@ describe("Composio MCP bridge API", () => {
       {
         actionId: "composio-scholar-claim-check",
         consent: true,
-        payload: {
-          title: `Ouija Evidence Packet: ${result.classification.title}`,
-          description: "Projectile launch angle and measured range.",
-          evidencePacket: packet,
-          rows: result.rows,
-          sources: result.sources
-        }
+        execution: "create",
+        payload: mcpPayload("composio-scholar-claim-check", result)
       },
       {
         COMPOSIO_API_KEY: "ak_test_secret",
@@ -971,7 +1015,6 @@ describe("Composio MCP bridge API", () => {
     const result = analyzeExperiment({
       description: "Projectile launch angle and measured range."
     });
-    const packet = buildEvidencePacket(result, result.rows, "Projectile launch angle and measured range.");
     const fetchCalls: Array<{ url: string; init?: RequestInit }> = [];
     const fetchMock = async (url: string, init?: RequestInit) => {
       fetchCalls.push({ url, init });
@@ -990,13 +1033,8 @@ describe("Composio MCP bridge API", () => {
       {
         actionId: "gmail-teacher-review-draft",
         consent: true,
-        payload: {
-          title: `Ouija Evidence Packet: ${result.classification.title}`,
-          description: "Projectile launch angle and measured range.",
-          evidencePacket: packet,
-          rows: result.rows,
-          sources: result.sources
-        }
+        execution: "create",
+        payload: mcpPayload("gmail-teacher-review-draft", result)
       },
       {
         COMPOSIO_API_KEY: "ak_test_secret",
@@ -1035,7 +1073,6 @@ describe("Composio MCP bridge API", () => {
     const result = analyzeExperiment({
       description: "Projectile launch angle and measured range."
     });
-    const packet = buildEvidencePacket(result, result.rows, "Projectile launch angle and measured range.");
     const fetchCalls: Array<{ url: string; init?: RequestInit }> = [];
     const fetchMock = async (url: string, init?: RequestInit) => {
       fetchCalls.push({ url, init });
@@ -1054,13 +1091,8 @@ describe("Composio MCP bridge API", () => {
       {
         actionId: "google-slides-submission-deck",
         consent: true,
-        payload: {
-          title: `Ouija Evidence Packet: ${result.classification.title}`,
-          description: "Projectile launch angle and measured range.",
-          evidencePacket: packet,
-          rows: result.rows,
-          sources: result.sources
-        }
+        execution: "create",
+        payload: mcpPayload("google-slides-submission-deck", result)
       },
       {
         COMPOSIO_API_KEY: "ak_test_secret",
@@ -1097,18 +1129,13 @@ describe("Composio MCP bridge API", () => {
 
   it("rejects MCP dry-runs without explicit consent", async () => {
     const app = createApp();
+    const result = analyzeExperiment({ description: "Projectile launch angle and measured range." });
     const response = await request(app)
       .post("/api/mcp/export")
       .send({
         actionId: "google-docs-evidence-packet",
         consent: false,
-        payload: {
-          title: "Ouija Evidence Packet",
-          description: "A lab",
-          evidencePacket: "Claim: ___",
-          rows: [{ id: "row-1" }],
-          sources: [{ id: "source-1", publisher: "Demo", title: "Demo", url: "https://example.com", note: "Demo" }]
-        }
+        payload: mcpPayload("google-docs-evidence-packet", result)
       })
       .expect(400);
 
@@ -1121,6 +1148,147 @@ function clearComposioEnv() {
     delete process.env[key];
   }
 }
+
+function mcpPayload(actionId: McpBridgePayloadActionId, result: ReturnType<typeof analyzeExperiment>): McpBridgePayload {
+  const title = `Ouija Evidence Packet: ${result.classification.title}`;
+  const query = `${result.classification.title} ${result.variables.join(" ")} source quality`;
+  const sourceUrls = result.sources.map((source) => source.url);
+  const variables = result.variables;
+  const setupChecks = result.preLabDesignCoach.setupChecks.map((check) => check.label);
+  const prompts = result.learningExitTicket.prompts.map((prompt) => prompt.studentPrompt);
+  const evidencePacket = buildEvidencePacket(result, result.rows, result.classification.title);
+
+  if (
+    actionId === "composio-search-source-audit"
+    || actionId === "composio-scholar-claim-check"
+    || actionId === "semanticscholar-reference-check"
+    || actionId === "composio-browser-source-capture"
+    || actionId === "deepwiki-source-proof"
+  ) {
+    return {
+      category: "source",
+      title,
+      query,
+      variables,
+      sourceUrls
+    };
+  }
+
+  if (actionId === "canvas-assignment-context") {
+    return {
+      category: "assignment_context",
+      title,
+      query: "Import the selected lab prompt, due date, file metadata, and rubric criteria only.",
+      variables,
+      sourceUrls
+    };
+  }
+
+  if (actionId === "google-docs-evidence-packet") {
+    return {
+      category: "document_export",
+      title,
+      markdown: evidencePacket,
+      sourceUrls
+    };
+  }
+
+  if (actionId === "google-slides-submission-deck") {
+    return {
+      category: "deck_export",
+      title,
+      outline: [
+        "Problem and student user",
+        "AI workflow and evidence boundaries",
+        "Expected pattern and citation notes",
+        "Next student-owned claim draft"
+      ],
+      sourceUrls
+    };
+  }
+
+  if (actionId === "google-sheets-data-log") {
+    return {
+      category: "table_export",
+      title,
+      columns: result.columns.map((column) => column.key),
+      rows: result.rows
+    };
+  }
+
+  if (actionId === "google-drive-portfolio-archive") {
+    return {
+      category: "portfolio_archive",
+      title,
+      summary: `${result.classification.title} saved run archive`,
+      artifactUrls: sourceUrls
+    };
+  }
+
+  if (actionId === "google-classroom-prelab-checkpoint") {
+    return {
+      category: "classroom_checkpoint",
+      title,
+      setupChecks,
+      variablePlan: result.preLabDesignCoach.variablePlan,
+      sourceUrls
+    };
+  }
+
+  if (actionId === "google-forms-readiness-check") {
+    return {
+      category: "readiness_form",
+      title,
+      prompts,
+      setupChecks
+    };
+  }
+
+  if (actionId === "google-calendar-next-trial-reminder") {
+    return {
+      category: "calendar_reminder",
+      title,
+      reminderTitle: `Next trial: ${result.classification.title}`,
+      nextAction: result.nextTrialPlan.nextMeasurement,
+      dueWindow: "Next lab block"
+    };
+  }
+
+  if (actionId === "gmail-teacher-review-draft") {
+    return {
+      category: "teacher_review_draft",
+      title,
+      subject: `Review request: ${result.classification.title}`,
+      body: "Please review my variables, controls, source trust, safety checks, and evidence plan before I write my final claim.",
+      sourceUrls
+    };
+  }
+
+  return {
+    category: "learning_record",
+    title,
+    status: result.trackEvidence.readiness,
+    nextAction: result.nextTrialPlan.nextMeasurement,
+    reflectionPrompts: prompts
+  };
+}
+
+type McpBridgePayloadActionId =
+  | "composio-search-source-audit"
+  | "composio-scholar-claim-check"
+  | "semanticscholar-reference-check"
+  | "composio-browser-source-capture"
+  | "deepwiki-source-proof"
+  | "canvas-assignment-context"
+  | "google-docs-evidence-packet"
+  | "google-slides-submission-deck"
+  | "google-sheets-data-log"
+  | "google-drive-portfolio-archive"
+  | "google-classroom-prelab-checkpoint"
+  | "google-forms-readiness-check"
+  | "google-calendar-next-trial-reminder"
+  | "gmail-teacher-review-draft"
+  | "notion-learning-record";
 
 function restoreEnv(key: string, value: string | undefined) {
   if (value === undefined) {

@@ -22,6 +22,7 @@ import runtimeProofHandler from "../api/runtime-proof";
 import { analyzeExperiment } from "../src/lib/analysis";
 import { buildEvidencePacket } from "../src/lib/evidencePacket";
 import { MCP_CONNECTOR_CATALOG } from "../src/lib/mcpIntegrationPlan";
+import type { McpBridgePayload, McpIntegrationActionId } from "../src/lib/types";
 
 const originalKey = process.env.OPENAI_API_KEY;
 const originalExternalGroundingEnabled = process.env.OUIJA_EXTERNAL_GROUNDING_ENABLED;
@@ -316,13 +317,7 @@ describe("Vercel API functions", () => {
         body: {
           actionId: "google-forms-readiness-check",
           consent: true,
-          payload: {
-            title: `Ouija Evidence Packet: ${result.classification.title}`,
-            description: "Temperature changes reaction rate for an effervescent tablet.",
-            evidencePacket: buildEvidencePacket(result, result.rows, "Temperature changes reaction rate for an effervescent tablet."),
-            rows: result.rows,
-            sources: result.sources
-          }
+          payload: mcpPayload("google-forms-readiness-check", result)
         }
       },
       response.res
@@ -348,13 +343,8 @@ describe("Vercel API functions", () => {
         body: {
           actionId: "google-forms-readiness-check",
           consent: true,
-          payload: {
-            title: `Ouija Evidence Packet: ${result.classification.title}`,
-            description: "Temperature changes reaction rate for an effervescent tablet.",
-            evidencePacket: buildEvidencePacket(result, result.rows, "Temperature changes reaction rate for an effervescent tablet."),
-            rows: result.rows,
-            sources: result.sources
-          }
+          execution: "preview",
+          payload: mcpPayload("google-forms-readiness-check", result)
         }
       },
       response.res
@@ -380,13 +370,7 @@ describe("Vercel API functions", () => {
         body: {
           actionId: "composio-scholar-claim-check",
           consent: true,
-          payload: {
-            title: `Ouija Evidence Packet: ${result.classification.title}`,
-            description: "Projectile launch angle and measured range.",
-            evidencePacket: buildEvidencePacket(result, result.rows, "Projectile launch angle and measured range."),
-            rows: result.rows,
-            sources: result.sources
-          }
+          payload: mcpPayload("composio-scholar-claim-check", result)
         }
       },
       response.res
@@ -412,13 +396,7 @@ describe("Vercel API functions", () => {
         body: {
           actionId: "composio-browser-source-capture",
           consent: true,
-          payload: {
-            title: `Ouija Evidence Packet: ${result.classification.title}`,
-            description: "Projectile launch angle and measured range.",
-            evidencePacket: buildEvidencePacket(result, result.rows, "Projectile launch angle and measured range."),
-            rows: result.rows,
-            sources: result.sources
-          }
+          payload: mcpPayload("composio-browser-source-capture", result)
         }
       },
       response.res
@@ -444,13 +422,7 @@ describe("Vercel API functions", () => {
         body: {
           actionId: "semanticscholar-reference-check",
           consent: true,
-          payload: {
-            title: `Ouija Evidence Packet: ${result.classification.title}`,
-            description: "Projectile launch angle and measured range.",
-            evidencePacket: buildEvidencePacket(result, result.rows, "Projectile launch angle and measured range."),
-            rows: result.rows,
-            sources: result.sources
-          }
+          payload: mcpPayload("semanticscholar-reference-check", result)
         }
       },
       semanticResponse.res
@@ -467,13 +439,7 @@ describe("Vercel API functions", () => {
         body: {
           actionId: "canvas-assignment-context",
           consent: true,
-          payload: {
-            title: `Ouija Evidence Packet: ${result.classification.title}`,
-            description: "Projectile launch angle and measured range.",
-            evidencePacket: buildEvidencePacket(result, result.rows, "Projectile launch angle and measured range."),
-            rows: result.rows,
-            sources: result.sources
-          }
+          payload: mcpPayload("canvas-assignment-context", result)
         }
       },
       canvasResponse.res
@@ -497,13 +463,7 @@ describe("Vercel API functions", () => {
         body: {
           actionId: "gmail-teacher-review-draft",
           consent: true,
-          payload: {
-            title: `Ouija Evidence Packet: ${result.classification.title}`,
-            description: "Projectile launch angle and measured range.",
-            evidencePacket: buildEvidencePacket(result, result.rows, "Projectile launch angle and measured range."),
-            rows: result.rows,
-            sources: result.sources
-          }
+          payload: mcpPayload("gmail-teacher-review-draft", result)
         }
       },
       response.res
@@ -528,13 +488,7 @@ describe("Vercel API functions", () => {
         body: {
           actionId: "google-slides-submission-deck",
           consent: true,
-          payload: {
-            title: `Ouija Evidence Packet: ${result.classification.title}`,
-            description: "Projectile launch angle and measured range.",
-            evidencePacket: buildEvidencePacket(result, result.rows, "Projectile launch angle and measured range."),
-            rows: result.rows,
-            sources: result.sources
-          }
+          payload: mcpPayload("google-slides-submission-deck", result)
         }
       },
       response.res
@@ -587,6 +541,76 @@ function clearComposioEnv() {
   for (const key of composioEnvKeys) {
     delete process.env[key];
   }
+}
+
+function mcpPayload(actionId: McpIntegrationActionId, result: ReturnType<typeof analyzeExperiment>): McpBridgePayload {
+  const title = `Ouija Evidence Packet: ${result.classification.title}`;
+  const sourceUrls = result.sources.map((source) => source.url);
+  const variables = result.variables;
+  const prompts = result.learningExitTicket.prompts.map((prompt) => prompt.studentPrompt);
+  const setupChecks = result.preLabDesignCoach.setupChecks.map((check) => check.label);
+
+  if (
+    actionId === "composio-search-source-audit"
+    || actionId === "composio-scholar-claim-check"
+    || actionId === "semanticscholar-reference-check"
+    || actionId === "composio-browser-source-capture"
+    || actionId === "deepwiki-source-proof"
+  ) {
+    return {
+      category: "source",
+      title,
+      query: `${result.classification.title} ${variables.join(" ")} source quality`,
+      variables,
+      sourceUrls
+    };
+  }
+
+  if (actionId === "canvas-assignment-context") {
+    return {
+      category: "assignment_context",
+      title,
+      query: "Import selected lab prompt, due date, file metadata, and rubric criteria only.",
+      variables,
+      sourceUrls
+    };
+  }
+
+  if (actionId === "google-forms-readiness-check") {
+    return {
+      category: "readiness_form",
+      title,
+      prompts,
+      setupChecks
+    };
+  }
+
+  if (actionId === "gmail-teacher-review-draft") {
+    return {
+      category: "teacher_review_draft",
+      title,
+      subject: `Review request: ${result.classification.title}`,
+      body: "Please review my variables, controls, source trust, safety checks, and evidence plan before I write my final claim.",
+      sourceUrls
+    };
+  }
+
+  if (actionId === "google-slides-submission-deck") {
+    return {
+      category: "deck_export",
+      title,
+      outline: ["Problem and student user", "AI workflow", "Evidence boundaries", "Student-owned next claim draft"],
+      sourceUrls
+    };
+  }
+
+  return {
+    category: "calendar_reminder",
+    title,
+    reminderTitle: `Next trial: ${result.classification.title}`,
+    nextAction: result.nextTrialPlan.nextMeasurement,
+    dueWindow: "Next lab block"
+  };
 }
 
 function restoreEnv(key: string, value: string | undefined) {
