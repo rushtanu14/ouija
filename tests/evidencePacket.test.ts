@@ -31,24 +31,6 @@ describe("buildEvidencePacket", () => {
     expect(packet).not.toContain("DEMO SAMPLE - not student evidence");
   });
 
-  it("labels legacy packets as unknown provenance and not student evidence", () => {
-    const result = {
-      ...analyzeExperiment({
-        description: "temperature changes reaction rate for a tablet",
-        rows: [
-          { id: "legacy-1", tempC: 10, reactionTimeS: 118, ratePerS: 0.008 },
-          { id: "legacy-2", tempC: 22, reactionTimeS: 74, ratePerS: 0.014 }
-        ]
-      }),
-      dataOrigin: "legacy_unknown" as const
-    };
-
-    const packet = buildEvidencePacket(result, result.rows, "temperature changes reaction rate for a tablet");
-
-    expect(packet).toContain("LEGACY SAVED DATA - provenance unknown");
-    expect(packet).toContain("Do not use these saved rows as student observations");
-  });
-
   it("creates a student-owned packet without writing the final conclusion", () => {
     const result = analyzeExperiment({
       description: "We launched a ball at angles and measured range."

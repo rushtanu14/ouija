@@ -59,23 +59,6 @@ describe("fallback analysis", () => {
     expect(claimedStudentData.labBrief.signal).not.toContain("Demo sample");
   });
 
-  it("preserves legacy provenance when saved rows are loaded and edited", () => {
-    const result = analyzeExperiment({
-      description: "temperature changes reaction rate for a tablet",
-      rows: [
-        { id: "legacy-1", tempC: 10, reactionTimeS: 118, ratePerS: 0.008 },
-        { id: "legacy-2", tempC: 22, reactionTimeS: 74, ratePerS: 0.014 }
-      ]
-    });
-    const legacyResult = { ...result, dataOrigin: "legacy_unknown" as const };
-    const editedLegacyRows = legacyResult.rows.map((row) => (row.id === "legacy-1" ? { ...row, ratePerS: 0.09 } : row));
-
-    const editedLegacy = refreshResultForRows(legacyResult, editedLegacyRows);
-
-    expect(editedLegacy.dataOrigin).toBe("legacy_unknown");
-    expect(editedLegacy.labBrief.signal).toContain("Demo sample");
-  });
-
   it("returns usable expected results, columns, sources, and hints without credentials", () => {
     const result = analyzeExperiment({
       description: "We launched a ball at angles and measured range."

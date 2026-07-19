@@ -385,13 +385,6 @@ function formatDataProvenance(result: AnalyzeResult): string {
     ].join("\n");
   }
 
-  if (result.dataOrigin === "legacy_unknown") {
-    return [
-      "LEGACY SAVED DATA - provenance unknown.",
-      "Do not use these saved rows as student observations, saved learning progress, pilot evidence, or external handoff proof until the student starts an owned data table."
-    ].join("\n");
-  }
-
   return [
     "DEMO SAMPLE - not student evidence.",
     "Do not use these sample rows as student observations, saved learning progress, pilot evidence, or external handoff proof."

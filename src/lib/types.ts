@@ -982,7 +982,7 @@ export interface AnalyzeRequest {
 
 export interface AnalyzeResult {
   templateId: string;
-  dataOrigin: SavedDataOrigin;
+  dataOrigin: DataOrigin;
   classification: {
     subject: SubjectArea;
     title: string;

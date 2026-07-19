@@ -58,6 +58,7 @@ import type {
   AiEvaluationHarness,
   ConceptCoach,
   CustomLabTriage,
+  DataOrigin,
   DataHandlingLedger,
   DevelopmentJourney,
   EvaluationReport,
@@ -183,7 +184,7 @@ export function App() {
   const [error, setError] = useState("");
   const analysisRequestId = useRef(0);
 
-  async function analyze(nextDescription = description, nextRows?: StudentDataRow[], preservedDataOrigin?: SavedDataOrigin) {
+  async function analyze(nextDescription = description, nextRows?: StudentDataRow[], preservedDataOrigin?: DataOrigin) {
     const requestId = analysisRequestId.current + 1;
     analysisRequestId.current = requestId;
     setStatus("loading");
@@ -256,7 +257,7 @@ export function App() {
 
   function loadSavedLab(savedLab: SavedLab) {
     setDescription(savedLab.description);
-    void analyze(savedLab.description, savedLab.rows, savedLab.dataOrigin);
+    void analyze(savedLab.description, savedLab.rows, getActiveDataOrigin(savedLab.dataOrigin));
   }
 
   function deleteSavedLab(id: string) {
@@ -516,11 +517,7 @@ export function App() {
               </div>
               {result.dataOrigin !== "student_supplied" ? (
                 <div className="demo-sample-banner" role="status">
-                  <strong>
-                    {result.dataOrigin === "legacy_unknown"
-                      ? "LEGACY SAVED DATA - provenance unknown."
-                      : "DEMO SAMPLE - not student evidence."}
-                  </strong>
+                  <strong>DEMO SAMPLE - not student evidence.</strong>
                   <span>Use your own data or import rows to enable saved progress, pilot evidence, Evidence Packet copy, and MCP handoff.</span>
                 </div>
               ) : null}
@@ -4724,6 +4721,10 @@ function formatSavedDataOrigin(origin: SavedDataOrigin) {
   if (origin === "student_supplied") return "Student-supplied evidence";
   if (origin === "demo_sample") return "Demo sample - excluded from evidence";
   return "Legacy provenance unknown - excluded from evidence";
+}
+
+function getActiveDataOrigin(origin: SavedDataOrigin): DataOrigin {
+  return origin === "student_supplied" ? "student_supplied" : "demo_sample";
 }
 
 function loadSavedLabs(): SavedLab[] {

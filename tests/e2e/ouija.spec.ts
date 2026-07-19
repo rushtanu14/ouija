@@ -866,12 +866,12 @@ test("provenance gates demo edits and legacy loads until explicit student owners
   await page.getByRole("link", { name: "Saved Labs" }).click();
   await expect(page.locator(".saved-lab-card").filter({ hasText: "Legacy Reaction Snapshot" }).getByText("Legacy provenance unknown")).toBeVisible();
   await page.locator(".saved-lab-card").filter({ hasText: "Legacy Reaction Snapshot" }).getByRole("button", { name: "Load" }).click();
-  await expect(page.locator(".analysis-panel .demo-sample-banner").getByText("LEGACY SAVED DATA - provenance unknown.")).toBeVisible();
+  await expect(page.locator(".analysis-panel .demo-sample-banner").getByText("DEMO SAMPLE - not student evidence.")).toBeVisible();
   await expect(page.getByRole("button", { name: "Save current lab" })).toBeDisabled();
-  await expect(page.getByLabel("Student evidence packet")).toHaveValue(/LEGACY SAVED DATA - provenance unknown/);
+  await expect(page.getByLabel("Student evidence packet")).toHaveValue(/DEMO SAMPLE - not student evidence/);
 
   await page.getByLabel("Rate row legacy-1").fill("0.09");
-  await expect(page.locator(".analysis-panel .demo-sample-banner").getByText("LEGACY SAVED DATA - provenance unknown.")).toBeVisible();
+  await expect(page.locator(".analysis-panel .demo-sample-banner").getByText("DEMO SAMPLE - not student evidence.")).toBeVisible();
   await expect(page.getByRole("button", { name: "Save current lab" })).toBeDisabled();
 
   await page.getByRole("button", { name: "Use my own data" }).click();
