@@ -3149,6 +3149,13 @@ a:focus-visible {
   color: #172439;
 }
 
+.data-import-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
 .data-import-header button {
   display: inline-flex;
   flex: 0 0 auto;
@@ -5097,6 +5104,7 @@ td input {
 }
 
 .saved-lab-card span,
+.saved-lab-card small,
 .empty-copy {
   color: #607087;
   font-size: 13px;

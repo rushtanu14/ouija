@@ -183,7 +183,7 @@ export function App() {
   const [error, setError] = useState("");
   const analysisRequestId = useRef(0);
 
-  async function analyze(nextDescription = description, nextRows?: StudentDataRow[]) {
+  async function analyze(nextDescription = description, nextRows?: StudentDataRow[], preservedDataOrigin?: SavedDataOrigin) {
     const requestId = analysisRequestId.current + 1;
     analysisRequestId.current = requestId;
     setStatus("loading");
@@ -192,8 +192,11 @@ export function App() {
     try {
       const analysis = await requestAnalysis({ description: nextDescription, rows: nextRows });
       if (requestId !== analysisRequestId.current) return;
-      setResult(analysis);
-      setRows(analysis.rows);
+      const nextAnalysis = preservedDataOrigin
+        ? refreshResultForRows({ ...analysis, dataOrigin: preservedDataOrigin }, analysis.rows, preservedDataOrigin)
+        : analysis;
+      setResult(nextAnalysis);
+      setRows(nextAnalysis.rows);
       setReflectionAnswers({});
       setMasteryAnswers({});
       setMcpExportResult(null);
@@ -219,8 +222,16 @@ export function App() {
     setRows(nextRows);
 
     if (result) {
-      setResult(refreshResultForRows(result, nextRows));
+      setResult(refreshResultForRows(result, nextRows, result.dataOrigin));
     }
+  }
+
+  function startStudentOwnedTable() {
+    if (!result) return;
+
+    const nextRows = createStudentOwnedRows(result);
+    setRows(nextRows);
+    setResult(refreshResultForRows(result, nextRows, "student_supplied"));
   }
 
   function saveCurrentLab() {
@@ -245,7 +256,7 @@ export function App() {
 
   function loadSavedLab(savedLab: SavedLab) {
     setDescription(savedLab.description);
-    void analyze(savedLab.description, savedLab.rows);
+    void analyze(savedLab.description, savedLab.rows, savedLab.dataOrigin);
   }
 
   function deleteSavedLab(id: string) {
@@ -291,6 +302,10 @@ export function App() {
     }));
   }, [result, rows]);
   const progressPortfolio = useMemo(() => buildProgressPortfolio(savedLabs), [savedLabs]);
+  const studentSuppliedSavedLabCount = useMemo(
+    () => savedLabs.filter((savedLab) => savedLab.dataOrigin === "student_supplied").length,
+    [savedLabs]
+  );
   const pilotEvidenceSummary = useMemo(() => summarizePilotEvidence(pilotEvidenceEntries), [pilotEvidenceEntries]);
   const studentReflectionWorkspace = useMemo(() => {
     if (!result) return null;
@@ -499,10 +514,14 @@ export function App() {
                   <span key={concept}>{concept}</span>
                 ))}
               </div>
-              {result.dataOrigin === "demo_sample" ? (
+              {result.dataOrigin !== "student_supplied" ? (
                 <div className="demo-sample-banner" role="status">
-                  <strong>DEMO SAMPLE - not student evidence.</strong>
-                  <span>Edit, paste, or import rows to enable saved progress, pilot evidence, Evidence Packet copy, and MCP handoff.</span>
+                  <strong>
+                    {result.dataOrigin === "legacy_unknown"
+                      ? "LEGACY SAVED DATA - provenance unknown."
+                      : "DEMO SAMPLE - not student evidence."}
+                  </strong>
+                  <span>Use your own data or import rows to enable saved progress, pilot evidence, Evidence Packet copy, and MCP handoff.</span>
                 </div>
               ) : null}
 
@@ -537,8 +556,8 @@ export function App() {
                 </div>
                 <DataImportPanel result={result} rows={rows} onImportRows={(nextRows) => {
                   setRows(nextRows);
-                  setResult(refreshResultForRows(result, nextRows));
-                }} />
+                  setResult(refreshResultForRows(result, nextRows, "student_supplied"));
+                }} onUseOwnData={startStudentOwnedTable} />
                 <DataTable result={result} rows={rows} onCellChange={updateCell} />
               </div>
 
@@ -652,7 +671,7 @@ export function App() {
               runtimeProof={runtimeProof}
               mcpBridgeStatus={mcpBridgeStatus}
               pilotEvidenceSummary={pilotEvidenceSummary}
-              savedLabCount={savedLabs.length}
+              studentSuppliedSavedLabCount={studentSuppliedSavedLabCount}
             />
             <AiyesRulesSnapshotPanel />
             <SubmissionGatePanel evaluationReport={evaluationReport} runtimeProof={runtimeProof} mcpBridgeStatus={mcpBridgeStatus} />
@@ -735,6 +754,18 @@ function RunSnapshotPanel({ result, evaluationReport }: { result: AnalyzeResult;
       </div>
     </section>
   );
+}
+
+function createStudentOwnedRows(result: AnalyzeResult): StudentDataRow[] {
+  const rowCount = Math.max(1, result.rows.length);
+
+  return Array.from({ length: rowCount }, (_, index) => ({
+    id: `student-${index + 1}`,
+    ...result.columns.reduce<Record<string, string>>((cells, column) => {
+      cells[column.key] = "";
+      return cells;
+    }, {})
+  }));
 }
 
 function StudentImpactBriefPanel({ brief }: { brief: StudentImpactBrief }) {
@@ -1335,20 +1366,20 @@ function TopAwardRadarPanel({
   runtimeProof,
   mcpBridgeStatus,
   pilotEvidenceSummary,
-  savedLabCount
+  studentSuppliedSavedLabCount
 }: {
   result: AnalyzeResult | null;
   evaluationReport: EvaluationReport | null;
   runtimeProof: RuntimeProof | null;
   mcpBridgeStatus: McpBridgeStatus | null;
   pilotEvidenceSummary: PilotEvidenceSummary;
-  savedLabCount: number;
+  studentSuppliedSavedLabCount: number;
 }) {
   const regressionReady = evaluationReport?.status === "pass";
   const runtimeReady = runtimeProof?.status === "fallback_ready" || runtimeProof?.status === "web_enriched_ready";
   const mcpRouteCount = mcpBridgeStatus?.toolkits.length ?? 0;
   const pilotReady = pilotEvidenceSummary.qualityStatus === "submission_ready";
-  const savedEvidenceReady = savedLabCount >= 2;
+  const savedEvidenceReady = studentSuppliedSavedLabCount >= 2;
   const radarItems = [
     {
       label: "Problem and relevance",
@@ -1375,8 +1406,8 @@ function TopAwardRadarPanel({
     {
       label: "Impact evidence",
       status: pilotReady ? "Strong" : "Collect",
-      detail: `${pilotEvidenceSummary.observationCount}/3 anonymous pilot observations logged; ${savedLabCount} saved lab snapshot${
-        savedLabCount === 1 ? "" : "s"
+      detail: `${pilotEvidenceSummary.observationCount}/3 anonymous pilot observations logged; ${studentSuppliedSavedLabCount} student-supplied saved lab snapshot${
+        studentSuppliedSavedLabCount === 1 ? "" : "s"
       } available; quality gate ${pilotEvidenceSummary.qualityScore}/100 (${formatPilotEvidenceQualityStatus(
         pilotEvidenceSummary.qualityStatus
       )}); CSV-ready export is available in Pilot Evidence Tracker.`
@@ -2311,6 +2342,7 @@ function SavedLabsPanel({
                   {formatReadiness(savedLab.readiness)} · {savedLab.score}/100 · {savedLab.issueCount} flag
                   {savedLab.issueCount === 1 ? "" : "s"} · {formatSavedTime(savedLab.savedAt)}
                 </span>
+                <small>{formatSavedDataOrigin(savedLab.dataOrigin)}</small>
               </div>
               <div className="saved-lab-actions">
                 <button type="button" onClick={() => onLoad(savedLab)}>
@@ -2908,11 +2940,13 @@ function DataTable({
 function DataImportPanel({
   result,
   rows,
-  onImportRows
+  onImportRows,
+  onUseOwnData
 }: {
   result: AnalyzeResult;
   rows: StudentDataRow[];
   onImportRows: (rows: StudentDataRow[]) => void;
+  onUseOwnData: () => void;
 }) {
   const [draft, setDraft] = useState("");
   const [status, setStatus] = useState<{ tone: "success" | "error"; message: string } | null>(null);
@@ -2948,10 +2982,16 @@ function DataImportPanel({
           <p className="section-label">Data handling</p>
           <strong>Paste spreadsheet rows</strong>
         </div>
-        <button type="button" onClick={importRows} disabled={!draft.trim()}>
-          <ClipboardPaste size={16} />
-          Import rows
-        </button>
+        <div className="data-import-actions">
+          <button type="button" onClick={onUseOwnData}>
+            <SlidersHorizontal size={16} />
+            Use my own data
+          </button>
+          <button type="button" onClick={importRows} disabled={!draft.trim()}>
+            <ClipboardPaste size={16} />
+            Import rows
+          </button>
+        </div>
       </div>
       <textarea
         className="data-import-box"
@@ -4678,6 +4718,12 @@ function formatSavedTime(value: string) {
     hour: "numeric",
     minute: "2-digit"
   }).format(new Date(value));
+}
+
+function formatSavedDataOrigin(origin: SavedDataOrigin) {
+  if (origin === "student_supplied") return "Student-supplied evidence";
+  if (origin === "demo_sample") return "Demo sample - excluded from evidence";
+  return "Legacy provenance unknown - excluded from evidence";
 }
 
 function loadSavedLabs(): SavedLab[] {

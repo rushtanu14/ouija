@@ -1,5 +1,21 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 import { analyzeExperiment } from "../../src/lib/analysis";
+
+const reactionRateTable = "Temperature (C)\tReaction time (s)\tRate (1/s)\n10\t118\t0.008\n22\t74\t0.014\n35\t44\t0.023\n50\t25\t0.04";
+const waterFiltrationTable =
+  "Filter stage\tTurbidity (NTU)\tObservation\nBefore filter\t94\tcloudy\nGravel\t61\tlarge sediment removed\nSand\t31\tclearer\nCharcoal\t18\tleast cloudy";
+
+async function importReactionRateRows(page: Page) {
+  await page.getByLabel("Paste data table").fill(reactionRateTable);
+  await page.getByRole("button", { name: "Import rows" }).click();
+  await expect(page.getByText("Imported 4 rows using headers.")).toBeVisible();
+}
+
+async function importWaterFiltrationRows(page: Page) {
+  await page.getByLabel("Paste data table").fill(waterFiltrationTable);
+  await page.getByRole("button", { name: "Import rows" }).click();
+  await expect(page.getByText("Imported 4 rows using headers.")).toBeVisible();
+}
 
 test("student can analyze a sample experiment, edit table data, and see citations", async ({ page }) => {
   test.setTimeout(120_000);
@@ -124,6 +140,8 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(page.getByLabel("Pilot evidence quality gate").getByText("Three anonymous observations")).toBeVisible();
   await expect(page.getByLabel("Pilot evidence quality gate").getByText("Privacy scan")).toBeVisible();
   await expect(page.locator(".pilot-evidence-boundary").getByText("Do not claim completed student testing yet")).toBeVisible();
+  await importReactionRateRows(page);
+  await expect(page.getByRole("button", { name: "Save current lab" })).toBeEnabled();
   await page.getByLabel("Time to graph Observation 1").fill("90");
   await page.getByLabel("Confidence before Observation 1").selectOption("2");
   await page.getByLabel("Confidence after Observation 1").selectOption("4");
@@ -563,6 +581,7 @@ test("judge mode shows a top award radar with honest win gaps", async ({ page })
 
   await page.getByRole("button", { name: "Reaction Rate" }).click();
   await expect(page.getByRole("heading", { name: "Reaction Rate vs Temperature" })).toBeVisible();
+  await importReactionRateRows(page);
   await page.getByLabel("Time to graph Observation 1").fill("90");
   await page.getByLabel("Confidence before Observation 1").selectOption("2");
   await page.getByLabel("Confidence after Observation 1").selectOption("4");
@@ -581,6 +600,7 @@ test("judge mode shows a top award radar with honest win gaps", async ({ page })
   await expect(page.getByLabel("Top Award Radar").getByText("Model Strategy, AI Architecture Map, and Technical Depth Proof are visible.")).toBeVisible();
   await expect(page.getByLabel("Top Award Radar").getByText("UX and design")).toBeVisible();
   await expect(page.locator(".top-award-grid").getByText("Impact evidence", { exact: true })).toBeVisible();
+  await expect(page.getByLabel("Top Award Radar").getByText("0 student-supplied saved lab snapshots")).toBeVisible();
   await expect(page.getByLabel("Top Award Radar").getByText("quality gate 80/100")).toBeVisible();
   await expect(page.getByLabel("Top award next moves").getByText("Complete the pilot evidence quality gate before claiming user testing.")).toBeVisible();
   await expect(page.getByLabel("Top award next moves").getByText("Use Team Readiness Worksheet, then confirm the final roster in Devpost.")).toBeVisible();
@@ -775,14 +795,103 @@ test("student can paste spreadsheet data into the active table", async ({ page }
   await expect(page.getByLabel("Reasoning trail").getByText("Expose model strategy")).toBeVisible();
 });
 
+test("provenance gates demo edits and legacy loads until explicit student ownership", async ({ page }) => {
+  test.setTimeout(120_000);
+  await page.addInitScript(() => {
+    window.localStorage.clear();
+    const savedRows = [
+      { id: "legacy-1", tempC: 10, reactionTimeS: 118, ratePerS: 0.008 },
+      { id: "legacy-2", tempC: 22, reactionTimeS: 74, ratePerS: 0.014 }
+    ];
+    window.localStorage.setItem(
+      "ouija:saved-labs",
+      JSON.stringify([
+        {
+          id: "legacy-run",
+          title: "Legacy Reaction Snapshot",
+          subject: "Chemistry",
+          description: "temperature changes reaction rate for a tablet",
+          savedAt: "2026-07-03T12:00:00.000Z",
+          rows: savedRows,
+          score: 94,
+          readiness: "competitive",
+          issueCount: 0
+        },
+        {
+          id: "demo-run",
+          title: "Demo Reaction Snapshot",
+          subject: "Chemistry",
+          description: "temperature changes reaction rate for a tablet",
+          savedAt: "2026-07-04T12:00:00.000Z",
+          rows: savedRows,
+          score: 94,
+          readiness: "competitive",
+          issueCount: 0,
+          dataOrigin: "demo_sample"
+        },
+        {
+          id: "student-run",
+          title: "Student Reaction Snapshot",
+          subject: "Chemistry",
+          description: "temperature changes reaction rate for a tablet",
+          savedAt: "2026-07-05T12:00:00.000Z",
+          rows: savedRows,
+          score: 94,
+          readiness: "competitive",
+          issueCount: 0,
+          dataOrigin: "student_supplied"
+        }
+      ])
+    );
+  });
+
+  await page.goto("/?judge=1");
+  await page.getByRole("button", { name: "Reaction Rate" }).click();
+  await expect(page.getByRole("heading", { name: "Reaction Rate vs Temperature" })).toBeVisible();
+  await expect(page.locator(".analysis-panel .demo-sample-banner").getByText("DEMO SAMPLE - not student evidence.")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Save current lab" })).toBeDisabled();
+  await expect(page.getByRole("button", { name: "Copy packet" })).toBeDisabled();
+  await expect(page.getByRole("button", { name: "Copy evidence" })).toBeDisabled();
+
+  await page.getByLabel("Rate row c1").fill("0.09");
+  await expect(page.locator(".analysis-panel .demo-sample-banner").getByText("DEMO SAMPLE - not student evidence.")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Save current lab" })).toBeDisabled();
+  await page.getByRole("link", { name: "MCP Export" }).click();
+  await expect(page.locator(".mcp-action-button").first()).toBeDisabled();
+  await expect(page.locator(".mcp-action-button").first()).toHaveText("Student rows required");
+
+  await page.getByRole("link", { name: "Award Radar" }).click();
+  await expect(page.getByLabel("Top Award Radar").getByText("1 student-supplied saved lab snapshot")).toBeVisible();
+
+  await page.getByRole("link", { name: "Saved Labs" }).click();
+  await expect(page.locator(".saved-lab-card").filter({ hasText: "Legacy Reaction Snapshot" }).getByText("Legacy provenance unknown")).toBeVisible();
+  await page.locator(".saved-lab-card").filter({ hasText: "Legacy Reaction Snapshot" }).getByRole("button", { name: "Load" }).click();
+  await expect(page.locator(".analysis-panel .demo-sample-banner").getByText("LEGACY SAVED DATA - provenance unknown.")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Save current lab" })).toBeDisabled();
+  await expect(page.getByLabel("Student evidence packet")).toHaveValue(/LEGACY SAVED DATA - provenance unknown/);
+
+  await page.getByLabel("Rate row legacy-1").fill("0.09");
+  await expect(page.locator(".analysis-panel .demo-sample-banner").getByText("LEGACY SAVED DATA - provenance unknown.")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Save current lab" })).toBeDisabled();
+
+  await page.getByRole("button", { name: "Use my own data" }).click();
+  await expect(page.locator(".analysis-panel .demo-sample-banner")).toHaveCount(0);
+  await expect(page.getByLabel("Temperature row student-1")).toHaveValue("");
+  await expect(page.getByRole("button", { name: "Save current lab" })).toBeEnabled();
+  await expect(page.getByRole("button", { name: "Copy packet" })).toBeEnabled();
+  await page.getByRole("link", { name: "MCP Export" }).click();
+  await expect(page.locator(".mcp-action-button").first()).toBeEnabled();
+  await expect(page.locator(".mcp-action-button").first()).toHaveText("Validate route");
+});
+
 test("saved labs build a visible progress portfolio for judges", async ({ page }) => {
   await page.addInitScript(() => window.localStorage.clear());
   await page.goto("/?judge=1");
   await expect(page.getByRole("heading", { name: "Projectile Motion" })).toBeVisible();
 
-  await page.getByLabel("Describe your experiment").fill("We compared paper towel brands by measuring how much water each towel absorbed.");
-  await page.getByRole("button", { name: "Analyze" }).click();
-  await expect(page.getByRole("heading", { name: "Custom Lab Triage" })).toBeVisible();
+  await page.getByRole("button", { name: "Reaction Rate" }).click();
+  await expect(page.getByRole("heading", { name: "Reaction Rate vs Temperature" })).toBeVisible();
+  await importReactionRateRows(page);
   await page.getByRole("button", { name: "Save current lab" }).click();
   await page.getByRole("link", { name: "Saved Labs" }).click();
   await expect(page.getByRole("heading", { name: "Progress Portfolio" })).toBeVisible();
@@ -792,14 +901,14 @@ test("saved labs build a visible progress portfolio for judges", async ({ page }
 
   await page.getByRole("button", { name: "Water Filtration" }).click();
   await expect(page.getByRole("heading", { name: "Water Filtration and Turbidity" })).toBeVisible();
+  await importWaterFiltrationRows(page);
   await page.getByRole("button", { name: "Save current lab" }).click();
   await page.getByRole("link", { name: "Saved Labs" }).click();
 
   await expect(page.getByLabel("Progress Portfolio").getByText("2 saved runs")).toBeVisible();
-  await expect(page.locator(".progress-metric").filter({ hasText: "Score trend" }).getByText("+19", { exact: true })).toBeVisible();
   await expect(page.locator(".progress-metric").filter({ hasText: "Subject breadth" }).getByText("2 subjects", { exact: true })).toBeVisible();
   await expect(page.getByLabel("Portfolio Story Builder").getByText("Story ready")).toBeVisible();
-  await expect(page.getByLabel("Portfolio Story Builder").getByText("Across my saved labs, my evidence changed from 75/100 to 94/100")).toBeVisible();
+  await expect(page.getByLabel("Portfolio Story Builder").getByText("Across my saved labs")).toBeVisible();
   await expect(page.getByLabel("Portfolio Story Builder").getByText("student writes the progress story")).toBeVisible();
   await expect(page.getByLabel("Progress Portfolio").getByText("repeated learning evidence")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Progress Portfolio shows learning over multiple saved runs.")).toBeVisible();

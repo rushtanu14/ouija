@@ -28,6 +28,7 @@ import type {
   PreLabDesignCoach,
   ReliabilityCoach,
   SafetyCoach,
+  SavedDataOrigin,
   SourceCard,
   StudentDataRow,
   StudentImpactBrief,
@@ -974,11 +975,11 @@ export function mergeEnrichment(base: AnalyzeResult, enrichment: Partial<Analyze
   };
 }
 
-export function refreshResultForRows(result: AnalyzeResult, rows: StudentDataRow[]): AnalyzeResult {
+export function refreshResultForRows(result: AnalyzeResult, rows: StudentDataRow[], dataOrigin: SavedDataOrigin = result.dataOrigin): AnalyzeResult {
   const template = EXPERIMENT_TEMPLATES.find((candidate) => candidate.id === result.templateId);
   if (!template) return { ...result, rows };
 
-  const dataOrigin: DataOrigin = rows.length > 0 ? "student_supplied" : "demo_sample";
+  const labBriefDataOrigin: DataOrigin = dataOrigin === "student_supplied" ? "student_supplied" : "demo_sample";
   const preservedIssues = result.issues.filter((issue) => issue.id.startsWith("integrity-"));
   const issues = mergeIssues(preservedIssues, evaluateRows(result.templateId, rows));
   const hints = buildHints(template, issues);
@@ -987,7 +988,7 @@ export function refreshResultForRows(result: AnalyzeResult, rows: StudentDataRow
   const methodAudit = buildMethodAudit(template, rows, issues);
   const expectedComparison = buildExpectedComparison(template, rows);
   const nextTrialPlan = buildNextTrialPlan(template, rows, issues, methodAudit);
-  const labBrief = buildLabBrief(template, rows, issues, result.sources, dataOrigin);
+  const labBrief = buildLabBrief(template, rows, issues, result.sources, labBriefDataOrigin);
   const guidedFlow = buildGuidedLabFlow(result.classification.confidence, issues, safetyCoach, methodAudit, nextTrialPlan, labBrief);
   const reliabilityCoach = buildReliabilityCoach(template, rows, issues);
   const patternEvidence = buildPatternEvidence(template, rows, issues);
