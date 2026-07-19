@@ -884,6 +884,38 @@ test("provenance gates demo edits and legacy loads until explicit student owners
   await expect(page.locator(".mcp-action-button").first()).toHaveText("Validate route");
 });
 
+test("browser storage status supports saved-lab and pilot-evidence undo", async ({ page }) => {
+  await page.addInitScript(() => window.localStorage.clear());
+  await page.goto("/?judge=1");
+
+  await page.getByRole("button", { name: "Reaction Rate" }).click();
+  await expect(page.getByRole("heading", { name: "Reaction Rate vs Temperature" })).toBeVisible();
+  await importReactionRateRows(page);
+  await page.getByRole("button", { name: "Save current lab" }).click();
+  await page.getByRole("link", { name: "Saved Labs" }).click();
+
+  await expect(page.getByLabel("Browser storage status").getByText("Storage saved")).toBeVisible();
+  await expect(page.getByLabel("Browser storage status").getByText("Saved this student-supplied lab snapshot.")).toBeVisible();
+  const savedCard = page.locator(".saved-lab-card").filter({ hasText: "Reaction Rate vs Temperature" });
+  await expect(savedCard).toBeVisible();
+  await savedCard.getByRole("button", { name: /Delete Reaction Rate vs Temperature snapshot/ }).click();
+  await expect(savedCard).toHaveCount(0);
+  await expect(page.getByLabel("Browser storage status").getByText("Saved lab snapshot deleted.")).toBeVisible();
+  await page.getByLabel("Browser storage status").getByRole("button", { name: /Undo/ }).click();
+  await expect(page.locator(".saved-lab-card").filter({ hasText: "Reaction Rate vs Temperature" })).toBeVisible();
+  await expect(page.getByLabel("Browser storage status").getByText("Restored the deleted saved lab snapshot.")).toBeVisible();
+
+  await page.getByRole("link", { name: "Pilot Log" }).click();
+  await page.getByLabel("Time to graph Observation 1").fill("91");
+  await expect(page.getByLabel("Browser storage status").getByText("Pilot evidence saved locally.")).toBeVisible();
+  await page.getByRole("button", { name: "Clear pilot evidence" }).click();
+  await expect(page.getByLabel("Time to graph Observation 1")).toHaveValue("");
+  await expect(page.getByLabel("Browser storage status").getByRole("status").getByText("Pilot evidence cleared.")).toBeVisible();
+  await page.getByLabel("Browser storage status").getByRole("button", { name: /Undo/ }).click();
+  await expect(page.getByLabel("Time to graph Observation 1")).toHaveValue("91");
+  await expect(page.getByLabel("Browser storage status").getByText("Restored the cleared pilot evidence.")).toBeVisible();
+});
+
 test("saved labs build a visible progress portfolio for judges", async ({ page }) => {
   await page.addInitScript(() => window.localStorage.clear());
   await page.goto("/?judge=1");

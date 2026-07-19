@@ -39,6 +39,8 @@ import { requestAnalysis, requestEvaluation, requestMcpExport, requestMcpSession
 import { refreshResultForRows } from "./lib/analysis";
 import { buildConceptMasteryCheck } from "./lib/conceptMasteryCheck";
 import type { ConceptMasteryAnswerMap, ConceptMasteryCheck } from "./lib/conceptMasteryCheck";
+import { readStorageList, readStorageValue, writeStorageValue } from "./lib/browserStorage";
+import type { BrowserStorageLike, StorageResult } from "./lib/browserStorage";
 import { buildPasteExample, parsePastedTable } from "./lib/dataImport";
 import { buildEvidencePacket } from "./lib/evidencePacket";
 import { buildMcpIntegrationPlan } from "./lib/mcpIntegrationPlan";
@@ -118,6 +120,10 @@ interface SavedLab extends ProgressPortfolioSnapshot {
   rows: StudentDataRow[];
 }
 
+type PersistenceStatus = { tone: "success" | "warning"; message: string };
+type UndoAction =
+  | { kind: "saved_labs"; message: string; value: SavedLab[] }
+  | { kind: "pilot_evidence"; message: string; value: PilotEvidenceEntry[] };
 type LearningLevel = "middle" | "high";
 type ViewMode = "student" | "judge";
 
@@ -166,6 +172,8 @@ function getInitialViewMode(): ViewMode {
 }
 
 export function App() {
+  const [savedLabsLoadResult] = useState(() => loadSavedLabs());
+  const [pilotEvidenceLoadResult] = useState(() => loadPilotEvidenceEntries());
   const [description, setDescription] = useState(initialPrompt);
   const [learningLevel, setLearningLevel] = useState<LearningLevel>("middle");
   const [viewMode, setViewMode] = useState<ViewMode>(getInitialViewMode);
@@ -174,8 +182,12 @@ export function App() {
   const [rows, setRows] = useState<StudentDataRow[]>([]);
   const [reflectionAnswers, setReflectionAnswers] = useState<StudentReflectionAnswers>({});
   const [masteryAnswers, setMasteryAnswers] = useState<ConceptMasteryAnswerMap>({});
-  const [savedLabs, setSavedLabs] = useState<SavedLab[]>(loadSavedLabs);
-  const [pilotEvidenceEntries, setPilotEvidenceEntries] = useState<PilotEvidenceEntry[]>(loadPilotEvidenceEntries);
+  const [savedLabs, setSavedLabs] = useState<SavedLab[]>(savedLabsLoadResult.value);
+  const [pilotEvidenceEntries, setPilotEvidenceEntries] = useState<PilotEvidenceEntry[]>(pilotEvidenceLoadResult.value);
+  const [persistenceStatus, setPersistenceStatus] = useState<PersistenceStatus | null>(() =>
+    firstStorageWarning(savedLabsLoadResult, pilotEvidenceLoadResult)
+  );
+  const [undoAction, setUndoAction] = useState<UndoAction | null>(null);
   const [evaluationReport, setEvaluationReport] = useState<EvaluationReport | null>(null);
   const [runtimeProof, setRuntimeProof] = useState<RuntimeProof | null>(null);
   const [mcpBridgeStatus, setMcpBridgeStatus] = useState<McpBridgeStatus | null>(null);
@@ -255,7 +267,8 @@ export function App() {
     };
     const nextSavedLabs = [snapshot, ...savedLabs].slice(0, 6);
     setSavedLabs(nextSavedLabs);
-    storeSavedLabs(nextSavedLabs);
+    setUndoAction((current) => (current?.kind === "saved_labs" ? null : current));
+    persistSavedLabs(nextSavedLabs, "Saved this student-supplied lab snapshot.");
   }
 
   function loadSavedLab(savedLab: SavedLab) {
@@ -264,9 +277,13 @@ export function App() {
   }
 
   function deleteSavedLab(id: string) {
+    const deletedLab = savedLabs.find((savedLab) => savedLab.id === id);
+    if (!deletedLab) return;
+
     const nextSavedLabs = savedLabs.filter((savedLab) => savedLab.id !== id);
     setSavedLabs(nextSavedLabs);
-    storeSavedLabs(nextSavedLabs);
+    setUndoAction({ kind: "saved_labs", message: `${deletedLab.title} deleted.`, value: savedLabs });
+    persistSavedLabs(nextSavedLabs, "Saved lab snapshot deleted.");
   }
 
   function updateReflectionAnswer(promptId: keyof StudentReflectionAnswers, answer: string) {
@@ -286,13 +303,37 @@ export function App() {
   function updatePilotEvidenceEntry(id: string, patch: Partial<Omit<PilotEvidenceEntry, "id" | "label">>) {
     const nextEntries = pilotEvidenceEntries.map((entry) => (entry.id === id ? { ...entry, ...patch } : entry));
     setPilotEvidenceEntries(nextEntries);
-    storePilotEvidenceEntries(nextEntries);
+    setUndoAction((current) => (current?.kind === "pilot_evidence" ? null : current));
+    persistPilotEvidenceEntries(nextEntries, "Pilot evidence saved locally.");
   }
 
   function resetPilotEvidenceEntries() {
     const nextEntries = createInitialPilotEvidenceEntries();
     setPilotEvidenceEntries(nextEntries);
-    storePilotEvidenceEntries(nextEntries);
+    setUndoAction({ kind: "pilot_evidence", message: "Pilot evidence cleared.", value: pilotEvidenceEntries });
+    persistPilotEvidenceEntries(nextEntries, "Pilot evidence cleared.");
+  }
+
+  function undoLastStorageAction() {
+    if (!undoAction) return;
+
+    if (undoAction.kind === "saved_labs") {
+      setSavedLabs(undoAction.value);
+      persistSavedLabs(undoAction.value, "Restored the deleted saved lab snapshot.");
+    } else {
+      setPilotEvidenceEntries(undoAction.value);
+      persistPilotEvidenceEntries(undoAction.value, "Restored the cleared pilot evidence.");
+    }
+
+    setUndoAction(null);
+  }
+
+  function persistSavedLabs(nextSavedLabs: SavedLab[], successMessage: string) {
+    setPersistenceStatus(formatPersistenceResult(storeSavedLabs(nextSavedLabs), successMessage));
+  }
+
+  function persistPilotEvidenceEntries(nextEntries: PilotEvidenceEntry[], successMessage: string) {
+    setPersistenceStatus(formatPersistenceResult(storePilotEvidenceEntries(nextEntries), successMessage));
   }
 
   const chartData = useMemo(() => {
@@ -776,6 +817,7 @@ export function App() {
         </aside>
       </section>
       <section className="lower-workspace" aria-label="Saved labs and settings">
+        <StorageStatusPanel status={persistenceStatus} undoAction={undoAction} onUndo={undoLastStorageAction} />
         <SavedLabsPanel savedLabs={savedLabs} onLoad={loadSavedLab} onDelete={deleteSavedLab} />
         <ProgressPortfolioPanel portfolio={progressPortfolio} />
         {isJudgeMode ? (
@@ -2492,6 +2534,35 @@ function SavedLabsPanel({
   );
 }
 
+function StorageStatusPanel({
+  status,
+  undoAction,
+  onUndo
+}: {
+  status: PersistenceStatus | null;
+  undoAction: UndoAction | null;
+  onUndo: () => void;
+}) {
+  if (!status && !undoAction) return null;
+
+  return (
+    <section className="settings-panel storage-status-panel" aria-label="Browser storage status">
+      {status ? (
+        <p className={`import-status import-status-${status.tone === "warning" ? "error" : "success"}`} role="status">
+          <strong>{status.tone === "warning" ? "Storage warning" : "Storage saved"}</strong>
+          <span>{status.message}</span>
+        </p>
+      ) : null}
+      {undoAction ? (
+        <button className="secondary-action" type="button" onClick={onUndo}>
+          Undo
+          <span>{undoAction.message}</span>
+        </button>
+      ) : null}
+    </section>
+  );
+}
+
 function ProgressPortfolioPanel({ portfolio }: { portfolio: ProgressPortfolio }) {
   return (
     <section className={`progress-portfolio-panel progress-portfolio-${portfolio.status}`} id="progress" aria-label="Progress Portfolio">
@@ -3105,6 +3176,11 @@ function DataImportPanel({
 
   function importRows() {
     const parsed = parsePastedTable(draft, result.columns);
+
+    if (parsed.error) {
+      setStatus({ tone: "error", message: parsed.error });
+      return;
+    }
 
     if (parsed.rows.length === 0) {
       setStatus({ tone: "error", message: "No usable rows found." });
@@ -4874,24 +4950,42 @@ function getActiveDataOrigin(origin: SavedDataOrigin): DataOrigin {
   return origin === "student_supplied" ? "student_supplied" : "demo_sample";
 }
 
-function loadSavedLabs(): SavedLab[] {
-  if (typeof window === "undefined") return [];
-
-  try {
-    const parsed = JSON.parse(window.localStorage.getItem(savedLabsKey) ?? "[]");
-    return Array.isArray(parsed) ? parsed.slice(0, 6).map(normalizeSavedLab).filter((savedLab): savedLab is SavedLab => Boolean(savedLab)) : [];
-  } catch {
-    return [];
-  }
+function loadSavedLabs(): StorageResult<SavedLab[]> {
+  const result = readStorageList(getBrowserLocalStorage(), savedLabsKey, normalizeSavedLab, []);
+  return result.ok ? { ok: true, value: result.value.slice(0, 6) } : { ...result, value: result.value.slice(0, 6) };
 }
 
 function normalizeSavedLab(savedLab: unknown): SavedLab | null {
   if (!savedLab || typeof savedLab !== "object") return null;
 
-  const record = savedLab as SavedLab;
+  const record = savedLab as Partial<SavedLab>;
+  if (
+    !isNonEmptyString(record.id) ||
+    !isNonEmptyString(record.title) ||
+    typeof record.subject !== "string" ||
+    !isNonEmptyString(record.savedAt) ||
+    !isNonEmptyString(record.description) ||
+    !Array.isArray(record.rows) ||
+    typeof record.score !== "number" ||
+    !Number.isFinite(record.score) ||
+    !isTrackReadiness(record.readiness) ||
+    typeof record.issueCount !== "number" ||
+    !Number.isFinite(record.issueCount)
+  ) {
+    return null;
+  }
+
   return {
-    ...record,
-    dataOrigin: normalizeSavedDataOrigin((savedLab as Partial<SavedLab>).dataOrigin)
+    id: record.id,
+    title: record.title,
+    subject: record.subject,
+    savedAt: record.savedAt,
+    score: record.score,
+    readiness: record.readiness,
+    issueCount: record.issueCount,
+    dataOrigin: normalizeSavedDataOrigin(record.dataOrigin),
+    description: record.description,
+    rows: record.rows.map(normalizeStudentDataRow).filter((row): row is StudentDataRow => row !== null)
   };
 }
 
@@ -4903,23 +4997,69 @@ function normalizeSavedDataOrigin(value: unknown): SavedDataOrigin {
   return "legacy_unknown";
 }
 
-function loadPilotEvidenceEntries(): PilotEvidenceEntry[] {
-  if (typeof window === "undefined") return createInitialPilotEvidenceEntries();
+function loadPilotEvidenceEntries(): StorageResult<PilotEvidenceEntry[]> {
+  const result = readStorageValue(
+    getBrowserLocalStorage(),
+    pilotEvidenceKey,
+    normalizePilotEvidenceEntries,
+    createInitialPilotEvidenceEntries()
+  );
+
+  return result.ok
+    ? result
+    : {
+        ...result,
+        error: "Unable to read saved browser data. The app will keep working without loading saved pilot evidence."
+      };
+}
+
+function storeSavedLabs(savedLabs: SavedLab[]): StorageResult<null> {
+  return writeStorageValue(getBrowserLocalStorage(), savedLabsKey, savedLabs);
+}
+
+function storePilotEvidenceEntries(entries: PilotEvidenceEntry[]): StorageResult<null> {
+  return writeStorageValue(getBrowserLocalStorage(), pilotEvidenceKey, entries);
+}
+
+function firstStorageWarning(...results: StorageResult<unknown>[]): PersistenceStatus | null {
+  const warning = results.find((result) => !result.ok);
+  return warning && !warning.ok ? { tone: "warning", message: warning.error } : null;
+}
+
+function formatPersistenceResult(result: StorageResult<null>, successMessage: string): PersistenceStatus {
+  return result.ok ? { tone: "success", message: successMessage } : { tone: "warning", message: result.error };
+}
+
+function getBrowserLocalStorage(): BrowserStorageLike | null {
+  if (typeof window === "undefined") return null;
 
   try {
-    const parsed = JSON.parse(window.localStorage.getItem(pilotEvidenceKey) ?? "[]");
-    return normalizePilotEvidenceEntries(parsed);
+    return window.localStorage;
   } catch {
-    return createInitialPilotEvidenceEntries();
+    return null;
   }
 }
 
-function storeSavedLabs(savedLabs: SavedLab[]) {
-  if (typeof window === "undefined") return;
-  window.localStorage.setItem(savedLabsKey, JSON.stringify(savedLabs));
+function normalizeStudentDataRow(value: unknown): StudentDataRow | null {
+  if (!value || typeof value !== "object") return null;
+  const record = value as Record<string, unknown>;
+  if (!isNonEmptyString(record.id)) return null;
+
+  return Object.entries(record).reduce<StudentDataRow>(
+    (row, [key, rowValue]) => {
+      if (typeof rowValue === "string" || typeof rowValue === "number") {
+        return { ...row, [key]: rowValue };
+      }
+      return row;
+    },
+    { id: record.id }
+  );
 }
 
-function storePilotEvidenceEntries(entries: PilotEvidenceEntry[]) {
-  if (typeof window === "undefined") return;
-  window.localStorage.setItem(pilotEvidenceKey, JSON.stringify(entries));
+function isTrackReadiness(value: unknown): value is SavedLab["readiness"] {
+  return value === "competitive" || value === "submittable" || value === "needs_work";
+}
+
+function isNonEmptyString(value: unknown): value is string {
+  return typeof value === "string" && value.trim().length > 0;
 }

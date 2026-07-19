@@ -40,6 +40,46 @@ describe("parsePastedTable", () => {
     expect(parsed.rows[0]).toEqual({ id: "import-1", liquid: "oil, vegetable", observation: "top layer" });
   });
 
+  it("keeps quoted multiline cells and escaped quotes in one imported row", () => {
+    const columns: DataColumn[] = [
+      { key: "sample", label: "Sample", numeric: false },
+      { key: "observation", label: "Observation", numeric: false },
+      { key: "note", label: "Note", numeric: false }
+    ];
+
+    const parsed = parsePastedTable(
+      'Sample,Observation,Note\r\nA,"top layer\r\nstill separated","student wrote ""needs repeat"""',
+      columns
+    );
+
+    expect(parsed.error).toBeUndefined();
+    expect(parsed.usedHeader).toBe(true);
+    expect(parsed.rows).toEqual([
+      {
+        id: "import-1",
+        sample: "A",
+        observation: "top layer\nstill separated",
+        note: 'student wrote "needs repeat"'
+      }
+    ]);
+  });
+
+  it("preserves empty fields between delimiters", () => {
+    const parsed = parsePastedTable("10,,0.008\n22,74,", reactionColumns);
+
+    expect(parsed.rows).toEqual([
+      { id: "import-1", tempC: "10", reactionTimeS: "", ratePerS: "0.008" },
+      { id: "import-2", tempC: "22", reactionTimeS: "74", ratePerS: "" }
+    ]);
+  });
+
+  it("returns a clear error for malformed quoted input", () => {
+    const parsed = parsePastedTable('Temperature (C),Reaction time (s)\n"10,118', reactionColumns);
+
+    expect(parsed.rows).toEqual([]);
+    expect(parsed.error).toContain("quoted field");
+  });
+
   it("ignores blank pasted rows", () => {
     const parsed = parsePastedTable("\n\nTemperature (C),Reaction time (s),Rate (1/s)\n\n", reactionColumns);
 
