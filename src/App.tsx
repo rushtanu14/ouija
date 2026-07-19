@@ -87,6 +87,7 @@ import type {
   ReliabilityCoach,
   RuntimeProof,
   SafetyCoach,
+  SavedDataOrigin,
   StudentDataRow,
   StudentImpactBrief,
   StudentPilotStudyKit,
@@ -223,7 +224,7 @@ export function App() {
   }
 
   function saveCurrentLab() {
-    if (!result) return;
+    if (!result || result.dataOrigin !== "student_supplied") return;
 
     const snapshot: SavedLab = {
       id: `${Date.now()}-${result.templateId}`,
@@ -234,7 +235,8 @@ export function App() {
       rows,
       score: result.trackEvidence.score,
       readiness: result.trackEvidence.readiness,
-      issueCount: result.issues.filter((issue) => issue.severity !== "info").length
+      issueCount: result.issues.filter((issue) => issue.severity !== "info").length,
+      dataOrigin: result.dataOrigin
     };
     const nextSavedLabs = [snapshot, ...savedLabs].slice(0, 6);
     setSavedLabs(nextSavedLabs);
@@ -316,6 +318,7 @@ export function App() {
   }, [description, evidencePacket, mcpBridgeStatus, progressPortfolio, result, rows]);
   const isJudgeMode = viewMode === "judge";
   const navLinks = isJudgeMode ? judgeNavLinks : studentNavLinks;
+  const studentEvidenceReady = result?.dataOrigin === "student_supplied";
 
   function changeViewMode(nextMode: ViewMode) {
     setViewMode(nextMode);
@@ -332,7 +335,7 @@ export function App() {
   }
 
   async function validateMcpAction(actionId: McpIntegrationActionId) {
-    if (!result || !mcpIntegrationPlan) return;
+    if (!result || !mcpIntegrationPlan || result.dataOrigin !== "student_supplied") return;
 
     setMcpExportStatus("loading");
     setMcpExportError("");
@@ -454,7 +457,13 @@ export function App() {
             <Search size={18} />
             {status === "loading" ? "Analyzing..." : "Analyze"}
           </button>
-          <button className="secondary-action" type="button" onClick={saveCurrentLab} disabled={!result}>
+          <button
+            className="secondary-action"
+            type="button"
+            onClick={saveCurrentLab}
+            disabled={!studentEvidenceReady}
+            title={studentEvidenceReady ? "Save this student-supplied run" : "Student-supplied rows are required before saving evidence."}
+          >
             <Save size={17} />
             Save current lab
           </button>
@@ -490,6 +499,12 @@ export function App() {
                   <span key={concept}>{concept}</span>
                 ))}
               </div>
+              {result.dataOrigin === "demo_sample" ? (
+                <div className="demo-sample-banner" role="status">
+                  <strong>DEMO SAMPLE - not student evidence.</strong>
+                  <span>Edit, paste, or import rows to enable saved progress, pilot evidence, Evidence Packet copy, and MCP handoff.</span>
+                </div>
+              ) : null}
 
               <RunSnapshotPanel result={result} evaluationReport={evaluationReport} />
               <StudentImpactBriefPanel brief={result.studentImpactBrief} />
@@ -539,6 +554,7 @@ export function App() {
               <PilotEvidenceTrackerPanel
                 entries={pilotEvidenceEntries}
                 summary={pilotEvidenceSummary}
+                enabled={studentEvidenceReady}
                 onEntryChange={updatePilotEvidenceEntry}
                 onReset={resetPilotEvidenceEntries}
               />
@@ -550,7 +566,7 @@ export function App() {
                 />
               ) : null}
               <LabBriefPanel brief={result.labBrief} />
-              <EvidencePacketPanel packet={evidencePacket} />
+              <EvidencePacketPanel packet={evidencePacket} enabled={studentEvidenceReady} />
               {isJudgeMode ? (
                 <>
                   <ModelStrategyPanel strategy={result.modelStrategy} />
@@ -624,6 +640,7 @@ export function App() {
               sessionResult={mcpSessionResult}
               exportStatus={mcpExportStatus}
               exportError={mcpExportError}
+              enabled={studentEvidenceReady}
               onValidateAction={validateMcpAction}
             />
             <EvaluationBenchPanel report={evaluationReport} />
@@ -2386,6 +2403,7 @@ function McpIntegrationCoachPanel({
   sessionResult,
   exportStatus,
   exportError,
+  enabled,
   onValidateAction
 }: {
   plan: McpIntegrationPlan | null;
@@ -2394,6 +2412,7 @@ function McpIntegrationCoachPanel({
   sessionResult: McpBridgeSessionResponse | null;
   exportStatus: "idle" | "loading" | "error";
   exportError: string;
+  enabled: boolean;
   onValidateAction: (actionId: McpIntegrationActionId) => void;
 }) {
   const [copyStatus, setCopyStatus] = useState("");
@@ -2404,6 +2423,11 @@ function McpIntegrationCoachPanel({
   }, [payloadText]);
 
   async function copyPayload() {
+    if (!enabled) {
+      setCopyStatus("Student-supplied rows are required before copying an MCP handoff preview.");
+      return;
+    }
+
     if (!payloadText || !navigator.clipboard) {
       setCopyStatus("Select the preview text to copy.");
       return;
@@ -2428,13 +2452,19 @@ function McpIntegrationCoachPanel({
           <Workflow size={18} />
           <h3>MCP Integration Coach</h3>
         </div>
-        <button type="button" onClick={() => void copyPayload()} disabled={!plan}>
+        <button type="button" onClick={() => void copyPayload()} disabled={!plan || !enabled}>
           <Copy size={16} />
           Copy preview
         </button>
       </div>
       {plan ? (
         <>
+          {!enabled ? (
+            <div className="demo-sample-banner" role="status">
+              <strong>MCP handoff locked for demo samples.</strong>
+              <span>Preview stays visible, but validate/copy actions require student-supplied rows.</span>
+            </div>
+          ) : null}
           <div className="mcp-summary">
             <div>
               <p className="section-label">Composio route</p>
@@ -2565,9 +2595,9 @@ function McpIntegrationCoachPanel({
                   className="mcp-action-button"
                   type="button"
                   onClick={() => onValidateAction(action.id)}
-                  disabled={exportStatus === "loading"}
+                  disabled={!enabled || exportStatus === "loading"}
                 >
-                  {exportStatus === "loading" ? "Validating..." : "Validate route"}
+                  {!enabled ? "Student rows required" : exportStatus === "loading" ? "Validating..." : "Validate route"}
                 </button>
               </article>
             ))}
@@ -3390,11 +3420,13 @@ function StudentPilotStudyKitPanel({ kit }: { kit: StudentPilotStudyKit }) {
 function PilotEvidenceTrackerPanel({
   entries,
   summary,
+  enabled,
   onEntryChange,
   onReset
 }: {
   entries: PilotEvidenceEntry[];
   summary: PilotEvidenceSummary;
+  enabled: boolean;
   onEntryChange: (id: string, patch: Partial<Omit<PilotEvidenceEntry, "id" | "label">>) => void;
   onReset: () => void;
 }) {
@@ -3406,6 +3438,11 @@ function PilotEvidenceTrackerPanel({
   }, [exportText]);
 
   async function copyPilotEvidence() {
+    if (!enabled) {
+      setCopyStatus("Student-supplied rows are required before copying pilot evidence.");
+      return;
+    }
+
     if (!navigator.clipboard) {
       setCopyStatus("Select the export text to copy.");
       return;
@@ -3430,11 +3467,17 @@ function PilotEvidenceTrackerPanel({
           <ClipboardCheck size={18} />
           <h3>Pilot Evidence Tracker</h3>
         </div>
-        <button type="button" onClick={onReset}>
+        <button type="button" onClick={onReset} disabled={!enabled}>
           <Trash2 size={16} />
           Clear pilot evidence
         </button>
       </div>
+      {!enabled ? (
+        <div className="demo-sample-banner" role="status">
+          <strong>Pilot evidence locked for demo samples.</strong>
+          <span>Collect or enter student-supplied rows before editing or copying pilot evidence.</span>
+        </div>
+      ) : null}
       <div className="pilot-evidence-summary">
         <div>
           <p className="section-label">Evidence status</p>
@@ -3504,6 +3547,7 @@ function PilotEvidenceTrackerPanel({
                 value={entry.timeToGraphSeconds}
                 onChange={(event) => onEntryChange(entry.id, { timeToGraphSeconds: event.target.value })}
                 placeholder="seconds"
+                disabled={!enabled}
               />
             </label>
             <label>
@@ -3512,6 +3556,7 @@ function PilotEvidenceTrackerPanel({
                 aria-label={`Confidence before ${entry.label}`}
                 value={entry.confidenceBefore}
                 onChange={(event) => onEntryChange(entry.id, { confidenceBefore: event.target.value })}
+                disabled={!enabled}
               >
                 <option value="">Not rated</option>
                 <option value="1">1 - lost</option>
@@ -3527,6 +3572,7 @@ function PilotEvidenceTrackerPanel({
                 aria-label={`Confidence after ${entry.label}`}
                 value={entry.confidenceAfter}
                 onChange={(event) => onEntryChange(entry.id, { confidenceAfter: event.target.value })}
+                disabled={!enabled}
               >
                 <option value="">Not rated</option>
                 <option value="1">1 - lost</option>
@@ -3542,6 +3588,7 @@ function PilotEvidenceTrackerPanel({
                 aria-label={`Issue spotted ${entry.label}`}
                 value={entry.issueCaught}
                 onChange={(event) => onEntryChange(entry.id, { issueCaught: event.target.value as PilotEvidenceEntry["issueCaught"] })}
+                disabled={!enabled}
               >
                 <option value="">Not recorded</option>
                 <option value="yes">Yes</option>
@@ -3559,6 +3606,7 @@ function PilotEvidenceTrackerPanel({
                     reflectionReadiness: event.target.value as PilotEvidenceEntry["reflectionReadiness"]
                   })
                 }
+                disabled={!enabled}
               >
                 <option value="">Not recorded</option>
                 <option value="ready">Ready</option>
@@ -3574,6 +3622,7 @@ function PilotEvidenceTrackerPanel({
                 value={entry.note}
                 onChange={(event) => onEntryChange(entry.id, { note: event.target.value })}
                 placeholder="No names, contact info, grades, faces, or private class details."
+                disabled={!enabled}
               />
             </label>
           </article>
@@ -3585,7 +3634,7 @@ function PilotEvidenceTrackerPanel({
             <p className="section-label">Pilot evidence export</p>
             <strong>CSV-ready anonymous summary</strong>
           </div>
-          <button type="button" onClick={() => void copyPilotEvidence()}>
+          <button type="button" onClick={() => void copyPilotEvidence()} disabled={!enabled}>
             <Copy size={16} />
             Copy evidence
           </button>
@@ -4285,7 +4334,7 @@ function NextTrialPanel({ plan }: { plan: NextTrialPlan }) {
   );
 }
 
-function EvidencePacketPanel({ packet }: { packet: string }) {
+function EvidencePacketPanel({ packet, enabled }: { packet: string; enabled: boolean }) {
   const [copyStatus, setCopyStatus] = useState("");
 
   useEffect(() => {
@@ -4293,6 +4342,11 @@ function EvidencePacketPanel({ packet }: { packet: string }) {
   }, [packet]);
 
   async function copyPacket() {
+    if (!enabled) {
+      setCopyStatus("Student-supplied rows are required before copying an Evidence Packet.");
+      return;
+    }
+
     if (!navigator.clipboard) {
       setCopyStatus("Select the packet text to copy.");
       return;
@@ -4313,11 +4367,17 @@ function EvidencePacketPanel({ packet }: { packet: string }) {
           <FileText size={18} />
           <h3>Evidence Packet</h3>
         </div>
-        <button type="button" onClick={() => void copyPacket()}>
+        <button type="button" onClick={() => void copyPacket()} disabled={!enabled}>
           <Copy size={16} />
           Copy packet
         </button>
       </div>
+      {!enabled ? (
+        <div className="demo-sample-banner" role="status">
+          <strong>DEMO SAMPLE preview only.</strong>
+          <span>The packet text is visible for review, but copy is locked until rows are student-supplied.</span>
+        </div>
+      ) : null}
       <textarea className="packet-preview" aria-label="Student evidence packet" readOnly value={packet} />
       {copyStatus ? (
         <p className="packet-status" aria-live="polite">
@@ -4625,10 +4685,28 @@ function loadSavedLabs(): SavedLab[] {
 
   try {
     const parsed = JSON.parse(window.localStorage.getItem(savedLabsKey) ?? "[]");
-    return Array.isArray(parsed) ? parsed.slice(0, 6) : [];
+    return Array.isArray(parsed) ? parsed.slice(0, 6).map(normalizeSavedLab).filter((savedLab): savedLab is SavedLab => Boolean(savedLab)) : [];
   } catch {
     return [];
   }
+}
+
+function normalizeSavedLab(savedLab: unknown): SavedLab | null {
+  if (!savedLab || typeof savedLab !== "object") return null;
+
+  const record = savedLab as SavedLab;
+  return {
+    ...record,
+    dataOrigin: normalizeSavedDataOrigin((savedLab as Partial<SavedLab>).dataOrigin)
+  };
+}
+
+function normalizeSavedDataOrigin(value: unknown): SavedDataOrigin {
+  if (value === "demo_sample" || value === "student_supplied" || value === "legacy_unknown") {
+    return value;
+  }
+
+  return "legacy_unknown";
 }
 
 function loadPilotEvidenceEntries(): PilotEvidenceEntry[] {

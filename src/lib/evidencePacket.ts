@@ -23,6 +23,9 @@ export function buildEvidencePacket(
   return [
     `# Ouija Evidence Packet: ${result.classification.title}`,
     "",
+    "## Data Provenance",
+    formatDataProvenance(result),
+    "",
     "## Student Description",
     description.trim(),
     "",
@@ -371,6 +374,20 @@ export function buildEvidencePacket(
     "",
     "## Integrity Boundary",
     "Use this packet to write your own conclusion. Ouija does not write the final lab report."
+  ].join("\n");
+}
+
+function formatDataProvenance(result: AnalyzeResult): string {
+  if (result.dataOrigin === "student_supplied") {
+    return [
+      "STUDENT SUPPLIED - eligible for student evidence gates.",
+      "Rows came from student-entered, edited, or pasted data for this run."
+    ].join("\n");
+  }
+
+  return [
+    "DEMO SAMPLE - not student evidence.",
+    "Do not use these sample rows as student observations, saved learning progress, pilot evidence, or external handoff proof."
   ].join("\n");
 }
 

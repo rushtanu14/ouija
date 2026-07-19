@@ -2,28 +2,32 @@ import type { ProgressPortfolio, ProgressPortfolioSnapshot, TrackEvidence } from
 
 export function buildProgressPortfolio(snapshots: ProgressPortfolioSnapshot[]): ProgressPortfolio {
   const orderedSnapshots = [...snapshots].sort((left, right) => Date.parse(left.savedAt) - Date.parse(right.savedAt));
-  const savedCount = orderedSnapshots.length;
-  const subjects = new Set(orderedSnapshots.map((snapshot) => snapshot.subject));
-  const first = orderedSnapshots[0];
-  const latest = orderedSnapshots.at(-1);
-  const strongest = [...orderedSnapshots].sort((left, right) => right.score - left.score)[0];
+  const studentSnapshots = orderedSnapshots.filter((snapshot) => getSnapshotDataOrigin(snapshot) === "student_supplied");
+  const excludedCount = orderedSnapshots.length - studentSnapshots.length;
+  const savedCount = studentSnapshots.length;
+  const studentSubjects = new Set(studentSnapshots.map((snapshot) => snapshot.subject));
+  const first = studentSnapshots[0];
+  const latest = studentSnapshots.at(-1);
+  const strongest = [...studentSnapshots].sort((left, right) => right.score - left.score)[0];
   const scoreDelta = first && latest ? latest.score - first.score : 0;
   const bestReadiness = strongest ? formatReadiness(strongest.readiness) : "No saved runs";
-  const subjectNames = Array.from(subjects);
+  const subjectNames = Array.from(studentSubjects);
 
   return {
-    status: savedCount === 0 ? "empty" : savedCount === 1 ? "building" : "evidence_ready",
-    summary: buildSummary(savedCount, scoreDelta, subjects.size),
+    status: orderedSnapshots.length === 0 ? "empty" : savedCount >= 2 ? "evidence_ready" : "building",
+    summary: buildSummary(savedCount, scoreDelta, studentSubjects.size, excludedCount),
     metrics: [
       {
         id: "saved-runs",
         label: "Saved runs",
-        value: `${savedCount} saved run${savedCount === 1 ? "" : "s"}`,
+        value: formatSavedRunValue(savedCount, excludedCount),
         status: savedCount >= 2 ? "strong" : savedCount === 1 ? "watch" : "needs_action",
         detail:
           savedCount >= 2
-            ? "Multiple snapshots let a judge see more than one lab moment."
-            : "Save one more checked lab before presenting progress."
+            ? "Multiple student-supplied snapshots let a judge see more than one lab moment."
+            : excludedCount > 0
+              ? "Demo and legacy snapshots stay visible, but only student-supplied rows count as evidence."
+              : "Save one more checked lab before presenting progress."
       },
       {
         id: "score-trend",
@@ -38,10 +42,10 @@ export function buildProgressPortfolio(snapshots: ProgressPortfolioSnapshot[]): 
       {
         id: "subject-breadth",
         label: "Subject breadth",
-        value: `${subjects.size} subject${subjects.size === 1 ? "" : "s"}`,
-        status: subjects.size >= 2 ? "strong" : subjects.size === 1 ? "watch" : "needs_action",
+        value: `${studentSubjects.size} subject${studentSubjects.size === 1 ? "" : "s"}`,
+        status: studentSubjects.size >= 2 ? "strong" : studentSubjects.size === 1 ? "watch" : "needs_action",
         detail:
-          subjects.size >= 2
+          studentSubjects.size >= 2
             ? "Saved work spans more than one science area."
             : "Save a different subject to prove transfer across labs."
       },
@@ -55,18 +59,23 @@ export function buildProgressPortfolio(snapshots: ProgressPortfolioSnapshot[]): 
           : "No saved run is available yet."
       }
     ],
-    milestones: buildMilestones(orderedSnapshots, strongest),
-    story: buildPortfolioStory(orderedSnapshots, subjectNames, scoreDelta, strongest),
-    nextAction: buildNextAction(savedCount, subjects.size, scoreDelta),
+    milestones: buildMilestones(studentSnapshots, strongest),
+    story: buildPortfolioStory(studentSnapshots, subjectNames, scoreDelta, strongest),
+    nextAction: buildNextAction(savedCount, studentSubjects.size, scoreDelta, excludedCount),
     judgeTakeaway:
       savedCount >= 2
         ? "Progress Portfolio turns one-off AI help into repeated learning evidence across saved lab runs."
-        : "Progress Portfolio is ready to prove repeated learning once a student saves at least two checked labs."
+        : excludedCount > 0
+          ? "Demo and legacy snapshots are excluded from student-evidence readiness until student-supplied rows are saved."
+          : "Progress Portfolio is ready to prove repeated learning once a student saves at least two checked labs."
   };
 }
 
-function buildSummary(savedCount: number, scoreDelta: number, subjectCount: number) {
+function buildSummary(savedCount: number, scoreDelta: number, subjectCount: number, excludedCount: number) {
   if (savedCount === 0) {
+    if (excludedCount > 0) {
+      return `0 student-supplied saved labs are ready for progress evidence; ${excludedCount} demo or legacy snapshot${excludedCount === 1 ? "" : "s"} excluded.`;
+    }
     return "Save at least two checked labs to build a progress portfolio.";
   }
 
@@ -75,6 +84,14 @@ function buildSummary(savedCount: number, scoreDelta: number, subjectCount: numb
   }
 
   return `${savedCount} saved labs show a ${formatScoreDelta(scoreDelta)} score trend across ${subjectCount} subject${subjectCount === 1 ? "" : "s"}.`;
+}
+
+function formatSavedRunValue(savedCount: number, excludedCount: number) {
+  if (excludedCount > 0) {
+    return `${savedCount} student-supplied run${savedCount === 1 ? "" : "s"}`;
+  }
+
+  return `${savedCount} saved run${savedCount === 1 ? "" : "s"}`;
 }
 
 function buildMilestones(
@@ -171,8 +188,12 @@ function buildPortfolioStory(
   };
 }
 
-function buildNextAction(savedCount: number, subjectCount: number, scoreDelta: number) {
+function buildNextAction(savedCount: number, subjectCount: number, scoreDelta: number, excludedCount: number) {
   if (savedCount === 0) {
+    if (excludedCount > 0) {
+      return "Save a student-supplied lab before using demo or legacy snapshots as progress evidence.";
+    }
+
     return "Save this checked lab, then save a second run after revising or trying another subject.";
   }
 
@@ -189,6 +210,10 @@ function buildNextAction(savedCount: number, subjectCount: number, scoreDelta: n
   }
 
   return "Use the portfolio in the Judge Brief to show repeated progress, breadth, and a student-owned next step.";
+}
+
+function getSnapshotDataOrigin(snapshot: ProgressPortfolioSnapshot) {
+  return snapshot.dataOrigin ?? "legacy_unknown";
 }
 
 function formatScoreDelta(scoreDelta: number) {

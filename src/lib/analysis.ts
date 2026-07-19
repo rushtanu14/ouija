@@ -8,6 +8,7 @@ import type {
   CustomLabPlanner,
   CustomPatternArchetype,
   CustomLabTriage,
+  DataOrigin,
   DataHandlingLedger,
   DevelopmentJourney,
   ExpectedComparison,
@@ -69,7 +70,8 @@ export function matchExperiment(description: string): {
 
 export function analyzeExperiment(request: AnalyzeRequest): AnalyzeResult {
   const { template, confidence, candidates } = matchExperiment(request.description);
-  const rows = normalizeRows(request.rows?.length ? request.rows : template.sampleRows, template);
+  const dataOrigin: DataOrigin = request.rows?.length ? "student_supplied" : "demo_sample";
+  const rows = normalizeRows(dataOrigin === "student_supplied" ? request.rows ?? [] : template.sampleRows, template);
   const issues = evaluateRows(template.id, rows);
   const integrityIssues = detectIntegrityRisk(request.description);
   const coverageIssues = buildCoverageIssues(confidence, template);
@@ -77,7 +79,7 @@ export function analyzeExperiment(request: AnalyzeRequest): AnalyzeResult {
   const hints = buildHints(template, allIssues);
   const conceptCoach = buildConceptCoach(template);
   const safetyCoach = buildSafetyCoach(template, allIssues);
-  const labBrief = buildLabBrief(template, rows, allIssues, template.fallbackSources);
+  const labBrief = buildLabBrief(template, rows, allIssues, template.fallbackSources, dataOrigin);
   const methodAudit = buildMethodAudit(template, rows, allIssues);
   const expectedComparison = buildExpectedComparison(template, rows);
   const reliabilityCoach = buildReliabilityCoach(template, rows, allIssues);
@@ -241,6 +243,7 @@ export function analyzeExperiment(request: AnalyzeRequest): AnalyzeResult {
 
   return {
     templateId: template.id,
+    dataOrigin,
     classification: {
       subject: template.subject,
       title: template.title,
@@ -975,6 +978,7 @@ export function refreshResultForRows(result: AnalyzeResult, rows: StudentDataRow
   const template = EXPERIMENT_TEMPLATES.find((candidate) => candidate.id === result.templateId);
   if (!template) return { ...result, rows };
 
+  const dataOrigin: DataOrigin = rows.length > 0 ? "student_supplied" : "demo_sample";
   const preservedIssues = result.issues.filter((issue) => issue.id.startsWith("integrity-"));
   const issues = mergeIssues(preservedIssues, evaluateRows(result.templateId, rows));
   const hints = buildHints(template, issues);
@@ -983,7 +987,7 @@ export function refreshResultForRows(result: AnalyzeResult, rows: StudentDataRow
   const methodAudit = buildMethodAudit(template, rows, issues);
   const expectedComparison = buildExpectedComparison(template, rows);
   const nextTrialPlan = buildNextTrialPlan(template, rows, issues, methodAudit);
-  const labBrief = buildLabBrief(template, rows, issues, result.sources);
+  const labBrief = buildLabBrief(template, rows, issues, result.sources, dataOrigin);
   const guidedFlow = buildGuidedLabFlow(result.classification.confidence, issues, safetyCoach, methodAudit, nextTrialPlan, labBrief);
   const reliabilityCoach = buildReliabilityCoach(template, rows, issues);
   const patternEvidence = buildPatternEvidence(template, rows, issues);
@@ -1144,6 +1148,7 @@ export function refreshResultForRows(result: AnalyzeResult, rows: StudentDataRow
 
   return {
     ...result,
+    dataOrigin,
     rows,
     issues,
     hints,
@@ -1209,12 +1214,14 @@ export function buildLabBrief(
   template: ExperimentTemplate,
   rows: StudentDataRow[],
   issues: Issue[],
-  sources: SourceCard[]
+  sources: SourceCard[],
+  dataOrigin: DataOrigin
 ): LabBrief {
   const errorCount = issues.filter((issue) => issue.severity === "error").length;
   const warningCount = issues.filter((issue) => issue.severity === "warning").length;
   const status: LabBrief["status"] = errorCount > 0 ? "blocked" : warningCount > 0 ? "needs_checks" : "ready_to_reason";
-  const signal = buildBriefSignal(errorCount, warningCount);
+  const signal = buildBriefSignal(errorCount, warningCount, dataOrigin);
+  const isStudentSupplied = dataOrigin === "student_supplied";
   const completeDataRows = rows.filter((row) =>
     template.columns.every((column) => {
       const value = row[column.key];
@@ -1236,8 +1243,10 @@ export function buildLabBrief(
       {
         id: "data-rows",
         label: "Usable data rows",
-        detail: `${completeDataRows.length} of ${rows.length} rows have every required table cell filled in.`,
-        complete: rows.length > 0 && completeDataRows.length === rows.length
+        detail: isStudentSupplied
+          ? `${completeDataRows.length} of ${rows.length} rows have every required table cell filled in.`
+          : `${completeDataRows.length} demo sample row${completeDataRows.length === 1 ? "" : "s"} are shown for practice only.`,
+        complete: isStudentSupplied && rows.length > 0 && completeDataRows.length === rows.length
       },
       {
         id: "data-quality",
@@ -1261,7 +1270,11 @@ export function buildLabBrief(
   };
 }
 
-function buildBriefSignal(errorCount: number, warningCount: number): string {
+function buildBriefSignal(errorCount: number, warningCount: number, dataOrigin: DataOrigin): string {
+  if (dataOrigin === "demo_sample") {
+    return "Demo sample only - not student observations.";
+  }
+
   if (errorCount > 0) {
     return `${errorCount} error${errorCount === 1 ? "" : "s"} to fix before reasoning.`;
   }

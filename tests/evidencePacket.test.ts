@@ -3,6 +3,34 @@ import { analyzeExperiment } from "../src/lib/analysis";
 import { buildEvidencePacket } from "../src/lib/evidencePacket";
 
 describe("buildEvidencePacket", () => {
+  it("labels demo sample packets as not student evidence", () => {
+    const result = analyzeExperiment({
+      description: "We launched a ball at angles and measured range."
+    });
+
+    const packet = buildEvidencePacket(result, result.rows, "We launched a ball at angles and measured range.");
+
+    expect(result.dataOrigin).toBe("demo_sample");
+    expect(packet).toContain("DEMO SAMPLE - not student evidence");
+    expect(packet).toContain("Do not use these sample rows as student observations");
+  });
+
+  it("labels student-supplied packets as student evidence", () => {
+    const result = analyzeExperiment({
+      description: "temperature changes reaction rate for a tablet",
+      rows: [
+        { id: "student-1", tempC: 10, reactionTimeS: 118, ratePerS: 0.008 },
+        { id: "student-2", tempC: 22, reactionTimeS: 74, ratePerS: 0.014 }
+      ]
+    });
+
+    const packet = buildEvidencePacket(result, result.rows, "temperature changes reaction rate for a tablet");
+
+    expect(result.dataOrigin).toBe("student_supplied");
+    expect(packet).toContain("STUDENT SUPPLIED - eligible for student evidence gates");
+    expect(packet).not.toContain("DEMO SAMPLE - not student evidence");
+  });
+
   it("creates a student-owned packet without writing the final conclusion", () => {
     const result = analyzeExperiment({
       description: "We launched a ball at angles and measured range."

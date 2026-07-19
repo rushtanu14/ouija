@@ -15,6 +15,35 @@ describe("experiment matching", () => {
 });
 
 describe("fallback analysis", () => {
+  it("marks omitted or empty rows as demo sample data", () => {
+    const omittedRows = analyzeExperiment({
+      description: "We launched a ball at angles and measured range."
+    });
+    const emptyRows = analyzeExperiment({
+      description: "We launched a ball at angles and measured range.",
+      rows: []
+    });
+
+    expect(omittedRows.dataOrigin).toBe("demo_sample");
+    expect(emptyRows.dataOrigin).toBe("demo_sample");
+    expect(omittedRows.rows.length).toBeGreaterThan(0);
+    expect(omittedRows.labBrief.signal).toContain("Demo sample");
+    expect(refreshResultForRows(omittedRows, []).dataOrigin).toBe("demo_sample");
+  });
+
+  it("marks caller-supplied rows as student supplied data", () => {
+    const result = analyzeExperiment({
+      description: "We launched a ball at angles and measured range.",
+      rows: [
+        { id: "student-1", angleDeg: 20, launchSpeedMs: 12, rangeM: 9.2, timeS: 1.0 },
+        { id: "student-2", angleDeg: 35, launchSpeedMs: 12, rangeM: 13.1, timeS: 1.4 }
+      ]
+    });
+
+    expect(result.dataOrigin).toBe("student_supplied");
+    expect(result.labBrief.signal).not.toContain("Demo sample");
+  });
+
   it("returns usable expected results, columns, sources, and hints without credentials", () => {
     const result = analyzeExperiment({
       description: "We launched a ball at angles and measured range."

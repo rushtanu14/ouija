@@ -2,6 +2,10 @@ export type SubjectArea = "Physics" | "Chemistry" | "Biology" | "Earth Science";
 
 export type GraphKind = "line" | "scatter" | "stage";
 
+export type DataOrigin = "demo_sample" | "student_supplied";
+
+export type SavedDataOrigin = DataOrigin | "legacy_unknown";
+
 export interface StudentDataRow {
   id: string;
   [key: string]: string | number;
@@ -553,6 +557,7 @@ export interface ProgressPortfolioSnapshot {
   score: number;
   readiness: TrackEvidence["readiness"];
   issueCount: number;
+  dataOrigin: SavedDataOrigin;
 }
 
 export interface ProgressPortfolioMetric {
@@ -977,6 +982,7 @@ export interface AnalyzeRequest {
 
 export interface AnalyzeResult {
   templateId: string;
+  dataOrigin: DataOrigin;
   classification: {
     subject: SubjectArea;
     title: string;
