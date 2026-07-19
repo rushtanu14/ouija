@@ -9,7 +9,7 @@ import { enrichWithOpenAIWebSearch, externalGroundingFallbackNote, shouldUseExte
 import { validateAnalyzeRequest } from "./requestValidation";
 import { consumeRateLimit, resolveAnalyzeRateLimit } from "./rateLimit";
 import { isAllowedOrigin } from "./httpSecurity";
-import { applyApiHeaders, handleOptions, sendApiResult, sendError, sendJson } from "./httpResponse";
+import { applyApiHeaders, handleOptions, sendApiResult, sendError, sendJson, sendUnexpectedApiError } from "./httpResponse";
 import type { NextFunction, Request, Response } from "express";
 
 interface AppOptions {
@@ -151,11 +151,6 @@ export function createApp(options: AppOptions = {}) {
     }
   });
 
-  app.use("/api", (req, res) => {
-    applyApiHeaders(req, res, "GET, POST, OPTIONS");
-    sendError(res, 404, "API route not found.");
-  });
-
   if (options.staticDir) {
     app.use(express.static(options.staticDir));
     app.get("*", (req, res, next) => {
@@ -167,11 +162,22 @@ export function createApp(options: AppOptions = {}) {
     });
   }
 
+  app.use("/api", apiErrorMiddleware);
+
+  app.use("/api", (req, res) => {
+    applyApiHeaders(req, res, "GET, POST, OPTIONS");
+    sendError(res, 404, "API route not found.");
+  });
+
   return app;
 }
 
 function allowCorsOrigin(origin: string | undefined, callback: (error: Error | null, allow?: boolean) => void) {
   return callback(null, isAllowedOrigin(origin));
+}
+
+export function apiErrorMiddleware(error: unknown, req: Request, res: Response, _next: NextFunction) {
+  sendUnexpectedApiError(req, res, "GET, POST, OPTIONS", `${req.method} ${req.originalUrl}`, error);
 }
 
 type ApiMethod = "GET" | "POST";

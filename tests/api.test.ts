@@ -1,6 +1,7 @@
+import express from "express";
 import request from "supertest";
-import { afterEach, describe, expect, it } from "vitest";
-import { createApp } from "../server/app";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { apiErrorMiddleware, createApp } from "../server/app";
 import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -8,6 +9,7 @@ import { analyzeExperiment } from "../src/lib/analysis";
 import { buildEvidencePacket } from "../src/lib/evidencePacket";
 import { MCP_CONNECTOR_CATALOG } from "../src/lib/mcpIntegrationPlan";
 import { createMcpSessionTicket } from "../server/mcpBridge";
+import { genericApiErrorMessage } from "../server/httpResponse";
 import type { McpBridgePayload } from "../src/lib/types";
 
 const originalKey = process.env.OPENAI_API_KEY;
@@ -91,6 +93,38 @@ describe("POST /api/analyze", () => {
         error: testCase.error
       });
     }
+  });
+
+  it("uses the shared generic 500 envelope for unexpected Express API errors", async () => {
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const app = express();
+    app.get("/api/throws", () => {
+      throw new Error("OPENAI_API_KEY=sk-secret COMPOSIO_API_KEY=ak-secret");
+    });
+    app.use("/api", apiErrorMiddleware);
+
+    const response = await request(app)
+      .get("/api/throws")
+      .set("Origin", "https://ouija-olive.vercel.app")
+      .expect(500);
+
+    expect(response.headers["cache-control"]).toBe("no-store");
+    expect(response.headers["x-content-type-options"]).toBe("nosniff");
+    expect(response.headers["referrer-policy"]).toBe("no-referrer");
+    expect(response.headers["access-control-allow-origin"]).toBe("https://ouija-olive.vercel.app");
+    expect(response.body).toEqual({
+      ok: false,
+      error: genericApiErrorMessage
+    });
+    expect(JSON.stringify(response.body)).not.toContain("sk-secret");
+    expect(JSON.stringify(response.body)).not.toContain("ak-secret");
+    expect(JSON.stringify(errorSpy.mock.calls)).not.toContain("sk-secret");
+    expect(JSON.stringify(errorSpy.mock.calls)).not.toContain("ak-secret");
+    expect(errorSpy).toHaveBeenCalledWith("ouija api failure", {
+      context: "GET /api/throws",
+      diagnosticClass: "Error"
+    });
+    errorSpy.mockRestore();
   });
 
   it("does not expose provider errors to students", async () => {

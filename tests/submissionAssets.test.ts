@@ -2,6 +2,7 @@ import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { existsSync, readFileSync, statSync } from "node:fs";
 import { describe, expect, it } from "vitest";
+import { validateMcpExportRequest } from "../server/mcpBridge";
 
 function read(path: string) {
   return readFileSync(path, "utf8");
@@ -230,10 +231,25 @@ describe("AIYES submission assets", () => {
     expect(statSync("public/submission/assets/ouija-walkthrough.webm").size).toBeGreaterThan(100_000);
   });
 
-  it("keeps the API source example schema current", () => {
+  it("keeps the documented MCP export example accepted by the real validator", () => {
     const api = read("docs/API.md");
+    const match = api.match(/`POST \/api\/mcp\/export` input:\n\n```json\n([\s\S]*?)\n```/);
 
-    expect(api).toContain('"confidence": "built-in"');
+    expect(match).not.toBeNull();
+    const example = JSON.parse(match?.[1] ?? "{}") as unknown;
+    const response = validateMcpExportRequest(example, {});
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body).toMatchObject({
+      status: "dry_run",
+      toolkit: "Google Calendar",
+      sanitizedPayload: {
+        payloadCategory: "calendar_reminder",
+        fieldCount: 4,
+        sourceCount: 0
+      }
+    });
+    expect(JSON.stringify(example)).not.toMatch(/evidencePacket|rows|sources|confidence/);
   });
 
   it("verifies the canonical docs asset manifest against actual binaries and public mirrors", () => {

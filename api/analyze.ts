@@ -1,4 +1,4 @@
-import { handleOptions, sendError, sendJson } from "../server/httpResponse.js";
+import { handleOptions, sendError, sendJson, withApiBoundary } from "../server/httpResponse.js";
 import { requestClientKey } from "../server/httpSecurity.js";
 import { enrichWithOpenAIWebSearch, externalGroundingFallbackNote, shouldUseExternalGrounding } from "../server/openaiGrounding.js";
 import { consumeRateLimit, resolveAnalyzeRateLimit } from "../server/rateLimit.js";
@@ -8,7 +8,7 @@ import type { ApiRequestLike, ApiResponseLike } from "../server/httpResponse.js"
 
 const allowedMethods = "POST, OPTIONS";
 
-export default async function handler(req: ApiRequestLike & { body?: unknown }, res: ApiResponseLike) {
+async function handler(req: ApiRequestLike & { body?: unknown }, res: ApiResponseLike) {
   if (handleOptions(req, res, allowedMethods)) return;
 
   if (req.method !== "POST") {
@@ -62,3 +62,5 @@ export default async function handler(req: ApiRequestLike & { body?: unknown }, 
     }
   });
 }
+
+export default withApiBoundary(handler, "POST /api/analyze", allowedMethods);

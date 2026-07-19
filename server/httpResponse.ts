@@ -12,6 +12,10 @@ export interface ApiResponseLike {
   end(): void;
 }
 
+export const genericApiErrorMessage = "Unexpected API error. Try again shortly.";
+
+export type ApiHandler<TRequest extends ApiRequestLike = ApiRequestLike> = (req: TRequest, res: ApiResponseLike) => void | Promise<void>;
+
 export function applyApiHeaders(req: ApiRequestLike, res: ApiResponseLike, allowedMethods: string) {
   const origin = readRequestHeader(req.headers, "origin");
   if (origin && isAllowedOrigin(origin)) res.setHeader("Access-Control-Allow-Origin", origin);
@@ -46,6 +50,27 @@ export function sendApiResult(res: ApiResponseLike, statusCode: number, body: un
   sendJson(res, statusCode, body);
 }
 
+export function sendUnexpectedApiError(req: ApiRequestLike, res: ApiResponseLike, allowedMethods: string, context: string, error: unknown) {
+  logApiError(context, error);
+  applyApiHeaders(req, res, allowedMethods);
+  sendError(res, 500, genericApiErrorMessage);
+}
+
+export function withApiBoundary<TRequest extends ApiRequestLike>(handler: ApiHandler<TRequest>, context: string, allowedMethods: string) {
+  return async (req: TRequest, res: ApiResponseLike) => {
+    try {
+      await handler(req, res);
+    } catch (error) {
+      sendUnexpectedApiError(req, res, allowedMethods, context, error);
+    }
+  };
+}
+
 function isStringErrorBody(body: unknown): body is { error: string } {
   return typeof body === "object" && body !== null && typeof (body as { error?: unknown }).error === "string";
+}
+
+function logApiError(context: string, error: unknown) {
+  const diagnosticClass = error instanceof Error ? "Error" : typeof error;
+  console.error("ouija api failure", { context, diagnosticClass });
 }

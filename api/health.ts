@@ -1,9 +1,9 @@
-import { handleOptions, sendError, sendJson } from "../server/httpResponse.js";
+import { handleOptions, sendError, sendJson, withApiBoundary } from "../server/httpResponse.js";
 import type { ApiRequestLike, ApiResponseLike } from "../server/httpResponse.js";
 
 const allowedMethods = "GET, OPTIONS";
 
-export default function handler(req: ApiRequestLike, res: ApiResponseLike) {
+function handler(req: ApiRequestLike, res: ApiResponseLike) {
   if (handleOptions(req, res, allowedMethods)) return;
 
   if (req.method !== "GET") {
@@ -13,3 +13,5 @@ export default function handler(req: ApiRequestLike, res: ApiResponseLike) {
 
   sendJson(res, 200, { ok: true, service: "ouija-api" });
 }
+
+export default withApiBoundary(handler, "GET /api/health", allowedMethods);

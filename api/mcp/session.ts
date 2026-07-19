@@ -1,4 +1,4 @@
-import { handleOptions, sendApiResult, sendError } from "../../server/httpResponse.js";
+import { handleOptions, sendApiResult, sendError, withApiBoundary } from "../../server/httpResponse.js";
 import { readRequestHeader, requestClientKey } from "../../server/httpSecurity.js";
 import { createMcpSessionTicket } from "../../server/mcpBridge.js";
 import { consumeRateLimit } from "../../server/rateLimit.js";
@@ -6,7 +6,7 @@ import type { ApiRequestLike, ApiResponseLike } from "../../server/httpResponse.
 
 const allowedMethods = "POST, OPTIONS";
 
-export default async function handler(req: ApiRequestLike & { body?: unknown }, res: ApiResponseLike) {
+async function handler(req: ApiRequestLike & { body?: unknown }, res: ApiResponseLike) {
   if (handleOptions(req, res, allowedMethods)) return;
 
   if (req.method !== "POST") {
@@ -25,3 +25,5 @@ export default async function handler(req: ApiRequestLike & { body?: unknown }, 
   const response = await createMcpSessionTicket(req.body, process.env, fetch, authorization);
   sendApiResult(res, response.statusCode, response.body);
 }
+
+export default withApiBoundary(handler, "POST /api/mcp/session", allowedMethods);

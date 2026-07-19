@@ -22,6 +22,7 @@ import runtimeProofHandler from "../api/runtime-proof";
 import { analyzeExperiment } from "../src/lib/analysis";
 import { buildEvidencePacket } from "../src/lib/evidencePacket";
 import { MCP_CONNECTOR_CATALOG } from "../src/lib/mcpIntegrationPlan";
+import { genericApiErrorMessage, withApiBoundary } from "../server/httpResponse";
 import type { McpBridgePayload, McpIntegrationActionId } from "../src/lib/types";
 
 const originalKey = process.env.OPENAI_API_KEY;
@@ -130,6 +131,41 @@ describe("Vercel API functions", () => {
         error: testCase.error
       });
     }
+  });
+
+  it("uses the shared generic 500 envelope for unexpected serverless errors", async () => {
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const response = createMockResponse();
+    const handler = withApiBoundary(() => {
+      throw new Error("OPENAI_API_KEY=sk-secret COMPOSIO_API_KEY=ak-secret");
+    }, "GET /api/serverless-throw", "GET, OPTIONS");
+
+    await handler(
+      {
+        method: "GET",
+        headers: { origin: "https://ouija-olive.vercel.app" }
+      },
+      response.res
+    );
+
+    expect(response.statusCode).toBe(500);
+    expect(response.headers["Cache-Control"]).toBe("no-store");
+    expect(response.headers["X-Content-Type-Options"]).toBe("nosniff");
+    expect(response.headers["Referrer-Policy"]).toBe("no-referrer");
+    expect(response.headers["Access-Control-Allow-Origin"]).toBe("https://ouija-olive.vercel.app");
+    expect(response.body).toEqual({
+      ok: false,
+      error: genericApiErrorMessage
+    });
+    expect(JSON.stringify(response.body)).not.toContain("sk-secret");
+    expect(JSON.stringify(response.body)).not.toContain("ak-secret");
+    expect(JSON.stringify(errorSpy.mock.calls)).not.toContain("sk-secret");
+    expect(JSON.stringify(errorSpy.mock.calls)).not.toContain("ak-secret");
+    expect(errorSpy).toHaveBeenCalledWith("ouija api failure", {
+      context: "GET /api/serverless-throw",
+      diagnosticClass: "Error"
+    });
+    errorSpy.mockRestore();
   });
 
   it("returns health status from the serverless health function", () => {
