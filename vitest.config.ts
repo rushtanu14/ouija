@@ -9,8 +9,9 @@ export default defineConfig({
       provider: "v8",
       reporter: ["text", "json-summary"],
       include: ["src/lib/**/*.ts", "server/**/*.ts", "api/**/*.ts"],
-      exclude: ["server/index.ts"],
+      exclude: ["server/index.ts", "src/lib/samples.ts"],
       thresholds: {
+        perFile: true,
         statements: 80,
         branches: 75,
         functions: 80,

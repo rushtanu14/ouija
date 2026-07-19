@@ -23,11 +23,13 @@ import { analyzeExperiment } from "../src/lib/analysis";
 import { buildEvidencePacket } from "../src/lib/evidencePacket";
 import { MCP_CONNECTOR_CATALOG } from "../src/lib/mcpIntegrationPlan";
 import { genericApiErrorMessage, withApiBoundary } from "../server/httpResponse";
+import { resetRateLimitsForTests } from "../server/rateLimit";
 import type { McpBridgePayload, McpIntegrationActionId } from "../src/lib/types";
 
 const originalKey = process.env.OPENAI_API_KEY;
 const originalExternalGroundingEnabled = process.env.OUIJA_EXTERNAL_GROUNDING_ENABLED;
 const originalNodeEnv = process.env.NODE_ENV;
+const originalAnalyzeRateLimit = process.env.OUIJA_ANALYZE_RATE_LIMIT;
 const composioEnvKeys = [
   "COMPOSIO_API_KEY",
   "COMPOSIO_LIVE_EXPORTS",
@@ -64,9 +66,11 @@ const mcpRouteContractCases: Array<{ actionId: McpIntegrationActionId; category:
 
 afterEach(() => {
   mockResponsesCreate.mockReset();
+  resetRateLimitsForTests();
   restoreEnv("OPENAI_API_KEY", originalKey);
   restoreEnv("OUIJA_EXTERNAL_GROUNDING_ENABLED", originalExternalGroundingEnabled);
   restoreEnv("NODE_ENV", originalNodeEnv);
+  restoreEnv("OUIJA_ANALYZE_RATE_LIMIT", originalAnalyzeRateLimit);
   for (const key of composioEnvKeys) {
     const value = originalComposioEnv.get(key);
     if (value === undefined) {
@@ -222,6 +226,45 @@ describe("Vercel API functions", () => {
     expect(response.body.groundingStatus.mode).toBe("fallback");
   });
 
+  it("handles serverless analysis preflights and rate limits", async () => {
+    const preflight = createMockResponse();
+    await analyzeHandler(
+      {
+        method: "OPTIONS",
+        headers: { origin: "https://ouija-olive.vercel.app" }
+      },
+      preflight.res
+    );
+
+    process.env.OUIJA_ANALYZE_RATE_LIMIT = "1";
+    const first = createMockResponse();
+    const blocked = createMockResponse();
+    await analyzeHandler(
+      {
+        method: "POST",
+        headers: { "x-forwarded-for": "198.51.100.5" },
+        body: { description: "Projectile motion lab using launch angle and range data." }
+      },
+      first.res
+    );
+    await analyzeHandler(
+      {
+        method: "POST",
+        headers: { "x-forwarded-for": "198.51.100.5" },
+        body: { description: "Projectile motion lab using launch angle and range data." }
+      },
+      blocked.res
+    );
+
+    expect(preflight.statusCode).toBe(204);
+    expect(preflight.ended).toBe(true);
+    expect(preflight.headers["Access-Control-Allow-Origin"]).toBe("https://ouija-olive.vercel.app");
+    expect(first.statusCode).toBe(200);
+    expect(blocked.statusCode).toBe(429);
+    expect(blocked.headers["Retry-After"]).toBeDefined();
+    expect(blocked.body).toEqual({ ok: false, error: "Too many analysis requests. Try again shortly." });
+  });
+
   it("validates empty experiment descriptions through the serverless analyze function", async () => {
     const response = createMockResponse();
 
@@ -277,6 +320,59 @@ describe("Vercel API functions", () => {
     expect(mockResponsesCreate).not.toHaveBeenCalled();
     expect(response.body.groundingStatus.mode).toBe("fallback");
     expect(response.body.groundingStatus.note).toContain("disabled in production");
+  });
+
+  it("uses serverless web enrichment when request and server gates allow it", async () => {
+    process.env.OPENAI_API_KEY = "sk-test";
+    process.env.OUIJA_EXTERNAL_GROUNDING_ENABLED = "true";
+    process.env.NODE_ENV = "development";
+    mockResponsesCreate.mockResolvedValue({
+      output_text: '{"expectedSummary":"External summary","explanation":"External explanation","confidenceNote":"Mixed evidence"}',
+      output: [{
+        type: "message",
+        content: [{
+          annotations: [{ type: "url_citation", url: "https://science.example/source", title: "Source" }]
+        }]
+      }]
+    });
+    const response = createMockResponse();
+
+    await analyzeHandler(
+      {
+        method: "POST",
+        body: { description: "Projectile motion lab using launch angle and range data.", allowExternalGrounding: true }
+      },
+      response.res
+    );
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body.expectedResult.summary).toBe("External summary");
+    expect(response.body.explanation).toBe("External explanation");
+    expect(response.body.sources[0].url).toBe("https://science.example/source");
+    expect(response.body.groundingStatus.mode).toBe("web_enriched");
+  });
+
+  it("falls back safely when serverless web enrichment throws", async () => {
+    process.env.OPENAI_API_KEY = "sk-test";
+    process.env.OUIJA_EXTERNAL_GROUNDING_ENABLED = "true";
+    process.env.NODE_ENV = "development";
+    mockResponsesCreate.mockRejectedValue(new Error("provider secret detail"));
+    const response = createMockResponse();
+
+    await analyzeHandler(
+      {
+        method: "POST",
+        body: { description: "Projectile motion lab using launch angle and range data.", allowExternalGrounding: true }
+      },
+      response.res
+    );
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body.groundingStatus).toEqual({
+      mode: "fallback",
+      note: "Using built-in science references because web enrichment was unavailable."
+    });
+    expect(JSON.stringify(response.body)).not.toContain("provider secret detail");
   });
 
   it("bounds descriptions and table rows through the serverless analyze function", async () => {
@@ -516,6 +612,26 @@ describe("Vercel API functions", () => {
     expect(response.body.target.sessionUserEnv).toBe("COMPOSIO_SESSION_USER_ID");
   });
 
+  it("rate-limits serverless MCP session attempts before ticket creation", async () => {
+    let lastResponse = createMockResponse();
+
+    for (let index = 0; index < 11; index += 1) {
+      lastResponse = createMockResponse();
+      await mcpSessionHandler(
+        {
+          method: "POST",
+          headers: { "x-forwarded-for": "203.0.113.9" },
+          body: {}
+        },
+        lastResponse.res
+      );
+    }
+
+    expect(lastResponse.statusCode).toBe(429);
+    expect(lastResponse.headers["Retry-After"]).toBeDefined();
+    expect(lastResponse.body).toEqual({ ok: false, error: "Too many MCP session requests. Try again shortly." });
+  });
+
   it("validates a Scholar claim-check route through the serverless export function", () => {
     clearComposioEnv();
     const result = analyzeExperiment({
@@ -677,6 +793,9 @@ function createMockResponse() {
     },
     get headers() {
       return state.headers;
+    },
+    get ended() {
+      return state.ended;
     },
     res: {
       setHeader(name: string, value: string) {

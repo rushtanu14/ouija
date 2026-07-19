@@ -7,6 +7,17 @@ interface FakeEntry {
 }
 
 describe("browser storage helpers", () => {
+  it("returns unavailable errors when read storage is missing", () => {
+    expect(readStorageList(null, "ouija:test", normalizeEntry)).toMatchObject({
+      ok: false,
+      error: expect.stringContaining("Browser storage is unavailable")
+    });
+    expect(readStorageValue(undefined, "ouija:test", (value) => value)).toMatchObject({
+      ok: false,
+      error: expect.stringContaining("Browser storage is unavailable")
+    });
+  });
+
   it("returns a storage result instead of throwing when reads are blocked", () => {
     const storage = {
       getItem: vi.fn(() => {
@@ -47,6 +58,20 @@ describe("browser storage helpers", () => {
     expect(result).toEqual({ ok: true, value: [] });
   });
 
+  it("rejects saved lists with an unexpected persisted shape", () => {
+    const storage = {
+      getItem: vi.fn(() => JSON.stringify({ id: "not-a-list" })),
+      setItem: vi.fn()
+    };
+
+    const result = readStorageList(storage, "ouija:test", normalizeEntry);
+
+    expect(result).toMatchObject({
+      ok: false,
+      error: expect.stringContaining("unexpected shape")
+    });
+  });
+
   it("returns null for missing singleton storage so callers can construct defaults", () => {
     const storage = {
       getItem: vi.fn(() => null),
@@ -56,6 +81,30 @@ describe("browser storage helpers", () => {
     const result = readStorageValue(storage, "ouija:test", (value) => value);
 
     expect(result).toEqual({ ok: true, value: null });
+  });
+
+  it("normalizes singleton values and reports parse failures", () => {
+    const validStorage = {
+      getItem: vi.fn(() => JSON.stringify({ id: "a", label: "Saved" })),
+      setItem: vi.fn()
+    };
+    const invalidStorage = {
+      getItem: vi.fn(() => "{not json"),
+      setItem: vi.fn()
+    };
+
+    expect(readStorageValue(validStorage, "ouija:test", normalizeEntry)).toEqual({
+      ok: true,
+      value: { id: "a", label: "Saved" }
+    });
+    expect(readStorageValue(invalidStorage, "ouija:test", normalizeEntry)).toMatchObject({
+      ok: false,
+      error: expect.stringContaining("Unable to read saved browser data")
+    });
+  });
+
+  it("treats missing write storage as a no-op so the app keeps running", () => {
+    expect(writeStorageValue(null, "ouija:test", { id: "a" })).toEqual({ ok: true, value: null });
   });
 
   it("returns a storage result instead of throwing when quota writes fail", () => {

@@ -10,11 +10,13 @@ import { buildEvidencePacket } from "../src/lib/evidencePacket";
 import { MCP_CONNECTOR_CATALOG } from "../src/lib/mcpIntegrationPlan";
 import { createMcpSessionTicket } from "../server/mcpBridge";
 import { genericApiErrorMessage } from "../server/httpResponse";
+import { resetRateLimitsForTests } from "../server/rateLimit";
 import type { McpBridgePayload } from "../src/lib/types";
 
 const originalKey = process.env.OPENAI_API_KEY;
 const originalExternalGroundingEnabled = process.env.OUIJA_EXTERNAL_GROUNDING_ENABLED;
 const originalNodeEnv = process.env.NODE_ENV;
+const originalAnalyzeRateLimit = process.env.OUIJA_ANALYZE_RATE_LIMIT;
 const composioEnvKeys = [
   "COMPOSIO_API_KEY",
   "COMPOSIO_LIVE_EXPORTS",
@@ -55,9 +57,11 @@ const mcpRouteContractCases: Array<{ actionId: McpBridgePayloadActionId; categor
 ];
 
 afterEach(() => {
+  resetRateLimitsForTests();
   restoreEnv("OPENAI_API_KEY", originalKey);
   restoreEnv("OUIJA_EXTERNAL_GROUNDING_ENABLED", originalExternalGroundingEnabled);
   restoreEnv("NODE_ENV", originalNodeEnv);
+  restoreEnv("OUIJA_ANALYZE_RATE_LIMIT", originalAnalyzeRateLimit);
   for (const key of composioEnvKeys) {
     const value = originalComposioEnv.get(key);
     if (value === undefined) {
@@ -93,6 +97,42 @@ describe("POST /api/analyze", () => {
         error: testCase.error
       });
     }
+  });
+
+  it("answers trusted preflights and unknown API routes with shared headers", async () => {
+    const app = createApp();
+
+    const preflight = await request(app)
+      .options("/api/analyze")
+      .set("Origin", "https://ouija-olive.vercel.app")
+      .expect(204);
+    const missing = await request(app)
+      .get("/api/not-real")
+      .set("Origin", "https://ouija-olive.vercel.app")
+      .expect(404);
+
+    expect(preflight.headers["access-control-allow-origin"]).toBe("https://ouija-olive.vercel.app");
+    expect(preflight.headers["cache-control"]).toBe("no-store");
+    expect(preflight.headers["access-control-allow-methods"]).toBe("POST, OPTIONS");
+    expect(missing.headers["cache-control"]).toBe("no-store");
+    expect(missing.body).toEqual({ ok: false, error: "API route not found." });
+  });
+
+  it("rate-limits Express analysis before expensive work", async () => {
+    process.env.OUIJA_ANALYZE_RATE_LIMIT = "1";
+    const app = createApp();
+
+    await request(app)
+      .post("/api/analyze")
+      .send({ description: "Projectile launch angle and range." })
+      .expect(200);
+    const blocked = await request(app)
+      .post("/api/analyze")
+      .send({ description: "Projectile launch angle and range." })
+      .expect(429);
+
+    expect(blocked.headers["retry-after"]).toBeDefined();
+    expect(blocked.body).toEqual({ ok: false, error: "Too many analysis requests. Try again shortly." });
   });
 
   it("uses the shared generic 500 envelope for unexpected Express API errors", async () => {
@@ -198,6 +238,34 @@ describe("POST /api/analyze", () => {
     expect(enrichmentCalls).toBe(0);
     expect(response.body.groundingStatus.mode).toBe("fallback");
     expect(response.body.groundingStatus.note).toContain("disabled in production");
+  });
+
+  it("merges Express external enrichment only when all grounding gates pass", async () => {
+    process.env.OPENAI_API_KEY = "sk-test";
+    process.env.OUIJA_EXTERNAL_GROUNDING_ENABLED = "true";
+    process.env.NODE_ENV = "development";
+    const app = createApp({
+      enrichExperiment: async (_description, fallback) => ({
+        expectedResult: {
+          ...fallback.expectedResult,
+          pattern: "External pattern",
+          summary: "External summary",
+          mixedEvidence: true
+        },
+        groundingStatus: {
+          mode: "web_enriched",
+          note: "Expected results are enriched with web-search citations."
+        }
+      })
+    });
+
+    const response = await request(app)
+      .post("/api/analyze")
+      .send({ description: "Projectile motion lab using launch angle and range data.", allowExternalGrounding: true })
+      .expect(200);
+
+    expect(response.body.expectedResult.summary).toBe("External summary");
+    expect(response.body.groundingStatus.mode).toBe("web_enriched");
   });
 
   it("rejects oversized experiment descriptions", async () => {
@@ -334,6 +402,20 @@ describe("POST /api/analyze", () => {
     const response = await request(app).get("/").expect(200);
 
     expect(response.text).toContain("Ouija production shell");
+  });
+
+  it("keeps static fallback from swallowing API misses", async () => {
+    const staticDir = mkdtempSync(join(tmpdir(), "ouija-static-"));
+    writeFileSync(join(staticDir, "index.html"), "<main>Ouija production shell</main>");
+
+    const app = createApp({ staticDir });
+
+    await expect(request(app).get("/nested/student/path")).resolves.toMatchObject({
+      status: 200,
+      text: expect.stringContaining("Ouija production shell")
+    });
+    const apiMiss = await request(app).get("/api/missing").expect(404);
+    expect(apiMiss.body).toEqual({ ok: false, error: "API route not found." });
   });
 });
 
