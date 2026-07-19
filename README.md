@@ -100,7 +100,7 @@ AIYES Development Journey maps each run to the required Track 1 story: problem i
 
 Top Award Radar turns the internal council audit into a judge-visible card: it separates submittable evidence from top-award risk, anchors the win target to the official Gold/Silver/Bronze/Honorable Mention certificate bands, highlights quality-gated impact evidence, AI/model proof, UX/design, submission package readiness, and external blockers, then lists the next moves before judging.
 
-Official AIYES Rules Snapshot keeps the judge path tied to the current Devpost page: ages 13-18, students only, listed 2-5 team requirement with individual/team wording caveat, September 1 deadline, Track 1 artifacts, judging criteria, award bands, source link, July 18, 2026 verified date, and a snapshot that Devpost showed 86 participants at verification time.
+Official AIYES Rules Snapshot keeps the judge path tied to the current Devpost page: ages 13-18, students only, listed 2-5 team requirement with individual/team wording caveat, September 1 deadline, Track 1 artifacts, judging criteria, award bands, source link, July 18, 2026 verified date, and a stable rules snapshot without volatile live-count fields.
 
 AIYES Submission Gate turns the live Devpost requirements into a judge-visible submittability audit: most app, deck, video, source, source ZIP fallback, AI, impact, and UX items pass inside the product, while roster and final submit remain marked as external.
 
@@ -114,7 +114,7 @@ Learning Impact Loop measures student readiness for each run through outcome, da
 
 Student Pilot Study Kit prepares a consent-safe 10-minute student pilot protocol for each run, including a research question, three-session sample plan, run script, success thresholds, consent stop rules, UX/impact metrics, observer checklist, and evidence to collect before submission.
 
-Pilot Evidence Tracker turns that protocol into browser-local, anonymous evidence capture: time to first graph, confidence before/after, data or source issues spotted, exit-ticket readiness, and non-identifying observer notes. It starts empty and explicitly says not to claim completed student testing until observations are collected. A 100-point quality gate checks three observations, timing, paired confidence, issue/reflection signals, and privacy scan status before evidence is treated as submission-ready. A copyable CSV-ready export summarizes counts, quality checks, and direct-contact redaction before the team moves pilot evidence into Devpost, Sheets, Forms, or Notion.
+Pilot Evidence Tracker turns that protocol into browser-local, anonymous evidence capture: time to first graph, confidence before/after, data or source issues spotted, exit-ticket readiness, and local observer notes. It starts empty and explicitly says not to claim completed student testing until observations are collected. A 100-point quality gate checks three observations, timing, paired confidence, issue/reflection signals, and privacy scan status before evidence is treated as submission-ready. A copyable CSV-ready export summarizes structured metrics and aggregate privacy-risk counts only, with no raw or redacted note column, before the team moves pilot evidence into Devpost, Sheets, Forms, or Notion.
 
 Learning Exit Ticket turns AI feedback into three student reflection prompts for variables, graph pattern, and next step, so the app proves understanding without writing the conclusion.
 
@@ -174,9 +174,9 @@ The production alias reflects the July 18, 2026 Source Scout refresh after `main
 
 ## AI Grounding
 
-Ouija works without credentials through deterministic built-in experiment templates and trusted citations. `GET /api/runtime-proof` reports whether the live deployment is using fallback or web-search-ready mode without exposing secret values. When `OPENAI_API_KEY` is present in the environment, the server attempts OpenAI Responses API web-search enrichment and falls back safely if enrichment is unavailable.
+Ouija works without credentials through deterministic built-in experiment templates and trusted citations. `GET /api/runtime-proof` reports whether the live deployment is using fallback or web-search-ready mode without exposing secret values. OpenAI Responses API web-search enrichment runs only when the request explicitly opts in, `OPENAI_API_KEY` is configured, `OUIJA_EXTERNAL_GROUNDING_ENABLED=true`, and `NODE_ENV` is not `production`; otherwise the server keeps the trusted fallback path.
 
-Student privacy boundary: do not enter names, contact information, school identifiers, or other personal data in experiment descriptions. When web enrichment is configured, the description is sent server-side to OpenAI; credential-free fallback mode keeps analysis deterministic and does not call OpenAI.
+Student privacy boundary: do not enter names, contact information, school identifiers, or other personal data in experiment descriptions. Request-opted web enrichment sends only allowlisted structured analysis fields from the fallback result to OpenAI, not raw rows, pilot notes, reflection drafts, or Evidence Packet text; fallback mode does not call OpenAI.
 
 ## Composio MCP Bridge
 

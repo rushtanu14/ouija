@@ -12,10 +12,14 @@
     "capture:submission": "node scripts/capture-submission-assets.mjs",
     "record:walkthrough": "node scripts/record-walkthrough.mjs",
     "sync:public-submission": "node scripts/sync-public-submission-assets.mjs",
+    "assets:manifest": "node scripts/generate-asset-manifest.mjs",
+    "build:server": "esbuild server/index.ts --platform=node --format=esm --bundle --packages=external --outfile=dist-server/index.js",
+    "serve:prod": "node dist-server/index.js",
     "build": "tsc --noEmit && vite build",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "test:e2e:prod": "playwright test --config=playwright.prod.config.ts"
   },
   "dependencies": {
     "@vitejs/plugin-react": "^4.3.4",
@@ -37,6 +41,7 @@
     "@types/supertest": "^6.0.2",
     "@vitest/coverage-v8": "^4.1.10",
     "concurrently": "^9.1.0",
+    "esbuild": "^0.28.1",
     "supertest": "^7.0.0",
     "tsx": "^4.19.2",
     "typescript": "^5.7.2",

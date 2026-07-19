@@ -11,7 +11,11 @@ interface RuntimeProofOptions {
 
 export function buildRuntimeProof(options: RuntimeProofOptions = {}): RuntimeProof {
   const evaluation = runEvaluationSuite();
-  const webSearchConfigured = options.openAiConfigured ?? Boolean(process.env.OPENAI_API_KEY);
+  const webSearchConfigured = options.openAiConfigured ?? (
+    Boolean(process.env.OPENAI_API_KEY) &&
+    process.env.OUIJA_EXTERNAL_GROUNDING_ENABLED === "true" &&
+    process.env.NODE_ENV !== "production"
+  );
   const model = options.model ?? process.env.OPENAI_MODEL ?? "gpt-5.6";
   const mcpBridgeMode = options.mcpBridgeMode ?? "server_dry_run";
   const status = webSearchConfigured ? "web_enriched_ready" : "fallback_ready";
@@ -40,8 +44,8 @@ export function buildRuntimeProof(options: RuntimeProofOptions = {}): RuntimePro
         status: webSearchConfigured ? "configured" : "ready",
         value: webSearchConfigured ? "OpenAI web search configured" : "Trusted fallback active",
         detail: webSearchConfigured
-          ? "Server-side Responses API web_search can enrich explanations and citations."
-          : "Built-in trusted science references keep the public demo honest without API credentials."
+          ? "Server-side Responses API web_search can enrich explanations and citations only after per-request opt-in."
+          : "Built-in trusted science references keep the public demo honest unless explicit opt-in, server enablement, and non-production mode are all present."
       },
       {
         id: "evaluation",
@@ -73,7 +77,7 @@ export function buildRuntimeProof(options: RuntimeProofOptions = {}): RuntimePro
       }
     ],
     judgeTakeaway: webSearchConfigured
-      ? "Ouija is running a web-enriched AI path with visible citations, a deterministic regression suite, and server-only secret handling."
+      ? "Ouija can run a request-opted web-enriched AI path with visible citations, a deterministic regression suite, and server-only secret handling."
       : "Ouija is still judge-demoable without credentials: deterministic classification, trusted fallback grounding, a regression suite, and explicit server-only boundaries are visible."
   };
 }

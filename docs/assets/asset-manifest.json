@@ -1,0 +1,41 @@
+{
+  "version": 1,
+  "assets": [
+    {
+      "relativePath": "docs/assets/ouija-custom-triage.png",
+      "bytes": 4012572,
+      "sha256": "5ef6706bf2c16a24754d639838199442f3eff68473f00a5a9777ee7fb30715d9",
+      "width": 1440,
+      "height": 18184
+    },
+    {
+      "relativePath": "docs/assets/ouija-demo-desktop.png",
+      "bytes": 4141522,
+      "sha256": "8c9929055ef26d1b44c594d3b935f5b2fbfb028fb9a59cd2f4b8f7ce4b388211",
+      "width": 1440,
+      "height": 16142
+    },
+    {
+      "relativePath": "docs/assets/ouija-demo-mobile.png",
+      "bytes": 2629786,
+      "sha256": "a65a93aef1981d306a0f9b8d03e42295f91dc9b7071a4fe041c4655162025e11",
+      "width": 390,
+      "height": 29586
+    },
+    {
+      "relativePath": "docs/assets/ouija-walkthrough.webm",
+      "bytes": 24123761,
+      "sha256": "73653219da2e69d998cc337920af8a77b7d35d52ba2d525151d620479618dcb2",
+      "width": 1440,
+      "height": 900,
+      "durationSeconds": 238
+    },
+    {
+      "relativePath": "docs/assets/ouija-warning-state.png",
+      "bytes": 4208588,
+      "sha256": "8ad8375844ff7e5fdb631d010dc61e7c56fb94ce6fcf1c3f444adcfbc210849c",
+      "width": 1440,
+      "height": 16656
+    }
+  ]
+}

@@ -2,10 +2,12 @@ import { describe, expect, it } from "vitest";
 import {
   buildPilotEvidenceExport,
   createInitialPilotEvidenceEntries,
+  formatCsvCell,
   formatPilotEvidenceSeconds,
   normalizePilotEvidenceEntries,
   summarizePilotEvidence
 } from "../src/lib/pilotEvidence";
+import { PRIVACY_REVIEW_COPY, scanPrivateText } from "../src/lib/privacyText";
 
 describe("pilot evidence tracker", () => {
   it("starts empty and prevents fake user-testing claims", () => {
@@ -95,7 +97,37 @@ describe("pilot evidence tracker", () => {
     expect(normalized[0].note).toHaveLength(160);
   });
 
-  it("builds a CSV-ready anonymous export and redacts direct contact details", () => {
+  it("detects broader private classroom text without claiming complete PII coverage", () => {
+    const scanned = scanPrivateText([
+      "Email rushil@example.com after period 4.",
+      "Student ID 123456 and grade 10.",
+      "Meet at 742 Evergreen Street near 37.7749, -122.4194.",
+      "Access code ABCD-1234 and face photo attached."
+    ].join(" "));
+
+    expect(scanned.safe).toBe(false);
+    expect(scanned.reasons.map((reason) => reason.kind)).toEqual([
+      "contact",
+      "student_or_class_id",
+      "grade_or_class_period",
+      "address",
+      "access_code",
+      "coordinates",
+      "photo_or_face"
+    ]);
+    expect(PRIVACY_REVIEW_COPY).toContain("automated screen");
+    expect(PRIVACY_REVIEW_COPY).toContain("not a complete guarantee");
+  });
+
+  it("neutralizes spreadsheet formula-leading values before CSV quoting", () => {
+    expect(formatCsvCell("=IMPORTXML(\"https://example.com\",\"//title\")")).toBe("\"'=IMPORTXML(\"\"https://example.com\"\",\"\"//title\"\")\"");
+    expect(formatCsvCell("+SUM(A1:A2)")).toBe("'+SUM(A1:A2)");
+    expect(formatCsvCell("-10")).toBe("'-10");
+    expect(formatCsvCell("@cmd")).toBe("'@cmd");
+    expect(formatCsvCell("normal value")).toBe("normal value");
+  });
+
+  it("raw notes never appear in the CSV-ready anonymous export", () => {
     const entries = createInitialPilotEvidenceEntries();
     const nextEntries = entries.map((entry, index) => ({
       ...entry,
@@ -104,7 +136,10 @@ describe("pilot evidence tracker", () => {
       confidenceAfter: index === 0 ? "4" : entry.confidenceAfter,
       issueCaught: index === 0 ? ("yes" as const) : entry.issueCaught,
       reflectionReadiness: index === 0 ? ("ready" as const) : entry.reflectionReadiness,
-      note: index === 0 ? "Student emailed rushil@example.com and used 555-123-4567." : entry.note
+      note:
+        index === 0
+          ? "Rushil Patel in grade 10 emailed rushil@example.com, used 555-123-4567, and wrote =IMPORTXML(\"https://example.com\",\"//title\")."
+          : entry.note
     }));
     const summary = summarizePilotEvidence(nextEntries);
     const exported = buildPilotEvidenceExport(nextEntries, summary);
@@ -113,10 +148,19 @@ describe("pilot evidence tracker", () => {
     expect(exported).toContain("Quality status,review");
     expect(exported).toContain("Quality score,80");
     expect(exported).toContain("Anonymous observations,1");
-    expect(exported).toContain("Observation 1,90,2,4,+2.0,yes,ready");
-    expect(exported).toContain("[redacted email]");
-    expect(exported).toContain("[redacted phone]");
+    expect(exported).toContain("Observation 1,90,2,4,'+2.0,yes,ready");
+    expect(exported).toContain("Observer notes recorded,1");
+    expect(exported).toContain("Raw observer notes stay browser-local");
+    expect(exported).toContain("structured metrics and aggregate privacy-risk counts only");
+    expect(exported).toContain("no raw or redacted note column");
+    expect(exported).not.toContain("Non-identifying note");
+    expect(exported).not.toContain("[redacted email]");
+    expect(exported).not.toContain("[redacted phone]");
+    expect(exported).not.toContain("Rushil Patel");
+    expect(exported).not.toContain("grade 10");
     expect(exported).not.toContain("rushil@example.com");
     expect(exported).not.toContain("555-123-4567");
+    expect(exported).not.toContain("=IMPORTXML");
+    expect(exported).not.toContain("https://example.com");
   });
 });

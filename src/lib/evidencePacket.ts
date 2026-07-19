@@ -23,6 +23,9 @@ export function buildEvidencePacket(
   return [
     `# Ouija Evidence Packet: ${result.classification.title}`,
     "",
+    "## Data Provenance",
+    formatDataProvenance(result),
+    "",
     "## Student Description",
     description.trim(),
     "",
@@ -70,7 +73,7 @@ export function buildEvidencePacket(
     `  - Grounding quality: ${result.groundingAudit.score}/100 with ${result.sources.length} visible citation${result.sources.length === 1 ? "" : "s"} and mixed-evidence checks.`,
     `  - Pattern engine: ${result.patternEvidence.score}/100 with ${result.expectedComparison.points.filter((point) => point.expectedY !== null).length} expected-overlay points.`,
     `  - Privacy and integrity: ${result.dataHandlingLedger.score}/100 with server-only keys, local saved labs, blank claim starters, and consent-gated MCP packets.`,
-    "- Boundary: deterministic fallback keeps the demo inspectable without credentials; OpenAI web search can enrich citations server-side when configured.",
+    "- Boundary: deterministic fallback keeps the demo inspectable without credentials; OpenAI web search runs only with explicit per-run opt-in, OUIJA_EXTERNAL_GROUNDING_ENABLED=true, a server key, and non-production development mode. Public production stays deterministic fallback-only.",
     "",
     "## AI Evaluation Harness",
     `- Score: ${result.aiEvaluationHarness.score}/100 (${formatAiEvaluationStatus(result.aiEvaluationHarness.status)})`,
@@ -259,9 +262,9 @@ export function buildEvidencePacket(
     `- Average confidence shift: ${formatPilotEvidenceDelta(pilotEvidenceSummary?.averageConfidenceDelta ?? null)}`,
     `- Data or source issues spotted: ${pilotEvidenceSummary?.issueCaughtCount ?? 0}`,
     `- Exit tickets ready: ${pilotEvidenceSummary?.reflectionReadyCount ?? 0}`,
-    `- Non-identifying observer notes: ${pilotEvidenceSummary?.noteCount ?? 0}`,
+    `- Browser-local observer notes recorded: ${pilotEvidenceSummary?.noteCount ?? 0}`,
     `- Direct identifier risks: ${pilotEvidenceSummary?.directIdentifierRiskCount ?? 0}`,
-    "- Privacy boundary: Browser-local only; no names, contact info, grades, faces, or private classroom data.",
+    "- Privacy boundary: Raw observer notes stay browser-local. Pilot exports contain structured metrics and aggregate privacy-risk counts only, with no raw or redacted note column.",
     `- Judge takeaway: ${
       pilotEvidenceSummary?.judgeTakeaway ??
       "Do not claim completed student testing yet; this tracker shows exactly what evidence still needs to be collected."
@@ -371,6 +374,20 @@ export function buildEvidencePacket(
     "",
     "## Integrity Boundary",
     "Use this packet to write your own conclusion. Ouija does not write the final lab report."
+  ].join("\n");
+}
+
+function formatDataProvenance(result: AnalyzeResult): string {
+  if (result.dataOrigin === "student_supplied") {
+    return [
+      "STUDENT SUPPLIED - eligible for student evidence gates.",
+      "Rows came from student-entered, edited, or pasted data for this run."
+    ].join("\n");
+  }
+
+  return [
+    "DEMO SAMPLE - not student evidence.",
+    "Do not use these sample rows as student observations, saved learning progress, pilot evidence, or external handoff proof."
   ].join("\n");
 }
 

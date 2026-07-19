@@ -13,6 +13,7 @@ function snapshot(overrides: Partial<ProgressPortfolioSnapshot>): ProgressPortfo
     score: 94,
     readiness: "competitive",
     issueCount: 0,
+    dataOrigin: "student_supplied",
     ...overrides
   };
 }
@@ -78,5 +79,29 @@ describe("progress portfolio", () => {
     expect(portfolio.story.prompts.find((prompt) => prompt.id === "transfer-reflection")?.evidenceToUse).toContain("Biology, Chemistry");
     expect(portfolio.story.integrityBoundary).toContain("student writes the progress story");
     expect(portfolio.judgeTakeaway).toContain("repeated learning evidence");
+  });
+
+  it("excludes demo and legacy snapshots from student-evidence readiness", () => {
+    const portfolio = buildProgressPortfolio([
+      snapshot({
+        id: "demo-run",
+        title: "Projectile Motion",
+        subject: "Physics",
+        dataOrigin: "demo_sample"
+      }),
+      snapshot({
+        id: "legacy-run",
+        title: "Legacy Saved Lab",
+        subject: "Chemistry",
+        dataOrigin: "legacy_unknown"
+      })
+    ]);
+
+    expect(portfolio.status).toBe("building");
+    expect(portfolio.summary).toContain("0 student-supplied");
+    expect(portfolio.metrics.find((metric) => metric.id === "saved-runs")?.value).toBe("0 student-supplied runs");
+    expect(portfolio.story.status).toBe("not_ready");
+    expect(portfolio.nextAction).toContain("Save a student-supplied lab");
+    expect(portfolio.judgeTakeaway).toContain("Demo and legacy snapshots are excluded");
   });
 });

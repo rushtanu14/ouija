@@ -4,11 +4,14 @@ import type {
   McpBridgeExportCheck,
   McpBridgeExportRequest,
   McpBridgeExportResponse,
+  McpBridgePayload,
+  McpBridgePayloadCategory,
+  McpBridgeSessionRequest,
   McpBridgeSessionResponse,
   McpBridgeStatus,
   McpBridgeToolkitStatus,
   McpConnectorCatalogItem,
-  SourceCard,
+  PreLabVariablePlan,
   StudentDataRow
 } from "../src/lib/types.js";
 
@@ -87,14 +90,14 @@ export function getMcpBridgeStatus(env: EnvMap = process.env): McpBridgeStatus {
 export function validateMcpExportRequest(rawBody: unknown, env: EnvMap = process.env): BridgeResponse<McpBridgeExportResponse | { error: string }> {
   const request = parseRequest(rawBody);
 
-  if (!request) {
+  if (!request.ok) {
     return {
       statusCode: 400,
-      body: { error: "Send a valid MCP export action, consent flag, and bounded payload for server dry-run validation." }
+      body: { error: request.error }
     };
   }
 
-  const connector = MCP_CONNECTOR_CATALOG.find((candidate) => candidate.id === request.actionId);
+  const connector = MCP_CONNECTOR_CATALOG.find((candidate) => candidate.id === request.value.actionId);
 
   if (!connector) {
     return {
@@ -103,7 +106,7 @@ export function validateMcpExportRequest(rawBody: unknown, env: EnvMap = process
     };
   }
 
-  if (!request.consent) {
+  if (!request.value.consent) {
     return {
       statusCode: 400,
       body: { error: "Student or teacher consent is required before validating an MCP export packet." }
@@ -112,7 +115,7 @@ export function validateMcpExportRequest(rawBody: unknown, env: EnvMap = process
 
   const bridge = getMcpBridgeStatus(env);
   const toolkit = bridge.toolkits.find((candidate) => candidate.actionId === connector.id) ?? buildToolkitStatus(connector, bridge.apiKeyConfigured, env);
-  const payload = request.payload;
+  const payload = request.value.payload;
   const checks = buildExportChecks({
     payload,
     bridge,
@@ -141,13 +144,7 @@ export function validateMcpExportRequest(rawBody: unknown, env: EnvMap = process
         recommendedTools: selectEnabledTools(connector, toolkit),
         docsUrl: connector.docsUrl
       },
-      sanitizedPayload: {
-        title: payload.title,
-        rowCount: payload.rows.length,
-        sourceCount: payload.sources.length,
-        descriptionPreview: previewText(payload.description, 180),
-        evidenceExcerpt: previewText(payload.evidencePacket, 500)
-      },
+      sanitizedPayload: sanitizePayload(payload),
       nextStep: bridge.status === "ready"
         ? "Create a Composio session with this toolkit, auth config, allowed tools, and explicit user confirmation."
         : "Add the missing server env vars shown by /api/mcp/status, then keep the same consent-gated validation step before live execution."
@@ -163,14 +160,22 @@ export async function createMcpSessionTicket(
 ): Promise<BridgeResponse<McpBridgeSessionResponse | { error: string }>> {
   const request = parseRequest(rawBody);
 
-  if (!request) {
+  if (!request.ok) {
     return {
       statusCode: 400,
-      body: { error: "Send an MCP session action, consent flag, and payload for a scoped Composio session ticket." }
+      body: { error: request.error }
+    };
+  }
+  const sessionRequest = normalizeSessionRequest(request.value, rawBody);
+
+  if (!sessionRequest.ok) {
+    return {
+      statusCode: 400,
+      body: { error: sessionRequest.error }
     };
   }
 
-  const connector = MCP_CONNECTOR_CATALOG.find((candidate) => candidate.id === request.actionId);
+  const connector = MCP_CONNECTOR_CATALOG.find((candidate) => candidate.id === sessionRequest.value.actionId);
 
   if (!connector) {
     return {
@@ -179,7 +184,7 @@ export async function createMcpSessionTicket(
     };
   }
 
-  if (!request.consent) {
+  if (!sessionRequest.value.consent) {
     return {
       statusCode: 400,
       body: { error: "Student or teacher consent is required before preparing a Composio MCP session." }
@@ -188,7 +193,7 @@ export async function createMcpSessionTicket(
 
   const bridge = getMcpBridgeStatus(env);
   const toolkit = bridge.toolkits.find((candidate) => candidate.actionId === connector.id) ?? buildToolkitStatus(connector, bridge.apiKeyConfigured, env);
-  const payload = request.payload;
+  const payload = sessionRequest.value.payload;
   const checks = buildExportChecks({
     payload,
     bridge,
@@ -211,6 +216,24 @@ export async function createMcpSessionTicket(
         toolkit,
         payload,
         bridgeMode: bridge.mode,
+        bridge,
+        env,
+        checks: sessionChecks,
+        sessionCreated: false,
+        sessionId: undefined
+      })
+    };
+  }
+
+  if (sessionRequest.value.execution === "preview") {
+    return {
+      statusCode: 200,
+      body: buildSessionResponse({
+        status: sessionReady ? "ready" : "dry_run",
+        connector,
+        toolkit,
+        payload,
+        bridgeMode: sessionReady ? "server_mcp" : "server_dry_run",
         bridge,
         env,
         checks: sessionChecks,
@@ -263,7 +286,7 @@ export async function createMcpSessionTicket(
   if (!sessionResult.ok) {
     return {
       statusCode: 502,
-      body: { error: sessionResult.error }
+      body: { error: "Composio session creation was unavailable." }
     };
   }
 
@@ -340,8 +363,8 @@ function buildExportChecks({
   bridge: McpBridgeStatus;
   toolkit: McpBridgeToolkitStatus;
 }): McpBridgeExportCheck[] {
-  const payloadComplete = payload.title.length > 0 && payload.description.length > 0 && payload.evidencePacket.length > 0 && payload.rows.length > 0 && payload.sources.length > 0;
-  const hasIntegrityBlank = payload.evidencePacket.includes("___");
+  const payloadComplete = isPayloadComplete(payload);
+  const hasIntegrityBlank = hasAcademicIntegrityBoundary(payload);
 
   return [
     {
@@ -361,8 +384,8 @@ function buildExportChecks({
       label: "Payload completeness",
       status: payloadComplete ? "pass" : "blocked",
       detail: payloadComplete
-        ? `${payload.rows.length} rows and ${payload.sources.length} source links are present.`
-        : "Title, description, evidence packet, rows, and sources are required before export."
+        ? `${formatPayloadCategory(payload.category)} payload uses its action-specific allowlist.`
+        : "Required action-specific MCP payload fields are missing or empty."
     },
     {
       id: "integrity",
@@ -395,38 +418,150 @@ function markSelectedSessionCredentialsReady(checks: McpBridgeExportCheck[], too
   );
 }
 
-function parseRequest(rawBody: unknown): McpBridgeExportRequest | null {
+type ParseResult<T> = { ok: true; value: T } | { ok: false; error: string };
+
+function parseRequest(rawBody: unknown): ParseResult<McpBridgeExportRequest> {
   const body = typeof rawBody === "string" ? parseJson(rawBody) : rawBody;
-  if (!isRecord(body) || typeof body.actionId !== "string" || typeof body.consent !== "boolean" || !isRecord(body.payload)) return null;
-  const payload = normalizePayload(body.payload);
-  if (!payload) return null;
+  if (!isRecord(body) || typeof body.actionId !== "string" || typeof body.consent !== "boolean" || !isRecord(body.payload)) {
+    return { ok: false, error: "Send a valid MCP action, consent flag, and action-specific payload." };
+  }
+  const expectedCategory = getPayloadCategoryForAction(body.actionId);
+  if (!expectedCategory) {
+    return {
+      ok: true,
+      value: {
+        actionId: body.actionId as McpBridgeExportRequest["actionId"],
+        consent: body.consent,
+        payload: body.payload as unknown as McpBridgePayload
+      }
+    };
+  }
+  const payload = normalizePayload(body.payload, expectedCategory);
+  if (!payload.ok) return payload;
 
   return {
-    actionId: body.actionId as McpBridgeExportRequest["actionId"],
-    consent: body.consent,
-    payload
+    ok: true,
+    value: {
+      actionId: body.actionId as McpBridgeExportRequest["actionId"],
+      consent: body.consent,
+      payload: payload.value
+    }
   };
 }
 
-function normalizePayload(payload: unknown): McpBridgeExportRequest["payload"] | null {
-  if (!isRecord(payload)) return null;
-  const body = payload;
-  const title = boundedString(body.title, 200);
-  const description = boundedString(body.description, 2_000);
-  const evidencePacket = boundedString(body.evidencePacket, 100_000);
-  if (title === null || description === null || evidencePacket === null) return null;
-  if (!Array.isArray(body.rows) || body.rows.length > 200 || !body.rows.every(isValidStudentRow)) return null;
-  if (!Array.isArray(body.sources) || body.sources.length > 20 || !body.sources.every(isValidSourceCard)) return null;
-  if (body.reflectionAnswers !== undefined && !isValidReflectionAnswers(body.reflectionAnswers)) return null;
+function normalizeSessionRequest(request: McpBridgeExportRequest, rawBody: unknown): ParseResult<McpBridgeSessionRequest> {
+  const body = typeof rawBody === "string" ? parseJson(rawBody) : rawBody;
+  if (!isRecord(body) || (body.execution !== "preview" && body.execution !== "create")) {
+    return { ok: false, error: "Choose preview or create execution for MCP sessions." };
+  }
 
   return {
-    title,
-    description,
-    evidencePacket,
-    rows: body.rows,
-    sources: body.sources,
-    reflectionAnswers: body.reflectionAnswers as McpBridgeExportRequest["payload"]["reflectionAnswers"]
+    ok: true,
+    value: {
+      ...request,
+      execution: body.execution
+    }
   };
+}
+
+function normalizePayload(payload: unknown, expectedCategory: McpBridgePayloadCategory): ParseResult<McpBridgePayload> {
+  if (!isRecord(payload)) return { ok: false, error: "Send a valid MCP action, consent flag, and action-specific payload." };
+  if (payload.category !== expectedCategory) return { ok: false, error: "MCP payload category does not match this action." };
+
+  const allowedKeys = allowedPayloadKeys(expectedCategory);
+  if (!hasOnlyAllowedKeys(payload, allowedKeys)) {
+    return { ok: false, error: "MCP payload fields are not allowed for this action." };
+  }
+
+  const title = boundedString(payload.title, 200);
+  if (title === null) return { ok: false, error: "Send a valid MCP action, consent flag, and action-specific payload." };
+
+  if (expectedCategory === "source") {
+    const query = boundedString(payload.query, 1_000);
+    const variables = normalizeStringArray(payload.variables, 20, 100);
+    const sourceUrls = normalizeUrlArray(payload.sourceUrls, 20);
+    if (query === null || !variables || !sourceUrls) return { ok: false, error: "Send a valid MCP action, consent flag, and action-specific payload." };
+    return { ok: true, value: { category: "source", title, query, variables, sourceUrls } };
+  }
+
+  if (expectedCategory === "assignment_context") {
+    const query = boundedString(payload.query, 1_000);
+    const variables = normalizeStringArray(payload.variables, 20, 100);
+    const sourceUrls = normalizeUrlArray(payload.sourceUrls, 20);
+    if (query === null || !variables || !sourceUrls) return { ok: false, error: "Send a valid MCP action, consent flag, and action-specific payload." };
+    return { ok: true, value: { category: "assignment_context", title, query, variables, sourceUrls } };
+  }
+
+  if (expectedCategory === "document_export") {
+    const markdown = boundedString(payload.markdown, 100_000);
+    const sourceUrls = normalizeUrlArray(payload.sourceUrls, 20);
+    if (markdown === null || !sourceUrls) return { ok: false, error: "Send a valid MCP action, consent flag, and action-specific payload." };
+    return { ok: true, value: { category: "document_export", title, markdown, sourceUrls } };
+  }
+
+  if (expectedCategory === "deck_export") {
+    const outline = normalizeStringArray(payload.outline, 20, 2_000);
+    const sourceUrls = normalizeUrlArray(payload.sourceUrls, 20);
+    if (!outline || !sourceUrls) return { ok: false, error: "Send a valid MCP action, consent flag, and action-specific payload." };
+    return { ok: true, value: { category: "deck_export", title, outline, sourceUrls } };
+  }
+
+  if (expectedCategory === "table_export") {
+    const columns = normalizeStringArray(payload.columns, 32, 100);
+    if (!columns || !Array.isArray(payload.rows) || payload.rows.length > 200 || !payload.rows.every(isValidStudentRow)) {
+      return { ok: false, error: "Send a valid MCP action, consent flag, and action-specific payload." };
+    }
+    return { ok: true, value: { category: "table_export", title, columns, rows: payload.rows } };
+  }
+
+  if (expectedCategory === "portfolio_archive") {
+    const summary = boundedString(payload.summary, 2_000);
+    const artifactUrls = normalizeUrlArray(payload.artifactUrls, 20);
+    if (summary === null || !artifactUrls) return { ok: false, error: "Send a valid MCP action, consent flag, and action-specific payload." };
+    return { ok: true, value: { category: "portfolio_archive", title, summary, artifactUrls } };
+  }
+
+  if (expectedCategory === "classroom_checkpoint") {
+    const setupChecks = normalizeStringArray(payload.setupChecks, 20, 500);
+    const sourceUrls = normalizeUrlArray(payload.sourceUrls, 20);
+    if (!setupChecks || !sourceUrls || !isValidVariablePlan(payload.variablePlan)) {
+      return { ok: false, error: "Send a valid MCP action, consent flag, and action-specific payload." };
+    }
+    return { ok: true, value: { category: "classroom_checkpoint", title, setupChecks, variablePlan: payload.variablePlan, sourceUrls } };
+  }
+
+  if (expectedCategory === "readiness_form") {
+    const prompts = normalizeStringArray(payload.prompts, 20, 1_000);
+    const setupChecks = normalizeStringArray(payload.setupChecks, 20, 500);
+    if (!prompts || !setupChecks) return { ok: false, error: "Send a valid MCP action, consent flag, and action-specific payload." };
+    return { ok: true, value: { category: "readiness_form", title, prompts, setupChecks } };
+  }
+
+  if (expectedCategory === "calendar_reminder") {
+    const reminderTitle = boundedString(payload.reminderTitle, 200);
+    const nextAction = boundedString(payload.nextAction, 1_000);
+    const dueWindow = boundedString(payload.dueWindow, 200);
+    if (reminderTitle === null || nextAction === null || dueWindow === null) {
+      return { ok: false, error: "Send a valid MCP action, consent flag, and action-specific payload." };
+    }
+    return { ok: true, value: { category: "calendar_reminder", title, reminderTitle, nextAction, dueWindow } };
+  }
+
+  if (expectedCategory === "teacher_review_draft") {
+    const subject = boundedString(payload.subject, 200);
+    const body = boundedString(payload.body, 5_000);
+    const sourceUrls = normalizeUrlArray(payload.sourceUrls, 20);
+    if (subject === null || body === null || !sourceUrls) return { ok: false, error: "Send a valid MCP action, consent flag, and action-specific payload." };
+    return { ok: true, value: { category: "teacher_review_draft", title, subject, body, sourceUrls } };
+  }
+
+  const status = boundedString(payload.status, 100);
+  const nextAction = boundedString(payload.nextAction, 1_000);
+  const reflectionPrompts = normalizeStringArray(payload.reflectionPrompts, 20, 1_000);
+  if ((status !== "competitive" && status !== "submittable" && status !== "needs_work") || nextAction === null || !reflectionPrompts) {
+    return { ok: false, error: "Send a valid MCP action, consent flag, and action-specific payload." };
+  }
+  return { ok: true, value: { category: "learning_record", title, status, nextAction, reflectionPrompts } };
 }
 
 function boundedString(value: unknown, maxLength: number) {
@@ -442,20 +577,6 @@ function isValidStudentRow(value: unknown): value is StudentDataRow {
     if (typeof cell === "number") return Number.isFinite(cell);
     return typeof cell === "string" && cell.length <= 500;
   });
-}
-
-function isValidSourceCard(value: unknown): value is SourceCard {
-  if (!isRecord(value)) return false;
-  return [value.id, value.title, value.publisher, value.note].every((field) => typeof field === "string" && field.length <= 500)
-    && ["built-in", "web", "mixed"].includes(String(value.confidence))
-    && typeof value.url === "string"
-    && isHttpsUrl(value.url);
-}
-
-function isValidReflectionAnswers(value: unknown) {
-  return isRecord(value)
-    && Object.keys(value).length <= 10
-    && Object.entries(value).every(([key, answer]) => key.length <= 100 && typeof answer === "string" && answer.length <= 2_000);
 }
 
 function isHttpsUrl(value: string) {
@@ -491,9 +612,104 @@ function hasValue(value: string | undefined) {
   return typeof value === "string" && value.trim().length > 0;
 }
 
-function previewText(value: string, length: number) {
-  const compact = value.replace(/\s+/g, " ").trim();
-  return compact.length > length ? `${compact.slice(0, length - 3)}...` : compact;
+function normalizeStringArray(value: unknown, maxItems: number, maxItemLength: number) {
+  if (!Array.isArray(value) || value.length > maxItems) return null;
+  const items = value.map((item) => boundedString(item, maxItemLength));
+  if (items.some((item) => item === null)) return null;
+  return items as string[];
+}
+
+function normalizeUrlArray(value: unknown, maxItems: number) {
+  const urls = normalizeStringArray(value, maxItems, 1_000);
+  if (!urls || !urls.every(isHttpsUrl)) return null;
+  return urls;
+}
+
+function isValidVariablePlan(value: unknown): value is PreLabVariablePlan {
+  if (!isRecord(value)) return false;
+  return boundedString(value.independentVariable, 200) !== null
+    && boundedString(value.dependentVariable, 200) !== null
+    && Boolean(normalizeStringArray(value.controlVariables, 20, 200));
+}
+
+function getPayloadCategoryForAction(actionId: string): McpBridgePayloadCategory | null {
+  if (
+    actionId === "composio-search-source-audit"
+    || actionId === "composio-scholar-claim-check"
+    || actionId === "semanticscholar-reference-check"
+    || actionId === "composio-browser-source-capture"
+    || actionId === "deepwiki-source-proof"
+  ) {
+    return "source";
+  }
+  if (actionId === "canvas-assignment-context") return "assignment_context";
+  if (actionId === "google-docs-evidence-packet") return "document_export";
+  if (actionId === "google-slides-submission-deck") return "deck_export";
+  if (actionId === "google-sheets-data-log") return "table_export";
+  if (actionId === "google-drive-portfolio-archive") return "portfolio_archive";
+  if (actionId === "google-classroom-prelab-checkpoint") return "classroom_checkpoint";
+  if (actionId === "google-forms-readiness-check") return "readiness_form";
+  if (actionId === "google-calendar-next-trial-reminder") return "calendar_reminder";
+  if (actionId === "gmail-teacher-review-draft") return "teacher_review_draft";
+  if (actionId === "notion-learning-record") return "learning_record";
+  return null;
+}
+
+function allowedPayloadKeys(category: McpBridgePayloadCategory) {
+  if (category === "source") return ["category", "title", "query", "variables", "sourceUrls"];
+  if (category === "assignment_context") return ["category", "title", "query", "variables", "sourceUrls"];
+  if (category === "document_export") return ["category", "title", "markdown", "sourceUrls"];
+  if (category === "deck_export") return ["category", "title", "outline", "sourceUrls"];
+  if (category === "table_export") return ["category", "title", "columns", "rows"];
+  if (category === "portfolio_archive") return ["category", "title", "summary", "artifactUrls"];
+  if (category === "classroom_checkpoint") return ["category", "title", "setupChecks", "variablePlan", "sourceUrls"];
+  if (category === "readiness_form") return ["category", "title", "prompts", "setupChecks"];
+  if (category === "calendar_reminder") return ["category", "title", "reminderTitle", "nextAction", "dueWindow"];
+  if (category === "teacher_review_draft") return ["category", "title", "subject", "body", "sourceUrls"];
+  return ["category", "title", "status", "nextAction", "reflectionPrompts"];
+}
+
+function hasOnlyAllowedKeys(value: Record<string, unknown>, allowedKeys: string[]) {
+  return Object.keys(value).every((key) => allowedKeys.includes(key));
+}
+
+function isPayloadComplete(payload: McpBridgePayload) {
+  if (payload.category === "source" || payload.category === "assignment_context") {
+    return payload.title.length > 0 && payload.query.length > 0 && payload.variables.length > 0 && payload.sourceUrls.length > 0;
+  }
+  if (payload.category === "document_export") return payload.title.length > 0 && payload.markdown.length > 0;
+  if (payload.category === "deck_export") return payload.title.length > 0 && payload.outline.length > 0;
+  if (payload.category === "table_export") return payload.title.length > 0 && payload.columns.length > 0 && payload.rows.length > 0;
+  if (payload.category === "portfolio_archive") return payload.title.length > 0 && payload.summary.length > 0;
+  if (payload.category === "classroom_checkpoint") return payload.title.length > 0 && payload.setupChecks.length > 0;
+  if (payload.category === "readiness_form") return payload.title.length > 0 && payload.prompts.length > 0;
+  if (payload.category === "calendar_reminder") return payload.title.length > 0 && payload.reminderTitle.length > 0 && payload.nextAction.length > 0;
+  if (payload.category === "teacher_review_draft") return payload.title.length > 0 && payload.subject.length > 0 && payload.body.length > 0;
+  return payload.title.length > 0 && payload.nextAction.length > 0;
+}
+
+function hasAcademicIntegrityBoundary(payload: McpBridgePayload) {
+  if (payload.category === "document_export") return payload.markdown.includes("___");
+  if (payload.category === "teacher_review_draft") return !/final\s+claim/i.test(payload.body);
+  return true;
+}
+
+function formatPayloadCategory(category: McpBridgePayloadCategory) {
+  return category.replaceAll("_", " ");
+}
+
+function sanitizePayload(payload: McpBridgePayload): McpBridgeExportResponse["sanitizedPayload"] {
+  const urls = "sourceUrls" in payload
+    ? payload.sourceUrls
+    : "artifactUrls" in payload
+      ? payload.artifactUrls
+      : [];
+  return {
+    title: payload.title,
+    payloadCategory: payload.category,
+    fieldCount: Object.keys(payload).filter((key) => key !== "category").length,
+    sourceCount: urls.length
+  };
 }
 
 function isToolkitReadyForSession({
@@ -551,12 +767,16 @@ function buildSessionResponse({
     summary:
       status === "created"
         ? "A scoped Composio Tool Router session was created server-side for this consent-gated action."
+        : status === "ready"
+          ? "Session preview is ready; live creation remains server-owned and requires bearer authorization."
         : status === "blocked"
           ? "The session ticket is blocked until the packet has enough student-visible evidence."
           : "Session dry-run only: Ouija shows the exact Composio session scope but does not contact Composio without live server credentials.",
     executionBoundary:
       status === "created"
         ? "The server created the session and withheld the raw MCP URL from browser code."
+        : status === "ready"
+          ? "Preview stops before Composio; only an authorized server-side create request may issue a live MCP session."
         : bridge.executionBoundary,
     checks,
     target: {
@@ -578,16 +798,12 @@ function buildSessionResponse({
       mcpUrlIssued: sessionCreated,
       sessionIdPreview: sessionId ? previewIdentifier(sessionId) : undefined
     },
-    sanitizedPayload: {
-      title: payload.title,
-      rowCount: payload.rows.length,
-      sourceCount: payload.sources.length,
-      descriptionPreview: previewText(payload.description, 180),
-      evidenceExcerpt: previewText(payload.evidencePacket, 500)
-    },
+    sanitizedPayload: sanitizePayload(payload),
     nextStep:
       status === "created"
         ? "Attach the server-side agent runner to the issued MCP session; do not paste the raw MCP URL into client code."
+        : status === "ready"
+          ? "Keep the browser in preview mode; live session creation requires a bearer-authorized server action."
         : "Configure COMPOSIO_API_KEY, COMPOSIO_SESSION_USER_ID, live exports, allowed tools, and this toolkit auth config when required before creating a live session."
   };
 }
@@ -649,8 +865,12 @@ async function createComposioSession({
   const body = (await response.json().catch(() => ({}))) as Record<string, unknown>;
 
   if (!response.ok) {
-    const error = isRecord(body.error) && typeof body.error.message === "string" ? body.error.message : "Composio session creation failed.";
-    return { ok: false, error };
+    console.warn("Composio session creation failed", {
+      actionId: connector.id,
+      toolkitSlug: connector.toolkitSlug,
+      status: response.status
+    });
+    return { ok: false, error: "Composio session creation was unavailable." };
   }
 
   const mcp = isRecord(body.mcp) ? body.mcp : {};

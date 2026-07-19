@@ -1,6 +1,13 @@
 import { describe, expect, it } from "vitest";
 import { analyzeExperiment, evaluateRows, matchExperiment, refreshResultForRows } from "../src/lib/analysis";
 
+function collectGeneratedStrings(value: unknown): string[] {
+  if (typeof value === "string") return [value];
+  if (!value || typeof value !== "object") return [];
+  if (Array.isArray(value)) return value.flatMap((item) => collectGeneratedStrings(item));
+  return Object.values(value).flatMap((item) => collectGeneratedStrings(item));
+}
+
 describe("experiment matching", () => {
   it("identifies the supported middle/high school experiment types", () => {
     expect(matchExperiment("launch a ball at different angles and measure range").template.id).toBe("projectile-motion");
@@ -15,6 +22,50 @@ describe("experiment matching", () => {
 });
 
 describe("fallback analysis", () => {
+  it("marks omitted or empty rows as demo sample data", () => {
+    const omittedRows = analyzeExperiment({
+      description: "We launched a ball at angles and measured range."
+    });
+    const emptyRows = analyzeExperiment({
+      description: "We launched a ball at angles and measured range.",
+      rows: []
+    });
+
+    expect(omittedRows.dataOrigin).toBe("demo_sample");
+    expect(emptyRows.dataOrigin).toBe("demo_sample");
+    expect(omittedRows.rows.length).toBeGreaterThan(0);
+    expect(omittedRows.labBrief.signal).toContain("Demo sample");
+    expect(refreshResultForRows(omittedRows, []).dataOrigin).toBe("demo_sample");
+  });
+
+  it("marks caller-supplied rows as student supplied data", () => {
+    const result = analyzeExperiment({
+      description: "We launched a ball at angles and measured range.",
+      rows: [
+        { id: "student-1", angleDeg: 20, launchSpeedMs: 12, rangeM: 9.2, timeS: 1.0 },
+        { id: "student-2", angleDeg: 35, launchSpeedMs: 12, rangeM: 13.1, timeS: 1.4 }
+      ]
+    });
+
+    expect(result.dataOrigin).toBe("student_supplied");
+    expect(result.labBrief.signal).not.toContain("Demo sample");
+  });
+
+  it("preserves demo provenance on row edits until an explicit student-data transition", () => {
+    const result = analyzeExperiment({
+      description: "temperature changes reaction rate for a tablet"
+    });
+    const editedDemoRows = result.rows.map((row) => (row.id === "c1" ? { ...row, ratePerS: 0.09 } : row));
+
+    const editedDemo = refreshResultForRows(result, editedDemoRows);
+    const claimedStudentData = refreshResultForRows(result, editedDemoRows, "student_supplied");
+
+    expect(editedDemo.dataOrigin).toBe("demo_sample");
+    expect(editedDemo.labBrief.signal).toContain("Demo sample");
+    expect(claimedStudentData.dataOrigin).toBe("student_supplied");
+    expect(claimedStudentData.labBrief.signal).not.toContain("Demo sample");
+  });
+
   it("returns usable expected results, columns, sources, and hints without credentials", () => {
     const result = analyzeExperiment({
       description: "We launched a ball at angles and measured range."
@@ -49,7 +100,7 @@ describe("fallback analysis", () => {
       "server-api-key"
     ]);
     expect(result.dataHandlingLedger.flows.some((flow) => flow.label === "Student data" && flow.storage.includes("Browser"))).toBe(true);
-    expect(result.dataHandlingLedger.safeguards).toContain("API key stays server-side; the browser never receives OPENAI_API_KEY.");
+    expect(result.dataHandlingLedger.safeguards.some((safeguard) => safeguard.includes("API key stays server-side; the browser never receives OPENAI_API_KEY"))).toBe(true);
     expect(result.dataHandlingLedger.studentRights).toContain("Students can clear saved labs from Settings.");
     expect(result.dataHandlingLedger.judgeTakeaway).toContain("privacy-preserving");
     expect(result.groundingAudit.status).toBe("source_backed");
@@ -215,6 +266,25 @@ describe("fallback analysis", () => {
     expect(result.trackEvidence.criteria.some((criterion) => criterion.id === "student-pilot-study" && criterion.status === "checked")).toBe(true);
     expect(result.trackEvidence.criteria.some((criterion) => criterion.id === "safety-responsibility" && criterion.status === "checked")).toBe(true);
     expect(result.trackEvidence.criteria.some((criterion) => criterion.id === "data-ethics" && criterion.status === "checked")).toBe(true);
+  });
+
+  it("keeps generated external-grounding copy on the strict opt-in boundary", () => {
+    const result = analyzeExperiment({
+      description: "We launched a ball at angles and measured range."
+    });
+    const generatedText = collectGeneratedStrings(result).join("\n");
+
+    expect(generatedText).toContain("explicit per-run opt-in");
+    expect(generatedText).toContain("OUIJA_EXTERNAL_GROUNDING_ENABLED=true");
+    expect(generatedText).toContain("server OPENAI_API_KEY");
+    expect(generatedText).toContain("non-production development mode");
+    expect(generatedText).toContain("public production stays deterministic fallback-only");
+    expect(generatedText).not.toMatch(
+      /when credentials are configured|can be enabled server-side|optional OpenAI web-search enrichment|optional web-search grounding|OpenAI web search can enrich citations server-side when configured|When `OPENAI_API_KEY` is configured/i
+    );
+    expect(generatedText).not.toMatch(
+      /(?:when|if)\s+(?:an?\s+)?(?:OPENAI_API_KEY|API key|credentials?)\s+(?:is|are)?\s*(?:configured|set|present|exists).{0,120}(?:web-search|web search|external grounding|enrich)/i
+    );
   });
 
   it("supports plant growth light-color experiments as a full template", () => {

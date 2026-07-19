@@ -2,6 +2,10 @@ export type SubjectArea = "Physics" | "Chemistry" | "Biology" | "Earth Science";
 
 export type GraphKind = "line" | "scatter" | "stage";
 
+export type DataOrigin = "demo_sample" | "student_supplied";
+
+export type SavedDataOrigin = DataOrigin | "legacy_unknown";
+
 export interface StudentDataRow {
   id: string;
   [key: string]: string | number;
@@ -226,6 +230,21 @@ export interface StudentImpactBrief {
 export type PilotEvidenceIssueSignal = "" | "yes" | "no" | "unsure";
 
 export type PilotEvidenceReflectionStatus = "" | "ready" | "partial" | "not_ready";
+
+export type PrivateTextRiskKind =
+  | "contact"
+  | "student_or_class_id"
+  | "grade_or_class_period"
+  | "address"
+  | "access_code"
+  | "coordinates"
+  | "photo_or_face";
+
+export interface PrivateTextRisk {
+  kind: PrivateTextRiskKind;
+  label: string;
+  detail: string;
+}
 
 export interface PilotEvidenceEntry {
   id: string;
@@ -553,6 +572,7 @@ export interface ProgressPortfolioSnapshot {
   score: number;
   readiness: TrackEvidence["readiness"];
   issueCount: number;
+  dataOrigin: SavedDataOrigin;
 }
 
 export interface ProgressPortfolioMetric {
@@ -796,17 +816,123 @@ export interface McpBridgeStatus {
   docs: Array<{ label: string; url: string }>;
 }
 
+export type McpBridgePayloadCategory =
+  | "source"
+  | "assignment_context"
+  | "document_export"
+  | "deck_export"
+  | "table_export"
+  | "portfolio_archive"
+  | "classroom_checkpoint"
+  | "readiness_form"
+  | "calendar_reminder"
+  | "teacher_review_draft"
+  | "learning_record";
+
+export interface McpBridgeSourcePayload {
+  category: "source";
+  title: string;
+  query: string;
+  variables: string[];
+  sourceUrls: string[];
+}
+
+export interface McpBridgeAssignmentContextPayload {
+  category: "assignment_context";
+  title: string;
+  query: string;
+  variables: string[];
+  sourceUrls: string[];
+}
+
+export interface McpBridgeDocumentExportPayload {
+  category: "document_export";
+  title: string;
+  markdown: string;
+  sourceUrls: string[];
+}
+
+export interface McpBridgeDeckExportPayload {
+  category: "deck_export";
+  title: string;
+  outline: string[];
+  sourceUrls: string[];
+}
+
+export interface McpBridgeTableExportPayload {
+  category: "table_export";
+  title: string;
+  columns: string[];
+  rows: StudentDataRow[];
+}
+
+export interface McpBridgePortfolioArchivePayload {
+  category: "portfolio_archive";
+  title: string;
+  summary: string;
+  artifactUrls: string[];
+}
+
+export interface McpBridgeClassroomCheckpointPayload {
+  category: "classroom_checkpoint";
+  title: string;
+  setupChecks: string[];
+  variablePlan: PreLabVariablePlan;
+  sourceUrls: string[];
+}
+
+export interface McpBridgeReadinessFormPayload {
+  category: "readiness_form";
+  title: string;
+  prompts: string[];
+  setupChecks: string[];
+}
+
+export interface McpBridgeCalendarReminderPayload {
+  category: "calendar_reminder";
+  title: string;
+  reminderTitle: string;
+  nextAction: string;
+  dueWindow: string;
+}
+
+export interface McpBridgeTeacherReviewDraftPayload {
+  category: "teacher_review_draft";
+  title: string;
+  subject: string;
+  body: string;
+  sourceUrls: string[];
+}
+
+export interface McpBridgeLearningRecordPayload {
+  category: "learning_record";
+  title: string;
+  status: TrackEvidence["readiness"];
+  nextAction: string;
+  reflectionPrompts: string[];
+}
+
+export type McpBridgePayload =
+  | McpBridgeSourcePayload
+  | McpBridgeAssignmentContextPayload
+  | McpBridgeDocumentExportPayload
+  | McpBridgeDeckExportPayload
+  | McpBridgeTableExportPayload
+  | McpBridgePortfolioArchivePayload
+  | McpBridgeClassroomCheckpointPayload
+  | McpBridgeReadinessFormPayload
+  | McpBridgeCalendarReminderPayload
+  | McpBridgeTeacherReviewDraftPayload
+  | McpBridgeLearningRecordPayload;
+
 export interface McpBridgeExportRequest {
   actionId: McpIntegrationActionId;
   consent: boolean;
-  payload: {
-    title: string;
-    description: string;
-    evidencePacket: string;
-    rows: StudentDataRow[];
-    sources: SourceCard[];
-    reflectionAnswers?: StudentReflectionAnswers;
-  };
+  payload: McpBridgePayload;
+}
+
+export interface McpBridgeSessionRequest extends McpBridgeExportRequest {
+  execution: "preview" | "create";
 }
 
 export interface McpBridgeExportCheck {
@@ -833,16 +959,15 @@ export interface McpBridgeExportResponse {
   };
   sanitizedPayload: {
     title: string;
-    rowCount: number;
+    payloadCategory: McpBridgePayloadCategory;
+    fieldCount: number;
     sourceCount: number;
-    descriptionPreview: string;
-    evidenceExcerpt: string;
   };
   nextStep: string;
 }
 
 export interface McpBridgeSessionResponse {
-  status: "dry_run" | "created" | "blocked";
+  status: "dry_run" | "ready" | "created" | "blocked";
   actionId: McpIntegrationActionId;
   toolkit: McpIntegrationAction["toolkit"];
   mode: McpBridgeStatus["mode"];
@@ -973,10 +1098,12 @@ export interface RuntimeProof {
 export interface AnalyzeRequest {
   description: string;
   rows?: StudentDataRow[];
+  allowExternalGrounding?: boolean;
 }
 
 export interface AnalyzeResult {
   templateId: string;
+  dataOrigin: DataOrigin;
   classification: {
     subject: SubjectArea;
     title: string;

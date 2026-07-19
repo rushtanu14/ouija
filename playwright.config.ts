@@ -6,6 +6,7 @@ const e2eApiPort = 18787;
 export default defineConfig({
   testDir: "./tests/e2e",
   timeout: 30_000,
+  grepInvert: /@prod-smoke/,
   workers: 1,
   fullyParallel: false,
   use: {

@@ -30,7 +30,7 @@
 
 ## AI Technical Design And Model Strategy
 
-- Hybrid design: deterministic science templates plus optional OpenAI Responses API `web_search`.
+- Hybrid design: deterministic science templates plus optional OpenAI Responses API `web_search` gated by request opt-in, server enablement, API key, and non-production mode.
 - Server-side grounding keeps the API key out of the browser.
 - AI Runtime Proof shows fallback/web-search readiness, template count, evaluation coverage, server-only key boundary, and MCP bridge mode through the UI and `/api/runtime-proof`.
 - Model Strategy exposes candidate rankings, matched signals, confidence, fallback behavior, validation layers, safety layer, and risk controls.
@@ -40,8 +40,8 @@
 - Data Handling Ledger exposes what student data is used, where it is stored, retention, local snapshots, student controls, and the server-only API-key boundary.
 - Student Pilot Study Kit is included in the analysis schema, Evidence Packet, rubric fit, development journey, evaluation evidence, and Google Forms MCP preview.
 - Pilot Evidence Tracker quality gate checks observation count, time-to-graph, paired confidence, issue/reflection signals, and privacy scan status before the export is treated as submission-ready.
-- Pilot Evidence Tracker export redacts direct contact details and keeps the pilot evidence path browser-local until the team intentionally copies or validates a consent-gated handoff.
-- MCP Integration Coach validates Source Scout plus Composio-powered Search, Scholar claim checks, Semantic Scholar reference checks, Browser source capture, DeepWiki public-source proof, Canvas assignment context, Google Docs, Google Slides, Google Sheets, Google Drive, Google Classroom, Google Forms, Google Calendar, Gmail teacher-review draft, and Notion routes through `/api/mcp/export`, then prepares a scoped `/api/mcp/session` ticket while keeping `COMPOSIO_API_KEY`, auth config IDs where required, and raw MCP URLs server-side. Judge Mode shows the source-verification receipts, DeepWiki indexing boundary, and Canvas assignment-context sessions before any write/export connector.
+- Pilot Evidence Tracker export includes structured metrics and aggregate privacy-risk counts only; raw notes stay browser-local, and no raw or redacted note column is shared until the team intentionally copies or validates a consent-gated handoff.
+- MCP Integration Coach validates Source Scout plus Composio-powered Search, Scholar claim checks, Semantic Scholar reference checks, Browser source capture, DeepWiki public-source proof, Canvas assignment context, Google Docs, Google Slides, Google Sheets, Google Drive, Google Classroom, Google Forms, Google Calendar, Gmail teacher-review draft, and Notion routes through `/api/mcp/export` using action/category allowlisted payloads. Browser `/api/mcp/session` calls are preview-only; live `execution: "create"` stays bearer-authorized and server-owned while keeping `COMPOSIO_API_KEY`, auth config IDs where required, and raw MCP URLs server-side. Judge Mode shows the source-verification receipts, DeepWiki indexing boundary, and Canvas assignment-context sessions before any write/export connector.
 - Grounding Audit scores citation visibility, source agreement, mixed-evidence boundaries, and student source use.
 - Result schema separates classification, expected result, citations, row checks, hints, and Claim Coach.
 - Method Audit adds deterministic experiment-quality evaluation beyond plain text generation.
@@ -97,7 +97,7 @@
 - Progress Portfolio visibly turns Saved Labs into repeated learning evidence instead of only storage.
 - Portfolio Story Builder visibly keeps the progress narrative student-owned through prompts, evidence references, and blanks.
 - Expected graph and editable table now appear before Model Strategy, AI Evaluation Harness, Data Handling Ledger, and AIYES Rubric Fit, so the practical student workflow is visible before the deeper judge evidence stack.
-- MCP Integration Coach visibly turns the Evidence Packet, Pre-Lab Design Coach, Next Trial Planner, and Progress Portfolio into Source Scout live proof receipts plus consent-gated source-audit, Scholar claim-check, Semantic Scholar reference-check, Browser source-capture, DeepWiki source-proof, Canvas assignment-context, Google Slides deck-draft, and classroom handoff plan with a Composio Sessions strategy, readiness matrix for env vars, allowed tools, scopes, dry-run checks, and data shared.
+- MCP Integration Coach visibly turns the Evidence Packet, Pre-Lab Design Coach, Next Trial Planner, and Progress Portfolio into Source Scout live proof receipts plus consent-gated source-audit, Scholar claim-check, Semantic Scholar reference-check, Browser source-capture, DeepWiki source-proof, Canvas assignment-context, Google Slides deck-draft, and classroom handoff plan with action-specific payload allowlists, a Composio Sessions preview/create split, readiness matrix for env vars, allowed tools, scopes, dry-run checks, and data shared.
 - AI Model Card visibly summarizes architecture, grounding mode, evaluation method, privacy boundary, and risk controls.
 - Data Handling Ledger visibly summarizes privacy, retention, browser-local saves, and student controls.
 - Deterministic Regression Suite exposes nine deterministic checks through the app and `/api/evaluate`.
@@ -133,13 +133,13 @@
 - Student Reflection Workspace appears in the app and Evidence Packet so judges can inspect student-authored answers without Ouija writing the conclusion.
 - Progress Portfolio appears near Saved Labs so judges can inspect score trend, subject breadth, and strongest saved run.
 - Portfolio Story Builder appears inside Progress Portfolio so judges can inspect student-authored impact prompts before any classroom export.
-- MCP Integration Coach appears near Progress Portfolio so judges can inspect the Source Scout receipts, July 18 Composio Search rules proof, classroom-lab source proof, DeepWiki indexing receipt, exact source-audit/export payload, Composio Search route, Scholar claim-check route, Semantic Scholar reference-check route, Browser source-capture route, DeepWiki source-proof route, Canvas assignment-context route, Google Slides deck-draft route, Google Classroom pre-lab checkpoint route, Google Forms readiness route, Google Calendar next-trial reminder route, credential boundary, Composio route, and server dry-run readiness matrix before any live connector is enabled.
+- MCP Integration Coach appears near Progress Portfolio so judges can inspect the Source Scout receipts, July 18 Composio Search rules proof, classroom-lab source proof, DeepWiki indexing receipt, exact source-audit/export payload categories, Composio Search route, Scholar claim-check route, Semantic Scholar reference-check route, Browser source-capture route, DeepWiki source-proof route, Canvas assignment-context route, Google Slides deck-draft route, Google Classroom pre-lab checkpoint route, Google Forms readiness route, Google Calendar next-trial reminder route, credential boundary, Composio route, and server dry-run readiness matrix before any live connector is enabled.
 - Submission Hub keeps the external judging packet scannable instead of forcing evaluators to hunt through the README or Devpost copy.
 - AIYES Submission Gate separates passed app/deck/video/source/AI/UX requirements from the external Devpost roster and final-submit step.
 - AIYES Team Readiness Worksheet prepares the listed 2-5 student roster with anonymous role, eligibility, consent, and Devpost-account checks while keeping personal details out of Ouija.
 - AIYES Demo Rehearsal maps the required video walkthrough and live demo to a 4:45 path under the five-minute cap.
 - AIYES Judge Q&A Prep maps likely judging questions to proof surfaces and no-overclaim boundaries before the team answers live.
-- Official AIYES Rules Snapshot shows the July 18, 2026 verified Devpost deadline, eligibility, Track 1 artifacts, judging criteria, award bands, 86-participant snapshot, source link, and team-roster caveat in Judge mode.
+- Official AIYES Rules Snapshot shows the July 18, 2026 verified Devpost deadline, eligibility, Track 1 artifacts, judging criteria, award bands, rules snapshot, source link, and team-roster caveat in Judge mode.
 - Top Award Radar now maps the win target to the official AIYES Gold/Silver/Bronze/Honorable Mention certificate bands and uses the pilot evidence quality gate as the remaining impact-evidence risk, so the team can aim for Gold-level evidence without pretending a literal first-place rank is guaranteed.
 - Desktop and mobile E2E checks verify no horizontal overflow.
 
@@ -149,8 +149,8 @@
 - Use `https://ouija-olive.vercel.app/submission/` as the one-click judge packet.
 - Use `https://ouija-olive.vercel.app/?judge=1` for judge walkthroughs and `https://ouija-olive.vercel.app` for the student default view.
 - Use AIYES Team Readiness Worksheet for anonymous 2-5 member prep, then handle the live Devpost page's final team roster requirement; the overview text also says participants may work individually, so verify the submission form behavior before final submit.
-- Optionally configure a real OpenAI API key for one web-search-enriched demo and live Composio credentials for classroom exports.
-- Use `/api/runtime-proof`, `/api/evaluate`, `/api/mcp/status`, and a consent-gated `/api/mcp/session` dry-run as quick public smoke checks after each deploy.
+- Optionally configure a real OpenAI API key plus `OUIJA_EXTERNAL_GROUNDING_ENABLED=true` for one non-production, request-opted web-search-enriched demo, and live Composio credentials for classroom exports.
+- Use `/api/runtime-proof`, `/api/evaluate`, `/api/mcp/status`, and a consent-gated `/api/mcp/session` preview as quick public smoke checks after each deploy.
 - In Judge mode, verify Official AIYES Rules Snapshot, AIYES Submission Gate, AIYES Team Readiness Worksheet, AIYES Demo Rehearsal, AIYES Judge Q&A Prep, and Judge Brief show the verified deadline, Track 1 artifacts, slide presentation, video walkthrough, submission hub, source/deployment, source ZIP fallback, judging criteria, award bands, anonymous roster prep, timed demo path, proof-backed live answers, and the external Devpost final-submit step.
 - Present or export `docs/aiyes-slide-deck.html`.
 - Paste `docs/devpost-submission-copy.md` into Devpost.

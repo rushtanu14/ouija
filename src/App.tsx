@@ -39,6 +39,8 @@ import { requestAnalysis, requestEvaluation, requestMcpExport, requestMcpSession
 import { refreshResultForRows } from "./lib/analysis";
 import { buildConceptMasteryCheck } from "./lib/conceptMasteryCheck";
 import type { ConceptMasteryAnswerMap, ConceptMasteryCheck } from "./lib/conceptMasteryCheck";
+import { readStorageList, readStorageValue, writeStorageValue } from "./lib/browserStorage";
+import type { BrowserStorageLike, StorageResult } from "./lib/browserStorage";
 import { buildPasteExample, parsePastedTable } from "./lib/dataImport";
 import { buildEvidencePacket } from "./lib/evidencePacket";
 import { buildMcpIntegrationPlan } from "./lib/mcpIntegrationPlan";
@@ -58,6 +60,7 @@ import type {
   AiEvaluationHarness,
   ConceptCoach,
   CustomLabTriage,
+  DataOrigin,
   DataHandlingLedger,
   DevelopmentJourney,
   EvaluationReport,
@@ -70,6 +73,8 @@ import type {
   LearningImpactSnapshot,
   McpBridgeExportRequest,
   McpBridgeExportResponse,
+  McpBridgePayload,
+  McpBridgeSessionRequest,
   McpBridgeSessionResponse,
   McpBridgeStatus,
   McpIntegrationActionId,
@@ -87,6 +92,7 @@ import type {
   ReliabilityCoach,
   RuntimeProof,
   SafetyCoach,
+  SavedDataOrigin,
   StudentDataRow,
   StudentImpactBrief,
   StudentPilotStudyKit,
@@ -107,13 +113,16 @@ const slideDeckUrl = "https://ouija-olive.vercel.app/submission/slide-deck.html"
 const walkthroughVideoUrl = "https://ouija-olive.vercel.app/submission/assets/ouija-walkthrough.webm";
 const officialAiyesDevpostUrl = "https://ai-yes-competition-30441.devpost.com/";
 const officialAiyesVerifiedDate = "July 18, 2026";
-const officialAiyesParticipantCount = "86 participants shown on Devpost at verification time";
 
 interface SavedLab extends ProgressPortfolioSnapshot {
   description: string;
   rows: StudentDataRow[];
 }
 
+type PersistenceStatus = { tone: "success" | "warning"; message: string };
+type UndoAction =
+  | { kind: "saved_labs"; message: string; value: SavedLab[] }
+  | { kind: "pilot_evidence"; message: string; value: PilotEvidenceEntry[] };
 type LearningLevel = "middle" | "high";
 type ViewMode = "student" | "judge";
 
@@ -162,15 +171,27 @@ function getInitialViewMode(): ViewMode {
 }
 
 export function App() {
+  const [savedLabsLoadResult] = useState(() => loadSavedLabs());
+  const [pilotEvidenceLoadResult] = useState(() => loadPilotEvidenceEntries());
+  const initialSavedLabs = savedLabsLoadResult.ok ? savedLabsLoadResult.value : [];
+  const initialPilotEvidenceEntries =
+    pilotEvidenceLoadResult.ok && pilotEvidenceLoadResult.value
+      ? pilotEvidenceLoadResult.value
+      : createInitialPilotEvidenceEntries();
   const [description, setDescription] = useState(initialPrompt);
   const [learningLevel, setLearningLevel] = useState<LearningLevel>("middle");
   const [viewMode, setViewMode] = useState<ViewMode>(getInitialViewMode);
+  const [allowExternalGrounding, setAllowExternalGrounding] = useState(false);
   const [result, setResult] = useState<AnalyzeResult | null>(null);
   const [rows, setRows] = useState<StudentDataRow[]>([]);
   const [reflectionAnswers, setReflectionAnswers] = useState<StudentReflectionAnswers>({});
   const [masteryAnswers, setMasteryAnswers] = useState<ConceptMasteryAnswerMap>({});
-  const [savedLabs, setSavedLabs] = useState<SavedLab[]>(loadSavedLabs);
-  const [pilotEvidenceEntries, setPilotEvidenceEntries] = useState<PilotEvidenceEntry[]>(loadPilotEvidenceEntries);
+  const [savedLabs, setSavedLabs] = useState<SavedLab[]>(initialSavedLabs);
+  const [pilotEvidenceEntries, setPilotEvidenceEntries] = useState<PilotEvidenceEntry[]>(initialPilotEvidenceEntries);
+  const [persistenceStatus, setPersistenceStatus] = useState<PersistenceStatus | null>(() =>
+    firstStorageWarning(savedLabsLoadResult, pilotEvidenceLoadResult)
+  );
+  const [undoAction, setUndoAction] = useState<UndoAction | null>(null);
   const [evaluationReport, setEvaluationReport] = useState<EvaluationReport | null>(null);
   const [runtimeProof, setRuntimeProof] = useState<RuntimeProof | null>(null);
   const [mcpBridgeStatus, setMcpBridgeStatus] = useState<McpBridgeStatus | null>(null);
@@ -182,17 +203,20 @@ export function App() {
   const [error, setError] = useState("");
   const analysisRequestId = useRef(0);
 
-  async function analyze(nextDescription = description, nextRows?: StudentDataRow[]) {
+  async function analyze(nextDescription = description, nextRows?: StudentDataRow[], preservedDataOrigin?: DataOrigin) {
     const requestId = analysisRequestId.current + 1;
     analysisRequestId.current = requestId;
     setStatus("loading");
     setError("");
 
     try {
-      const analysis = await requestAnalysis({ description: nextDescription, rows: nextRows });
+      const analysis = await requestAnalysis({ description: nextDescription, rows: nextRows, allowExternalGrounding });
       if (requestId !== analysisRequestId.current) return;
-      setResult(analysis);
-      setRows(analysis.rows);
+      const nextAnalysis = preservedDataOrigin
+        ? refreshResultForRows({ ...analysis, dataOrigin: preservedDataOrigin }, analysis.rows, preservedDataOrigin)
+        : analysis;
+      setResult(nextAnalysis);
+      setRows(nextAnalysis.rows);
       setReflectionAnswers({});
       setMasteryAnswers({});
       setMcpExportResult(null);
@@ -218,12 +242,20 @@ export function App() {
     setRows(nextRows);
 
     if (result) {
-      setResult(refreshResultForRows(result, nextRows));
+      setResult(refreshResultForRows(result, nextRows, result.dataOrigin));
     }
   }
 
-  function saveCurrentLab() {
+  function startStudentOwnedTable() {
     if (!result) return;
+
+    const nextRows = createStudentOwnedRows(result);
+    setRows(nextRows);
+    setResult(refreshResultForRows(result, nextRows, "student_supplied"));
+  }
+
+  function saveCurrentLab() {
+    if (!result || result.dataOrigin !== "student_supplied") return;
 
     const snapshot: SavedLab = {
       id: `${Date.now()}-${result.templateId}`,
@@ -234,22 +266,28 @@ export function App() {
       rows,
       score: result.trackEvidence.score,
       readiness: result.trackEvidence.readiness,
-      issueCount: result.issues.filter((issue) => issue.severity !== "info").length
+      issueCount: result.issues.filter((issue) => issue.severity !== "info").length,
+      dataOrigin: result.dataOrigin
     };
     const nextSavedLabs = [snapshot, ...savedLabs].slice(0, 6);
     setSavedLabs(nextSavedLabs);
-    storeSavedLabs(nextSavedLabs);
+    setUndoAction((current) => (current?.kind === "saved_labs" ? null : current));
+    persistSavedLabs(nextSavedLabs, "Saved this student-supplied lab snapshot.");
   }
 
   function loadSavedLab(savedLab: SavedLab) {
     setDescription(savedLab.description);
-    void analyze(savedLab.description, savedLab.rows);
+    void analyze(savedLab.description, savedLab.rows, getActiveDataOrigin(savedLab.dataOrigin));
   }
 
   function deleteSavedLab(id: string) {
+    const deletedLab = savedLabs.find((savedLab) => savedLab.id === id);
+    if (!deletedLab) return;
+
     const nextSavedLabs = savedLabs.filter((savedLab) => savedLab.id !== id);
     setSavedLabs(nextSavedLabs);
-    storeSavedLabs(nextSavedLabs);
+    setUndoAction({ kind: "saved_labs", message: `${deletedLab.title} deleted.`, value: savedLabs });
+    persistSavedLabs(nextSavedLabs, "Saved lab snapshot deleted.");
   }
 
   function updateReflectionAnswer(promptId: keyof StudentReflectionAnswers, answer: string) {
@@ -269,13 +307,37 @@ export function App() {
   function updatePilotEvidenceEntry(id: string, patch: Partial<Omit<PilotEvidenceEntry, "id" | "label">>) {
     const nextEntries = pilotEvidenceEntries.map((entry) => (entry.id === id ? { ...entry, ...patch } : entry));
     setPilotEvidenceEntries(nextEntries);
-    storePilotEvidenceEntries(nextEntries);
+    setUndoAction((current) => (current?.kind === "pilot_evidence" ? null : current));
+    persistPilotEvidenceEntries(nextEntries, "Pilot evidence saved locally.");
   }
 
   function resetPilotEvidenceEntries() {
     const nextEntries = createInitialPilotEvidenceEntries();
     setPilotEvidenceEntries(nextEntries);
-    storePilotEvidenceEntries(nextEntries);
+    setUndoAction({ kind: "pilot_evidence", message: "Pilot evidence cleared.", value: pilotEvidenceEntries });
+    persistPilotEvidenceEntries(nextEntries, "Pilot evidence cleared.");
+  }
+
+  function undoLastStorageAction() {
+    if (!undoAction) return;
+
+    if (undoAction.kind === "saved_labs") {
+      setSavedLabs(undoAction.value);
+      persistSavedLabs(undoAction.value, "Restored the deleted saved lab snapshot.");
+    } else {
+      setPilotEvidenceEntries(undoAction.value);
+      persistPilotEvidenceEntries(undoAction.value, "Restored the cleared pilot evidence.");
+    }
+
+    setUndoAction(null);
+  }
+
+  function persistSavedLabs(nextSavedLabs: SavedLab[], successMessage: string) {
+    setPersistenceStatus(formatPersistenceResult(storeSavedLabs(nextSavedLabs), successMessage));
+  }
+
+  function persistPilotEvidenceEntries(nextEntries: PilotEvidenceEntry[], successMessage: string) {
+    setPersistenceStatus(formatPersistenceResult(storePilotEvidenceEntries(nextEntries), successMessage));
   }
 
   const chartData = useMemo(() => {
@@ -289,6 +351,10 @@ export function App() {
     }));
   }, [result, rows]);
   const progressPortfolio = useMemo(() => buildProgressPortfolio(savedLabs), [savedLabs]);
+  const studentSuppliedSavedLabCount = useMemo(
+    () => savedLabs.filter((savedLab) => savedLab.dataOrigin === "student_supplied").length,
+    [savedLabs]
+  );
   const pilotEvidenceSummary = useMemo(() => summarizePilotEvidence(pilotEvidenceEntries), [pilotEvidenceEntries]);
   const studentReflectionWorkspace = useMemo(() => {
     if (!result) return null;
@@ -316,6 +382,7 @@ export function App() {
   }, [description, evidencePacket, mcpBridgeStatus, progressPortfolio, result, rows]);
   const isJudgeMode = viewMode === "judge";
   const navLinks = isJudgeMode ? judgeNavLinks : studentNavLinks;
+  const studentEvidenceReady = result?.dataOrigin === "student_supplied";
 
   function changeViewMode(nextMode: ViewMode) {
     setViewMode(nextMode);
@@ -332,7 +399,7 @@ export function App() {
   }
 
   async function validateMcpAction(actionId: McpIntegrationActionId) {
-    if (!result || !mcpIntegrationPlan) return;
+    if (!result || !mcpIntegrationPlan || result.dataOrigin !== "student_supplied") return;
 
     setMcpExportStatus("loading");
     setMcpExportError("");
@@ -343,16 +410,13 @@ export function App() {
       const payload: McpBridgeExportRequest = {
         actionId,
         consent: true,
-        payload: {
-          title: mcpIntegrationPlan.payloadPreview.title,
-          description,
-          evidencePacket,
-          rows,
-          sources: result.sources,
-          reflectionAnswers
-        }
+        payload: buildMcpBridgePayload(actionId, result, rows, evidencePacket, mcpIntegrationPlan, reflectionAnswers)
       };
-      const [exportResponse, sessionResponse] = await Promise.all([requestMcpExport(payload), requestMcpSession(payload)]);
+      const sessionPayload: McpBridgeSessionRequest = {
+        ...payload,
+        execution: "preview"
+      };
+      const [exportResponse, sessionResponse] = await Promise.all([requestMcpExport(payload), requestMcpSession(sessionPayload)]);
       setMcpExportResult(exportResponse);
       setMcpSessionResult(sessionResponse);
       setMcpExportStatus("idle");
@@ -360,6 +424,137 @@ export function App() {
       setMcpExportStatus("error");
       setMcpExportError(exportError instanceof Error ? exportError.message : "Unable to validate this MCP packet.");
     }
+  }
+
+  function buildMcpBridgePayload(
+    actionId: McpIntegrationActionId,
+    currentResult: AnalyzeResult,
+    currentRows: StudentDataRow[],
+    currentEvidencePacket: string,
+    plan: McpIntegrationPlan,
+    currentReflectionAnswers: StudentReflectionAnswers
+  ): McpBridgePayload {
+    const title = plan.payloadPreview.title;
+    const sourceUrls = currentResult.sources.map((source) => source.url);
+    const variables = currentResult.variables;
+    const sourceQuery = `${currentResult.classification.title} ${variables.join(" ")} source quality`;
+    const setupChecks = currentResult.preLabDesignCoach.setupChecks.map((check) => `${check.label}: ${check.detail}`);
+    const reflectionPrompts = currentResult.learningExitTicket.prompts.map((prompt) => prompt.studentPrompt);
+
+    if (
+      actionId === "composio-search-source-audit"
+      || actionId === "composio-scholar-claim-check"
+      || actionId === "semanticscholar-reference-check"
+      || actionId === "composio-browser-source-capture"
+      || actionId === "deepwiki-source-proof"
+    ) {
+      return {
+        category: "source",
+        title,
+        query: sourceQuery,
+        variables,
+        sourceUrls
+      };
+    }
+
+    if (actionId === "canvas-assignment-context") {
+      return {
+        category: "assignment_context",
+        title,
+        query: "Import selected Canvas lab prompt, due date, file metadata, and rubric criteria only.",
+        variables,
+        sourceUrls
+      };
+    }
+
+    if (actionId === "google-docs-evidence-packet") {
+      return {
+        category: "document_export",
+        title,
+        markdown: currentEvidencePacket,
+        sourceUrls
+      };
+    }
+
+    if (actionId === "google-slides-submission-deck") {
+      return {
+        category: "deck_export",
+        title,
+        outline: [
+          "Problem and student user",
+          "AI workflow and evidence boundaries",
+          "Expected pattern and citation notes",
+          "Student-owned next claim draft",
+          ...Object.values(currentReflectionAnswers).filter((answer) => answer.trim().length > 0).slice(0, 3)
+        ],
+        sourceUrls
+      };
+    }
+
+    if (actionId === "google-sheets-data-log") {
+      return {
+        category: "table_export",
+        title,
+        columns: currentResult.columns.map((column) => column.key),
+        rows: currentRows
+      };
+    }
+
+    if (actionId === "google-drive-portfolio-archive") {
+      return {
+        category: "portfolio_archive",
+        title,
+        summary: `${plan.payloadPreview.savedRunCount} student-supplied saved run${plan.payloadPreview.savedRunCount === 1 ? "" : "s"} with ${plan.payloadPreview.sourceCount} citation${plan.payloadPreview.sourceCount === 1 ? "" : "s"}.`,
+        artifactUrls: sourceUrls
+      };
+    }
+
+    if (actionId === "google-classroom-prelab-checkpoint") {
+      return {
+        category: "classroom_checkpoint",
+        title,
+        setupChecks,
+        variablePlan: currentResult.preLabDesignCoach.variablePlan,
+        sourceUrls
+      };
+    }
+
+    if (actionId === "google-forms-readiness-check") {
+      return {
+        category: "readiness_form",
+        title,
+        prompts: reflectionPrompts,
+        setupChecks
+      };
+    }
+
+    if (actionId === "google-calendar-next-trial-reminder") {
+      return {
+        category: "calendar_reminder",
+        title,
+        reminderTitle: `Next trial: ${currentResult.classification.title}`,
+        nextAction: currentResult.nextTrialPlan.nextMeasurement,
+        dueWindow: "Next lab block"
+      };
+    }
+
+    if (actionId === "gmail-teacher-review-draft") {
+      return {
+        category: "teacher_review_draft",
+        title,
+        subject: `Review request: ${currentResult.classification.title}`,
+        body: "Please review my variables, controls, source trust, safety checks, and evidence plan before I write my final claim.",
+        sourceUrls
+      };
+    }
+
+    return {
+      category: "learning_record",
+      title,
+      status: currentResult.trackEvidence.readiness,
+      nextAction: currentResult.nextTrialPlan.nextMeasurement,
+      reflectionPrompts
+    };
   }
 
   return (
@@ -454,7 +649,13 @@ export function App() {
             <Search size={18} />
             {status === "loading" ? "Analyzing..." : "Analyze"}
           </button>
-          <button className="secondary-action" type="button" onClick={saveCurrentLab} disabled={!result}>
+          <button
+            className="secondary-action"
+            type="button"
+            onClick={saveCurrentLab}
+            disabled={!studentEvidenceReady}
+            title={studentEvidenceReady ? "Save this student-supplied run" : "Student-supplied rows are required before saving evidence."}
+          >
             <Save size={17} />
             Save current lab
           </button>
@@ -490,6 +691,12 @@ export function App() {
                   <span key={concept}>{concept}</span>
                 ))}
               </div>
+              {result.dataOrigin !== "student_supplied" ? (
+                <div className="demo-sample-banner" role="status">
+                  <strong>DEMO SAMPLE - not student evidence.</strong>
+                  <span>Use your own data or import rows to enable saved progress, pilot evidence, Evidence Packet copy, and MCP handoff.</span>
+                </div>
+              ) : null}
 
               <RunSnapshotPanel result={result} evaluationReport={evaluationReport} />
               <StudentImpactBriefPanel brief={result.studentImpactBrief} />
@@ -522,8 +729,8 @@ export function App() {
                 </div>
                 <DataImportPanel result={result} rows={rows} onImportRows={(nextRows) => {
                   setRows(nextRows);
-                  setResult(refreshResultForRows(result, nextRows));
-                }} />
+                  setResult(refreshResultForRows(result, nextRows, "student_supplied"));
+                }} onUseOwnData={startStudentOwnedTable} />
                 <DataTable result={result} rows={rows} onCellChange={updateCell} />
               </div>
 
@@ -539,6 +746,7 @@ export function App() {
               <PilotEvidenceTrackerPanel
                 entries={pilotEvidenceEntries}
                 summary={pilotEvidenceSummary}
+                enabled={studentEvidenceReady}
                 onEntryChange={updatePilotEvidenceEntry}
                 onReset={resetPilotEvidenceEntries}
               />
@@ -550,7 +758,7 @@ export function App() {
                 />
               ) : null}
               <LabBriefPanel brief={result.labBrief} />
-              <EvidencePacketPanel packet={evidencePacket} />
+              <EvidencePacketPanel packet={evidencePacket} enabled={studentEvidenceReady} />
               {isJudgeMode ? (
                 <>
                   <ModelStrategyPanel strategy={result.modelStrategy} />
@@ -613,6 +821,7 @@ export function App() {
         </aside>
       </section>
       <section className="lower-workspace" aria-label="Saved labs and settings">
+        <StorageStatusPanel status={persistenceStatus} undoAction={undoAction} onUndo={undoLastStorageAction} />
         <SavedLabsPanel savedLabs={savedLabs} onLoad={loadSavedLab} onDelete={deleteSavedLab} />
         <ProgressPortfolioPanel portfolio={progressPortfolio} />
         {isJudgeMode ? (
@@ -624,6 +833,7 @@ export function App() {
               sessionResult={mcpSessionResult}
               exportStatus={mcpExportStatus}
               exportError={mcpExportError}
+              enabled={studentEvidenceReady}
               onValidateAction={validateMcpAction}
             />
             <EvaluationBenchPanel report={evaluationReport} />
@@ -635,7 +845,7 @@ export function App() {
               runtimeProof={runtimeProof}
               mcpBridgeStatus={mcpBridgeStatus}
               pilotEvidenceSummary={pilotEvidenceSummary}
-              savedLabCount={savedLabs.length}
+              studentSuppliedSavedLabCount={studentSuppliedSavedLabCount}
             />
             <AiyesRulesSnapshotPanel />
             <SubmissionGatePanel evaluationReport={evaluationReport} runtimeProof={runtimeProof} mcpBridgeStatus={mcpBridgeStatus} />
@@ -657,6 +867,8 @@ export function App() {
           reflectionWorkspace={studentReflectionWorkspace}
           mcpStatus={mcpIntegrationPlan?.status ?? "preview_only"}
           viewMode={viewMode}
+          allowExternalGrounding={allowExternalGrounding}
+          onExternalGroundingChange={setAllowExternalGrounding}
         />
       </section>
     </main>
@@ -718,6 +930,18 @@ function RunSnapshotPanel({ result, evaluationReport }: { result: AnalyzeResult;
       </div>
     </section>
   );
+}
+
+function createStudentOwnedRows(result: AnalyzeResult): StudentDataRow[] {
+  const rowCount = Math.max(1, result.rows.length);
+
+  return Array.from({ length: rowCount }, (_, index) => ({
+    id: `student-${index + 1}`,
+    ...result.columns.reduce<Record<string, string>>((cells, column) => {
+      cells[column.key] = "";
+      return cells;
+    }, {})
+  }));
 }
 
 function StudentImpactBriefPanel({ brief }: { brief: StudentImpactBrief }) {
@@ -1318,20 +1542,20 @@ function TopAwardRadarPanel({
   runtimeProof,
   mcpBridgeStatus,
   pilotEvidenceSummary,
-  savedLabCount
+  studentSuppliedSavedLabCount
 }: {
   result: AnalyzeResult | null;
   evaluationReport: EvaluationReport | null;
   runtimeProof: RuntimeProof | null;
   mcpBridgeStatus: McpBridgeStatus | null;
   pilotEvidenceSummary: PilotEvidenceSummary;
-  savedLabCount: number;
+  studentSuppliedSavedLabCount: number;
 }) {
   const regressionReady = evaluationReport?.status === "pass";
   const runtimeReady = runtimeProof?.status === "fallback_ready" || runtimeProof?.status === "web_enriched_ready";
   const mcpRouteCount = mcpBridgeStatus?.toolkits.length ?? 0;
   const pilotReady = pilotEvidenceSummary.qualityStatus === "submission_ready";
-  const savedEvidenceReady = savedLabCount >= 2;
+  const savedEvidenceReady = studentSuppliedSavedLabCount >= 2;
   const radarItems = [
     {
       label: "Problem and relevance",
@@ -1358,8 +1582,8 @@ function TopAwardRadarPanel({
     {
       label: "Impact evidence",
       status: pilotReady ? "Strong" : "Collect",
-      detail: `${pilotEvidenceSummary.observationCount}/3 anonymous pilot observations logged; ${savedLabCount} saved lab snapshot${
-        savedLabCount === 1 ? "" : "s"
+      detail: `${pilotEvidenceSummary.observationCount}/3 anonymous pilot observations logged; ${studentSuppliedSavedLabCount} student-supplied saved lab snapshot${
+        studentSuppliedSavedLabCount === 1 ? "" : "s"
       } available; quality gate ${pilotEvidenceSummary.qualityScore}/100 (${formatPilotEvidenceQualityStatus(
         pilotEvidenceSummary.qualityStatus
       )}); CSV-ready export is available in Pilot Evidence Tracker.`
@@ -1460,11 +1684,6 @@ function AiyesRulesSnapshotPanel() {
       detail: "Online public submission; all hosted links should be checked again on submission day."
     },
     {
-      label: "Live page signal",
-      value: "86 participants visible",
-      detail: "The page was rechecked on July 18, 2026; treat the participant count as a snapshot, not a fixed contest total."
-    },
-    {
       label: "Track 1 artifacts",
       value: "Slide deck, 5-minute video, source/deploy link",
       detail: "Ouija has a hosted deck, walkthrough, public repo, live app, and one-click Submission Hub."
@@ -1493,7 +1712,7 @@ function AiyesRulesSnapshotPanel() {
           <strong>AIYES Devpost page</strong>
         </div>
         <span>
-          {officialAiyesVerifiedDate} · {officialAiyesParticipantCount}
+          {officialAiyesVerifiedDate} · stable rules snapshot
         </span>
       </div>
       <div className="aiyes-rules-grid">
@@ -2069,7 +2288,7 @@ function JudgeBriefPanel({ result }: { result: AnalyzeResult | null }) {
     "Learning Impact Loop measures the student's outcome for each run.",
     "Student Pilot Study Kit prepares a consent-safe 10-minute protocol for collecting UX and impact evidence.",
     "Pilot Evidence Tracker logs anonymous browser-local observations without letting the team claim fake completed testing.",
-    "Pilot Evidence Export gives the team a CSV-ready, redacted handoff for Devpost or classroom tools.",
+    "Pilot Evidence Export gives the team a CSV-ready handoff of structured metrics and aggregate privacy-risk counts only.",
     "Submission Hub gives judges one URL for live app, judge view, deck, video, source, source ZIP fallback, Devpost pack, and proof endpoints.",
     "Pre-Lab Design Coach helps students plan variables, controls, repeats, sources, and safety before collecting data.",
     "Learning Exit Ticket proves students must explain variables, patterns, and next steps themselves.",
@@ -2191,7 +2410,7 @@ function ModelCardPanel({ result }: { result: AnalyzeResult | null }) {
     "AIYES Development Journey turns the required slide and video story into inspectable run evidence.",
     "Student Impact Brief makes real-world relevance visible before the deeper proof stack.",
     "Learning Impact Loop turns analysis into measurable student readiness and next-trial evidence.",
-    "Student Pilot Study Kit defines anonymous student-testing tasks, metrics, observer notes, and evidence to collect.",
+    "Student Pilot Study Kit defines anonymous student-testing tasks, metrics, browser-local observer notes, and evidence to collect.",
     "Pilot Evidence Tracker summarizes anonymous time-to-graph, confidence shift, issue spotting, and exit-ticket readiness without collecting student identifiers.",
     "Pre-Lab Design Coach turns classification into variables, controls, repeats, source checks, and safety before data collection.",
     "Learning Exit Ticket converts the AI feedback into student reflection prompts judges can inspect.",
@@ -2294,6 +2513,7 @@ function SavedLabsPanel({
                   {formatReadiness(savedLab.readiness)} · {savedLab.score}/100 · {savedLab.issueCount} flag
                   {savedLab.issueCount === 1 ? "" : "s"} · {formatSavedTime(savedLab.savedAt)}
                 </span>
+                <small>{formatSavedDataOrigin(savedLab.dataOrigin)}</small>
               </div>
               <div className="saved-lab-actions">
                 <button type="button" onClick={() => onLoad(savedLab)}>
@@ -2309,6 +2529,35 @@ function SavedLabsPanel({
       ) : (
         <p className="empty-copy">No saved lab snapshots yet.</p>
       )}
+    </section>
+  );
+}
+
+function StorageStatusPanel({
+  status,
+  undoAction,
+  onUndo
+}: {
+  status: PersistenceStatus | null;
+  undoAction: UndoAction | null;
+  onUndo: () => void;
+}) {
+  if (!status && !undoAction) return null;
+
+  return (
+    <section className="settings-panel storage-status-panel" aria-label="Browser storage status">
+      {status ? (
+        <p className={`import-status import-status-${status.tone === "warning" ? "error" : "success"}`} role="status">
+          <strong>{status.tone === "warning" ? "Storage warning" : "Storage saved"}</strong>
+          <span>{status.message}</span>
+        </p>
+      ) : null}
+      {undoAction ? (
+        <button className="secondary-action" type="button" onClick={onUndo}>
+          Undo
+          <span>{undoAction.message}</span>
+        </button>
+      ) : null}
     </section>
   );
 }
@@ -2386,6 +2635,7 @@ function McpIntegrationCoachPanel({
   sessionResult,
   exportStatus,
   exportError,
+  enabled,
   onValidateAction
 }: {
   plan: McpIntegrationPlan | null;
@@ -2394,6 +2644,7 @@ function McpIntegrationCoachPanel({
   sessionResult: McpBridgeSessionResponse | null;
   exportStatus: "idle" | "loading" | "error";
   exportError: string;
+  enabled: boolean;
   onValidateAction: (actionId: McpIntegrationActionId) => void;
 }) {
   const [copyStatus, setCopyStatus] = useState("");
@@ -2404,6 +2655,11 @@ function McpIntegrationCoachPanel({
   }, [payloadText]);
 
   async function copyPayload() {
+    if (!enabled) {
+      setCopyStatus("Student-supplied rows are required before copying an MCP handoff preview.");
+      return;
+    }
+
     if (!payloadText || !navigator.clipboard) {
       setCopyStatus("Select the preview text to copy.");
       return;
@@ -2428,13 +2684,19 @@ function McpIntegrationCoachPanel({
           <Workflow size={18} />
           <h3>MCP Integration Coach</h3>
         </div>
-        <button type="button" onClick={() => void copyPayload()} disabled={!plan}>
+        <button type="button" onClick={() => void copyPayload()} disabled={!plan || !enabled}>
           <Copy size={16} />
           Copy preview
         </button>
       </div>
       {plan ? (
         <>
+          {!enabled ? (
+            <div className="demo-sample-banner" role="status">
+              <strong>MCP handoff locked for demo samples.</strong>
+              <span>Preview stays visible, but validate/copy actions require student-supplied rows.</span>
+            </div>
+          ) : null}
           <div className="mcp-summary">
             <div>
               <p className="section-label">Composio route</p>
@@ -2565,9 +2827,9 @@ function McpIntegrationCoachPanel({
                   className="mcp-action-button"
                   type="button"
                   onClick={() => onValidateAction(action.id)}
-                  disabled={exportStatus === "loading"}
+                  disabled={!enabled || exportStatus === "loading"}
                 >
-                  {exportStatus === "loading" ? "Validating..." : "Validate route"}
+                  {!enabled ? "Student rows required" : exportStatus === "loading" ? "Validating..." : "Validate route"}
                 </button>
               </article>
             ))}
@@ -2645,7 +2907,8 @@ function McpIntegrationCoachPanel({
                 {exportResult.toolkit} via {exportResult.target.toolkitSlug}: {exportResult.target.recommendedTools.join(", ")}
               </small>
               <small>
-                Payload: {exportResult.sanitizedPayload.rowCount} rows, {exportResult.sanitizedPayload.sourceCount} sources
+                Payload: {exportResult.sanitizedPayload.payloadCategory.replaceAll("_", " ")}, {exportResult.sanitizedPayload.fieldCount} fields,{" "}
+                {exportResult.sanitizedPayload.sourceCount} sources
               </small>
               <div className="mcp-export-check-grid">
                 {exportResult.checks.map((check) => (
@@ -2701,13 +2964,17 @@ function SettingsPanel({
   savedLabCount,
   reflectionWorkspace,
   mcpStatus,
-  viewMode
+  viewMode,
+  allowExternalGrounding,
+  onExternalGroundingChange
 }: {
   result: AnalyzeResult | null;
   savedLabCount: number;
   reflectionWorkspace: StudentReflectionWorkspace | null;
   mcpStatus: McpIntegrationPlan["status"];
   viewMode: ViewMode;
+  allowExternalGrounding: boolean;
+  onExternalGroundingChange: (nextValue: boolean) => void;
 }) {
   const settings = [
     {
@@ -2754,8 +3021,16 @@ function SettingsPanel({
           </article>
         ))}
       </div>
+      <label className="settings-privacy-note">
+        <input
+          type="checkbox"
+          checked={allowExternalGrounding}
+          onChange={(event) => onExternalGroundingChange(event.target.checked)}
+        />
+        Allow external grounding for the next analysis when the server is explicitly configured for non-production web enrichment.
+      </label>
       <p className="settings-privacy-note">
-        Do not enter names or personal information. Experiment descriptions may be sent to OpenAI only when server-side web enrichment is enabled.
+        Do not enter names or personal information. External grounding requires this opt-in, server enablement, and non-production mode.
       </p>
     </section>
   );
@@ -2878,11 +3153,13 @@ function DataTable({
 function DataImportPanel({
   result,
   rows,
-  onImportRows
+  onImportRows,
+  onUseOwnData
 }: {
   result: AnalyzeResult;
   rows: StudentDataRow[];
   onImportRows: (rows: StudentDataRow[]) => void;
+  onUseOwnData: () => void;
 }) {
   const [draft, setDraft] = useState("");
   const [status, setStatus] = useState<{ tone: "success" | "error"; message: string } | null>(null);
@@ -2898,6 +3175,11 @@ function DataImportPanel({
 
   function importRows() {
     const parsed = parsePastedTable(draft, result.columns);
+
+    if (parsed.error) {
+      setStatus({ tone: "error", message: parsed.error });
+      return;
+    }
 
     if (parsed.rows.length === 0) {
       setStatus({ tone: "error", message: "No usable rows found." });
@@ -2918,10 +3200,16 @@ function DataImportPanel({
           <p className="section-label">Data handling</p>
           <strong>Paste spreadsheet rows</strong>
         </div>
-        <button type="button" onClick={importRows} disabled={!draft.trim()}>
-          <ClipboardPaste size={16} />
-          Import rows
-        </button>
+        <div className="data-import-actions">
+          <button type="button" onClick={onUseOwnData}>
+            <SlidersHorizontal size={16} />
+            Use my own data
+          </button>
+          <button type="button" onClick={importRows} disabled={!draft.trim()}>
+            <ClipboardPaste size={16} />
+            Import rows
+          </button>
+        </div>
       </div>
       <textarea
         className="data-import-box"
@@ -3149,7 +3437,7 @@ function TechnicalDepthProofPanel({ result }: { result: AnalyzeResult }) {
         ))}
       </div>
       <p className="technical-depth-boundary">
-        Fallback mode is still AI strategy proof: the classifier, validators, overlays, audits, and eval suite run deterministically without exposing keys, while OpenAI web search can enrich citations server-side when configured.
+        Fallback mode is still AI strategy proof: the classifier, validators, overlays, audits, and eval suite run deterministically without exposing keys. OpenAI web search is available only for explicit per-run opt-in when `OUIJA_EXTERNAL_GROUNDING_ENABLED=true`, a server key exists, and the app is running in non-production development mode; public production stays deterministic fallback-only.
       </p>
     </section>
   );
@@ -3390,11 +3678,13 @@ function StudentPilotStudyKitPanel({ kit }: { kit: StudentPilotStudyKit }) {
 function PilotEvidenceTrackerPanel({
   entries,
   summary,
+  enabled,
   onEntryChange,
   onReset
 }: {
   entries: PilotEvidenceEntry[];
   summary: PilotEvidenceSummary;
+  enabled: boolean;
   onEntryChange: (id: string, patch: Partial<Omit<PilotEvidenceEntry, "id" | "label">>) => void;
   onReset: () => void;
 }) {
@@ -3406,6 +3696,11 @@ function PilotEvidenceTrackerPanel({
   }, [exportText]);
 
   async function copyPilotEvidence() {
+    if (!enabled) {
+      setCopyStatus("Student-supplied rows are required before copying pilot evidence.");
+      return;
+    }
+
     if (!navigator.clipboard) {
       setCopyStatus("Select the export text to copy.");
       return;
@@ -3430,11 +3725,17 @@ function PilotEvidenceTrackerPanel({
           <ClipboardCheck size={18} />
           <h3>Pilot Evidence Tracker</h3>
         </div>
-        <button type="button" onClick={onReset}>
+        <button type="button" onClick={onReset} disabled={!enabled}>
           <Trash2 size={16} />
           Clear pilot evidence
         </button>
       </div>
+      {!enabled ? (
+        <div className="demo-sample-banner" role="status">
+          <strong>Pilot evidence locked for demo samples.</strong>
+          <span>Collect or enter student-supplied rows before editing or copying pilot evidence.</span>
+        </div>
+      ) : null}
       <div className="pilot-evidence-summary">
         <div>
           <p className="section-label">Evidence status</p>
@@ -3504,6 +3805,7 @@ function PilotEvidenceTrackerPanel({
                 value={entry.timeToGraphSeconds}
                 onChange={(event) => onEntryChange(entry.id, { timeToGraphSeconds: event.target.value })}
                 placeholder="seconds"
+                disabled={!enabled}
               />
             </label>
             <label>
@@ -3512,6 +3814,7 @@ function PilotEvidenceTrackerPanel({
                 aria-label={`Confidence before ${entry.label}`}
                 value={entry.confidenceBefore}
                 onChange={(event) => onEntryChange(entry.id, { confidenceBefore: event.target.value })}
+                disabled={!enabled}
               >
                 <option value="">Not rated</option>
                 <option value="1">1 - lost</option>
@@ -3527,6 +3830,7 @@ function PilotEvidenceTrackerPanel({
                 aria-label={`Confidence after ${entry.label}`}
                 value={entry.confidenceAfter}
                 onChange={(event) => onEntryChange(entry.id, { confidenceAfter: event.target.value })}
+                disabled={!enabled}
               >
                 <option value="">Not rated</option>
                 <option value="1">1 - lost</option>
@@ -3542,6 +3846,7 @@ function PilotEvidenceTrackerPanel({
                 aria-label={`Issue spotted ${entry.label}`}
                 value={entry.issueCaught}
                 onChange={(event) => onEntryChange(entry.id, { issueCaught: event.target.value as PilotEvidenceEntry["issueCaught"] })}
+                disabled={!enabled}
               >
                 <option value="">Not recorded</option>
                 <option value="yes">Yes</option>
@@ -3559,6 +3864,7 @@ function PilotEvidenceTrackerPanel({
                     reflectionReadiness: event.target.value as PilotEvidenceEntry["reflectionReadiness"]
                   })
                 }
+                disabled={!enabled}
               >
                 <option value="">Not recorded</option>
                 <option value="ready">Ready</option>
@@ -3567,13 +3873,14 @@ function PilotEvidenceTrackerPanel({
               </select>
             </label>
             <label className="pilot-evidence-note">
-              <span>Non-identifying note</span>
+              <span>Local observer note</span>
               <textarea
                 aria-label={`Pilot note ${entry.label}`}
                 maxLength={160}
                 value={entry.note}
                 onChange={(event) => onEntryChange(entry.id, { note: event.target.value })}
                 placeholder="No names, contact info, grades, faces, or private class details."
+                disabled={!enabled}
               />
             </label>
           </article>
@@ -3585,15 +3892,15 @@ function PilotEvidenceTrackerPanel({
             <p className="section-label">Pilot evidence export</p>
             <strong>CSV-ready anonymous summary</strong>
           </div>
-          <button type="button" onClick={() => void copyPilotEvidence()}>
+          <button type="button" onClick={() => void copyPilotEvidence()} disabled={!enabled}>
             <Copy size={16} />
             Copy evidence
           </button>
         </div>
         <textarea aria-label="Pilot evidence CSV export" readOnly value={exportText} />
         <div className="pilot-evidence-export-note">
-          <span>Emails and phone-like strings are redacted automatically.</span>
-          <span>Review notes before sharing with Devpost, Sheets, Forms, or Notion.</span>
+          <span>Raw notes stay browser-local; exports include structured metrics and aggregate privacy-risk counts only.</span>
+          <span>No raw or redacted note column is shared with Devpost, Sheets, Forms, or Notion.</span>
         </div>
         {copyStatus ? (
           <p className="copy-status" role="status">
@@ -3603,7 +3910,7 @@ function PilotEvidenceTrackerPanel({
       </div>
       <div className="pilot-evidence-boundary">
         <strong>{summary.judgeTakeaway}</strong>
-        <span>Browser-local only. Export routes can summarize counts later; they should not send raw student identifiers.</span>
+        <span>Browser-local only. Export routes summarize structured metrics and aggregate privacy-risk counts; they do not send raw or redacted observer notes.</span>
       </div>
     </section>
   );
@@ -4285,7 +4592,7 @@ function NextTrialPanel({ plan }: { plan: NextTrialPlan }) {
   );
 }
 
-function EvidencePacketPanel({ packet }: { packet: string }) {
+function EvidencePacketPanel({ packet, enabled }: { packet: string; enabled: boolean }) {
   const [copyStatus, setCopyStatus] = useState("");
 
   useEffect(() => {
@@ -4293,6 +4600,11 @@ function EvidencePacketPanel({ packet }: { packet: string }) {
   }, [packet]);
 
   async function copyPacket() {
+    if (!enabled) {
+      setCopyStatus("Student-supplied rows are required before copying an Evidence Packet.");
+      return;
+    }
+
     if (!navigator.clipboard) {
       setCopyStatus("Select the packet text to copy.");
       return;
@@ -4313,11 +4625,17 @@ function EvidencePacketPanel({ packet }: { packet: string }) {
           <FileText size={18} />
           <h3>Evidence Packet</h3>
         </div>
-        <button type="button" onClick={() => void copyPacket()}>
+        <button type="button" onClick={() => void copyPacket()} disabled={!enabled}>
           <Copy size={16} />
           Copy packet
         </button>
       </div>
+      {!enabled ? (
+        <div className="demo-sample-banner" role="status">
+          <strong>DEMO SAMPLE preview only.</strong>
+          <span>The packet text is visible for review, but copy is locked until rows are student-supplied.</span>
+        </div>
+      ) : null}
       <textarea className="packet-preview" aria-label="Student evidence packet" readOnly value={packet} />
       {copyStatus ? (
         <p className="packet-status" aria-live="polite">
@@ -4463,6 +4781,7 @@ function formatMcpExportStatus(status: McpBridgeExportResponse["status"]) {
 
 function formatMcpSessionStatus(status: McpBridgeSessionResponse["status"]) {
   if (status === "created") return "Session created";
+  if (status === "ready") return "Preview ready";
   if (status === "blocked") return "Blocked";
   return "Session dry-run";
 }
@@ -4620,34 +4939,125 @@ function formatSavedTime(value: string) {
   }).format(new Date(value));
 }
 
-function loadSavedLabs(): SavedLab[] {
-  if (typeof window === "undefined") return [];
+function formatSavedDataOrigin(origin: SavedDataOrigin) {
+  if (origin === "student_supplied") return "Student-supplied evidence";
+  if (origin === "demo_sample") return "Demo sample - excluded from evidence";
+  return "Legacy provenance unknown - excluded from evidence";
+}
+
+function getActiveDataOrigin(origin: SavedDataOrigin): DataOrigin {
+  return origin === "student_supplied" ? "student_supplied" : "demo_sample";
+}
+
+function loadSavedLabs(): StorageResult<SavedLab[]> {
+  const result = readStorageList(getBrowserLocalStorage(), savedLabsKey, normalizeSavedLab);
+  return result.ok ? { ok: true, value: result.value.slice(0, 6) } : result;
+}
+
+function normalizeSavedLab(savedLab: unknown): SavedLab | null {
+  if (!savedLab || typeof savedLab !== "object") return null;
+
+  const record = savedLab as Partial<SavedLab>;
+  if (
+    !isNonEmptyString(record.id) ||
+    !isNonEmptyString(record.title) ||
+    typeof record.subject !== "string" ||
+    !isNonEmptyString(record.savedAt) ||
+    !isNonEmptyString(record.description) ||
+    !Array.isArray(record.rows) ||
+    typeof record.score !== "number" ||
+    !Number.isFinite(record.score) ||
+    !isTrackReadiness(record.readiness) ||
+    typeof record.issueCount !== "number" ||
+    !Number.isFinite(record.issueCount)
+  ) {
+    return null;
+  }
+
+  return {
+    id: record.id,
+    title: record.title,
+    subject: record.subject,
+    savedAt: record.savedAt,
+    score: record.score,
+    readiness: record.readiness,
+    issueCount: record.issueCount,
+    dataOrigin: normalizeSavedDataOrigin(record.dataOrigin),
+    description: record.description,
+    rows: record.rows.map(normalizeStudentDataRow).filter((row): row is StudentDataRow => row !== null)
+  };
+}
+
+function normalizeSavedDataOrigin(value: unknown): SavedDataOrigin {
+  if (value === "demo_sample" || value === "student_supplied" || value === "legacy_unknown") {
+    return value;
+  }
+
+  return "legacy_unknown";
+}
+
+function loadPilotEvidenceEntries(): StorageResult<PilotEvidenceEntry[] | null> {
+  const result = readStorageValue(
+    getBrowserLocalStorage(),
+    pilotEvidenceKey,
+    normalizePilotEvidenceEntries
+  );
+
+  return result.ok
+    ? result
+    : {
+        ...result,
+        error: "Unable to read saved browser data. The app will keep working without loading saved pilot evidence."
+      };
+}
+
+function storeSavedLabs(savedLabs: SavedLab[]): StorageResult<null> {
+  return writeStorageValue(getBrowserLocalStorage(), savedLabsKey, savedLabs);
+}
+
+function storePilotEvidenceEntries(entries: PilotEvidenceEntry[]): StorageResult<null> {
+  return writeStorageValue(getBrowserLocalStorage(), pilotEvidenceKey, entries);
+}
+
+function firstStorageWarning(...results: StorageResult<unknown>[]): PersistenceStatus | null {
+  const warning = results.find((result) => !result.ok);
+  return warning && !warning.ok ? { tone: "warning", message: warning.error } : null;
+}
+
+function formatPersistenceResult(result: StorageResult<null>, successMessage: string): PersistenceStatus {
+  return result.ok ? { tone: "success", message: successMessage } : { tone: "warning", message: result.error };
+}
+
+function getBrowserLocalStorage(): BrowserStorageLike | null {
+  if (typeof window === "undefined") return null;
 
   try {
-    const parsed = JSON.parse(window.localStorage.getItem(savedLabsKey) ?? "[]");
-    return Array.isArray(parsed) ? parsed.slice(0, 6) : [];
+    return window.localStorage;
   } catch {
-    return [];
+    return null;
   }
 }
 
-function loadPilotEvidenceEntries(): PilotEvidenceEntry[] {
-  if (typeof window === "undefined") return createInitialPilotEvidenceEntries();
+function normalizeStudentDataRow(value: unknown): StudentDataRow | null {
+  if (!value || typeof value !== "object") return null;
+  const record = value as Record<string, unknown>;
+  if (!isNonEmptyString(record.id)) return null;
 
-  try {
-    const parsed = JSON.parse(window.localStorage.getItem(pilotEvidenceKey) ?? "[]");
-    return normalizePilotEvidenceEntries(parsed);
-  } catch {
-    return createInitialPilotEvidenceEntries();
-  }
+  return Object.entries(record).reduce<StudentDataRow>(
+    (row, [key, rowValue]) => {
+      if (typeof rowValue === "string" || typeof rowValue === "number") {
+        return { ...row, [key]: rowValue };
+      }
+      return row;
+    },
+    { id: record.id }
+  );
 }
 
-function storeSavedLabs(savedLabs: SavedLab[]) {
-  if (typeof window === "undefined") return;
-  window.localStorage.setItem(savedLabsKey, JSON.stringify(savedLabs));
+function isTrackReadiness(value: unknown): value is SavedLab["readiness"] {
+  return value === "competitive" || value === "submittable" || value === "needs_work";
 }
 
-function storePilotEvidenceEntries(entries: PilotEvidenceEntry[]) {
-  if (typeof window === "undefined") return;
-  window.localStorage.setItem(pilotEvidenceKey, JSON.stringify(entries));
+function isNonEmptyString(value: unknown): value is string {
+  return typeof value === "string" && value.trim().length > 0;
 }

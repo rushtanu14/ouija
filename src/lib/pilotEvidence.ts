@@ -1,4 +1,5 @@
 import type { PilotEvidenceEntry, PilotEvidenceSummary } from "./types";
+import { PRIVACY_REVIEW_COPY, scanPrivateText } from "./privacyText";
 
 const pilotEvidenceRowCount = 3;
 
@@ -62,7 +63,7 @@ export function summarizePilotEvidence(entries: PilotEvidenceEntry[]): PilotEvid
   const issueCaughtCount = observations.filter((entry) => entry.issueCaught === "yes").length;
   const reflectionReadyCount = observations.filter((entry) => entry.reflectionReadiness === "ready").length;
   const noteCount = observations.filter((entry) => entry.note.trim().length > 0).length;
-  const directIdentifierRiskCount = observations.filter((entry) => hasDirectIdentifierRisk(entry.note)).length;
+  const directIdentifierRiskCount = observations.filter((entry) => !scanPrivateText(entry.note).safe).length;
   const qualityChecks = buildQualityChecks(observations);
   const qualityScore = calculateQualityScore(qualityChecks, observationCount);
   const qualityStatus: PilotEvidenceSummary["qualityStatus"] =
@@ -109,16 +110,16 @@ export function buildPilotEvidenceExport(entries: PilotEvidenceEntry[], summary:
     `Average confidence shift,${formatCsvCell(formatExportDelta(summary.averageConfidenceDelta))}`,
     `Issues spotted,${summary.issueCaughtCount}`,
     `Exit tickets ready,${summary.reflectionReadyCount}`,
-    `Non-identifying notes,${summary.noteCount}`,
+    `Observer notes recorded,${summary.noteCount}`,
     `Direct identifier risks,${summary.directIdentifierRiskCount}`,
-    "Privacy boundary,No names contact info grades faces or private classroom details. Review notes before sharing externally."
+    `Privacy boundary,${formatCsvCell(`${PRIVACY_REVIEW_COPY} Raw observer notes stay browser-local. Exports contain structured metrics and aggregate privacy-risk counts only; no raw or redacted note column is included.`)}`
   ];
   const checks = [
     "Quality checks",
     ...summary.qualityChecks.map((check) => `${formatCsvCell(check.label)},${formatCsvCell(check.status)},${formatCsvCell(check.detail)}`)
   ];
   const rows = [
-    "Observation,Time to graph seconds,Confidence before,Confidence after,Confidence delta,Issue spotted,Exit ticket readiness,Non-identifying note",
+    "Observation,Time to graph seconds,Confidence before,Confidence after,Confidence delta,Issue spotted,Exit ticket readiness",
     ...entries.map((entry) =>
       [
         entry.label,
@@ -127,8 +128,7 @@ export function buildPilotEvidenceExport(entries: PilotEvidenceEntry[], summary:
         entry.confidenceAfter || "not rated",
         formatEntryDelta(entry),
         formatEvidenceSignal(entry.issueCaught),
-        formatReflectionSignal(entry.reflectionReadiness),
-        redactSensitiveNote(entry.note.trim() || "none")
+        formatReflectionSignal(entry.reflectionReadiness)
       ]
         .map(formatCsvCell)
         .join(",")
@@ -180,7 +180,7 @@ function buildQualityChecks(observations: PilotEvidenceEntry[]): PilotEvidenceSu
     (entry) => toPositiveNumber(entry.confidenceBefore) !== null && toPositiveNumber(entry.confidenceAfter) !== null
   ).length;
   const issueReflectionCount = observations.filter((entry) => entry.issueCaught && entry.reflectionReadiness).length;
-  const directIdentifierRiskCount = observations.filter((entry) => hasDirectIdentifierRisk(entry.note)).length;
+  const directIdentifierRiskCount = observations.filter((entry) => !scanPrivateText(entry.note).safe).length;
 
   return [
     {
@@ -233,10 +233,10 @@ function buildQualityChecks(observations: PilotEvidenceEntry[]): PilotEvidenceSu
       status: directIdentifierRiskCount === 0 && observationCount > 0 ? "pass" : directIdentifierRiskCount > 0 ? "review" : "fail",
       detail:
         directIdentifierRiskCount === 0 && observationCount > 0
-          ? "No email or phone-like strings detected in observer notes."
+          ? "No common private-text patterns detected in local observer notes."
           : directIdentifierRiskCount > 0
-            ? `${directIdentifierRiskCount} note${directIdentifierRiskCount === 1 ? "" : "s"} may contain direct identifiers; review before sharing.`
-            : "Add only non-identifying notes; no names, contact info, grades, faces, or private class details."
+            ? `${directIdentifierRiskCount} note${directIdentifierRiskCount === 1 ? "" : "s"} may contain private details; keep notes local and review before sharing summaries.`
+            : "Add only non-identifying notes; no names, contact info, grades, faces, access codes, locations, or private class details."
     }
   ];
 }
@@ -277,22 +277,14 @@ function formatReflectionSignal(value: PilotEvidenceEntry["reflectionReadiness"]
   return "not recorded";
 }
 
-function redactSensitiveNote(note: string) {
-  return note
-    .replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi, "[redacted email]")
-    .replace(/\b(?:\+?1[-.\s]?)?(?:\(?\d{3}\)?[-.\s]?)\d{3}[-.\s]?\d{4}\b/g, "[redacted phone]")
-    .replace(/\s+/g, " ")
-    .slice(0, 160);
-}
-
-function hasDirectIdentifierRisk(note: string) {
-  return /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i.test(note) || /\b(?:\+?1[-.\s]?)?(?:\(?\d{3}\)?[-.\s]?)\d{3}[-.\s]?\d{4}\b/.test(note);
-}
-
-function formatCsvCell(value: string | number) {
-  const text = String(value);
+export function formatCsvCell(value: string | number) {
+  const text = neutralizeFormulaPrefix(String(value));
   if (!/[",\n]/.test(text)) return text;
   return `"${text.replaceAll("\"", "\"\"")}"`;
+}
+
+function neutralizeFormulaPrefix(value: string) {
+  return /^[=+\-@]/.test(value) ? `'${value}` : value;
 }
 
 function buildHeadline(status: PilotEvidenceSummary["status"], observationCount: number) {

@@ -4,6 +4,7 @@ import type {
   EvaluationReport,
   McpBridgeExportRequest,
   McpBridgeExportResponse,
+  McpBridgeSessionRequest,
   McpBridgeSessionResponse,
   McpBridgeStatus,
   RuntimeProof
@@ -69,7 +70,7 @@ export async function requestMcpExport(payload: McpBridgeExportRequest): Promise
   return response.json() as Promise<McpBridgeExportResponse>;
 }
 
-export async function requestMcpSession(payload: McpBridgeExportRequest): Promise<McpBridgeSessionResponse> {
+export async function requestMcpSession(payload: McpBridgeSessionRequest): Promise<McpBridgeSessionResponse> {
   const response = await fetch("/api/mcp/session", {
     method: "POST",
     headers: { "Content-Type": "application/json" },

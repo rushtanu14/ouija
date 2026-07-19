@@ -18,7 +18,8 @@ describe("MCP integration plan", () => {
         savedAt: "2026-07-03T12:00:00.000Z",
         score: result.trackEvidence.score,
         readiness: result.trackEvidence.readiness,
-        issueCount: 0
+        issueCount: 0,
+        dataOrigin: "student_supplied"
       }
     ]);
 
@@ -280,7 +281,8 @@ describe("MCP integration plan", () => {
         savedAt: "2026-07-03T12:00:00.000Z",
         score: result.trackEvidence.score,
         readiness: result.trackEvidence.readiness,
-        issueCount: 0
+        issueCount: 0,
+        dataOrigin: "student_supplied"
       }
     ]);
 
