@@ -1,5 +1,5 @@
 import { analyzeExperiment, mergeEnrichment } from "../src/lib/analysis.js";
-import { enrichWithOpenAIWebSearch } from "../server/openaiGrounding.js";
+import { enrichWithOpenAIWebSearch, externalGroundingFallbackNote, shouldUseExternalGrounding } from "../server/openaiGrounding.js";
 import { validateAnalyzeRequest } from "../server/requestValidation.js";
 import { apiAllowedHeaders, isAllowedOrigin, readRequestHeader, requestClientKey } from "../server/httpSecurity.js";
 import { consumeRateLimit, resolveAnalyzeRateLimit } from "../server/rateLimit.js";
@@ -43,25 +43,38 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
     res.status(400).json({ error: validation.error });
     return;
   }
-  const { description, rows } = validation.value;
+  const requestBody = validation.value;
+  const { description, rows } = requestBody;
 
   const fallback = analyzeExperiment({
     description,
     rows
   });
 
-  try {
-    const enrichment = await enrichWithOpenAIWebSearch(description, fallback);
-    res.status(200).json(mergeEnrichment(fallback, enrichment));
-  } catch (error) {
-    res.status(200).json({
-      ...fallback,
-      groundingStatus: {
-        mode: "fallback",
-        note: "Using built-in science references because web enrichment was unavailable."
-      }
-    });
+  if (shouldUseExternalGrounding(requestBody)) {
+    try {
+      const enrichment = await enrichWithOpenAIWebSearch(description, fallback);
+      res.status(200).json(mergeEnrichment(fallback, enrichment));
+      return;
+    } catch (error) {
+      res.status(200).json({
+        ...fallback,
+        groundingStatus: {
+          mode: "fallback",
+          note: "Using built-in science references because web enrichment was unavailable."
+        }
+      });
+      return;
+    }
   }
+
+  res.status(200).json({
+    ...fallback,
+    groundingStatus: {
+      mode: "fallback",
+      note: externalGroundingFallbackNote(requestBody)
+    }
+  });
 }
 
 function setApiHeaders(req: RequestLike, res: ResponseLike) {

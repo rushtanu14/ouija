@@ -10,6 +10,8 @@ import { MCP_CONNECTOR_CATALOG } from "../src/lib/mcpIntegrationPlan";
 import { createMcpSessionTicket } from "../server/mcpBridge";
 
 const originalKey = process.env.OPENAI_API_KEY;
+const originalExternalGroundingEnabled = process.env.OUIJA_EXTERNAL_GROUNDING_ENABLED;
+const originalNodeEnv = process.env.NODE_ENV;
 const composioEnvKeys = [
   "COMPOSIO_API_KEY",
   "COMPOSIO_LIVE_EXPORTS",
@@ -24,7 +26,9 @@ const composioEnvKeys = [
 const originalComposioEnv = new Map(composioEnvKeys.map((key) => [key, process.env[key]]));
 
 afterEach(() => {
-  process.env.OPENAI_API_KEY = originalKey;
+  restoreEnv("OPENAI_API_KEY", originalKey);
+  restoreEnv("OUIJA_EXTERNAL_GROUNDING_ENABLED", originalExternalGroundingEnabled);
+  restoreEnv("NODE_ENV", originalNodeEnv);
   for (const key of composioEnvKeys) {
     const value = originalComposioEnv.get(key);
     if (value === undefined) {
@@ -37,6 +41,9 @@ afterEach(() => {
 
 describe("POST /api/analyze", () => {
   it("does not expose provider errors to students", async () => {
+    process.env.OPENAI_API_KEY = "sk-test";
+    process.env.OUIJA_EXTERNAL_GROUNDING_ENABLED = "true";
+    process.env.NODE_ENV = "development";
     const app = createApp({
       enrichExperiment: async () => {
         throw new Error("OPENAI_API_KEY rejected for project secret-project-id");
@@ -44,12 +51,66 @@ describe("POST /api/analyze", () => {
     });
     const response = await request(app)
       .post("/api/analyze")
-      .send({ description: "Projectile motion lab using launch angle and range data." })
+      .send({ description: "Projectile motion lab using launch angle and range data.", allowExternalGrounding: true })
       .expect(200);
 
     expect(response.body.groundingStatus.note).toContain("web enrichment was unavailable");
     expect(response.body.groundingStatus.note).not.toContain("secret-project-id");
     expect(response.body.groundingStatus.note).not.toContain("OPENAI_API_KEY");
+  });
+
+  it("skips external grounding unless the request explicitly opts in", async () => {
+    process.env.OPENAI_API_KEY = "sk-test";
+    process.env.OUIJA_EXTERNAL_GROUNDING_ENABLED = "true";
+    process.env.NODE_ENV = "development";
+    let enrichmentCalls = 0;
+    const app = createApp({
+      enrichExperiment: async () => {
+        enrichmentCalls += 1;
+        return {
+          groundingStatus: {
+            mode: "web_enriched",
+            note: "External call should not happen without request opt-in."
+          }
+        };
+      }
+    });
+
+    const response = await request(app)
+      .post("/api/analyze")
+      .send({ description: "Projectile motion lab using launch angle and range data." })
+      .expect(200);
+
+    expect(enrichmentCalls).toBe(0);
+    expect(response.body.groundingStatus.mode).toBe("fallback");
+    expect(response.body.groundingStatus.note).toContain("explicit opt-in");
+  });
+
+  it("skips external grounding in production even when the request opts in", async () => {
+    process.env.OPENAI_API_KEY = "sk-test";
+    process.env.OUIJA_EXTERNAL_GROUNDING_ENABLED = "true";
+    process.env.NODE_ENV = "production";
+    let enrichmentCalls = 0;
+    const app = createApp({
+      enrichExperiment: async () => {
+        enrichmentCalls += 1;
+        return {
+          groundingStatus: {
+            mode: "web_enriched",
+            note: "External call should not happen in production."
+          }
+        };
+      }
+    });
+
+    const response = await request(app)
+      .post("/api/analyze")
+      .send({ description: "Projectile motion lab using launch angle and range data.", allowExternalGrounding: true })
+      .expect(200);
+
+    expect(enrichmentCalls).toBe(0);
+    expect(response.body.groundingStatus.mode).toBe("fallback");
+    expect(response.body.groundingStatus.note).toContain("disabled in production");
   });
 
   it("rejects oversized experiment descriptions", async () => {
@@ -1058,5 +1119,13 @@ describe("Composio MCP bridge API", () => {
 function clearComposioEnv() {
   for (const key of composioEnvKeys) {
     delete process.env[key];
+  }
+}
+
+function restoreEnv(key: string, value: string | undefined) {
+  if (value === undefined) {
+    delete process.env[key];
+  } else {
+    process.env[key] = value;
   }
 }

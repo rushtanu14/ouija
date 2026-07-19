@@ -30,7 +30,7 @@
 
 ## AI Technical Design And Model Strategy
 
-- Hybrid design: deterministic science templates plus optional OpenAI Responses API `web_search`.
+- Hybrid design: deterministic science templates plus optional OpenAI Responses API `web_search` gated by request opt-in, server enablement, API key, and non-production mode.
 - Server-side grounding keeps the API key out of the browser.
 - AI Runtime Proof shows fallback/web-search readiness, template count, evaluation coverage, server-only key boundary, and MCP bridge mode through the UI and `/api/runtime-proof`.
 - Model Strategy exposes candidate rankings, matched signals, confidence, fallback behavior, validation layers, safety layer, and risk controls.
@@ -149,7 +149,7 @@
 - Use `https://ouija-olive.vercel.app/submission/` as the one-click judge packet.
 - Use `https://ouija-olive.vercel.app/?judge=1` for judge walkthroughs and `https://ouija-olive.vercel.app` for the student default view.
 - Use AIYES Team Readiness Worksheet for anonymous 2-5 member prep, then handle the live Devpost page's final team roster requirement; the overview text also says participants may work individually, so verify the submission form behavior before final submit.
-- Optionally configure a real OpenAI API key for one web-search-enriched demo and live Composio credentials for classroom exports.
+- Optionally configure a real OpenAI API key plus `OUIJA_EXTERNAL_GROUNDING_ENABLED=true` for one non-production, request-opted web-search-enriched demo, and live Composio credentials for classroom exports.
 - Use `/api/runtime-proof`, `/api/evaluate`, `/api/mcp/status`, and a consent-gated `/api/mcp/session` dry-run as quick public smoke checks after each deploy.
 - In Judge mode, verify Official AIYES Rules Snapshot, AIYES Submission Gate, AIYES Team Readiness Worksheet, AIYES Demo Rehearsal, AIYES Judge Q&A Prep, and Judge Brief show the verified deadline, Track 1 artifacts, slide presentation, video walkthrough, submission hub, source/deployment, source ZIP fallback, judging criteria, award bands, anonymous roster prep, timed demo path, proof-backed live answers, and the external Devpost final-submit step.
 - Present or export `docs/aiyes-slide-deck.html`.

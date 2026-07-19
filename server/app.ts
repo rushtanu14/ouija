@@ -5,7 +5,7 @@ import { analyzeExperiment, mergeEnrichment } from "../src/lib/analysis";
 import { runEvaluationSuite } from "../src/lib/evaluation";
 import { buildRuntimeProof } from "../src/lib/runtimeProof";
 import { createMcpSessionTicket, getMcpBridgeStatus, validateMcpExportRequest } from "./mcpBridge";
-import { enrichWithOpenAIWebSearch } from "./openaiGrounding";
+import { enrichWithOpenAIWebSearch, externalGroundingFallbackNote, shouldUseExternalGrounding } from "./openaiGrounding";
 import { validateAnalyzeRequest } from "./requestValidation";
 import { consumeRateLimit, resolveAnalyzeRateLimit } from "./rateLimit";
 import { isAllowedOrigin } from "./httpSecurity";
@@ -66,25 +66,36 @@ export function createApp(options: AppOptions = {}) {
     }
     const validation = validateAnalyzeRequest(req.body);
     if (!validation.ok) return res.status(400).json({ error: validation.error });
-    const { description, rows } = validation.value;
+    const requestBody = validation.value;
+    const { description, rows } = requestBody;
 
     const fallback = analyzeExperiment({
       description,
       rows
     });
 
-    try {
-      const enrichment = await enrichExperiment(description, fallback);
-      return res.json(mergeEnrichment(fallback, enrichment));
-    } catch (error) {
-      return res.json({
-        ...fallback,
-        groundingStatus: {
-          mode: "fallback",
-          note: "Using built-in science references because web enrichment was unavailable."
-        }
-      });
+    if (shouldUseExternalGrounding(requestBody)) {
+      try {
+        const enrichment = await enrichExperiment(description, fallback);
+        return res.json(mergeEnrichment(fallback, enrichment));
+      } catch (error) {
+        return res.json({
+          ...fallback,
+          groundingStatus: {
+            mode: "fallback",
+            note: "Using built-in science references because web enrichment was unavailable."
+          }
+        });
+      }
     }
+
+    return res.json({
+      ...fallback,
+      groundingStatus: {
+        mode: "fallback",
+        note: externalGroundingFallbackNote(requestBody)
+      }
+    });
   });
 
   if (options.staticDir) {

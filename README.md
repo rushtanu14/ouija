@@ -174,9 +174,9 @@ The production alias reflects the July 18, 2026 Source Scout refresh after `main
 
 ## AI Grounding
 
-Ouija works without credentials through deterministic built-in experiment templates and trusted citations. `GET /api/runtime-proof` reports whether the live deployment is using fallback or web-search-ready mode without exposing secret values. When `OPENAI_API_KEY` is present in the environment, the server attempts OpenAI Responses API web-search enrichment and falls back safely if enrichment is unavailable.
+Ouija works without credentials through deterministic built-in experiment templates and trusted citations. `GET /api/runtime-proof` reports whether the live deployment is using fallback or web-search-ready mode without exposing secret values. OpenAI Responses API web-search enrichment runs only when the request explicitly opts in, `OPENAI_API_KEY` is configured, `OUIJA_EXTERNAL_GROUNDING_ENABLED=true`, and `NODE_ENV` is not `production`; otherwise the server keeps the trusted fallback path.
 
-Student privacy boundary: do not enter names, contact information, school identifiers, or other personal data in experiment descriptions. When web enrichment is configured, the description is sent server-side to OpenAI; credential-free fallback mode keeps analysis deterministic and does not call OpenAI.
+Student privacy boundary: do not enter names, contact information, school identifiers, or other personal data in experiment descriptions. Request-opted web enrichment sends only allowlisted structured analysis fields from the fallback result to OpenAI, not raw rows, pilot notes, reflection drafts, or Evidence Packet text; fallback mode does not call OpenAI.
 
 ## Composio MCP Bridge
 

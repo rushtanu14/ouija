@@ -1,4 +1,17 @@
-import { describe, expect, it, afterEach } from "vitest";
+import { describe, expect, it, afterEach, vi } from "vitest";
+
+const { mockResponsesCreate } = vi.hoisted(() => ({
+  mockResponsesCreate: vi.fn()
+}));
+
+vi.mock("openai", () => ({
+  default: class MockOpenAI {
+    responses = {
+      create: mockResponsesCreate
+    };
+  }
+}));
+
 import analyzeHandler from "../api/analyze";
 import evaluateHandler from "../api/evaluate";
 import healthHandler from "../api/health";
@@ -11,6 +24,8 @@ import { buildEvidencePacket } from "../src/lib/evidencePacket";
 import { MCP_CONNECTOR_CATALOG } from "../src/lib/mcpIntegrationPlan";
 
 const originalKey = process.env.OPENAI_API_KEY;
+const originalExternalGroundingEnabled = process.env.OUIJA_EXTERNAL_GROUNDING_ENABLED;
+const originalNodeEnv = process.env.NODE_ENV;
 const composioEnvKeys = [
   "COMPOSIO_API_KEY",
   "COMPOSIO_LIVE_EXPORTS",
@@ -25,7 +40,10 @@ const composioEnvKeys = [
 const originalComposioEnv = new Map(composioEnvKeys.map((key) => [key, process.env[key]]));
 
 afterEach(() => {
-  process.env.OPENAI_API_KEY = originalKey;
+  mockResponsesCreate.mockReset();
+  restoreEnv("OPENAI_API_KEY", originalKey);
+  restoreEnv("OUIJA_EXTERNAL_GROUNDING_ENABLED", originalExternalGroundingEnabled);
+  restoreEnv("NODE_ENV", originalNodeEnv);
   for (const key of composioEnvKeys) {
     const value = originalComposioEnv.get(key);
     if (value === undefined) {
@@ -98,6 +116,54 @@ describe("Vercel API functions", () => {
 
     expect(response.statusCode).toBe(400);
     expect(response.body.error).toContain("Describe the experiment");
+  });
+
+  it("skips serverless external grounding without explicit request opt-in", async () => {
+    process.env.OPENAI_API_KEY = "sk-test";
+    process.env.OUIJA_EXTERNAL_GROUNDING_ENABLED = "true";
+    process.env.NODE_ENV = "development";
+    mockResponsesCreate.mockResolvedValue({
+      output_text: '{"expectedSummary":"External","explanation":"External","confidenceNote":"High"}',
+      output: []
+    });
+    const response = createMockResponse();
+
+    await analyzeHandler(
+      {
+        method: "POST",
+        body: { description: "Projectile motion lab using launch angle and range data." }
+      },
+      response.res
+    );
+
+    expect(response.statusCode).toBe(200);
+    expect(mockResponsesCreate).not.toHaveBeenCalled();
+    expect(response.body.groundingStatus.mode).toBe("fallback");
+    expect(response.body.groundingStatus.note).toContain("explicit opt-in");
+  });
+
+  it("skips serverless external grounding in production even with request opt-in", async () => {
+    process.env.OPENAI_API_KEY = "sk-test";
+    process.env.OUIJA_EXTERNAL_GROUNDING_ENABLED = "true";
+    process.env.NODE_ENV = "production";
+    mockResponsesCreate.mockResolvedValue({
+      output_text: '{"expectedSummary":"External","explanation":"External","confidenceNote":"High"}',
+      output: []
+    });
+    const response = createMockResponse();
+
+    await analyzeHandler(
+      {
+        method: "POST",
+        body: { description: "Projectile motion lab using launch angle and range data.", allowExternalGrounding: true }
+      },
+      response.res
+    );
+
+    expect(response.statusCode).toBe(200);
+    expect(mockResponsesCreate).not.toHaveBeenCalled();
+    expect(response.body.groundingStatus.mode).toBe("fallback");
+    expect(response.body.groundingStatus.note).toContain("disabled in production");
   });
 
   it("bounds descriptions and table rows through the serverless analyze function", async () => {
@@ -520,5 +586,13 @@ function createMockResponse() {
 function clearComposioEnv() {
   for (const key of composioEnvKeys) {
     delete process.env[key];
+  }
+}
+
+function restoreEnv(key: string, value: string | undefined) {
+  if (value === undefined) {
+    delete process.env[key];
+  } else {
+    process.env[key] = value;
   }
 }

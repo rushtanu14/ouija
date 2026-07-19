@@ -231,6 +231,21 @@ export type PilotEvidenceIssueSignal = "" | "yes" | "no" | "unsure";
 
 export type PilotEvidenceReflectionStatus = "" | "ready" | "partial" | "not_ready";
 
+export type PrivateTextRiskKind =
+  | "contact"
+  | "student_or_class_id"
+  | "grade_or_class_period"
+  | "address"
+  | "access_code"
+  | "coordinates"
+  | "photo_or_face";
+
+export interface PrivateTextRisk {
+  kind: PrivateTextRiskKind;
+  label: string;
+  detail: string;
+}
+
 export interface PilotEvidenceEntry {
   id: string;
   label: string;
@@ -978,6 +993,7 @@ export interface RuntimeProof {
 export interface AnalyzeRequest {
   description: string;
   rows?: StudentDataRow[];
+  allowExternalGrounding?: boolean;
 }
 
 export interface AnalyzeResult {

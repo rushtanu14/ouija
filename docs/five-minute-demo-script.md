@@ -52,7 +52,7 @@ Show Learning Exit Ticket: students must explain the independent/dependent varia
 
 ## 2:26-2:38 - Grounded Expected Results
 
-Point to Guided Lab Flow, Grounding Audit, the expected-results graph, the dashed expected overlay, and the trusted citation rail. Explain that Ouija works offline with built-in references, checks citation visibility/source agreement, and can enrich with OpenAI web search when an API key is configured.
+Point to Guided Lab Flow, Grounding Audit, the expected-results graph, the dashed expected overlay, and the trusted citation rail. Explain that Ouija works offline with built-in references, checks citation visibility/source agreement, and can enrich with OpenAI web search only after request opt-in, server enablement, an API key, and non-production mode.
 
 ## 2:38-3:16 - Data Table, Pattern Evidence, Method Audit, Safety Coach, Concept Coach, And Error Detection
 

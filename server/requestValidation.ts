@@ -21,8 +21,10 @@ export function validateAnalyzeRequest(rawBody: unknown): ValidationResult {
     return { ok: false, error: "Keep the experiment description to 2,000 characters or fewer." };
   }
 
+  const allowExternalGrounding = body?.allowExternalGrounding === true;
+
   if (body?.rows === undefined) {
-    return { ok: true, value: { description } };
+    return { ok: true, value: { description, allowExternalGrounding } };
   }
 
   if (!Array.isArray(body.rows)) {
@@ -37,7 +39,7 @@ export function validateAnalyzeRequest(rawBody: unknown): ValidationResult {
     return { ok: false, error: "Send valid table rows with bounded text or numeric cells." };
   }
 
-  return { ok: true, value: { description, rows: body.rows as StudentDataRow[] } };
+  return { ok: true, value: { description, rows: body.rows as StudentDataRow[], allowExternalGrounding } };
 }
 
 function parseBody(rawBody: unknown): Record<string, unknown> | null {

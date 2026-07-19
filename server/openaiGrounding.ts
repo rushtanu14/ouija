@@ -1,11 +1,53 @@
 import OpenAI from "openai";
-import type { AnalyzeResult, SourceCard } from "../src/lib/types.js";
+import type { AnalyzeRequest, AnalyzeResult, SourceCard } from "../src/lib/types.js";
 
 type Enrichment = Partial<Pick<AnalyzeResult, "expectedResult" | "sources" | "explanation" | "groundingStatus">>;
+type GroundingEnv = Partial<Pick<NodeJS.ProcessEnv, "OPENAI_API_KEY" | "OPENAI_MODEL" | "OUIJA_EXTERNAL_GROUNDING_ENABLED" | "NODE_ENV">>;
 interface ParsedEnrichment {
   expectedSummary: string;
   explanation: string;
   confidenceNote: string;
+}
+
+export function shouldUseExternalGrounding(request: Pick<AnalyzeRequest, "allowExternalGrounding">, env: GroundingEnv = process.env) {
+  return request.allowExternalGrounding === true
+    && env.OUIJA_EXTERNAL_GROUNDING_ENABLED === "true"
+    && env.NODE_ENV !== "production"
+    && hasValue(env.OPENAI_API_KEY);
+}
+
+export function externalGroundingFallbackNote(request: Pick<AnalyzeRequest, "allowExternalGrounding">, env: GroundingEnv = process.env) {
+  if (env.NODE_ENV === "production") {
+    return "External grounding is disabled in production; using built-in trusted science references.";
+  }
+  if (!hasValue(env.OPENAI_API_KEY)) {
+    return "No OpenAI API key configured; using built-in trusted science references.";
+  }
+  if (request.allowExternalGrounding !== true) {
+    return "External grounding requires explicit opt-in; using built-in trusted science references.";
+  }
+  if (env.OUIJA_EXTERNAL_GROUNDING_ENABLED !== "true") {
+    return "External grounding is disabled on this server; using built-in trusted science references.";
+  }
+  return "External grounding is unavailable; using built-in trusted science references.";
+}
+
+export function buildOpenAIGroundingInput(fallback: AnalyzeResult) {
+  return [
+    "You are enriching a middle/high school science experiment helper named Ouija.",
+    "Use web search only for reputable education or science references.",
+    "Do not write a lab report or final conclusion for the student.",
+    "Return concise JSON with keys: expectedSummary, explanation, confidenceNote.",
+    `Built-in classification: ${fallback.classification.title}`,
+    `Subject: ${fallback.classification.subject}`,
+    `Concepts: ${fallback.classification.concepts.join(", ")}`,
+    `Variables: ${fallback.variables.join(", ")}`,
+    `Built-in expected pattern: ${fallback.expectedResult.pattern}`,
+    `Current expected summary: ${fallback.expectedResult.summary}`,
+    `Grounding audit summary: ${fallback.groundingAudit.summary}`,
+    `Grounding consensus: ${fallback.groundingAudit.consensus}`,
+    `Source publishers: ${fallback.sources.map((source) => source.publisher).join(", ")}`
+  ];
 }
 
 export async function enrichWithOpenAIWebSearch(
@@ -45,15 +87,7 @@ export async function enrichWithOpenAIWebSearch(
         }
       }
     },
-    input: [
-      "You are enriching a middle/high school science experiment helper named Ouija.",
-      "Use web search only for reputable education or science references.",
-      "Do not write a lab report or final conclusion for the student.",
-      "Return concise JSON with keys: expectedSummary, explanation, confidenceNote.",
-      `Experiment description: ${description}`,
-      `Built-in classification: ${fallback.classification.title}`,
-      `Built-in expected pattern: ${fallback.expectedResult.pattern}`
-    ].join("\n")
+    input: buildOpenAIGroundingInput(fallback).join("\n")
   }, { signal: AbortSignal.timeout(15_000) });
 
   const rawText = response.output_text ?? "";
@@ -150,4 +184,8 @@ function isSafeHttpsUrl(value: string) {
   } catch {
     return false;
   }
+}
+
+function hasValue(value: string | undefined) {
+  return typeof value === "string" && value.trim().length > 0;
 }

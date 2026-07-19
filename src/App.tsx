@@ -167,6 +167,7 @@ export function App() {
   const [description, setDescription] = useState(initialPrompt);
   const [learningLevel, setLearningLevel] = useState<LearningLevel>("middle");
   const [viewMode, setViewMode] = useState<ViewMode>(getInitialViewMode);
+  const [allowExternalGrounding, setAllowExternalGrounding] = useState(false);
   const [result, setResult] = useState<AnalyzeResult | null>(null);
   const [rows, setRows] = useState<StudentDataRow[]>([]);
   const [reflectionAnswers, setReflectionAnswers] = useState<StudentReflectionAnswers>({});
@@ -191,7 +192,7 @@ export function App() {
     setError("");
 
     try {
-      const analysis = await requestAnalysis({ description: nextDescription, rows: nextRows });
+      const analysis = await requestAnalysis({ description: nextDescription, rows: nextRows, allowExternalGrounding });
       if (requestId !== analysisRequestId.current) return;
       const nextAnalysis = preservedDataOrigin
         ? refreshResultForRows({ ...analysis, dataOrigin: preservedDataOrigin }, analysis.rows, preservedDataOrigin)
@@ -690,6 +691,8 @@ export function App() {
           reflectionWorkspace={studentReflectionWorkspace}
           mcpStatus={mcpIntegrationPlan?.status ?? "preview_only"}
           viewMode={viewMode}
+          allowExternalGrounding={allowExternalGrounding}
+          onExternalGroundingChange={setAllowExternalGrounding}
         />
       </section>
     </main>
@@ -2760,13 +2763,17 @@ function SettingsPanel({
   savedLabCount,
   reflectionWorkspace,
   mcpStatus,
-  viewMode
+  viewMode,
+  allowExternalGrounding,
+  onExternalGroundingChange
 }: {
   result: AnalyzeResult | null;
   savedLabCount: number;
   reflectionWorkspace: StudentReflectionWorkspace | null;
   mcpStatus: McpIntegrationPlan["status"];
   viewMode: ViewMode;
+  allowExternalGrounding: boolean;
+  onExternalGroundingChange: (nextValue: boolean) => void;
 }) {
   const settings = [
     {
@@ -2813,8 +2820,16 @@ function SettingsPanel({
           </article>
         ))}
       </div>
+      <label className="settings-privacy-note">
+        <input
+          type="checkbox"
+          checked={allowExternalGrounding}
+          onChange={(event) => onExternalGroundingChange(event.target.checked)}
+        />
+        Allow external grounding for the next analysis when the server is explicitly configured for non-production web enrichment.
+      </label>
       <p className="settings-privacy-note">
-        Do not enter names or personal information. Experiment descriptions may be sent to OpenAI only when server-side web enrichment is enabled.
+        Do not enter names or personal information. External grounding requires this opt-in, server enablement, and non-production mode.
       </p>
     </section>
   );

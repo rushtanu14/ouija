@@ -18,11 +18,14 @@ Generated from `server/app.ts` and `api/*.ts`.
 ```json
 {
   "description": "Projectile motion lab using launch angle and range data.",
+  "allowExternalGrounding": false,
   "rows": [
     { "id": "trial-1", "angleDeg": 45, "rangeM": 14.6 }
   ]
 }
 ```
+
+`allowExternalGrounding` defaults to `false`. OpenAI web-search enrichment runs only when the request sets it to `true`, the server has `OUIJA_EXTERNAL_GROUNDING_ENABLED=true`, `OPENAI_API_KEY` is configured, and `NODE_ENV` is not `production`. The OpenAI prompt uses allowlisted structured analysis fields from Ouija's fallback result, not raw rows, reflections, pilot notes, or evidence packets.
 
 `POST /api/mcp/export` input:
 
@@ -52,7 +55,7 @@ Generated from `server/app.ts` and `api/*.ts`.
 
 `POST /api/mcp/session` uses the same consent-gated input as `/api/mcp/export`. Without complete Composio env gates it returns `status: "dry_run"` and the scoped toolkit/tool plan. With `COMPOSIO_API_KEY`, `COMPOSIO_SESSION_USER_ID`, `COMPOSIO_LIVE_EXPORTS=true`, `MCP_SESSION_AUTH_TOKEN`, connector allowed tools, and toolkit auth config where required, an authorized server request with `Authorization: Bearer $MCP_SESSION_AUTH_TOKEN` can call Composio's Sessions endpoint and return `status: "created"` without exposing the raw MCP URL. Source Scout is visible in the client-side MCP plan and names the read-only chain `COMPOSIO_SEARCH_WEB -> COMPOSIO_SEARCH_FETCH_URL_CONTENT -> COMPOSIO_SEARCH_SCHOLAR`, with `BROWSER_TOOL_CREATE_TASK`/`BROWSER_TOOL_WATCH_TASK` as a public-page fallback. The July 18 source-proof receipts show Composio Search finding the official AIYES/Devpost source and classroom-safe references for Ouija's supported lab demos, while the DeepWiki MCP receipt says `rushtanu14/ouija` must be indexed before live repo proof is claimed. The `composio-search-source-audit`, `composio-scholar-claim-check`, `composio-browser-source-capture`, and `deepwiki-source-proof` routes require allowed-tool env vars but no account auth config; `semanticscholar-reference-check`, `canvas-assignment-context`, `google-slides-submission-deck`, and `gmail-teacher-review-draft` require both auth config IDs and allowed-tool env vars before live use.
 
-`GET /api/runtime-proof` is intended for judges and deployment smoke checks. It returns booleans and counts only: no `OPENAI_API_KEY`, no `COMPOSIO_API_KEY`, and no connector auth values.
+`GET /api/runtime-proof` is intended for judges and deployment smoke checks. It returns booleans and counts only: no `OPENAI_API_KEY`, no `COMPOSIO_API_KEY`, and no connector auth values. Web-search readiness means the server-side non-production opt-in gates are present; a key alone is not enough.
 
 The Vercel serverless API handlers and local Express app use an allowlisted CORS policy. Production and local Vite origins are allowed by default; extra origins must be listed in `OUIJA_ALLOWED_ORIGIN`. API handlers allow `Content-Type` and `Authorization` headers, set `Cache-Control: no-store`, and the local Express app serves the built frontend when `dist/` exists.
 <!-- AUTO-GENERATED:API:END -->
