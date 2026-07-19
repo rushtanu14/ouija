@@ -38,6 +38,9 @@ jobs:
       - name: Dependency audit
         run: npm audit --audit-level=moderate
 
+      - name: Diff whitespace check
+        run: git diff --check
+
       - name: Production smoke E2E
         run: npm run test:e2e:prod
 
