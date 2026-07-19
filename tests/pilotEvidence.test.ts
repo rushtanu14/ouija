@@ -127,7 +127,7 @@ describe("pilot evidence tracker", () => {
     expect(formatCsvCell("normal value")).toBe("normal value");
   });
 
-  it("builds a CSV-ready anonymous export without raw or redacted note content", () => {
+  it("raw notes never appear in the CSV-ready anonymous export", () => {
     const entries = createInitialPilotEvidenceEntries();
     const nextEntries = entries.map((entry, index) => ({
       ...entry,
@@ -136,7 +136,10 @@ describe("pilot evidence tracker", () => {
       confidenceAfter: index === 0 ? "4" : entry.confidenceAfter,
       issueCaught: index === 0 ? ("yes" as const) : entry.issueCaught,
       reflectionReadiness: index === 0 ? ("ready" as const) : entry.reflectionReadiness,
-      note: index === 0 ? "Student emailed rushil@example.com and used 555-123-4567." : entry.note
+      note:
+        index === 0
+          ? "Rushil Patel in grade 10 emailed rushil@example.com, used 555-123-4567, and wrote =IMPORTXML(\"https://example.com\",\"//title\")."
+          : entry.note
     }));
     const summary = summarizePilotEvidence(nextEntries);
     const exported = buildPilotEvidenceExport(nextEntries, summary);
@@ -153,7 +156,11 @@ describe("pilot evidence tracker", () => {
     expect(exported).not.toContain("Non-identifying note");
     expect(exported).not.toContain("[redacted email]");
     expect(exported).not.toContain("[redacted phone]");
+    expect(exported).not.toContain("Rushil Patel");
+    expect(exported).not.toContain("grade 10");
     expect(exported).not.toContain("rushil@example.com");
     expect(exported).not.toContain("555-123-4567");
+    expect(exported).not.toContain("=IMPORTXML");
+    expect(exported).not.toContain("https://example.com");
   });
 });
