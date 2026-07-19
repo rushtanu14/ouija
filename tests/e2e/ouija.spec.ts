@@ -17,14 +17,41 @@ async function importWaterFiltrationRows(page: Page) {
   await expect(page.getByText("Imported 4 rows using headers.")).toBeVisible();
 }
 
-test("student can analyze a sample experiment, edit table data, and see citations", async ({ page }) => {
-  test.setTimeout(120_000);
+async function openReactionRateJudgeRun(page: Page) {
   await page.addInitScript(() => window.localStorage.clear());
   await page.goto("/?judge=1");
-
   await page.getByRole("button", { name: "Reaction Rate" }).click();
   await expect(page.getByRole("heading", { name: "Reaction Rate vs Temperature" })).toBeVisible();
   await expect(page.getByLabel("View mode").getByRole("button", { name: "Judge" })).toHaveAttribute("aria-pressed", "true");
+}
+
+async function fillPilotEvidenceAndReflections(page: Page) {
+  await importReactionRateRows(page);
+  await page.getByLabel("Time to graph Observation 1").fill("90");
+  await page.getByLabel("Confidence before Observation 1").selectOption("2");
+  await page.getByLabel("Confidence after Observation 1").selectOption("4");
+  await page.getByLabel("Issue spotted Observation 1").selectOption("yes");
+  await page.getByLabel("Exit ticket Observation 1").selectOption("ready");
+  await page.locator('textarea[aria-label="Pilot note Observation 1"]').fill("Student found the graph warning before writing.");
+  await page
+    .getByLabel("Reflection answer Variable check")
+    .fill("The independent variable was water temperature and the dependent variable was reaction rate.");
+  await page
+    .getByLabel("Reflection answer Pattern check")
+    .fill("The graph shows rate increased as the water temperature increased, which matches the expected pattern.");
+  await page
+    .getByLabel("Reflection answer Next-step check")
+    .fill("I would repeat the hottest trial while keeping water volume and tablet size the same.");
+}
+
+async function expectNoHorizontalOverflow(page: Page) {
+  const overflow = await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth);
+  expect(overflow).toBe(false);
+}
+
+test("judge reaction run shows core science, model, and learning surfaces", async ({ page }) => {
+  await openReactionRateJudgeRun(page);
+
   await expect(page.getByRole("heading", { name: "Run Snapshot" })).toBeVisible();
   await expect(page.getByLabel("Run Snapshot").getByText("Rubric fit", { exact: true })).toBeVisible();
   await expect(page.getByLabel("Run Snapshot").getByText("Regression", { exact: true })).toBeVisible();
@@ -140,6 +167,21 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(page.getByLabel("Pilot evidence quality gate").getByText("Three anonymous observations")).toBeVisible();
   await expect(page.getByLabel("Pilot evidence quality gate").getByText("Privacy scan")).toBeVisible();
   await expect(page.locator(".pilot-evidence-boundary").getByText("Do not claim completed student testing yet")).toBeVisible();
+  await importReactionRateRows(page);
+  await page.getByLabel("Rate row import-1").fill("0.09");
+  await expect(page.getByLabel("Comparison insights").getByText("Rate trend does not match the expected temperature pattern")).toBeVisible();
+  await expect(page.getByLabel("Method Audit").getByText("Needs review")).toBeVisible();
+  await expect(page.getByLabel("Pattern Evidence Engine").getByText("Mixed evidence")).toBeVisible();
+  await expect(page.getByLabel("Learning Impact Loop").getByText("Review first")).toBeVisible();
+  await expect(page.getByLabel("Learning Exit Ticket").getByText("Review first", { exact: true })).toBeVisible();
+  await expect(page.getByLabel("Guided Lab Flow").getByText("Repeat or fix the flagged measurement before writing the claim.")).toBeVisible();
+  await expect(page.locator(".next-trial-summary > span").getByText("Fix warnings first", { exact: true })).toBeVisible();
+  await expect(page.getByLabel("Claim Coach").getByText(/warning to resolve/i)).toBeVisible();
+  await expectNoHorizontalOverflow(page);
+});
+
+test("pilot evidence and student reflections update the evidence packet", async ({ page }) => {
+  await openReactionRateJudgeRun(page);
   await importReactionRateRows(page);
   await expect(page.getByRole("button", { name: "Save current lab" })).toBeEnabled();
   await page.getByLabel("Time to graph Observation 1").fill("90");
@@ -271,6 +313,11 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(page.getByLabel("Pre-Lab Design Coach").getByText("Independent variable", { exact: true })).toBeVisible();
   await expect(page.getByLabel("Pre-Lab Design Coach").locator(".section-label").filter({ hasText: "Repeat plan" })).toBeVisible();
   await expect(page.getByLabel("Pre-Lab Design Coach").getByText("Source task", { exact: true })).toBeVisible();
+});
+
+test("judge regression, model card, and saved-lab proof are reachable", async ({ page }) => {
+  await openReactionRateJudgeRun(page);
+  await importReactionRateRows(page);
   await page.getByRole("link", { name: "Regression" }).click();
   await expect(page.getByLabel("Deterministic Regression Suite").getByText("9/9")).toBeVisible();
   await expect(page.getByLabel("Deterministic Regression Suite").getByText("checks passed")).toBeVisible();
@@ -316,6 +363,12 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await page.getByRole("link", { name: "Saved Labs" }).click();
   await expect(page.locator("#saved").getByText("Reaction Rate vs Temperature", { exact: true })).toBeVisible();
   await expect(page.locator("#saved").getByText(/Competitive .* 94\/100/)).toBeVisible();
+});
+
+test("MCP preview validates a route and settings reflect local evidence", async ({ page }) => {
+  await openReactionRateJudgeRun(page);
+  await fillPilotEvidenceAndReflections(page);
+  await page.getByRole("button", { name: "Save current lab" }).click();
   await page.getByRole("link", { name: "MCP Export" }).click();
   await expect(page.getByRole("heading", { name: "MCP Integration Coach" })).toBeVisible();
   await expect(page.locator(".mcp-summary").getByText("Server dry-run", { exact: true })).toBeVisible();
@@ -473,6 +526,11 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(page.getByLabel("Settings", { exact: true }).getByText("Server dry-run")).toBeVisible();
   await expect(page.getByLabel("Settings", { exact: true }).getByText("Reflections")).toBeVisible();
   await expect(page.getByLabel("Settings", { exact: true }).getByText("3/3")).toBeVisible();
+});
+
+test("judge brief exposes submission proof without blocking table editing flows", async ({ page }) => {
+  await openReactionRateJudgeRun(page);
+  await importReactionRateRows(page);
   await page.getByRole("link", { name: "Judge Brief" }).click();
   await expect(page.getByLabel("Judge Brief").getByText("AIYES Track 1")).toBeVisible();
   await expect(page.locator(".judge-status-grid").getByText("Hosted")).toHaveCount(4);
@@ -548,20 +606,40 @@ test("student can analyze a sample experiment, edit table data, and see citation
   await expect(page.getByLabel("Judge Brief").getByText("AIYES Judge Q&A Prep turns likely judging questions into proof-backed answers and no-overclaim boundaries.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Hosted deck and walkthrough are public.")).toBeVisible();
   await expect(page.getByLabel("Judge Brief").getByText("Low-confidence labs show a boundary warning.")).toBeVisible();
+  await expectNoHorizontalOverflow(page);
+});
 
-  const firstRate = page.getByLabel("Rate row c1");
-  await firstRate.fill("0.09");
-  await expect(page.getByLabel("Comparison insights").getByText("Rate trend does not match the expected temperature pattern")).toBeVisible();
-  await expect(page.getByLabel("Method Audit").getByText("Needs review")).toBeVisible();
-  await expect(page.getByLabel("Pattern Evidence Engine").getByText("Mixed evidence")).toBeVisible();
-  await expect(page.getByLabel("Learning Impact Loop").getByText("Review first")).toBeVisible();
-  await expect(page.getByLabel("Learning Exit Ticket").getByText("Review first", { exact: true })).toBeVisible();
-  await expect(page.getByLabel("Guided Lab Flow").getByText("Repeat or fix the flagged measurement before writing the claim.")).toBeVisible();
-  await expect(page.locator(".next-trial-summary > span").getByText("Fix warnings first", { exact: true })).toBeVisible();
-  await expect(page.getByLabel("Claim Coach").getByText(/warning to resolve/i)).toBeVisible();
+test("production build smoke covers judge, provenance, storage, and MCP preview @prod-smoke", async ({ page }) => {
+  await page.addInitScript(() => window.localStorage.clear());
+  await page.goto("/?judge=1");
 
-  const overflow = await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth);
-  expect(overflow).toBe(false);
+  await page.getByRole("button", { name: "Reaction Rate" }).click();
+  await expect(page.getByRole("heading", { name: "Reaction Rate vs Temperature" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Judge Demo Path" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "AI Runtime Proof" })).toBeVisible();
+  await expect(page.getByLabel("AI Runtime Proof").getByText("Deterministic fallback ready")).toBeVisible();
+  await expect(page.locator(".analysis-panel .demo-sample-banner").getByText("DEMO SAMPLE - not student evidence.")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Save current lab" })).toBeDisabled();
+
+  await importReactionRateRows(page);
+  await expect(page.locator(".analysis-panel .demo-sample-banner")).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Save current lab" })).toBeEnabled();
+  await page.getByRole("button", { name: "Save current lab" }).click();
+  await page.getByRole("link", { name: "Saved Labs" }).click();
+  await expect(page.getByLabel("Browser storage status").getByText("Storage saved")).toBeVisible();
+  await expect(page.locator(".saved-lab-card").filter({ hasText: "Reaction Rate vs Temperature" })).toBeVisible();
+
+  await page.getByRole("link", { name: "MCP Export" }).click();
+  await expect(page.getByRole("heading", { name: "MCP Integration Coach" })).toBeVisible();
+  await expect(page.locator(".mcp-summary").getByText("Server dry-run", { exact: true })).toBeVisible();
+  await page.locator(".mcp-action-card").filter({ hasText: "Run Scholar claim check" }).getByRole("button", { name: "Validate route" }).click();
+  await expect(page.getByLabel("MCP export dry-run result").getByText("Dry-run passed", { exact: true })).toBeVisible();
+  await expect(page.getByLabel("MCP session ticket result").getByText("Session dry-run", { exact: true })).toBeVisible();
+
+  await page.getByRole("link", { name: "Judge Brief" }).click();
+  await expect(page.getByLabel("Judge Brief").getByText("AIYES Track 1")).toBeVisible();
+  await expect(page.getByLabel("AIYES Submission Checklist").getByText("Submission hub")).toBeVisible();
+  await expectNoHorizontalOverflow(page);
 });
 
 test("judge mode shows a top award radar with honest win gaps", async ({ page }) => {
