@@ -1,4 +1,4 @@
-export type StorageResult<T> = { ok: true; value: T } | { ok: false; value: T; error: string };
+export type StorageResult<T> = { ok: true; value: T } | { ok: false; error: string };
 
 export interface BrowserStorageLike {
   getItem(key: string): string | null;
@@ -8,22 +8,23 @@ export interface BrowserStorageLike {
 export function readStorageList<T>(
   storage: BrowserStorageLike | null | undefined,
   key: string,
-  normalizeItem: (value: unknown) => T | null,
-  fallback: T[]
+  normalizeItem: (value: unknown) => T | null
 ): StorageResult<T[]> {
   if (!storage) {
-    return { ok: true, value: fallback };
+    return {
+      ok: false,
+      error: "Browser storage is unavailable. The app will keep working without loading saved entries."
+    };
   }
 
   try {
     const raw = storage.getItem(key);
-    if (!raw) return { ok: true, value: fallback };
+    if (!raw) return { ok: true, value: [] };
 
     const parsed = JSON.parse(raw);
     if (!Array.isArray(parsed)) {
       return {
         ok: false,
-        value: fallback,
         error: "Saved browser data had an unexpected shape and was ignored."
       };
     }
@@ -35,7 +36,6 @@ export function readStorageList<T>(
   } catch {
     return {
       ok: false,
-      value: fallback,
       error: "Unable to read saved browser data. The app will keep working without loading saved entries."
     };
   }
@@ -44,16 +44,18 @@ export function readStorageList<T>(
 export function readStorageValue<T>(
   storage: BrowserStorageLike | null | undefined,
   key: string,
-  normalizeValue: (value: unknown) => T,
-  fallback: T
-): StorageResult<T> {
+  normalizeValue: (value: unknown) => T
+): StorageResult<T | null> {
   if (!storage) {
-    return { ok: true, value: fallback };
+    return {
+      ok: false,
+      error: "Browser storage is unavailable. The app will keep working without loading saved entries."
+    };
   }
 
   try {
     const raw = storage.getItem(key);
-    if (!raw) return { ok: true, value: fallback };
+    if (!raw) return { ok: true, value: null };
 
     return {
       ok: true,
@@ -62,7 +64,6 @@ export function readStorageValue<T>(
   } catch {
     return {
       ok: false,
-      value: fallback,
       error: "Unable to read saved browser data. The app will keep working without loading saved entries."
     };
   }
@@ -77,7 +78,6 @@ export function writeStorageValue(storage: BrowserStorageLike | null | undefined
   } catch {
     return {
       ok: false,
-      value: null,
       error: "Unable to save browser data. Your current work remains visible, but it may not persist after refresh."
     };
   }

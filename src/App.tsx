@@ -174,6 +174,11 @@ function getInitialViewMode(): ViewMode {
 export function App() {
   const [savedLabsLoadResult] = useState(() => loadSavedLabs());
   const [pilotEvidenceLoadResult] = useState(() => loadPilotEvidenceEntries());
+  const initialSavedLabs = savedLabsLoadResult.ok ? savedLabsLoadResult.value : [];
+  const initialPilotEvidenceEntries =
+    pilotEvidenceLoadResult.ok && pilotEvidenceLoadResult.value
+      ? pilotEvidenceLoadResult.value
+      : createInitialPilotEvidenceEntries();
   const [description, setDescription] = useState(initialPrompt);
   const [learningLevel, setLearningLevel] = useState<LearningLevel>("middle");
   const [viewMode, setViewMode] = useState<ViewMode>(getInitialViewMode);
@@ -182,8 +187,8 @@ export function App() {
   const [rows, setRows] = useState<StudentDataRow[]>([]);
   const [reflectionAnswers, setReflectionAnswers] = useState<StudentReflectionAnswers>({});
   const [masteryAnswers, setMasteryAnswers] = useState<ConceptMasteryAnswerMap>({});
-  const [savedLabs, setSavedLabs] = useState<SavedLab[]>(savedLabsLoadResult.value);
-  const [pilotEvidenceEntries, setPilotEvidenceEntries] = useState<PilotEvidenceEntry[]>(pilotEvidenceLoadResult.value);
+  const [savedLabs, setSavedLabs] = useState<SavedLab[]>(initialSavedLabs);
+  const [pilotEvidenceEntries, setPilotEvidenceEntries] = useState<PilotEvidenceEntry[]>(initialPilotEvidenceEntries);
   const [persistenceStatus, setPersistenceStatus] = useState<PersistenceStatus | null>(() =>
     firstStorageWarning(savedLabsLoadResult, pilotEvidenceLoadResult)
   );
@@ -4951,8 +4956,8 @@ function getActiveDataOrigin(origin: SavedDataOrigin): DataOrigin {
 }
 
 function loadSavedLabs(): StorageResult<SavedLab[]> {
-  const result = readStorageList(getBrowserLocalStorage(), savedLabsKey, normalizeSavedLab, []);
-  return result.ok ? { ok: true, value: result.value.slice(0, 6) } : { ...result, value: result.value.slice(0, 6) };
+  const result = readStorageList(getBrowserLocalStorage(), savedLabsKey, normalizeSavedLab);
+  return result.ok ? { ok: true, value: result.value.slice(0, 6) } : result;
 }
 
 function normalizeSavedLab(savedLab: unknown): SavedLab | null {
@@ -4997,12 +5002,11 @@ function normalizeSavedDataOrigin(value: unknown): SavedDataOrigin {
   return "legacy_unknown";
 }
 
-function loadPilotEvidenceEntries(): StorageResult<PilotEvidenceEntry[]> {
+function loadPilotEvidenceEntries(): StorageResult<PilotEvidenceEntry[] | null> {
   const result = readStorageValue(
     getBrowserLocalStorage(),
     pilotEvidenceKey,
-    normalizePilotEvidenceEntries,
-    createInitialPilotEvidenceEntries()
+    normalizePilotEvidenceEntries
   );
 
   return result.ok

@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { readStorageList, writeStorageValue } from "../src/lib/browserStorage";
+import { readStorageList, readStorageValue, writeStorageValue } from "../src/lib/browserStorage";
 
 interface FakeEntry {
   id: string;
@@ -15,11 +15,11 @@ describe("browser storage helpers", () => {
       setItem: vi.fn()
     };
 
-    const result = readStorageList(storage, "ouija:test", normalizeEntry, []);
+    const result = readStorageList(storage, "ouija:test", normalizeEntry);
 
     expect(result.ok).toBe(false);
     if (result.ok) throw new Error("Expected blocked storage read to fail.");
-    expect(result.value).toEqual([]);
+    expect(result).not.toHaveProperty("value");
     expect(result.error).toContain("Unable to read saved browser data");
   });
 
@@ -29,10 +29,33 @@ describe("browser storage helpers", () => {
       setItem: vi.fn()
     };
 
-    const result = readStorageList(storage, "ouija:test", normalizeEntry, []);
+    const result = readStorageList(storage, "ouija:test", normalizeEntry);
 
     expect(result.ok).toBe(true);
+    if (!result.ok) throw new Error("Expected storage read to succeed.");
     expect(result.value).toEqual([{ id: "a", label: "Saved" }]);
+  });
+
+  it("returns an empty successful list when no saved entry exists", () => {
+    const storage = {
+      getItem: vi.fn(() => null),
+      setItem: vi.fn()
+    };
+
+    const result = readStorageList(storage, "ouija:test", normalizeEntry);
+
+    expect(result).toEqual({ ok: true, value: [] });
+  });
+
+  it("returns null for missing singleton storage so callers can construct defaults", () => {
+    const storage = {
+      getItem: vi.fn(() => null),
+      setItem: vi.fn()
+    };
+
+    const result = readStorageValue(storage, "ouija:test", (value) => value);
+
+    expect(result).toEqual({ ok: true, value: null });
   });
 
   it("returns a storage result instead of throwing when quota writes fail", () => {
@@ -47,6 +70,7 @@ describe("browser storage helpers", () => {
 
     expect(result.ok).toBe(false);
     if (result.ok) throw new Error("Expected blocked storage write to fail.");
+    expect(result).not.toHaveProperty("value");
     expect(result.error).toContain("Unable to save browser data");
   });
 });
