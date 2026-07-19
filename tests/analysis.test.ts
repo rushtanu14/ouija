@@ -1,6 +1,13 @@
 import { describe, expect, it } from "vitest";
 import { analyzeExperiment, evaluateRows, matchExperiment, refreshResultForRows } from "../src/lib/analysis";
 
+function collectGeneratedStrings(value: unknown): string[] {
+  if (typeof value === "string") return [value];
+  if (!value || typeof value !== "object") return [];
+  if (Array.isArray(value)) return value.flatMap((item) => collectGeneratedStrings(item));
+  return Object.values(value).flatMap((item) => collectGeneratedStrings(item));
+}
+
 describe("experiment matching", () => {
   it("identifies the supported middle/high school experiment types", () => {
     expect(matchExperiment("launch a ball at different angles and measure range").template.id).toBe("projectile-motion");
@@ -93,7 +100,7 @@ describe("fallback analysis", () => {
       "server-api-key"
     ]);
     expect(result.dataHandlingLedger.flows.some((flow) => flow.label === "Student data" && flow.storage.includes("Browser"))).toBe(true);
-    expect(result.dataHandlingLedger.safeguards).toContain("API key stays server-side; the browser never receives OPENAI_API_KEY.");
+    expect(result.dataHandlingLedger.safeguards.some((safeguard) => safeguard.includes("API key stays server-side; the browser never receives OPENAI_API_KEY"))).toBe(true);
     expect(result.dataHandlingLedger.studentRights).toContain("Students can clear saved labs from Settings.");
     expect(result.dataHandlingLedger.judgeTakeaway).toContain("privacy-preserving");
     expect(result.groundingAudit.status).toBe("source_backed");
@@ -259,6 +266,25 @@ describe("fallback analysis", () => {
     expect(result.trackEvidence.criteria.some((criterion) => criterion.id === "student-pilot-study" && criterion.status === "checked")).toBe(true);
     expect(result.trackEvidence.criteria.some((criterion) => criterion.id === "safety-responsibility" && criterion.status === "checked")).toBe(true);
     expect(result.trackEvidence.criteria.some((criterion) => criterion.id === "data-ethics" && criterion.status === "checked")).toBe(true);
+  });
+
+  it("keeps generated external-grounding copy on the strict opt-in boundary", () => {
+    const result = analyzeExperiment({
+      description: "We launched a ball at angles and measured range."
+    });
+    const generatedText = collectGeneratedStrings(result).join("\n");
+
+    expect(generatedText).toContain("explicit per-run opt-in");
+    expect(generatedText).toContain("OUIJA_EXTERNAL_GROUNDING_ENABLED=true");
+    expect(generatedText).toContain("server OPENAI_API_KEY");
+    expect(generatedText).toContain("non-production development mode");
+    expect(generatedText).toContain("public production stays deterministic fallback-only");
+    expect(generatedText).not.toMatch(
+      /when credentials are configured|can be enabled server-side|optional OpenAI web-search enrichment|optional web-search grounding|OpenAI web search can enrich citations server-side when configured|When `OPENAI_API_KEY` is configured/i
+    );
+    expect(generatedText).not.toMatch(
+      /(?:when|if)\s+(?:an?\s+)?(?:OPENAI_API_KEY|API key|credentials?)\s+(?:is|are)?\s*(?:configured|set|present|exists).{0,120}(?:web-search|web search|external grounding|enrich)/i
+    );
   });
 
   it("supports plant growth light-color experiments as a full template", () => {

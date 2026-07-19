@@ -180,7 +180,7 @@ describe("POST /api/analyze", () => {
     expect(response.body.dataHandlingLedger.status).toBe("privacy_preserving");
     expect(response.body.dataHandlingLedger.score).toBeGreaterThanOrEqual(90);
     expect(response.body.dataHandlingLedger.flows.some((flow: { id: string }) => flow.id === "local-snapshot")).toBe(true);
-    expect(response.body.dataHandlingLedger.safeguards).toContain("API key stays server-side; the browser never receives OPENAI_API_KEY.");
+    expect(response.body.dataHandlingLedger.safeguards.some((safeguard: string) => safeguard.includes("API key stays server-side; the browser never receives OPENAI_API_KEY"))).toBe(true);
     expect(response.body.aiEvaluationHarness.summary).toContain("AI evaluation checks");
     expect(response.body.aiEvaluationHarness.checks.some((check: { id: string }) => check.id === "coverage-benchmark")).toBe(true);
     expect(response.body.aiEvaluationHarness.judgeSignal).toContain("Judges");

@@ -36,6 +36,8 @@ import type {
 } from "./types.js";
 
 const INTEGRITY_NOTICE = "Hints, checks, and explanations only. Ouija will not write the full lab report or final conclusion for you.";
+const EXTERNAL_GROUNDING_BOUNDARY =
+  "External web-search grounding requires explicit per-run opt-in, OUIJA_EXTERNAL_GROUNDING_ENABLED=true, a server OPENAI_API_KEY, and non-production development mode; public production stays deterministic fallback-only.";
 
 interface TemplateScore {
   template: ExperimentTemplate;
@@ -1342,8 +1344,8 @@ export function buildGroundingAudit(
         status: groundingMode === "web_enriched" ? "verified" : "review",
         detail:
           groundingMode === "web_enriched"
-            ? "Server-side OpenAI web search enriched the source trail; the API key stays out of the browser."
-            : "Built-in trusted references keep the app demoable without credentials; OpenAI web-search enrichment can be enabled server-side."
+            ? `Server-side OpenAI web search enriched the source trail under the strict gate. ${EXTERNAL_GROUNDING_BOUNDARY}`
+            : `Built-in trusted references keep the app demoable without credentials. ${EXTERNAL_GROUNDING_BOUNDARY}`
       },
       {
         id: "agreement",
@@ -1366,8 +1368,8 @@ export function buildGroundingAudit(
     studentTask: `Open one cited source and explain, in your own words, how it supports the ${formatColumnName(template, expectedResult.xKey)} to ${formatColumnName(template, expectedResult.yKey)} pattern.`,
     citationNote:
       groundingMode === "web_enriched"
-        ? "Web citations are extracted server-side and rendered as clickable links."
-        : "Fallback citations are curated classroom references; web enrichment can replace or add citations when credentials are configured."
+        ? `Web citations are extracted server-side and rendered as clickable links after the strict gate passes. ${EXTERNAL_GROUNDING_BOUNDARY}`
+        : `Fallback citations are curated classroom references. ${EXTERNAL_GROUNDING_BOUNDARY}`
   };
 }
 
@@ -2277,8 +2279,8 @@ function buildModelStrategy(
         value: groundingMode === "web_enriched" ? "Web enriched" : "Trusted fallback",
         detail:
           groundingMode === "web_enriched"
-            ? "Expected-result explanation is enriched with server-side web-search citations."
-            : `${sources.length} trusted built-in citation${sources.length === 1 ? "" : "s"} keep the demo reliable without credentials.`
+            ? `Expected-result explanation is enriched with server-side web-search citations after the strict gate passes. ${EXTERNAL_GROUNDING_BOUNDARY}`
+            : `${sources.length} trusted built-in citation${sources.length === 1 ? "" : "s"} keep the demo reliable without credentials. ${EXTERNAL_GROUNDING_BOUNDARY}`
       },
       {
         label: "Grounding audit",
@@ -2311,7 +2313,7 @@ function buildModelStrategy(
       "Low-confidence descriptions stay visibly marked as closest supported matches.",
       "Grounding Audit checks citation visibility, source agreement, and mixed-evidence boundaries before students use the expected pattern.",
       "AI Evaluation Harness scores classifier confidence, coverage, grounding, validators, safety, and fallback behavior before the run is used as proof.",
-      "OpenAI API keys stay server-side; fallback references keep the app demoable without credentials.",
+      `OpenAI API keys stay server-side, but key presence alone never enables web-search grounding. ${EXTERNAL_GROUNDING_BOUNDARY}`,
       "Data validators, Method Audit, Pattern Evidence Engine, Reliability Coach, Safety Coach, and Next Trial Planner run after classification.",
       "Claim Coach and Evidence Packet keep final conclusions blank for academic integrity."
     ]
@@ -3064,7 +3066,7 @@ function buildDataHandlingLedger(groundingMode: AnalyzeResult["groundingStatus"]
       id: "grounding-sources",
       label: "Grounding sources",
       purpose: "Show visible citations and source agreement for the expected result.",
-      storage: usesServerSearch ? "Server may request web-search snippets for the run; fallback sources are bundled in the app." : "Trusted fallback source metadata is bundled in the app.",
+      storage: usesServerSearch ? `Server may request web-search snippets for the run only after the strict gate passes. ${EXTERNAL_GROUNDING_BOUNDARY}` : `Trusted fallback source metadata is bundled in the app. ${EXTERNAL_GROUNDING_BOUNDARY}`,
       retention: "Citations are returned in the analysis result and Evidence Packet; Ouija does not create source logs.",
       studentControl: "Students can open citations and decide which source evidence to use in their own explanation.",
       status: "protected"
@@ -3072,7 +3074,7 @@ function buildDataHandlingLedger(groundingMode: AnalyzeResult["groundingStatus"]
     {
       id: "server-api-key",
       label: "Server API key",
-      purpose: "Enable optional OpenAI web-search enrichment without exposing credentials to students.",
+      purpose: `Keep OpenAI credentials server-only while enforcing the external-grounding gate. ${EXTERNAL_GROUNDING_BOUNDARY}`,
       storage: "Environment variable on the server only.",
       retention: "Never stored in browser state, saved labs, Evidence Packet, or API responses.",
       studentControl: "Students do not need credentials to use the deterministic fallback experience.",
@@ -3084,12 +3086,12 @@ function buildDataHandlingLedger(groundingMode: AnalyzeResult["groundingStatus"]
     status: "privacy_preserving",
     score: usesServerSearch ? 94 : 96,
     summary: usesServerSearch
-      ? "Student descriptions can be enriched through server-side web search, while table data and saved labs remain student-controlled."
-      : "Ouija works with built-in references, browser-local saved labs, and no server database for student lab data.",
+      ? `Student descriptions can be enriched through server-side web search only after the strict gate passes, while table data and saved labs remain student-controlled. ${EXTERNAL_GROUNDING_BOUNDARY}`
+      : `Ouija works with built-in references, browser-local saved labs, and no server database for student lab data. ${EXTERNAL_GROUNDING_BOUNDARY}`,
     flows,
     safeguards: [
       "No account system or teacher dashboard is required for the student workflow.",
-      "API key stays server-side; the browser never receives OPENAI_API_KEY.",
+      `API key stays server-side; the browser never receives OPENAI_API_KEY, and key presence alone never enables web-search grounding. ${EXTERNAL_GROUNDING_BOUNDARY}`,
       "Evidence Packet exports reasoning scaffolds without hidden personal identifiers.",
       "Saved labs are limited to six browser-local snapshots and can be deleted by the student.",
       "Academic-integrity prompts keep final claims blank instead of producing a complete lab report."
@@ -3139,8 +3141,8 @@ function buildOfficialRubricFit(
       : `${errorCount} error${errorCount === 1 ? "" : "s"} and ${warningCount} warning${warningCount === 1 ? "" : "s"} stay visible before the student writes a claim.`;
   const sourceMode =
     groundingMode === "web_enriched"
-      ? "server-side OpenAI web-search enrichment"
-      : "trusted built-in science references with optional OpenAI web-search enrichment";
+      ? `strictly gated server-side OpenAI web-search enrichment (${EXTERNAL_GROUNDING_BOUNDARY})`
+      : `trusted built-in science references; ${EXTERNAL_GROUNDING_BOUNDARY}`;
   const lowConfidence = matchQuality === "closest_supported" || confidence < 0.6;
   const aiReady = modelStrategy.candidates.length >= 3 && modelStrategy.signals.length >= 4 && sources.length > 0;
   const uxBlocked = guidedFlow.steps.some((step) => step.status === "blocked") || labBrief.status === "blocked";
@@ -3287,7 +3289,7 @@ function buildAiyesValuesFit(
       id: "connectivity",
       label: "Connectivity",
       status: sourceStatus,
-      evidence: `${sources.length} visible source${sources.length === 1 ? "" : "s"}, Grounding Audit score ${groundingAudit.score}/100, ${groundingMode === "web_enriched" ? "server-side web search" : "trusted fallback"} grounding, and Composio handoff planning connect lab evidence to outside systems.`,
+      evidence: `${sources.length} visible source${sources.length === 1 ? "" : "s"}, Grounding Audit score ${groundingAudit.score}/100, ${groundingMode === "web_enriched" ? "strictly gated server-side web search" : "trusted fallback"} grounding, and Composio handoff planning connect lab evidence to outside systems. ${EXTERNAL_GROUNDING_BOUNDARY}`,
       studentAction: "Open the citations and only enable the export route that your teacher actually needs."
     },
     {
@@ -3492,8 +3494,8 @@ function buildTrackEvidence(
         status: groundingMode === "web_enriched" || sources.length > 0 ? "checked" : "review",
         detail:
           groundingMode === "web_enriched"
-            ? `Hybrid classifier plus OpenAI web-search enrichment, source extraction, Grounding Audit ${groundingAudit.score}/100, row checks, and integrity guard.`
-            : `Hybrid classifier, candidate ranking, deterministic science templates, trusted citations, Grounding Audit ${groundingAudit.score}/100, row checks, and optional OpenAI web-search enrichment.`
+            ? `Hybrid classifier plus strictly gated OpenAI web-search enrichment, source extraction, Grounding Audit ${groundingAudit.score}/100, row checks, and integrity guard. ${EXTERNAL_GROUNDING_BOUNDARY}`
+            : `Hybrid classifier, candidate ranking, deterministic science templates, trusted citations, Grounding Audit ${groundingAudit.score}/100, row checks, and fallback-first integrity guard. ${EXTERNAL_GROUNDING_BOUNDARY}`
       },
       {
         id: "source-grounding",
