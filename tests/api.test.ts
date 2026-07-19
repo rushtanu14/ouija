@@ -34,6 +34,23 @@ const forbiddenMcpFields = {
   pilotNotes: "observer noted a direct identifier",
   finalClaim: "This is the student's final claim."
 };
+const mcpRouteContractCases: Array<{ actionId: McpBridgePayloadActionId; category: McpBridgePayload["category"] }> = [
+  { actionId: "composio-search-source-audit", category: "source" },
+  { actionId: "composio-scholar-claim-check", category: "source" },
+  { actionId: "semanticscholar-reference-check", category: "source" },
+  { actionId: "composio-browser-source-capture", category: "source" },
+  { actionId: "deepwiki-source-proof", category: "source" },
+  { actionId: "canvas-assignment-context", category: "assignment_context" },
+  { actionId: "google-docs-evidence-packet", category: "document_export" },
+  { actionId: "google-slides-submission-deck", category: "deck_export" },
+  { actionId: "google-sheets-data-log", category: "table_export" },
+  { actionId: "google-drive-portfolio-archive", category: "portfolio_archive" },
+  { actionId: "google-classroom-prelab-checkpoint", category: "classroom_checkpoint" },
+  { actionId: "google-forms-readiness-check", category: "readiness_form" },
+  { actionId: "google-calendar-next-trial-reminder", category: "calendar_reminder" },
+  { actionId: "gmail-teacher-review-draft", category: "teacher_review_draft" },
+  { actionId: "notion-learning-record", category: "learning_record" }
+];
 
 afterEach(() => {
   restoreEnv("OPENAI_API_KEY", originalKey);
@@ -402,24 +419,39 @@ describe("Composio MCP bridge API", () => {
     expect(response.body.checks.find((check: { id: string }) => check.id === "credentials")?.status).toBe("review");
   });
 
-  it("rejects forbidden source-route fields instead of silently trimming overbroad payloads", async () => {
+  it("rejects forbidden private fields for every MCP payload category instead of silently trimming", async () => {
     clearComposioEnv();
     const app = createApp();
-    const response = await request(app)
-      .post("/api/mcp/export")
-      .send({
-        actionId: "composio-search-source-audit",
-        consent: true,
-        payload: {
-          ...mcpPayload("composio-search-source-audit", analyzeExperiment({ description: "Projectile launch angle and measured range." })),
-          ...forbiddenMcpFields
-        }
-      })
-      .expect(400);
+    const result = analyzeExperiment({ description: "Projectile launch angle and measured range." });
 
-    expect(response.body.error).toBe("MCP payload fields are not allowed for this action.");
-    expect(JSON.stringify(response.body)).not.toContain("observer noted");
-    expect(JSON.stringify(response.body)).not.toContain("final claim");
+    for (const testCase of mcpRouteContractCases) {
+      const validResponse = await request(app)
+        .post("/api/mcp/export")
+        .send({
+          actionId: testCase.actionId,
+          consent: true,
+          payload: mcpPayload(testCase.actionId, result)
+        });
+      expect(validResponse.status, `${testCase.actionId} valid: ${JSON.stringify(validResponse.body)}`).toBe(200);
+      expect(validResponse.body.sanitizedPayload.payloadCategory).toBe(testCase.category);
+
+      const forbiddenResponse = await request(app)
+        .post("/api/mcp/export")
+        .send({
+          actionId: testCase.actionId,
+          consent: true,
+          payload: {
+            ...mcpPayload(testCase.actionId, result),
+            pilotNotes: forbiddenMcpFields.pilotNotes,
+            finalClaim: forbiddenMcpFields.finalClaim
+          }
+        });
+
+      expect(forbiddenResponse.status, `${testCase.actionId} forbidden: ${JSON.stringify(forbiddenResponse.body)}`).toBe(400);
+      expect(forbiddenResponse.body.error).toBe("MCP payload fields are not allowed for this action.");
+      expect(JSON.stringify(forbiddenResponse.body)).not.toContain("observer noted");
+      expect(JSON.stringify(forbiddenResponse.body)).not.toContain("final claim");
+    }
   });
 
   it("accepts only category-specific route payloads and keeps source routes metadata-only", async () => {
@@ -429,25 +461,7 @@ describe("Composio MCP bridge API", () => {
       description: "Projectile launch angle and measured range."
     });
 
-    const cases: Array<{ actionId: Parameters<typeof mcpPayload>[0]; category: McpBridgePayload["category"] }> = [
-      { actionId: "composio-search-source-audit", category: "source" },
-      { actionId: "composio-scholar-claim-check", category: "source" },
-      { actionId: "semanticscholar-reference-check", category: "source" },
-      { actionId: "composio-browser-source-capture", category: "source" },
-      { actionId: "deepwiki-source-proof", category: "source" },
-      { actionId: "canvas-assignment-context", category: "assignment_context" },
-      { actionId: "google-docs-evidence-packet", category: "document_export" },
-      { actionId: "google-slides-submission-deck", category: "deck_export" },
-      { actionId: "google-sheets-data-log", category: "table_export" },
-      { actionId: "google-drive-portfolio-archive", category: "portfolio_archive" },
-      { actionId: "google-classroom-prelab-checkpoint", category: "classroom_checkpoint" },
-      { actionId: "google-forms-readiness-check", category: "readiness_form" },
-      { actionId: "google-calendar-next-trial-reminder", category: "calendar_reminder" },
-      { actionId: "gmail-teacher-review-draft", category: "teacher_review_draft" },
-      { actionId: "notion-learning-record", category: "learning_record" }
-    ];
-
-    for (const testCase of cases) {
+    for (const testCase of mcpRouteContractCases) {
       const response = await request(app)
         .post("/api/mcp/export")
         .send({

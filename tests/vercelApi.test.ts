@@ -39,6 +39,27 @@ const composioEnvKeys = [
   ])
 ];
 const originalComposioEnv = new Map(composioEnvKeys.map((key) => [key, process.env[key]]));
+const forbiddenMcpFields = {
+  pilotNotes: "observer noted a direct identifier",
+  finalClaim: "This is the student's final claim."
+};
+const mcpRouteContractCases: Array<{ actionId: McpIntegrationActionId; category: McpBridgePayload["category"] }> = [
+  { actionId: "composio-search-source-audit", category: "source" },
+  { actionId: "composio-scholar-claim-check", category: "source" },
+  { actionId: "semanticscholar-reference-check", category: "source" },
+  { actionId: "composio-browser-source-capture", category: "source" },
+  { actionId: "deepwiki-source-proof", category: "source" },
+  { actionId: "canvas-assignment-context", category: "assignment_context" },
+  { actionId: "google-docs-evidence-packet", category: "document_export" },
+  { actionId: "google-slides-submission-deck", category: "deck_export" },
+  { actionId: "google-sheets-data-log", category: "table_export" },
+  { actionId: "google-drive-portfolio-archive", category: "portfolio_archive" },
+  { actionId: "google-classroom-prelab-checkpoint", category: "classroom_checkpoint" },
+  { actionId: "google-forms-readiness-check", category: "readiness_form" },
+  { actionId: "google-calendar-next-trial-reminder", category: "calendar_reminder" },
+  { actionId: "gmail-teacher-review-draft", category: "teacher_review_draft" },
+  { actionId: "notion-learning-record", category: "learning_record" }
+];
 
 afterEach(() => {
   mockResponsesCreate.mockReset();
@@ -330,6 +351,52 @@ describe("Vercel API functions", () => {
     expect(response.body.checks.find((check: { id: string }) => check.id === "payload")?.status).toBe("pass");
   });
 
+  it("enforces category-specific MCP route contracts through the serverless export function", () => {
+    clearComposioEnv();
+    const result = analyzeExperiment({
+      description: "Projectile launch angle and measured range."
+    });
+
+    for (const testCase of mcpRouteContractCases) {
+      const validResponse = createMockResponse();
+      mcpExportHandler(
+        {
+          method: "POST",
+          body: {
+            actionId: testCase.actionId,
+            consent: true,
+            payload: mcpPayload(testCase.actionId, result)
+          }
+        },
+        validResponse.res
+      );
+      expect(validResponse.statusCode, `${testCase.actionId} valid: ${JSON.stringify(validResponse.body)}`).toBe(200);
+      expect(validResponse.body.sanitizedPayload.payloadCategory).toBe(testCase.category);
+
+      const forbiddenResponse = createMockResponse();
+      mcpExportHandler(
+        {
+          method: "POST",
+          body: {
+            actionId: testCase.actionId,
+            consent: true,
+            payload: {
+              ...mcpPayload(testCase.actionId, result),
+              pilotNotes: forbiddenMcpFields.pilotNotes,
+              finalClaim: forbiddenMcpFields.finalClaim
+            }
+          }
+        },
+        forbiddenResponse.res
+      );
+
+      expect(forbiddenResponse.statusCode, `${testCase.actionId} forbidden: ${JSON.stringify(forbiddenResponse.body)}`).toBe(400);
+      expect(forbiddenResponse.body.error).toBe("MCP payload fields are not allowed for this action.");
+      expect(JSON.stringify(forbiddenResponse.body)).not.toContain("observer noted");
+      expect(JSON.stringify(forbiddenResponse.body)).not.toContain("final claim");
+    }
+  });
+
   it("prepares a Composio MCP session dry-run through the serverless function", async () => {
     clearComposioEnv();
     const result = analyzeExperiment({
@@ -549,6 +616,7 @@ function mcpPayload(actionId: McpIntegrationActionId, result: ReturnType<typeof 
   const variables = result.variables;
   const prompts = result.learningExitTicket.prompts.map((prompt) => prompt.studentPrompt);
   const setupChecks = result.preLabDesignCoach.setupChecks.map((check) => check.label);
+  const evidencePacket = buildEvidencePacket(result, result.rows, result.classification.title);
 
   if (
     actionId === "composio-search-source-audit"
@@ -585,6 +653,43 @@ function mcpPayload(actionId: McpIntegrationActionId, result: ReturnType<typeof 
     };
   }
 
+  if (actionId === "google-docs-evidence-packet") {
+    return {
+      category: "document_export",
+      title,
+      markdown: evidencePacket,
+      sourceUrls
+    };
+  }
+
+  if (actionId === "google-sheets-data-log") {
+    return {
+      category: "table_export",
+      title,
+      columns: result.columns.map((column) => column.key),
+      rows: result.rows
+    };
+  }
+
+  if (actionId === "google-drive-portfolio-archive") {
+    return {
+      category: "portfolio_archive",
+      title,
+      summary: `${result.classification.title} saved run archive`,
+      artifactUrls: sourceUrls
+    };
+  }
+
+  if (actionId === "google-classroom-prelab-checkpoint") {
+    return {
+      category: "classroom_checkpoint",
+      title,
+      setupChecks,
+      variablePlan: result.preLabDesignCoach.variablePlan,
+      sourceUrls
+    };
+  }
+
   if (actionId === "gmail-teacher-review-draft") {
     return {
       category: "teacher_review_draft",
@@ -601,6 +706,16 @@ function mcpPayload(actionId: McpIntegrationActionId, result: ReturnType<typeof 
       title,
       outline: ["Problem and student user", "AI workflow", "Evidence boundaries", "Student-owned next claim draft"],
       sourceUrls
+    };
+  }
+
+  if (actionId === "notion-learning-record") {
+    return {
+      category: "learning_record",
+      title,
+      status: result.trackEvidence.readiness,
+      nextAction: result.nextTrialPlan.nextMeasurement,
+      reflectionPrompts: prompts
     };
   }
 
